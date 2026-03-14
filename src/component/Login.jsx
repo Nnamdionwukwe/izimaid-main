@@ -29,7 +29,7 @@ export default function Login({ onSuccess }) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            id_token: tokenResponse.access_token,
+            access_token: tokenResponse.access_token,
             role,
           }),
         });
@@ -76,7 +76,7 @@ export default function Login({ onSuccess }) {
         <div className={styles.leftGrid} />
 
         <div className={styles.brand}>
-          <h1 className={styles.brandName}>IziMaid</h1>
+          <h1 className={styles.brandName}>Deusizi Sparkle</h1>
           <p className={styles.brandTagline}>Home services, simplified</p>
         </div>
 
@@ -94,7 +94,7 @@ export default function Login({ onSuccess }) {
           </p>
           <div className={styles.leftStats}>
             <div className={styles.stat}>
-              <div className={styles.statNumber}>2,400+</div>
+              <div className={styles.statNumber}>50+</div>
               <div className={styles.statLabel}>Verified maids</div>
             </div>
             <div className={styles.stat}>
@@ -102,14 +102,14 @@ export default function Login({ onSuccess }) {
               <div className={styles.statLabel}>Satisfaction</div>
             </div>
             <div className={styles.stat}>
-              <div className={styles.statNumber}>12k+</div>
+              <div className={styles.statNumber}>100+</div>
               <div className={styles.statLabel}>Homes cleaned</div>
             </div>
           </div>
         </div>
 
         <div className={styles.leftFooter}>
-          © {new Date().getFullYear()} IziMaid · Lagos, Nigeria
+          © {new Date().getFullYear()} Deusizi Sparkle · Abuja, Lagos, Nigeria
         </div>
       </div>
 
