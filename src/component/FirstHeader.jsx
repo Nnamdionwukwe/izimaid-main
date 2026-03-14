@@ -5,12 +5,12 @@ export default function FirstHeader() {
     <div>
       <div className={styles.header1}>
         <a className={styles.headerP} href="http://izibest.com">
-          Sparkle
+          Deuseizi Interiors
         </a>
       </div>
       <div className={styles.header2}>
         <a className={styles.headerP} href="http://izibest.com">
-          Sparkle
+          Deuseizi Interiors
         </a>
       </div>
     </div>
