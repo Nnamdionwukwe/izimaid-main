@@ -1,0 +1,115 @@
+@media screen and (min-width: 20px) {
+  .header {
+    background-color: white;
+    color: black;
+  }
+
+  .SubMain {
+    border-bottom: 1px solid rgb(230, 226, 226);
+    margin-top: 10px;
+  }
+
+  .SubHeader1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: -8px;
+    margin-right: -8px;
+  }
+
+  .SubHeader2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .SubHeader2 div {
+    margin-left: 10px;
+  }
+
+  .thirdHeader2 {
+    display: none;
+  }
+
+  .logo {
+    width: 60px;
+    padding-left: 20px;
+    cursor: pointer;
+  }
+
+  .hamburger {
+    padding-right: 20px;
+    font-size: 20px;
+    /* IF YOU WANT THE SIDE BAR TO BE A TRANPERANT 
+    OVER THE MAIN PAGE USE THE CODE BELOW */
+
+    /* opacity: 0.8; */
+  }
+
+  .hamburger i {
+    cursor: pointer;
+  }
+  /* 
+  .sideBarMain {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding-bottom: 1000px;
+    background-color: rgb(255, 255, 255);
+    overflow: scroll;
+    padding: 0px 20px;
+  } */
+
+  /* .SubMain {
+    border-bottom: 1px solid rgb(230, 226, 226);
+    margin-top: 10px;
+  }
+
+  .SubHeader2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sub1 {
+    display: flex;
+    background-color: rgb(150, 107, 7);
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    border-radius: 10px;
+    height: 50px;
+    margin-right: 20px;
+    cursor: pointer;
+  }
+
+  .sub2 {
+    display: flex;
+    background-color: rgb(150, 107, 7);
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    border-radius: 10px;
+    height: 50px;
+    margin-right: 20px;
+    cursor: pointer;
+  }
+
+  .sub1 i {
+    margin-right: 10px;
+    font-size: 18px;
+  }
+
+  .sub2 i {
+    margin-right: 10px;
+    font-size: 18px;
+  } */
+}

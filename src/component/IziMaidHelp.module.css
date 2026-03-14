@@ -1,0 +1,336 @@
+@media screen and (min-width: 20px) {
+  .main {
+    position: relative;
+    width: 100%;
+    height: 25em;
+  }
+
+  .main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cd p {
+    font-size: 20px;
+  }
+
+  .cd h1 {
+    display: flex;
+    justify-content: center;
+  }
+
+  .main2 {
+    flex: 1;
+    position: absolute;
+    top: 0;
+    background: rgb(235, 233, 233);
+    opacity: 0.9;
+    width: 92%;
+    height: 86%;
+    margin-left: 20px;
+    margin-top: 30px;
+    border-radius: 0.5em;
+    padding: 0em 0.2em 0em 0.5em;
+  }
+
+  .hello {
+    display: none;
+  }
+
+  .main2 h1 {
+    color: rgb(75, 65, 5);
+  }
+
+  .izibest {
+    display: flex;
+    justify-content: center;
+    padding: 0em 1.5em 0em 1em;
+    color: rgb(75, 65, 5);
+  }
+
+  .services {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+    margin: 50px 10px 0px 10px;
+    column-gap: 15px;
+  }
+
+  .mainDiv2 {
+    position: relative;
+    padding: 0em 1.3em 0em 1.3em;
+    display: flex;
+    align-items: center;
+    border-radius: 0.5em;
+    height: 75px;
+    cursor: pointer;
+    margin-bottom: 60px;
+    color: blue;
+    border: 1px solid rgb(198, 198, 201);
+    box-shadow: 2px 2px 19px 3px rgb(202, 200, 200);
+  }
+
+  .mainDiv3 {
+    position: relative;
+    padding: 0em 1.3em 0em 1.3em;
+    display: flex;
+    align-items: center;
+    border-radius: 0.5em;
+    height: 75px;
+    cursor: pointer;
+    margin-bottom: 60px;
+    color: blue;
+    border: 1px solid rgb(198, 198, 201);
+    box-shadow: 2px 2px 19px 3px rgb(202, 200, 200);
+  }
+
+  .mainDiv2 h4 {
+    margin-right: 5px;
+
+    color: blue;
+  }
+
+  .mainDiv2 h5:hover {
+    text-decoration: underline;
+  }
+
+  .mainDiv3 h5 {
+    margin-right: 0.9em;
+    width: 7em;
+    color: blue;
+  }
+
+  .mainDiv3 h5:hover {
+    text-decoration: underline;
+  }
+
+  .home {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    margin-left: 3.2em;
+    margin-top: -40px;
+  }
+
+  .home i {
+    font-size: 30px;
+    background: rgb(35, 12, 43);
+    padding: 12px;
+    border-radius: 100%;
+    color: rgb(243, 120, 140);
+  }
+
+  .home4 {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    margin-left: 3.2em;
+    margin-top: -40px;
+  }
+
+  .home4 i {
+    font-size: 30px;
+    background: rgb(35, 12, 43);
+    padding: 12px 14px 12px 14px;
+    border-radius: 100%;
+    color: rgb(243, 120, 140);
+  }
+
+  .home5 {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    margin-left: 3.2em;
+    margin-top: -40px;
+  }
+
+  .home5 i {
+    font-size: 30px;
+    background: rgb(35, 12, 43);
+    padding: 12px 16px 12px 16px;
+    border-radius: 100%;
+    color: rgb(243, 120, 140);
+  }
+}
+
+@media screen and (max-width: 778px) {
+  .grid {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 778px) {
+  .services {
+    display: none;
+  }
+
+  .gridMain {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 0px 10px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 35px;
+  }
+
+  .gridDiv {
+    position: relative;
+    width: 100%;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 6em;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    box-shadow: 2px 2px 19px 3px rgb(202, 200, 200);
+  }
+
+  .gridDiv img {
+    width: 90%;
+    height: 15em;
+    border-radius: 0.5em;
+    object-fit: cover;
+    padding: 1em;
+  }
+
+  .subDiv {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .subDiv h3 {
+    margin-top: -8px;
+    margin-bottom: -10px;
+    cursor: pointer;
+  }
+
+  .para {
+    color: gray;
+    font-size: 18px;
+  }
+
+  .p:hover {
+    text-decoration: underline;
+  }
+
+  .learnMore {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    color: rgb(49, 49, 95);
+    cursor: pointer;
+  }
+
+  .learnMore p {
+    margin-right: 10px;
+  }
+
+  .home2 {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+
+  .home2 i {
+    font-size: 30px;
+    background: rgb(35, 12, 43);
+    padding: 24px;
+    border-radius: 100%;
+    color: rgb(243, 120, 140);
+  }
+}
+
+@media screen and (min-width: 1192px) {
+  .main {
+    position: relative;
+    width: 100%;
+    height: 30em;
+  }
+
+  .main2 {
+    position: absolute;
+    top: 0;
+    background: rgb(235, 233, 233);
+    opacity: 0.9;
+    width: 52%;
+    height: 62%;
+    margin-top: 160px;
+    margin-left: 60px;
+    border-radius: 0.5em;
+    padding: 0em 0.2em 0em 1em;
+  }
+
+  .cd h1 {
+    display: flex;
+    justify-content: center;
+  }
+
+  .cd p {
+    display: flex;
+    justify-content: center;
+    padding: 0em 3em;
+    max-width: 1100px;
+  }
+
+  .hello {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    right: 0;
+    top: 0;
+    opacity: 0.8;
+    background: rgb(59, 59, 59);
+    border-bottom-left-radius: 0.5em;
+    padding: 1.5em;
+    margin-right: -1em;
+  }
+
+  .hello i {
+    font-size: 1.5em;
+    color: #ffff;
+    cursor: pointer;
+    margin-right: 25px;
+    width: 100%;
+  }
+
+  .gridMain {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 35px;
+    width: 100%;
+    padding: 0px 5em;
+  }
+
+  .gridDiv img {
+    width: 10em;
+    height: 10em;
+    border-radius: 0.5em;
+    object-fit: cover;
+    padding: 1em;
+  }
+
+  .gridDiv {
+    position: relative;
+    width: 100%;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 6em;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    box-shadow: 2px 2px 19px 3px rgb(202, 200, 200);
+  }
+}

@@ -1,0 +1,479 @@
+@media screen and (min-width: 20px) {
+  .mainDiv {
+    margin: 20px 10px 0px 10px;
+    padding: 25px 15px 0px 15px;
+    box-shadow: 1px 2px 3px 4px rgb(183, 183, 183);
+    border-radius: 5px;
+  }
+
+  .checkMarkMain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .checkMark {
+    border-radius: 100%;
+    padding: 5px 7.5px 5px 7px;
+    font-size: 10px;
+    background: rgb(19, 19, 103);
+    color: white;
+  }
+
+  .borderLine {
+    display: flex;
+    flex: 1;
+    border: 2px solid rgb(228, 228, 228);
+  }
+
+  .checkMark1 {
+    border-radius: 100%;
+    padding: 10px;
+    border: 2px solid rgb(228, 228, 228);
+  }
+
+  .started {
+    font-family: Arial, Helvetica, sans-serif sans-serif;
+    display: flex;
+    justify-content: center;
+    margin-top: -20px;
+    font-size: 20px;
+    color: rgb(19, 19, 103);
+    font-weight: bold;
+  }
+
+  .star {
+    font-family: Arial, Helvetica, sans-serif sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: rgb(95, 94, 94);
+  }
+
+  .type {
+    margin-bottom: -20px;
+    color: rgb(47, 47, 47);
+  }
+
+  .inputField {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    height: 40px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    border: 1px solid rgb(228, 228, 228);
+    color: rgb(80, 80, 80);
+    /* padding-left: 10px; */
+  }
+
+  .bedroomsDivMain {
+    display: flex;
+    align-items: center;
+    padding-bottom: 15px;
+    /* width: 100%; */
+  }
+
+  .bedroomsDiv {
+    width: 50%;
+    margin-right: 20px;
+  }
+
+  .name {
+    margin-bottom: -15px;
+  }
+
+  .bathroomsDiv {
+    width: 50%;
+  }
+
+  .inputField::placeholder {
+    padding-left: 10px;
+    font-size: 15px;
+  }
+
+  .yesDiv {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    color: rgb(66, 66, 66);
+    font-size: 17px;
+  }
+
+  .checkbox input {
+    width: 25px;
+    height: 25px;
+    margin-right: 15px;
+  }
+
+  .privacy {
+    font-size: 13px;
+    color: rgb(105, 105, 105);
+  }
+
+  .span {
+    text-decoration: underline;
+    cursor: pointer;
+    color: rgb(90, 85, 107);
+  }
+
+  .typeOfCleaning {
+    display: flex;
+    align-items: center;
+    margin-bottom: -10px;
+  }
+
+  .typeOfCleaning2 {
+    margin-bottom: -10px;
+  }
+
+  .radioButton {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+  }
+
+  .radioButton1 {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    width: 50%;
+  }
+
+  .radioButton2 {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    width: 60%;
+    cursor: pointer;
+  }
+
+  .radio2 {
+    width: 8px;
+    height: 8px;
+    border-radius: 100%;
+    border: 4px solid rgb(19, 19, 103);
+    margin-right: 10px;
+    cursor: pointer;
+  }
+
+  .radio:hover,
+  .radio2:hover {
+    cursor: pointer;
+  }
+
+  .radio {
+    width: 13px;
+    height: 13px;
+    border-radius: 100%;
+    border: 2px solid rgb(228, 228, 228);
+    margin-right: 10px;
+  }
+
+  .oneTime {
+    background: rgb(243, 243, 243);
+    padding: 0px 15px;
+    margin-top: 15px;
+    border-radius: 5px;
+  }
+
+  .oneTime2 {
+    padding: 0px 15px;
+    margin-top: 15px;
+    border-radius: 5px;
+  }
+
+  .select {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 45px;
+    border-radius: 5px;
+    border: 1px solid rgb(228, 228, 228);
+    color: rgb(80, 80, 80);
+    outline: none;
+    padding: 0px 10px;
+    cursor: pointer;
+  }
+
+  .select:hover {
+    background: rgb(19, 19, 103);
+    color: white;
+  }
+
+  .select option {
+    color: red;
+    padding: 10px;
+    outline: none;
+    border: none;
+  }
+
+  .selectBedRoomsMain {
+    position: absolute;
+    width: 40%;
+    background: rgb(227, 224, 224);
+    margin-top: -1px;
+    padding: 0px 12px 12px 12px;
+    border-radius: 5px;
+  }
+
+  .selectBedRooms {
+    background: rgb(200, 199, 199);
+    padding: 2px 10px 10px 10px;
+  }
+
+  .selectBedRooms p {
+    padding: 7px;
+    border-radius: 5px;
+    margin-bottom: -10px;
+    font-size: 13px;
+    font-weight: bold;
+    color: rgb(68, 68, 68);
+    padding-left: 20px;
+  }
+
+  .selectBedRooms p:hover {
+    background: rgb(19, 19, 103);
+    color: white;
+    cursor: pointer;
+  }
+
+  .image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    margin-top: 15px;
+    border-radius: 10px;
+  }
+
+  .fullMain {
+    background: rgb(249, 228, 231);
+    padding: 1px 20px 5px 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+
+  .full {
+    margin-bottom: -20px;
+  }
+
+  .checkMarkFooterDiv {
+    display: flex;
+    align-items: center;
+    margin-top: -15px;
+  }
+
+  .checkMarkFooter {
+    padding: 3px 5px 3px 5px;
+    background: rgb(203, 14, 140);
+    border-radius: 100%;
+    color: white;
+    margin-right: 10px;
+    font-size: 8px;
+  }
+
+  .submitButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    background: rgb(19, 19, 103);
+    margin-top: 20px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+  }
+
+  .submitButton:hover {
+    background: rgb(15, 15, 70);
+  }
+
+  .submitButton h4 {
+    margin-right: 10px;
+  }
+
+  .term {
+    color: gray;
+    margin-top: 30px;
+    margin-bottom: 0px;
+    padding-bottom: 25px;
+  }
+
+  .error {
+    font-size: 13px;
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+}
+
+@media screen and (min-width: 577px) {
+  .mainDiv {
+    margin: 50px 10px 0px 10px;
+  }
+
+  .checkMarkMain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* max-width: 600px; */
+    margin: 0px 60px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .mainDiv {
+    box-shadow: none;
+  }
+
+  .checkMarkMain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* max-width: 600px; */
+  }
+
+  .mainDivMain {
+    /* display: flex;
+    align-items: center; */
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .started {
+    display: flex;
+    justify-items: center;
+    margin-left: 10em;
+  }
+
+  .checkMarkMain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* max-width: 600px; */
+    margin: 20px 110px;
+  }
+
+  .mainDiv {
+    display: flex;
+    margin: 10px 10px 0px 10px;
+  }
+
+  .nameFlex {
+    display: flex;
+    align-items: center;
+  }
+
+  .inputField {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    height: 40px;
+    width: 310px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    border: 1px solid rgb(228, 228, 228);
+    color: rgb(80, 80, 80);
+    /* padding-left: 10px; */
+  }
+
+  .mainDivMain {
+    /* display: flex;
+    justify-content: center; */
+    margin: 40px 10px 0px 10px;
+    padding: 25px 25px 0px 25px;
+  }
+
+  .mainDivSub {
+    margin-right: 25px;
+  }
+
+  .nameFlexSub {
+    margin: 0px 0px 0px 15px;
+  }
+
+  .submitButton {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    height: 50px;
+    width: 200px;
+    background: rgb(19, 19, 103);
+    margin-top: 20px;
+    padding-left: 25px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+  }
+
+  .fullMain {
+    background: rgb(249, 228, 231);
+    padding: 1px 20px 5px 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    height: 470px;
+    width: 400px;
+    font-size: 14px;
+    font-weight: bold;
+    color: rgb(69, 68, 68);
+    margin-top: 50px;
+  }
+
+  .image {
+    height: 60px;
+    /* width: 200px; */
+    object-fit: cover;
+  }
+
+  .addressFull {
+    display: flex;
+    align-items: center;
+  }
+
+  .addressFullDivSub {
+    margin-left: 15px;
+  }
+}
+
+@media screen and (min-width: 1112px) {
+  .started {
+    display: flex;
+    justify-content: center;
+  }
+
+  .checkMarkMain {
+    margin: 20px 190px;
+  }
+
+  .mainDivMain {
+    margin: 0px 50px;
+  }
+
+  .mainDiv {
+    justify-content: center;
+    margin: 40px 10px 0px 10px;
+    padding: 25px 25px 0px 25px;
+    box-shadow: 1px 2px 3px 4px rgb(225, 224, 224);
+    border-radius: 5px;
+  }
+
+  .fullMain {
+    background: rgb(249, 228, 231);
+    padding: 1px 20px 5px 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    height: 400px;
+    width: 430px;
+    font-size: 13px;
+    font-weight: bold;
+    color: rgb(69, 68, 68);
+    margin-top: 50px;
+  }
+
+  .image {
+    height: 60px;
+    /* width: 200px; */
+    object-fit: cover;
+  }
+}

@@ -1,0 +1,197 @@
+@media screen and (min-width: 20px) {
+  .fixedHeader {
+    position: sticky;
+    top: 0;
+    right: 0;
+    left: 0;
+    background: #ffff;
+    z-index: 500;
+    margin-right: -8px;
+    margin-left: -5px;
+    height: 60px;
+  }
+
+  .SubHeader1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 90px;
+    margin-left: -8px;
+    margin-right: -8px;
+    border-bottom: 1px solid rgb(230, 226, 226);
+  }
+
+  .SubHeader2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sub2 {
+    display: flex;
+    flex-grow: 1;
+    background-color: rgb(187, 19, 47);
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border-radius: 10px;
+    height: 35px;
+    margin-right: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+  }
+
+  .sub2 i {
+    margin-right: 10px;
+    font-size: 12px;
+  }
+
+  .logo {
+    width: 100px;
+    height: 90px;
+    padding-left: 20px;
+    cursor: pointer;
+    margin-right: 0px;
+  }
+
+  .hamburger {
+    width: 100%;
+    padding-right: 10px;
+    /* font-size: 20px; */
+    /* IF YOU WANT THE SIDE BAR TO BE A TRANPERANT 
+    OVER THE MAIN PAGE USE THE CODE BELOW */
+
+    /* opacity: 0.8; */
+  }
+
+  .hamburger i {
+    cursor: pointer;
+  }
+  /* 
+  .sideBarMain {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding-bottom: 1000px;
+    background-color: rgb(255, 255, 255);
+    overflow: scroll;
+    padding: 0px 20px;
+  } */
+
+  /* .SubMain {
+    border-bottom: 1px solid rgb(230, 226, 226);
+    margin-top: 10px;
+  }
+
+  .SubHeader2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sub1 {
+    display: flex;
+    background-color: rgb(150, 107, 7);
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    border-radius: 10px;
+    height: 50px;
+    margin-right: 20px;
+    cursor: pointer;
+  }
+
+  .sub2 {
+    display: flex;
+    background-color: rgb(150, 107, 7);
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    border-radius: 10px;
+    height: 50px;
+    margin-right: 20px;
+    cursor: pointer;
+  }
+
+  .sub1 i {
+    margin-right: 10px;
+    font-size: 18px;
+  }
+
+  .sub2 i {
+    margin-right: 10px;
+    font-size: 18px;
+  } */
+}
+
+@media screen and (min-width: 768px) {
+  .mainDivMain {
+    /* background: gray; */
+    padding: 40px 35px 20px 35px;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .mainDivMain {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .mainDivMainFull {
+    display: none;
+  }
+
+  .mainDivMain {
+    display: flex;
+    justify-items: center;
+    flex: 1;
+    /* background: gray; */
+    padding: 40px 5px 20px 5px;
+  }
+}
+
+@media screen and (min-width: 1112px) {
+  .mainDivMain {
+    margin: 40px 50px 20px 50px;
+  }
+}
+
+@media screen and (max-width: 990px) {
+  .number {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .SubHeader1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 90px;
+    border-bottom: none;
+  }
+
+  .number {
+    display: flex;
+    justify-content: right;
+    margin-right: 10px;
+    color: rgb(187, 19, 47);
+  }
+
+  .sub2 {
+    display: none;
+  }
+}

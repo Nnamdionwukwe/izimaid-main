@@ -1,0 +1,34 @@
+.home {
+  border-top: 1px solid rgb(226, 224, 224);
+  margin-top: -10px;
+}
+
+.home div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 130px;
+  margin-left: 15px;
+  color: rgb(74, 74, 74);
+}
+
+.home div i {
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.home div h6 {
+  cursor: pointer;
+}
+
+.link {
+  color: rgb(74, 74, 74);
+  text-decoration: none;
+}
+
+@media screen and (min-width: 992px) {
+  .home {
+    border-top: 1px solid rgb(226, 224, 224);
+    margin-top: -10px;
+  }
+}

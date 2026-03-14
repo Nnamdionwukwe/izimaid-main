@@ -1,0 +1,595 @@
+@media screen and (min-width: 20px) {
+  .localIzimaidMain {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgb(35, 33, 33);
+    z-index: 200;
+    opacity: 0.98;
+  }
+
+  .localIzimaidMainDiv {
+    background: white;
+    height: 23em;
+    width: 29em;
+    z-index: 300;
+    opacity: 3;
+    border-radius: 7px;
+  }
+
+  .localIzimaidMainDivSub {
+    position: relative;
+  }
+
+  .timesHover {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-right: 15px;
+    cursor: pointer;
+  }
+
+  .timesHover h4 {
+    border: 2px solid rgb(6, 6, 60);
+    border-radius: 100%;
+    padding: 1px 6.5px 0.5px 6.5px;
+    background: white;
+  }
+
+  .logoDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 50px;
+  }
+
+  .logo2 {
+    width: 100px;
+    object-fit: cover;
+  }
+
+  .header {
+    background-color: white;
+    color: rgb(6, 6, 60);
+  }
+
+  .located {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgb(6, 6, 60);
+    margin-top: -25px;
+  }
+
+  .ZIPcode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    flex: 1;
+    border: 1px solid rgb(216, 213, 213);
+    margin: 0px 15px 0px 15px;
+    padding: 0px 10px;
+    background: rgb(242, 242, 242);
+    border-radius: 7px;
+  }
+
+  .ZIPcode input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgb(242, 242, 242);
+    flex: 1;
+    border: none;
+    outline: none;
+  }
+
+  .timesInput {
+    margin-right: 8px;
+    cursor: pointer;
+  }
+
+  .zip {
+    color: rgb(233, 42, 42);
+    margin-top: 8px;
+    margin-left: 15px;
+  }
+
+  .location {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgb(6, 6, 60);
+    height: 30px;
+    color: white;
+    cursor: pointer;
+    padding: 0px 10px;
+    border-radius: 7px;
+  }
+
+  .location i {
+    margin-right: 10px;
+    font-size: 12px;
+  }
+
+  .help {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    flex: 1;
+    border: 1px solid rgb(216, 213, 213);
+    margin: 20px 15px 0px 15px;
+    padding: 0px 10px;
+    background: rgb(6, 6, 60);
+    color: white;
+    border-radius: 7px;
+    cursor: pointer;
+  }
+
+  .help:hover {
+    background: rgb(4, 4, 36);
+  }
+
+  .field {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+  }
+
+  .SubMain {
+    border-top: 1px solid rgb(230, 226, 226);
+    padding-top: 10px;
+    border-bottom: 1px solid rgb(230, 226, 226);
+    margin-top: 10px;
+  }
+
+  .SubHeader1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgb(230, 226, 226);
+  }
+
+  .SubHeader2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* margin-left: -8px;
+    margin-right: -8px; */
+  }
+
+  .sub2 {
+    text-decoration: none;
+    color: white;
+    margin-top: -5px;
+  }
+
+  .SubHeader2 div {
+    margin-left: 10px;
+  }
+
+  .thirdHeader2 {
+    display: none;
+  }
+
+  .logo {
+    width: 100px;
+    padding-left: 20px;
+    cursor: pointer;
+  }
+
+  .hamburger {
+    padding-right: 20px;
+    font-size: 20px;
+    opacity: 0.8;
+  }
+
+  .hamburger i {
+    cursor: pointer;
+  }
+
+  .sub1 {
+    display: flex;
+    background-color: rgb(187, 19, 47);
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    border-radius: 10px;
+    height: 50px;
+    margin-right: 20px;
+    margin-bottom: 5px;
+    margin-left: 20px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .subP {
+    margin-left: 15px;
+    display: flex;
+    width: 80px;
+    align-items: center;
+  }
+
+  .sub2 {
+    display: flex;
+    align-items: center;
+    background-color: rgb(187, 19, 47);
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    border-radius: 10px;
+    height: 50px;
+    margin-right: 20px;
+    cursor: pointer;
+  }
+
+  .sub1 i {
+    margin-right: 10px;
+    font-size: 18px;
+  }
+
+  .sub2 i {
+    margin-right: 10px;
+    font-size: 18px;
+  }
+
+  .mins {
+    margin-left: 70px;
+    margin-top: -1px;
+  }
+
+  .thirdHeader {
+    display: flex;
+    align-items: center;
+    color: rgb(187, 19, 47);
+    margin-left: 20px;
+    margin-top: 20px;
+    padding-bottom: 20px;
+    cursor: pointer;
+  }
+
+  .thirdHeader i {
+    margin-right: 10px;
+    font-size: 25px;
+    color: rgb(187, 19, 47);
+  }
+
+  .thirdHeader p {
+    font-size: 12px;
+    font-weight: bold;
+  }
+}
+
+@media screen and (min-width: 577px) {
+  .SubMain {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px 10px 10px;
+  }
+
+  .thirdHeader2 {
+    display: none;
+  }
+
+  .sub2 {
+    margin-top: -5px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+}
+
+@media screen and (min-width: 890px) {
+}
+
+@media screen and (min-width: 992px) {
+  .header {
+    background-color: green;
+    display: none;
+  }
+
+  .localIzimaidMain {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgb(35, 33, 33);
+    z-index: 200;
+    opacity: 0.98;
+  }
+
+  .localIzimaidMainDiv {
+    background: white;
+    height: 27em;
+    width: 38em;
+    z-index: 300;
+    opacity: 3;
+    border-radius: 7px;
+  }
+
+  .localIzimaidMainDivSub {
+    position: relative;
+  }
+
+  .zip {
+    color: rgb(233, 42, 42);
+    margin-top: 8px;
+    margin-left: 15px;
+    font-size: 13px;
+  }
+
+  .timesHover {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-right: 15px;
+    cursor: pointer;
+  }
+
+  .timesHover h4 {
+    border: 2px solid rgb(6, 6, 60);
+    border-radius: 100%;
+    padding: 1px 6.5px 0.5px 6.5px;
+    background: white;
+  }
+
+  .logoDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 50px;
+  }
+
+  .logo2 {
+    width: 100px;
+    object-fit: cover;
+  }
+
+  .thirdHeader2 {
+    display: flex;
+    align-items: center;
+    color: rgb(187, 19, 47);
+    margin-left: 20px;
+    margin-top: 20px;
+    padding-bottom: 20px;
+    cursor: pointer;
+  }
+
+  .thirdHeader2 i {
+    margin-right: 10px;
+    font-size: 25px;
+    color: rgb(187, 19, 47);
+  }
+
+  .thirdHeader2 p {
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .thirdHeader3 {
+    display: flex;
+    align-items: center;
+    color: rgb(187, 19, 47);
+    padding-right: 20px;
+    padding-left: 20px;
+    margin-top: 20px;
+    padding-bottom: 20px;
+    cursor: pointer;
+  }
+
+  .thirdHeader3 p:hover {
+    text-decoration: underline;
+  }
+
+  .thirdHeader3 i {
+    margin-right: 10px;
+    font-size: 15px;
+    color: rgb(152, 26, 26);
+  }
+
+  .thirdHeader3 p {
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .secondMain1 {
+    display: flex;
+    align-items: center;
+    /* border-top: 1px solid rgb(242, 238, 238); */
+    border-bottom: 1px solid rgb(242, 238, 238);
+  }
+
+  .secondMainLogo {
+    flex: 1;
+  }
+
+  .secondMain {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    padding-right: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: gray;
+    padding: 15px 0px;
+  }
+
+  .thirdPara1 p:hover,
+  .thirdPara2 p:hover,
+  .thirdPara3:hover {
+    color: rgb(74, 74, 74);
+  }
+
+  .thirdPara1 p {
+    border-left: 1px solid rgb(242, 238, 238);
+    border-right: 1px solid rgb(242, 238, 238);
+    height: 20px;
+    margin-right: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    cursor: pointer;
+  }
+
+  .thirdPara2 p {
+    border-right: 1px solid rgb(242, 238, 238);
+    height: 20px;
+    margin-right: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    cursor: pointer;
+  }
+
+  .thirdPara3 {
+    cursor: pointer;
+  }
+
+  .thirdMain {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 40px;
+    padding-right: 20px;
+    font-weight: bold;
+    color: rgb(61, 61, 61);
+    z-index: 100;
+  }
+
+  .sub3 {
+    display: flex;
+    background-color: rgb(187, 19, 47);
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    width: 190px;
+    border-radius: 10px;
+    height: 70px;
+    margin-right: 20px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .sub3:hover {
+    background-color: rgb(187, 19, 47);
+  }
+
+  .sub3 i {
+    margin: 0px 15px;
+  }
+
+  .minsDi {
+    margin-left: -35px;
+  }
+
+  .thirdMainDiv1 {
+    padding: 22px 15px;
+  }
+
+  .thirdMainDiv2 {
+    width: 60px;
+    padding: 12px 50px 12px 22px;
+  }
+
+  .thirdMainDiv3 {
+    width: 60px;
+    padding: 12px 15px 12px 22px;
+  }
+
+  .thirdMainDiv4 {
+    width: 60px;
+    padding: 12px 10px 12px 22px;
+  }
+
+  .thirdMainDiv5 {
+    width: 60px;
+    padding: 12px 20px 12px 20px;
+  }
+
+  .thirdMainDiv6 {
+    width: 160px;
+    padding: 12px 10px 12px 20px;
+  }
+
+  .thirdMainDiv1:hover,
+  .thirdMainDiv2:hover,
+  .thirdMainDiv3:hover,
+  .thirdMainDiv4:hover,
+  .thirdMainDiv5:hover,
+  .thirdMainDiv6:hover {
+    background-color: rgb(73, 221, 73);
+    border-radius: 5px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .number {
+    font-size: 22px;
+    font-weight: bold;
+    color: green;
+    width: 157px;
+    z-index: 100;
+  }
+
+  .numberDiv {
+    text-decoration: none;
+  }
+
+  .hoverMainDiv1 {
+    display: flex;
+    align-items: center;
+  }
+
+  .residence:hover .hoverMain {
+    animation: 1s forwards;
+    opacity: 1;
+    transition: opacity 1s;
+  }
+
+  .residence {
+    position: relative;
+  }
+
+  .hoverMain {
+    /* width: 100%; */
+    /* flex: 1; */
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .thirdHeader2 {
+    display: flex;
+    align-items: center;
+    color: rgb(187, 19, 47);
+    margin-left: 20px;
+    margin-top: 20px;
+    padding-bottom: 20px;
+    cursor: pointer;
+    display: none;
+  }
+
+  .thirdHeaderMain {
+    display: none;
+  }
+}

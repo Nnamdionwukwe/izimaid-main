@@ -1,0 +1,102 @@
+.main {
+  margin: 20px 10px 20px 10px;
+}
+
+.mainSub {
+  border: 1px solid rgb(11, 11, 76);
+  border-radius: 5px;
+  border-left: 5px solid rgb(11, 11, 76);
+  width: 100%;
+  height: 100%;
+  color: rgb(11, 11, 76);
+  margin-bottom: 20px;
+}
+
+.backed {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin: 0em 0.5em;
+}
+
+.backed h2 {
+  margin-right: 0.3em;
+}
+
+.backed p {
+  color: #ffff;
+  border-radius: 100%;
+  padding: 2px 7px 4px 7px;
+  background-color: rgb(11, 11, 76);
+  margin-right: 5px;
+}
+
+.backed h3 {
+  flex: 1;
+  margin-right: 20px;
+  margin-left: 5px;
+}
+
+.hoverMainliv1 {
+  margin-top: -2px;
+  padding: 0em 1em;
+}
+
+.hoverMainliv1 li {
+  margin-left: 40px;
+  text-decoration: none;
+}
+
+.span {
+  margin-left: 5px;
+  margin-right: 5px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.residentialDIv li:hover,
+.residentialDIv2 li:hover {
+  text-decoration: underline;
+}
+
+.residentialDIv li,
+.residentialDIv2 li {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.see {
+  display: flex;
+  justify-content: center;
+  color: #ffff;
+  background-color: rgb(11, 11, 76);
+  margin-left: 10px;
+  margin-bottom: 30px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+@media screen and (min-width: 992px) {
+  .main {
+    margin: 0px 50px;
+  }
+
+  .mainSub {
+    margin-right: 30px;
+  }
+
+  .mainSub {
+    margin-top: 20px;
+    box-shadow: 2px 3px 4px 5px rgb(219, 216, 216);
+  }
+
+  .residentialDIv li,
+  .residentialDIv2 li {
+    cursor: pointer;
+  }
+
+  .residentialDIv li:hover,
+  .residentialDIv2 li:hover {
+    text-decoration: underline;
+  }
+}

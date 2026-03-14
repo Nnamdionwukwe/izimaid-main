@@ -1,0 +1,12 @@
+@media screen and (min-width: 20px) {
+  .mainDiv {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .main {
+    display: flex;
+    align-items: center;
+    color: red;
+  }
+}

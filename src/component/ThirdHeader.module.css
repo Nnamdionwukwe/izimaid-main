@@ -1,0 +1,108 @@
+@media screen and (min-width: 20px) {
+  .ThirdHeader {
+    background-color: rgb(32, 32, 65);
+    border-bottom: 4px solid gray;
+    height: 140px;
+    padding-top: -5px;
+    margin: 0px -8px 0px -8px;
+  }
+
+  .ThirdHeader2 {
+    display: none;
+  }
+
+  .ThirdHeaderDiv {
+    display: flex;
+    align-items: center;
+    padding: 5px 20px 0px 15px;
+  }
+
+  .i {
+    font-size: 50px;
+    color: rgb(187, 19, 47);
+  }
+
+  .spark {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    margin-left: 20px;
+  }
+
+  .times {
+    color: white;
+    font-size: 30px;
+    margin-top: -40px;
+    cursor: pointer;
+  }
+
+  .more {
+    display: flex;
+    justify-content: center;
+    text-decoration: underline;
+    font-weight: bold;
+    color: rgb(187, 19, 47);
+  }
+
+  .link {
+    color: rgb(187, 19, 47);
+    text-decoration: none;
+  }
+}
+
+@media screen and (min-width: 577px) {
+  .header {
+    background-color: red;
+  }
+
+  .ThirdHeaderDiv {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .header {
+    background-color: blue;
+  }
+}
+
+@media screen and (min-width: 890px) {
+  .header {
+    background-color: rgb(145, 145, 14);
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .header {
+    background-color: green;
+  }
+
+  .ThirdHeader {
+    display: none;
+
+    margin: 0px -8px 0px -8px;
+  }
+
+  .ThirdHeader2 {
+    display: flex;
+    align-items: center;
+    background-color: rgb(32, 32, 65);
+    border-bottom: 4px solid gray;
+    height: 80px;
+    padding-top: -5px;
+
+    margin: 0px -8px 0px -8px;
+  }
+
+  .more {
+    margin-left: 60px;
+    cursor: pointer;
+  }
+
+  .times {
+    margin-top: 0px;
+    margin-right: 20px;
+  }
+}

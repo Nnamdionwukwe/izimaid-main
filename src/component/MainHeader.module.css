@@ -1,0 +1,44 @@
+@media screen and (min-width: 20px) {
+  .fixedHeader {
+    position: sticky;
+    top: 0;
+    right: 0;
+    left: 0;
+    background: #ffff;
+    z-index: 100;
+    margin-right: -8px;
+    margin-left: -5px;
+    height: 60px;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .whyChooseUsFull {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .fixedHeader {
+    position: sticky;
+    top: 0;
+    right: 0;
+    left: 0;
+    background: #ffff;
+    z-index: 100;
+    display: none;
+  }
+
+  .fixedHeadr {
+    position: sticky;
+    top: 0;
+    right: 0;
+    left: 0;
+    background: #ffff;
+    z-index: 1000;
+  }
+
+  .whyChooseUs {
+    display: none;
+  }
+}

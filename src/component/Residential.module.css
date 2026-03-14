@@ -1,0 +1,310 @@
+@media screen and (min-width: 992px) {
+  .residence:hover .hoverMain {
+    animation: 1s forwards;
+    opacity: 1;
+    transition: opacity 1s;
+  }
+
+  .residence {
+    position: relative;
+  }
+
+  .hoverMainDiv1 {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv2 {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv3 {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv4 {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv5 {
+    display: flex;
+    align-items: center;
+    margin-left: 38px;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv6 {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv7 {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv8 {
+    display: flex;
+    align-items: center;
+    margin-left: -45px;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv18 {
+    display: flex;
+    align-items: center;
+    margin-right: 70px;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv17 {
+    display: flex;
+    align-items: center;
+    margin-right: 90px;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv16 {
+    display: flex;
+    align-items: center;
+    margin-right: 115px;
+    cursor: pointer;
+  }
+  .hoverMainDiv21 {
+    display: flex;
+    align-items: center;
+    margin-left: 92px;
+    cursor: pointer;
+  }
+  .hoverMainDiv22 {
+    display: flex;
+    align-items: center;
+    margin-left: 72px;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv20 {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-right: -120px;
+  }
+
+  .hoverMainDiv16 p {
+    color: rgb(77, 76, 76);
+  }
+
+  .hoverMainDiv1 i,
+  .hoverMainDiv2 i,
+  .hoverMainDiv3 i,
+  .hoverMainDiv4 i,
+  .hoverMainDiv5 i,
+  .hoverMainDiv6 i,
+  .hoverMainDiv7 i,
+  .hoverMainDiv8 i,
+  .hoverMainDiv9 i,
+  .hoverMainDiv18 i,
+  .hoverMainDiv17 i,
+  .hoverMainDiv16 i,
+  .hoverMainDiv20 i,
+  .hoverMainDiv21 i,
+  .hoverMainDiv22 i {
+    margin-right: 10px;
+    color: red;
+  }
+  /* 
+  .residentialMain {
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    width: 100%;
+    flex: 1;
+  } */
+
+  .residentialDIv {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+    margin-left: 50px;
+    width: 1100px;
+    background-color: white;
+    box-shadow: 1px 2px 10px -1px;
+    margin-top: -20px;
+    padding: 35px 0px;
+  }
+
+  .residentialDIv2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+    margin-left: -70px;
+    width: 1100px;
+    background-color: white;
+    box-shadow: 1px 2px 10px -1px;
+    margin-top: -20px;
+    padding: 35px 0px;
+  }
+
+  .residentialDIv3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+    margin-left: -215px;
+    width: 1100px;
+    background-color: white;
+    box-shadow: 1px 2px 10px -1px;
+    margin-top: -20px;
+    padding: 35px 0px;
+  }
+
+  .residentialDIv4 {
+    margin-left: -320px;
+    width: 1100px;
+    background-color: white;
+    box-shadow: 1px 2px 10px -1px;
+    margin-top: -20px;
+    padding: 35px 0px;
+  }
+
+  .residentialDIv5 {
+    margin-left: -420px;
+    width: 1100px;
+    background-color: white;
+    box-shadow: 1px 2px 10px -1px;
+    margin-top: -20px;
+    padding: 35px 0px;
+  }
+
+  .residentialDIv6 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+    margin-left: -530px;
+    width: 1100px;
+    background-color: white;
+    box-shadow: 1px 2px 10px -1px;
+    margin-top: -20px;
+    padding: 35px 0px;
+  }
+
+  .residentialSub {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 50px;
+  }
+
+  .residentialSub2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 50px;
+    width: 471px;
+  }
+
+  .residentialSub3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 50px;
+    width: 506px;
+  }
+  .residentialSub4 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 50px;
+    width: 773px;
+  }
+
+  .residentialSub5 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 50px;
+    width: 862px;
+  }
+
+  .residentialSub6 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 50px;
+    width: 800px;
+  }
+
+  .para5 {
+    width: 180px;
+  }
+
+  .para6 {
+    width: 150px;
+  }
+
+  .para7 {
+    width: 170px;
+  }
+
+  .approch {
+    border-bottom: 1px solid rgb(215, 212, 212);
+    padding-bottom: 10px;
+  }
+
+  .hoverMainDiv10 {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: 65px;
+  }
+
+  .hoverMainDiv11 {
+    display: flex;
+    align-items: center;
+    margin-left: 48px;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv12 {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+
+  .hoverMainDiv10 i,
+  .hoverMainDiv11 i,
+  .hoverMainDiv12 i {
+    margin-right: 10px;
+    color: red;
+  }
+
+  .homeDiv {
+    position: relative;
+  }
+
+  .home {
+    position: absolute;
+    font-size: 12px;
+    margin-left: 35px;
+    margin-top: -15px;
+  }
+
+  .homeP {
+    width: 150px;
+  }
+}

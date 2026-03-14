@@ -1,0 +1,526 @@
+.sideBarMain {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding-bottom: 1000px;
+  background: rgb(255, 255, 255);
+  overflow: scroll;
+  padding: 0px 20px;
+}
+
+.menuDIv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -25px;
+}
+
+.menu {
+  font-size: 15px;
+  font-weight: bold;
+  color: rgb(54, 53, 53);
+}
+
+.times p {
+  font-size: 30px;
+  color: black;
+  cursor: pointer;
+}
+
+.logo {
+  width: 100px;
+  cursor: pointer;
+}
+
+.SubHeader2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sub1 {
+  display: flex;
+  background-color: rgb(187, 19, 47);
+  font-size: 11px;
+  font-weight: bold;
+  color: white;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  border-radius: 10px;
+  height: 50px;
+  margin-right: 20px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.sub1:hover,
+.sub2:hover {
+  background-color: rgb(17, 17, 74);
+}
+
+.subP {
+  margin-left: 15px;
+  display: flex;
+  width: 80px;
+  align-items: center;
+}
+
+.sub2 {
+  display: flex;
+  background-color: rgb(187, 19, 47);
+  font-size: 11px;
+  font-weight: bold;
+  color: white;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  border-radius: 10px;
+  height: 50px;
+  margin-right: 20px;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+}
+
+.sub1 i {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.sub2 i {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.resident123 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 0px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.resident123 p {
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.resident1234 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.resident1234 p {
+  cursor: pointer;
+  font-size: 16px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.residentialDI {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.residentialDI23 {
+  display: flex;
+  align-items: center;
+  padding: 0px 0px 0px 0px;
+  border-radius: 10px;
+}
+
+.residentialDI div:hover,
+.resident1234:hover {
+  background-color: rgb(255, 228, 232);
+}
+
+.residentialDI div i {
+  color: purple;
+  margin-right: 10px;
+  padding-left: 10px;
+}
+
+.residentialDI div p {
+  cursor: pointer;
+}
+
+.greater {
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.hoverMainDiv1 {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.hoverMainDiv2 {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.hoverMainDiv3 {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.hoverMainDiv4 {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.hoverMainDiv5 {
+  display: flex;
+  align-items: center;
+  margin-left: 38px;
+  cursor: pointer;
+}
+
+.hoverMainDiv6 {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.hoverMainDiv7 {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.hoverMainDiv8 {
+  display: flex;
+  align-items: center;
+  margin-left: -45px;
+  cursor: pointer;
+}
+
+.hoverMainDiv18 {
+  display: flex;
+  align-items: center;
+  margin-right: 70px;
+  cursor: pointer;
+}
+
+.hoverMainDiv17 {
+  display: flex;
+  align-items: center;
+  margin-right: 90px;
+  cursor: pointer;
+}
+
+.hoverMainDiv16 {
+  display: flex;
+  align-items: center;
+  margin-right: 115px;
+  cursor: pointer;
+}
+.hoverMainDiv21 {
+  display: flex;
+  align-items: center;
+  margin-left: 92px;
+  cursor: pointer;
+}
+.hoverMainDiv22 {
+  display: flex;
+  align-items: center;
+  margin-left: 72px;
+  cursor: pointer;
+}
+
+.hoverMainDiv20 {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: -120px;
+}
+
+.hoverMainDiv16 p {
+  color: rgb(77, 76, 76);
+}
+
+.hoverMainDiv1 i,
+.hoverMainDiv2 i,
+.hoverMainDiv3 i,
+.hoverMainDiv4 i,
+.hoverMainDiv5 i,
+.hoverMainDiv6 i,
+.hoverMainDiv7 i,
+.hoverMainDiv8 i,
+.hoverMainDiv9 i,
+.hoverMainDiv18 i,
+.hoverMainDiv17 i,
+.hoverMainDiv16 i,
+.hoverMainDiv20 i,
+.hoverMainDiv21 i,
+.hoverMainDiv22 i {
+  margin-right: 10px;
+  color: red;
+}
+/* 
+  .residentialMain {
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    width: 100%;
+    flex: 1;
+  } */
+
+.residentialDIv {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  justify-items: center;
+  align-items: center;
+  margin-left: 50px;
+  width: 1100px;
+  background-color: white;
+  box-shadow: 1px 2px 10px -1px;
+  margin-top: -20px;
+  padding: 35px 0px;
+}
+
+.residentialDIv2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  justify-items: center;
+  align-items: center;
+  margin-left: -70px;
+  width: 1100px;
+  background-color: white;
+  box-shadow: 1px 2px 10px -1px;
+  margin-top: -20px;
+  padding: 35px 0px;
+}
+
+.residentialDIv3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-items: center;
+  align-items: center;
+  margin-left: -215px;
+  width: 1100px;
+  background-color: white;
+  box-shadow: 1px 2px 10px -1px;
+  margin-top: -20px;
+  padding: 35px 0px;
+}
+
+.residentialDIv4 {
+  margin-left: -320px;
+  width: 1100px;
+  background-color: white;
+  box-shadow: 1px 2px 10px -1px;
+  margin-top: -20px;
+  padding: 35px 0px;
+}
+
+.residentialDIv5 {
+  margin-left: -420px;
+  width: 1100px;
+  background-color: white;
+  box-shadow: 1px 2px 10px -1px;
+  margin-top: -20px;
+  padding: 35px 0px;
+}
+
+.residentialDIv6 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  justify-items: center;
+  align-items: center;
+  margin-left: -530px;
+  width: 1100px;
+  background-color: white;
+  box-shadow: 1px 2px 10px -1px;
+  margin-top: -20px;
+  padding: 35px 0px;
+}
+
+.residentialSub {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 50px;
+}
+
+.residentialSub2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 50px;
+  width: 471px;
+}
+
+.residentialSub3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 50px;
+  width: 506px;
+}
+.residentialSub4 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 50px;
+  width: 773px;
+}
+
+.residentialSub5 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 50px;
+  width: 862px;
+}
+
+.residentialSub6 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 50px;
+  width: 800px;
+}
+
+.para5 {
+  width: 180px;
+}
+
+.para6 {
+  width: 150px;
+}
+
+.para7 {
+  width: 170px;
+}
+
+.approch {
+  border-bottom: 1px solid rgb(215, 212, 212);
+  padding-bottom: 10px;
+}
+
+.hoverMainDiv10 {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 65px;
+}
+
+.hoverMainDiv11 {
+  display: flex;
+  align-items: center;
+  margin-left: 48px;
+  cursor: pointer;
+}
+
+.hoverMainDiv12 {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.hoverMainDiv10 i,
+.hoverMainDiv11 i,
+.hoverMainDiv12 i {
+  margin-right: 10px;
+  color: red;
+}
+
+.homeDiv {
+  position: relative;
+}
+
+.home {
+  position: absolute;
+  font-size: 12px;
+  margin-left: 35px;
+  margin-top: -15px;
+}
+
+.homeP {
+  width: 150px;
+}
+
+.residentialDI {
+  font-size: 12px;
+}
+
+.x {
+  margin: 20px 0px 0px 30px;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.thirdHeader {
+  display: flex;
+  align-items: center;
+  color: rgb(150, 107, 7);
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 20px;
+  padding-bottom: 20px;
+  cursor: pointer;
+  border-top: 1px solid rgb(223, 223, 223);
+  border-bottom: 1px solid rgb(223, 223, 223);
+}
+
+.thirdHeader i {
+  margin-right: 10px;
+  font-size: 15px;
+  color: rgb(152, 26, 26);
+}
+
+.thirdHeader p {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.thirdHeader:hover {
+  text-decoration: underline;
+}
+
+.icons {
+  display: flex;
+  align-items: center;
+  color: rgb(150, 107, 7);
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 20px;
+  padding-bottom: 20px;
+  cursor: pointer;
+  border-bottom: 1px solid rgb(223, 223, 223);
+}
+
+.icons i {
+  cursor: pointer;
+  color: blue;
+  margin-right: 30px;
+  font-size: 25px;
+}
+
+.giftsDiv {
+  font-size: 12px;
+  font-weight: bold;
+  color: gray;
+  margin-bottom: 100px;
+}
+
+.giftsDiv p:hover {
+  cursor: pointer;
+  color: darkblue;
+}

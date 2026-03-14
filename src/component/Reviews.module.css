@@ -1,0 +1,275 @@
+@media screen and (min-width: 20px) {
+  .main {
+    background: rgb(246, 245, 245);
+    margin-top: -30px;
+    margin-left: -5px;
+    margin-right: -5px;
+  }
+
+  .hearMain {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3em;
+  }
+
+  .hearMainSub h1 {
+    color: rgb(190, 13, 33);
+  }
+
+  .hearMainSub h4 {
+    display: flex;
+    justify-content: center;
+    border: 1px solid rgb(156, 39, 53);
+    border-radius: 10px;
+    color: rgb(190, 13, 33);
+    padding: 0.9em 0em;
+    margin: 0px 15px;
+  }
+
+  .imageContainer i {
+    font-size: 6em;
+    color: rgb(190, 13, 33);
+    margin-top: -0.3em;
+    border: 5px solid #ffff;
+    border-radius: 100%;
+    background: #ffff;
+  }
+
+  .reviewContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    /* animation: 1s left;
+    opacity: 1;
+    transition: opacity 1s; */
+    margin: 5em 0.5em 2em 0.6em;
+    background: #ffff;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 10em;
+    box-shadow: 11px 1px 14px 5px rgb(186, 185, 185);
+  }
+
+  .reviews {
+    padding: 1.5em 1.5em 2em 1.5em;
+    font-style: italic;
+    font-weight: bold;
+    color: rgb(57, 56, 56);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .reviewName {
+    font-style: italic;
+    font-weight: bold;
+    color: rgb(57, 56, 56);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .reviewFooterSub {
+    display: flex;
+    align-items: center;
+  }
+
+  .reviewFooterSub h2 {
+    margin-right: 0.3em;
+    color: rgb(57, 56, 56);
+  }
+
+  .reviewFooterSub i {
+    font-size: 0.7em;
+    margin-right: 0.3em;
+    color: rgb(255, 208, 0);
+  }
+
+  .greaterContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 2em;
+    margin: 2em 1em;
+    border-bottom: 0.15em solid rgb(198, 195, 195);
+  }
+
+  .h1 {
+    background: rgb(6, 6, 65);
+    padding: 0.4em 0.7em 0.4em 0.7em;
+    border-radius: 0.3em;
+    cursor: pointer;
+    color: #ffff;
+  }
+
+  .h2 {
+    background: rgb(6, 6, 65);
+    padding: 0.4em 0.7em 0.4em 0.7em;
+    border-radius: 0.3em;
+    cursor: pointer;
+    color: #ffff;
+    opacity: 0.5;
+  }
+
+  .circlesDiv {
+    display: flex;
+    align-items: center;
+  }
+
+  .circles1 {
+    background: rgb(6, 6, 65);
+    padding: 0.3em;
+    margin: 0em 0.2em;
+    border-radius: 100%;
+    opacity: 0.5;
+  }
+
+  .circles2 {
+    background: rgb(6, 6, 65);
+    padding: 0.3em;
+    margin: 0em 0.2em;
+    border-radius: 100%;
+  }
+
+  .logoDiv {
+    display: flex;
+    justify-content: center;
+    padding: 0em 1em 0em 1.3em;
+  }
+
+  .logoDiv1 {
+    display: flex;
+    justify-content: center;
+  }
+
+  .logoDiv2 {
+    display: flex;
+    justify-content: center;
+    /* max-width: 400px; */
+    color: rgb(88, 88, 88);
+  }
+
+  .logoDivDiv {
+    justify-content: center;
+    margin-bottom: 2em;
+  }
+
+  .logoDiv2 h2 .logoDiv3 h3 {
+    display: flex;
+    justify-items: center;
+  }
+
+  .logoDiv3 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    height: 3.8em;
+    color: #ffff;
+    background: rgb(6, 6, 65);
+    border-radius: 0.5em;
+    cursor: pointer;
+    margin-right: 5em;
+    margin-left: 5em;
+    font-size: 10px;
+    text-decoration: none;
+  }
+
+  .logoDiv3:hover {
+    background: rgb(2, 2, 36);
+  }
+
+  .logoDiv3 i {
+    display: flex;
+    justify-content: center;
+    margin-right: 0.6em;
+    font-size: 1.3em;
+  }
+
+  .logo1 {
+    width: 5em;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+}
+
+@media screen and (min-width: 577px) {
+}
+
+@media screen and (min-width: 668px) {
+}
+
+@media screen and (min-width: 992px) {
+  .main {
+    margin-top: 2em;
+  }
+
+  .mainSub {
+    display: flex;
+  }
+
+  .list {
+    display: flex;
+    list-style: none;
+    padding: 0.8rem 0;
+    overflow-x: scroll;
+  }
+
+  .reviewContainer {
+    display: flex;
+    align-items: center;
+    margin: 2em 0.5em 2em 0.6em;
+    background: #ffff;
+    box-shadow: 11px 1px 14px 5px rgb(186, 185, 185);
+  }
+
+  .reviews,
+  .reviewName {
+    font-size: 10px;
+  }
+
+  .reviewFooterSub h6 {
+    margin-right: 3px;
+  }
+
+  .reviewFooterSub i {
+    font-size: 0.2em;
+  }
+
+  .f {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    overflow: scroll;
+  }
+
+  .mainFull {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 35px;
+    width: 100%;
+    padding: 0px 5em;
+  }
+
+  .logoDivDiv {
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    margin-bottom: 3em;
+  }
+
+  .logoDiv2 {
+    margin: 0em 4em;
+  }
+
+  .logoDiv3 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 300px;
+    color: #ffff;
+    background: rgb(6, 6, 65);
+    border-radius: 0.5em;
+    cursor: pointer;
+    height: 3.8em;
+    text-decoration: none;
+  }
+}
