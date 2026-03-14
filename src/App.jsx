@@ -9,6 +9,8 @@ function App() {
       <Routes>
         <Route index path="/" element={<HomePage />} />
 
+        <Route index path="/login" element={<HomePage />} />
+
         <Route path="/request-a-free-estimate" element={<RequestEstimate />} />
 
         <Route path="/why-hire-us" element={<LearnMore />} />
@@ -16,7 +18,5 @@ function App() {
     </BrowserRouter>
   );
 }
-
-//          path="https://izimaid-sage.vercel.app/why-hire-us"
 
 export default App;

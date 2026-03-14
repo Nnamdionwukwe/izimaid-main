@@ -1,0 +1,360 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #faf7f4;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* ─── Left panel ─────────────────────────────────────────────── */
+.left {
+  position: relative;
+  background: #1a1208;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px;
+  overflow: hidden;
+}
+
+.leftPattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(
+      circle at 20% 80%,
+      rgba(212, 160, 86, 0.15) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(212, 160, 86, 0.08) 0%,
+      transparent 50%
+    );
+}
+
+.leftGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(212, 160, 86, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 160, 86, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.brand {
+  position: relative;
+  z-index: 1;
+}
+
+.brandName {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: #f5ede0;
+  letter-spacing: 0.02em;
+  margin: 0 0 4px;
+}
+
+.brandTagline {
+  font-size: 12px;
+  font-weight: 300;
+  color: rgba(245, 237, 224, 0.45);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.leftContent {
+  position: relative;
+  z-index: 1;
+}
+
+.leftHeading {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 52px;
+  font-weight: 300;
+  line-height: 1.1;
+  color: #f5ede0;
+  margin: 0 0 24px;
+}
+
+.leftHeadingAccent {
+  font-style: italic;
+  color: #d4a056;
+}
+
+.leftDesc {
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(245, 237, 224, 0.55);
+  line-height: 1.7;
+  max-width: 320px;
+  margin: 0 0 40px;
+}
+
+.leftStats {
+  display: flex;
+  gap: 32px;
+}
+
+.stat {
+  border-left: 1px solid rgba(212, 160, 86, 0.3);
+  padding-left: 16px;
+}
+
+.statNumber {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: #d4a056;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 300;
+  color: rgba(245, 237, 224, 0.4);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.leftFooter {
+  position: relative;
+  z-index: 1;
+  font-size: 11px;
+  color: rgba(245, 237, 224, 0.25);
+  letter-spacing: 0.06em;
+}
+
+/* ─── Right panel ────────────────────────────────────────────── */
+.right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  background: #faf7f4;
+}
+
+.formWrap {
+  width: 100%;
+  max-width: 380px;
+}
+
+.formHeader {
+  margin-bottom: 40px;
+}
+
+.formTitle {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 36px;
+  font-weight: 400;
+  color: #1a1208;
+  margin: 0 0 8px;
+  line-height: 1.1;
+}
+
+.formSubtitle {
+  font-size: 13px;
+  font-weight: 300;
+  color: #8a7b6a;
+  margin: 0;
+}
+
+.roleToggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid #e0d8ce;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 32px;
+  background: #f0ebe4;
+}
+
+.roleBtn {
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 400;
+  font-family: "DM Sans", sans-serif;
+  color: #8a7b6a;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+}
+
+.roleBtn:hover {
+  color: #1a1208;
+}
+
+.roleBtnActive {
+  background: #1a1208;
+  color: #f5ede0;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: #e0d8ce;
+}
+
+.dividerText {
+  font-size: 11px;
+  color: #b5a898;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.googleBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 24px;
+  background: #fff;
+  border: 1px solid #e0d8ce;
+  border-radius: 8px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #1a1208;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+  margin-bottom: 12px;
+}
+
+.googleBtn:hover {
+  border-color: #c9b99a;
+  background: #fdfaf7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(26, 18, 8, 0.06);
+}
+
+.googleBtn:active {
+  transform: translateY(0);
+}
+
+.googleBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.googleIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.loadingSpinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e0d8ce;
+  border-top-color: #1a1208;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fdf2f2;
+  border: 1px solid #f5c5c5;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.errorDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d4574a;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.errorText {
+  font-size: 13px;
+  color: #a03028;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.terms {
+  margin-top: 24px;
+  font-size: 11px;
+  color: #b5a898;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.termsLink {
+  color: #8a7b6a;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.termsLink:hover {
+  color: #1a1208;
+}
+
+/* ─── Animations ─────────────────────────────────────────────── */
+.formWrap {
+  animation: fadeUp 0.5s ease both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+
+  .left {
+    display: none;
+  }
+
+  .right {
+    padding: 32px 24px;
+    align-items: flex-start;
+    padding-top: 64px;
+  }
+
+  .formWrap {
+    max-width: 100%;
+  }
+}
