@@ -1,9 +1,18 @@
 @media screen and (min-width: 20px) {
   .mainDiv {
-    margin: 20px 10px 0px 10px;
-    padding: 25px 15px 0px 15px;
+    margin: 20px 10px 0 10px;
+    padding: 25px 15px 0 15px;
     box-shadow: 1px 2px 3px 4px rgb(183, 183, 183);
     border-radius: 5px;
+  }
+
+  .successDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
   }
 
   .checkMarkMain {
@@ -20,22 +29,21 @@
     color: white;
   }
 
-  .borderLine {
-    display: flex;
-    flex: 1;
-    border: 2px solid rgb(228, 228, 228);
-  }
-
   .checkMark1 {
     border-radius: 100%;
     padding: 10px;
     border: 2px solid rgb(228, 228, 228);
   }
 
+  .borderLine {
+    flex: 1;
+    border: 2px solid rgb(228, 228, 228);
+  }
+
   .started {
-    font-family: Arial, Helvetica, sans-serif sans-serif;
     display: flex;
     justify-content: center;
+    font-family: Arial, Helvetica, sans-serif;
     margin-top: -20px;
     font-size: 20px;
     color: rgb(19, 19, 103);
@@ -43,12 +51,15 @@
   }
 
   .star {
-    font-family: Arial, Helvetica, sans-serif sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
     font-weight: bold;
     color: rgb(95, 94, 94);
   }
 
+  .name {
+    margin-bottom: -15px;
+  }
   .type {
     margin-bottom: -20px;
     color: rgb(47, 47, 47);
@@ -58,52 +69,35 @@
     display: flex;
     align-items: center;
     flex: 1;
+    width: 100%;
     height: 40px;
-    border: none;
-    outline: none;
-    border-radius: 5px;
     border: 1px solid rgb(228, 228, 228);
+    border-radius: 5px;
+    outline: none;
     color: rgb(80, 80, 80);
-    /* padding-left: 10px; */
-  }
-
-  .bedroomsDivMain {
-    display: flex;
-    align-items: center;
-    padding-bottom: 15px;
-    /* width: 100%; */
-  }
-
-  .bedroomsDiv {
-    width: 50%;
-    margin-right: 20px;
-  }
-
-  .name {
-    margin-bottom: -15px;
-  }
-
-  .bathroomsDiv {
-    width: 50%;
+    padding-left: 10px;
+    font-size: 15px;
+    box-sizing: border-box;
   }
 
   .inputField::placeholder {
-    padding-left: 10px;
     font-size: 15px;
   }
 
   .yesDiv {
     display: flex;
     align-items: center;
+    gap: 12px;
     margin-top: 15px;
     color: rgb(66, 66, 66);
-    font-size: 17px;
+    font-size: 15px;
   }
 
-  .checkbox input {
-    width: 25px;
-    height: 25px;
-    margin-right: 15px;
+  .checkbox {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    cursor: pointer;
   }
 
   .privacy {
@@ -120,6 +114,8 @@
   .typeOfCleaning {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-bottom: -10px;
   }
 
@@ -130,21 +126,8 @@
   .radioButton {
     display: flex;
     align-items: center;
+    gap: 8px;
     margin-right: 20px;
-  }
-
-  .radioButton1 {
-    display: flex;
-    align-items: center;
-    margin-right: 20px;
-    width: 50%;
-  }
-
-  .radioButton2 {
-    display: flex;
-    align-items: center;
-    margin-right: 20px;
-    width: 60%;
     cursor: pointer;
   }
 
@@ -153,13 +136,7 @@
     height: 8px;
     border-radius: 100%;
     border: 4px solid rgb(19, 19, 103);
-    margin-right: 10px;
-    cursor: pointer;
-  }
-
-  .radio:hover,
-  .radio2:hover {
-    cursor: pointer;
+    flex-shrink: 0;
   }
 
   .radio {
@@ -167,20 +144,43 @@
     height: 13px;
     border-radius: 100%;
     border: 2px solid rgb(228, 228, 228);
-    margin-right: 10px;
+    flex-shrink: 0;
+  }
+
+  .radio:hover,
+  .radio2:hover {
+    cursor: pointer;
   }
 
   .oneTime {
     background: rgb(243, 243, 243);
-    padding: 0px 15px;
+    padding: 0 15px;
     margin-top: 15px;
     border-radius: 5px;
   }
 
   .oneTime2 {
-    padding: 0px 15px;
+    padding: 0 15px;
     margin-top: 15px;
     border-radius: 5px;
+  }
+
+  .bedroomsDivMain {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 15px;
+  }
+
+  .bedroomsDiv {
+    width: 50%;
+  }
+  .bathroomsDiv {
+    width: 50%;
+  }
+
+  .dropdownWrap {
+    position: relative;
   }
 
   .select {
@@ -191,9 +191,9 @@
     border-radius: 5px;
     border: 1px solid rgb(228, 228, 228);
     color: rgb(80, 80, 80);
-    outline: none;
-    padding: 0px 10px;
+    padding: 0 10px;
     cursor: pointer;
+    user-select: none;
   }
 
   .select:hover {
@@ -201,41 +201,29 @@
     color: white;
   }
 
-  .select option {
-    color: red;
-    padding: 10px;
-    outline: none;
-    border: none;
-  }
-
-  .selectBedRoomsMain {
+  .dropdownList {
     position: absolute;
-    width: 40%;
+    width: 100%;
     background: rgb(227, 224, 224);
-    margin-top: -1px;
-    padding: 0px 12px 12px 12px;
+    z-index: 10;
     border-radius: 5px;
+    padding: 8px;
+    box-sizing: border-box;
   }
 
-  .selectBedRooms {
-    background: rgb(200, 199, 199);
-    padding: 2px 10px 10px 10px;
-  }
-
-  .selectBedRooms p {
-    padding: 7px;
+  .dropdownItem {
+    padding: 7px 10px;
     border-radius: 5px;
-    margin-bottom: -10px;
     font-size: 13px;
     font-weight: bold;
     color: rgb(68, 68, 68);
-    padding-left: 20px;
+    cursor: pointer;
+    margin: 0;
   }
 
-  .selectBedRooms p:hover {
+  .dropdownItem:hover {
     background: rgb(19, 19, 103);
     color: white;
-    cursor: pointer;
   }
 
   .image {
@@ -260,158 +248,82 @@
   .checkMarkFooterDiv {
     display: flex;
     align-items: center;
-    margin-top: -15px;
+    gap: 10px;
+    margin-top: -10px;
   }
 
   .checkMarkFooter {
-    padding: 3px 5px 3px 5px;
+    padding: 3px 5px;
     background: rgb(203, 14, 140);
     border-radius: 100%;
     color: white;
-    margin-right: 10px;
     font-size: 8px;
+    flex-shrink: 0;
   }
 
   .submitButton {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    width: 100%;
     height: 50px;
     background: rgb(19, 19, 103);
     margin-top: 20px;
     border-radius: 8px;
     color: white;
     cursor: pointer;
+    border: none;
+    font-size: 15px;
   }
 
   .submitButton:hover {
     background: rgb(15, 15, 70);
   }
-
-  .submitButton h4 {
-    margin-right: 10px;
+  .submitButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   .term {
     color: gray;
-    margin-top: 30px;
-    margin-bottom: 0px;
+    margin-top: 15px;
     padding-bottom: 25px;
+    font-size: 13px;
   }
 
   .error {
     font-size: 13px;
     color: red;
     font-weight: bold;
-    margin-top: 10px;
+    margin-top: 5px;
   }
 }
 
 @media screen and (min-width: 577px) {
   .mainDiv {
-    margin: 50px 10px 0px 10px;
+    margin: 50px 10px 0 10px;
   }
-
   .checkMarkMain {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* max-width: 600px; */
-    margin: 0px 60px;
-  }
-}
-
-@media screen and (min-width: 768px) {
-  .mainDiv {
-    box-shadow: none;
-  }
-
-  .checkMarkMain {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* max-width: 600px; */
-  }
-
-  .mainDivMain {
-    /* display: flex;
-    align-items: center; */
+    margin: 0 60px;
   }
 }
 
 @media screen and (min-width: 992px) {
-  .started {
-    display: flex;
-    justify-items: center;
-    margin-left: 10em;
-  }
-
-  .checkMarkMain {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* max-width: 600px; */
-    margin: 20px 110px;
-  }
-
   .mainDiv {
     display: flex;
-    margin: 10px 10px 0px 10px;
-  }
-
-  .nameFlex {
-    display: flex;
-    align-items: center;
-  }
-
-  .inputField {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    height: 40px;
-    width: 310px;
-    border: none;
-    outline: none;
-    border-radius: 5px;
-    border: 1px solid rgb(228, 228, 228);
-    color: rgb(80, 80, 80);
-    /* padding-left: 10px; */
-  }
-
-  .mainDivMain {
-    /* display: flex;
-    justify-content: center; */
-    margin: 40px 10px 0px 10px;
-    padding: 25px 25px 0px 25px;
-  }
-
-  .mainDivSub {
-    margin-right: 25px;
-  }
-
-  .nameFlexSub {
-    margin: 0px 0px 0px 15px;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin: 10px;
   }
 
   .submitButton {
-    display: flex;
-    align-items: center;
-    justify-content: left;
-    height: 50px;
     width: 200px;
-    background: rgb(19, 19, 103);
-    margin-top: 20px;
+    justify-content: flex-start;
     padding-left: 25px;
-    border-radius: 8px;
-    color: white;
-    cursor: pointer;
   }
 
   .fullMain {
-    background: rgb(249, 228, 231);
-    padding: 1px 20px 5px 20px;
-    margin-top: 30px;
-    margin-bottom: 30px;
     height: 470px;
     width: 400px;
     font-size: 14px;
@@ -422,58 +334,31 @@
 
   .image {
     height: 60px;
-    /* width: 200px; */
-    object-fit: cover;
   }
 
-  .addressFull {
-    display: flex;
-    align-items: center;
-  }
-
-  .addressFullDivSub {
-    margin-left: 15px;
+  .inputField {
+    width: 310px;
+    max-width: 100%;
   }
 }
 
 @media screen and (min-width: 1112px) {
-  .started {
-    display: flex;
-    justify-content: center;
-  }
-
-  .checkMarkMain {
-    margin: 20px 190px;
-  }
-
-  .mainDivMain {
-    margin: 0px 50px;
-  }
-
   .mainDiv {
     justify-content: center;
-    margin: 40px 10px 0px 10px;
-    padding: 25px 25px 0px 25px;
+    margin: 40px 10px 0 10px;
+    padding: 25px;
     box-shadow: 1px 2px 3px 4px rgb(225, 224, 224);
     border-radius: 5px;
   }
 
   .fullMain {
-    background: rgb(249, 228, 231);
-    padding: 1px 20px 5px 20px;
-    margin-top: 30px;
-    margin-bottom: 30px;
     height: 400px;
     width: 430px;
     font-size: 13px;
-    font-weight: bold;
-    color: rgb(69, 68, 68);
     margin-top: 50px;
   }
 
-  .image {
-    height: 60px;
-    /* width: 200px; */
-    object-fit: cover;
+  .checkMarkMain {
+    margin: 20px 190px;
   }
 }
