@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import styles from "./AdminUsers.module.css";
+import styles from "./Adminusers.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
