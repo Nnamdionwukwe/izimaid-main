@@ -5,28 +5,25 @@ import HomePage from "./component/HomePage";
 import RequestEstimate from "./component/RequestEstimate";
 import LearnMore from "./component/LearnMore/LearnMore";
 import Login from "./component/Login.jsx";
+import AdminApp from "./component/AdminDashboard/AdminApp.jsx";
+
+function RequireAuth({ children, adminOnly = false }) {
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  if (!token) return <Navigate to="/login" replace />;
+  if (adminOnly && user.role !== "admin") return <Navigate to="/" replace />;
+  return children;
+}
 
 function App() {
-  const token = localStorage.getItem("token");
-
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
 
-          <Route
-            path="/login"
-            element={
-              token ? (
-                <Navigate to="/dashboard" replace />
-              ) : (
-                <Login
-                  onSuccess={() => (window.location.href = "/dashboard")}
-                />
-              )
-            }
-          />
+          <Route path="/login" element={<LoginRedirect />} />
 
           <Route
             path="/request-a-free-estimate"
@@ -35,31 +32,42 @@ function App() {
 
           <Route path="/why-hire-us" element={<LearnMore />} />
 
-          {/* Placeholder — replace with your real dashboard */}
           <Route
-            path="/dashboard"
+            path="/admin"
             element={
-              token ? (
-                <div style={{ padding: 32, fontFamily: "sans-serif" }}>
-                  Welcome! Dashboard coming soon.{" "}
-                  <button
-                    onClick={() => {
-                      localStorage.clear();
-                      window.location.href = "/login";
-                    }}
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              <RequireAuth adminOnly>
+                <AdminApp
+                  onLogout={() => {
+                    localStorage.clear();
+                    window.location.replace("/login");
+                  }}
+                />
+              </RequireAuth>
             }
           />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </GoogleOAuthProvider>
   );
+}
+
+function LoginRedirect() {
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  if (token) {
+    return <Navigate to={user.role === "admin" ? "/admin" : "/"} replace />;
+  }
+
+  function handleSuccess(data) {
+    // data is already saved to localStorage by Login component
+    const u = JSON.parse(localStorage.getItem("user") || "{}");
+    window.location.replace(u.role === "admin" ? "/admin" : "/");
+  }
+
+  return <Login onSuccess={handleSuccess} />;
 }
 
 export default App;
