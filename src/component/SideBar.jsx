@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useState } from "react";
 import styles from "./SideBsr.module.css";
@@ -29,6 +29,19 @@ export default function SideBar({ isOpen, setIsOpen }) {
   const [isAll, setIsAll] = useState(false);
 
   const [isOpenFotter, setIsOpenFotter] = useState(true);
+
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  function handleAuthBtn() {
+    if (token) {
+      localStorage.clear();
+      navigate("/login");
+    } else {
+      navigate("/login");
+    }
+  }
 
   function handleCloseAll() {
     setIsClose(false);
@@ -390,6 +403,9 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 <p>Apply Locally</p>
                 <p>Applicar Localmente</p>
                 <p>Own a Franchise</p>
+                <button onClick={handleAuthBtn}>
+                  {token ? `Logout (${user.name?.split(" ")[0]})` : "Login"}
+                </button>
               </div>
             )}
           </div>

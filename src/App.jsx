@@ -1,4 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import HomePage from "./component/HomePage";
@@ -7,67 +13,77 @@ import LearnMore from "./component/LearnMore/LearnMore";
 import Login from "./component/Login.jsx";
 import AdminApp from "./component/AdminDashboard/AdminApp.jsx";
 
-function RequireAuth({ children, adminOnly = false }) {
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-  if (!token) return <Navigate to="/login" replace />;
-  if (adminOnly && user.role !== "admin") return <Navigate to="/" replace />;
-  return children;
-}
-
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-
-          <Route path="/login" element={<LoginRedirect />} />
-
-          <Route
-            path="/request-a-free-estimate"
-            element={<RequestEstimate />}
-          />
-
-          <Route path="/why-hire-us" element={<LearnMore />} />
-
-          <Route
-            path="/admin"
-            element={
-              <RequireAuth adminOnly>
-                <AdminApp
-                  onLogout={() => {
-                    localStorage.clear();
-                    window.location.replace("/login");
-                  }}
-                />
-              </RequireAuth>
-            }
-          />
-
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <AppRoutes />
       </BrowserRouter>
     </GoogleOAuthProvider>
   );
 }
 
-function LoginRedirect() {
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+function AppRoutes() {
+  const navigate = useNavigate();
 
-  if (token) {
-    return <Navigate to={user.role === "admin" ? "/admin" : "/"} replace />;
+  function getToken() {
+    return localStorage.getItem("token");
+  }
+  function getUser() {
+    return JSON.parse(localStorage.getItem("user") || "{}");
   }
 
-  function handleSuccess(data) {
-    // data is already saved to localStorage by Login component
-    const u = JSON.parse(localStorage.getItem("user") || "{}");
-    window.location.replace(u.role === "admin" ? "/admin" : "/");
+  function handleLoginSuccess() {
+    const user = getUser();
+    navigate(user.role === "admin" ? "/admin" : "/", { replace: true });
   }
 
-  return <Login onSuccess={handleSuccess} />;
+  function handleLogout() {
+    localStorage.clear();
+    navigate("/login", { replace: true });
+  }
+
+  function ProtectedRoute({ children, adminOnly = false }) {
+    const token = getToken();
+    const user = getUser();
+    if (!token) return <Navigate to="/login" replace />;
+    if (adminOnly && user.role !== "admin") return <Navigate to="/" replace />;
+    return children;
+  }
+
+  const token = getToken();
+  const user = getUser();
+
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+
+      <Route
+        path="/login"
+        element={
+          token ? (
+            <Navigate to={user.role === "admin" ? "/admin" : "/"} replace />
+          ) : (
+            <Login onSuccess={handleLoginSuccess} />
+          )
+        }
+      />
+
+      <Route path="/request-a-free-estimate" element={<RequestEstimate />} />
+      <Route path="/why-hire-us" element={<LearnMore />} />
+
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute adminOnly>
+            <AdminApp onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 }
 
 export default App;
