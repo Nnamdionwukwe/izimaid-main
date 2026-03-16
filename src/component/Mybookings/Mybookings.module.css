@@ -1,0 +1,156 @@
+@media screen and (min-width: 20px) {
+  .page {
+    padding: 20px 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .pageTitle {
+    font-size: 22px;
+    font-weight: bold;
+    color: rgb(19, 19, 103);
+    margin: 0 0 4px;
+  }
+  .pageSubtitle {
+    font-size: 13px;
+    color: gray;
+    margin: 0 0 20px;
+  }
+  .filters {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-bottom: 20px;
+  }
+  .filters::-webkit-scrollbar {
+    display: none;
+  }
+  .filterBtn {
+    flex-shrink: 0;
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1px solid rgb(228, 228, 228);
+    background: white;
+    font-size: 12px;
+    font-weight: bold;
+    color: gray;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .filterBtnActive {
+    background: rgb(19, 19, 103);
+    color: white;
+    border-color: rgb(19, 19, 103);
+  }
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card {
+    background: white;
+    border: 1px solid rgb(228, 228, 228);
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: box-shadow 0.15s;
+  }
+  .card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  .cardTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .cardName {
+    font-size: 15px;
+    font-weight: bold;
+    color: rgb(30, 30, 30);
+    margin: 0 0 3px;
+  }
+  .cardDate {
+    font-size: 12px;
+    color: gray;
+    margin: 0;
+  }
+  .statusBadge {
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .statusPending {
+    background: rgb(255, 243, 205);
+    color: rgb(133, 100, 4);
+  }
+  .statusConfirmed {
+    background: rgb(209, 247, 224);
+    color: rgb(10, 107, 46);
+  }
+  .statusInProgress {
+    background: rgb(209, 236, 255);
+    color: rgb(10, 76, 140);
+  }
+  .statusCompleted {
+    background: rgb(230, 230, 230);
+    color: rgb(60, 60, 60);
+  }
+  .statusCancelled {
+    background: rgb(255, 228, 228);
+    color: rgb(168, 28, 28);
+  }
+  .cardMeta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .metaItem {
+    font-size: 12px;
+    color: gray;
+  }
+  .metaValue {
+    font-weight: bold;
+    color: rgb(47, 47, 47);
+  }
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: gray;
+    font-size: 14px;
+  }
+  .loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: gray;
+    font-size: 14px;
+  }
+  .newBookingBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    background: rgb(19, 19, 103);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 20px;
+    width: 100%;
+  }
+  .newBookingBtn:hover {
+    background: rgb(15, 15, 70);
+  }
+}
+@media screen and (min-width: 768px) {
+  .newBookingBtn {
+    width: auto;
+    padding: 0 32px;
+  }
+}

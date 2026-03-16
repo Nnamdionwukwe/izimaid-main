@@ -13,6 +13,11 @@ import LearnMore from "./component/LearnMore/LearnMore";
 import Login from "./component/Login.jsx";
 import AdminApp from "./component/AdminDashboard/Adminapp.jsx";
 
+import Maids from "./component/Maids/Maids.jsx";
+import Booking from "./component/Booking/Booking.jsx";
+import BookingDetail from "./component/Bookingdetail/Bookingdetail.jsx";
+import MyBookings from "./component/Mybookings/Mybookings.jsx";
+
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
@@ -81,6 +86,11 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      <Route path="/maids" element={<Maids />} />
+      <Route path="/book/:maidId" element={<Booking />} />
+      <Route path="/my-bookings" element={<MyBookings />} />
+      <Route path="/bookings/:id" element={<BookingDetail />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

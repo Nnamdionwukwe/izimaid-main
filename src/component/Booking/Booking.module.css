@@ -1,0 +1,192 @@
+@media screen and (min-width: 20px) {
+  .page {
+    padding: 20px 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .backBtn {
+    background: none;
+    border: none;
+    color: rgb(19, 19, 103);
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 0 16px;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .maidCard {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: white;
+    border: 1px solid rgb(228, 228, 228);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+  .avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .avatarPlaceholder {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgb(19, 19, 103);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+  .maidName {
+    font-size: 16px;
+    font-weight: bold;
+    color: rgb(30, 30, 30);
+    margin: 0 0 2px;
+  }
+  .maidRate {
+    font-size: 13px;
+    color: rgb(19, 19, 103);
+    font-weight: bold;
+    margin: 0;
+  }
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .label {
+    font-size: 13px;
+    font-weight: bold;
+    color: rgb(47, 47, 47);
+  }
+  .input {
+    height: 44px;
+    border: 1px solid rgb(228, 228, 228);
+    border-radius: 8px;
+    padding: 0 14px;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  .input:focus {
+    border-color: rgb(19, 19, 103);
+  }
+  .textarea {
+    border: 1px solid rgb(228, 228, 228);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 80px;
+    resize: vertical;
+  }
+  .textarea:focus {
+    border-color: rgb(19, 19, 103);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .summary {
+    background: rgb(240, 240, 255);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .summaryTitle {
+    font-size: 13px;
+    font-weight: bold;
+    color: rgb(47, 47, 47);
+    margin: 0 0 10px;
+  }
+  .summaryRow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: gray;
+    padding: 4px 0;
+  }
+  .summaryTotal {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: bold;
+    color: rgb(19, 19, 103);
+    border-top: 1px solid rgb(200, 200, 230);
+    padding-top: 10px;
+    margin-top: 6px;
+  }
+  .submitBtn {
+    height: 50px;
+    background: rgb(19, 19, 103);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .submitBtn:hover {
+    background: rgb(15, 15, 70);
+  }
+  .submitBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .error {
+    font-size: 13px;
+    color: red;
+    font-weight: bold;
+  }
+  .success {
+    background: rgb(210, 247, 224);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+  .successTitle {
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(10, 107, 46);
+    margin: 0 0 8px;
+  }
+  .successText {
+    font-size: 14px;
+    color: rgb(40, 80, 60);
+    margin: 0 0 16px;
+  }
+  .successBtn {
+    height: 44px;
+    padding: 0 24px;
+    background: rgb(19, 19, 103);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+  }
+}
