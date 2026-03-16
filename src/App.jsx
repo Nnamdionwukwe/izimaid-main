@@ -11,7 +11,7 @@ import HomePage from "./component/HomePage";
 import RequestEstimate from "./component/RequestEstimate";
 import LearnMore from "./component/LearnMore/LearnMore";
 import Login from "./component/Login.jsx";
-import AdminApp from "./component/AdminDashboard/AdminApp.jsx";
+import AdminApp from "./component/AdminDashboard/Adminapp.jsx";
 import Maids from "./component/Maids/Maids.jsx";
 import Booking from "./component/Booking/Booking.jsx";
 import BookingDetail from "./component/Bookingdetail/Bookingdetail.jsx";

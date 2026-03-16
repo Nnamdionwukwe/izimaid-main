@@ -9,6 +9,21 @@ import AboutUsSideBar from "./AboutUsSideBar";
 import CleaningTipsSideBar from "./CleaningTipsSIdeBar";
 import PracticalSideBar from "./PracticalSideBar";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+function buildGoogleOAuthURL(role) {
+  const redirectUri = window.location.origin + "/login";
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: redirectUri,
+    response_type: "token",
+    scope: "openid email profile",
+    state: role,
+  });
+  return `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+}
+
 export default function SideBar({ isOpen, setIsOpen }) {
   const [isClose, setIsClose] = useState(false);
   const [isOpen2, setIsOpen2] = useState(true);
@@ -27,6 +42,8 @@ export default function SideBar({ isOpen, setIsOpen }) {
   const [iziBest, setIziBest] = useState(true);
   const [iziBest2, setIziBest2] = useState(false);
   const [isAll, setIsAll] = useState(false);
+
+  const [role, setRole] = useState("");
 
   const [isOpenFotter, setIsOpenFotter] = useState(true);
 
@@ -406,13 +423,13 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 <button className={styles.authBtn} onClick={handleAuthBtn}>
                   {token ? `Logout (${user.name?.split(" ")[0]})` : "Login"}
                 </button>
-                <button className={styles.authBtn} onClick={handleAuthBtn}>
+                {/* <button className={styles.authBtn} onClick={handleAuthBtn}>
                   {role === "admin"
                     ? "Admin Dashboard"
                     : role === "maid"
                       ? "Maid Dashboard"
                       : "Login"}
-                </button>
+                </button> */}
               </div>
             )}
           </div>
