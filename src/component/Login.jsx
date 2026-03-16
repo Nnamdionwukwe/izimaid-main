@@ -31,11 +31,27 @@ export default function Login({ onSuccess }) {
 
     if (!access_token) return;
 
-    // Clean hash immediately
+    // Clean hash immediately to prevent re-processing on refresh
     window.history.replaceState(null, "", window.location.pathname);
 
     setLoading(true);
+    setError(null);
 
+    // First, logout any existing session to prevent duplicates
+    const currentToken = localStorage.getItem("token");
+    if (currentToken) {
+      // Clear localStorage before new login
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      // Optional: Call logout endpoint to clear server cache
+      fetch(`${API_URL}/api/auth/logout`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${currentToken}` },
+      }).catch((err) => console.warn("Previous session logout failed:", err));
+    }
+
+    // Now authenticate with new credentials
     fetch(`${API_URL}/api/auth/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -44,14 +60,22 @@ export default function Login({ onSuccess }) {
       .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
       .then(({ ok, data }) => {
         if (!ok) throw new Error(data.error || "Authentication failed");
-        if (!data.token) throw new Error("No token received");
+        if (!data.token || !data.user) throw new Error("No token received");
+
+        // Store new credentials
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
+
+        setLoading(false);
         onSuccess?.(data);
       })
       .catch((err) => {
         setError(err.message || "Something went wrong. Please try again.");
         setLoading(false);
+
+        // Clean up on error
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       });
   }, []);
 
@@ -79,7 +103,7 @@ export default function Login({ onSuccess }) {
               style={{ margin: "0 auto 16px" }}
             />
             <p style={{ color: "#8a7b6a", fontSize: "14px" }}>
-              Signing you in...
+              {error ? "Signing in..." : "Signing you in..."}
             </p>
           </div>
         </div>
