@@ -30,11 +30,81 @@ function initials(name) {
   );
 }
 
-function UserEditModal({ user, onClose, onUpdate }) {
+// ── Confirmation Modal ────────────────────────────────────────────────────────
+function ConfirmDeleteModal({ user, onConfirm, onCancel, isDeleting }) {
+  return (
+    <div className={styles.modalOverlay} onClick={onCancel}>
+      <div className={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHandle} />
+
+        <div style={{ textAlign: "center", paddingTop: 16 }}>
+          <div
+            style={{
+              fontSize: 48,
+              marginBottom: 16,
+            }}
+          >
+            ⚠️
+          </div>
+          <h2 style={{ fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
+            Delete user?
+          </h2>
+          <p
+            style={{
+              color: "rgb(100, 100, 100)",
+              fontSize: 14,
+              marginBottom: 16,
+            }}
+          >
+            Are you sure you want to permanently delete{" "}
+            <strong>{user.name}</strong>?
+          </p>
+          <p
+            style={{
+              color: "rgb(150, 100, 100)",
+              fontSize: 12,
+              marginBottom: 24,
+            }}
+          >
+            This action cannot be undone. Related data will be handled
+            appropriately.
+          </p>
+        </div>
+
+        <div className={styles.modalActions}>
+          <button
+            className={styles.modalBtn}
+            onClick={onCancel}
+            disabled={isDeleting}
+          >
+            Cancel
+          </button>
+          <button
+            className={`${styles.modalBtn} ${styles.modalBtnDanger}`}
+            onClick={onConfirm}
+            disabled={isDeleting}
+            style={{
+              background: isDeleting
+                ? "rgb(200, 100, 100)"
+                : "rgb(187, 19, 47)",
+            }}
+          >
+            {isDeleting ? "Deleting..." : "Delete user"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── User Edit Modal ────────────────────────────────────────────────────────────
+function UserEditModal({ user, onClose, onUpdate, onDelete }) {
   const [role, setRole] = useState(user.role);
   const [isActive, setIsActive] = useState(user.is_active);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleSave() {
     if (role === user.role && isActive === user.is_active) {
@@ -65,6 +135,42 @@ function UserEditModal({ user, onClose, onUpdate }) {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function handleDelete() {
+    setIsDeleting(true);
+    setError("");
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/admin/users/${user.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Failed to delete user");
+        setIsDeleting(false);
+        return;
+      }
+      onDelete(user.id);
+      onClose();
+    } catch (err) {
+      setError("Something went wrong");
+      setIsDeleting(false);
+    }
+  }
+
+  if (showDeleteConfirm) {
+    return (
+      <ConfirmDeleteModal
+        user={user}
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+        isDeleting={isDeleting}
+      />
+    );
   }
 
   const rows = [
@@ -143,6 +249,29 @@ function UserEditModal({ user, onClose, onUpdate }) {
           )}
         </div>
 
+        <div
+          className={styles.detailSection}
+          style={{ borderTop: "1px solid rgb(228, 228, 228)" }}
+        >
+          <p
+            className={styles.detailSectionTitle}
+            style={{ color: "rgb(187, 19, 47)" }}
+          >
+            Danger zone
+          </p>
+          <button
+            className={styles.modalBtn}
+            onClick={() => setShowDeleteConfirm(true)}
+            style={{
+              background: "rgb(187, 19, 47)",
+              color: "white",
+              width: "100%",
+            }}
+          >
+            Delete user permanently
+          </button>
+        </div>
+
         <div className={styles.modalActions}>
           <button className={styles.modalBtn} onClick={onClose}>
             Cancel
@@ -192,6 +321,7 @@ export default function AdminUsers({ onBack }) {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
   useEffect(() => {
     setPage(1);
   }, [filter]);
@@ -211,6 +341,11 @@ export default function AdminUsers({ onBack }) {
 
   function handleUpdate(updated) {
     setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+  }
+
+  function handleDelete(userId) {
+    setUsers((prev) => prev.filter((u) => u.id !== userId));
+    setTotal((prev) => Math.max(0, prev - 1));
   }
 
   const totalPages = Math.ceil(total / LIMIT);
@@ -374,6 +509,7 @@ export default function AdminUsers({ onBack }) {
           user={selectedUser}
           onClose={() => setSelectedUser(null)}
           onUpdate={handleUpdate}
+          onDelete={handleDelete}
         />
       )}
     </div>
