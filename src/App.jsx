@@ -11,7 +11,7 @@ import HomePage from "./component/HomePage";
 import RequestEstimate from "./component/RequestEstimate";
 import LearnMore from "./component/LearnMore/LearnMore";
 import Login from "./component/Login.jsx";
-import AdminApp from "./component/AdminDashboard/AdminApp.jsx";
+import AdminApp from "./component/AdminDashboard/AdminApp";
 
 function App() {
   return (
