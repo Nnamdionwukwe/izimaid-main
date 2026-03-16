@@ -58,6 +58,8 @@ function ProfileTab({ token, user }) {
   const [msg, setMsg] = useState({ type: "", text: "" });
   const [gettingLocation, setGettingLocation] = useState(false);
   const [currentCoords, setCurrentCoords] = useState(null);
+  const [locationAttempts, setLocationAttempts] = useState(0);
+  const [fullAddress, setFullAddress] = useState(null);
 
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -97,10 +99,77 @@ function ProfileTab({ token, user }) {
     load();
   }, [user.id, token, API_URL]);
 
-  // Get current location using Geolocation API
+  // Extract detailed address from Nominatim response
+  function extractAddressDetails(data) {
+    const address = data.address || {};
+
+    const details = {
+      street: address.road || address.house_number || "",
+      houseNumber: address.house_number || "",
+      city: address.city || address.town || address.village || "",
+      state: address.state || address.region || address.county || "",
+      country: address.country || "",
+      postalCode: address.postcode || "",
+      displayName: data.display_name || "",
+    };
+
+    return details;
+  }
+
+  // Format address nicely
+  function formatAddress(addressDetails) {
+    const parts = [];
+
+    // Add street if available
+    if (addressDetails.street) {
+      parts.push(addressDetails.street);
+    }
+
+    // Add city
+    if (addressDetails.city) {
+      parts.push(addressDetails.city);
+    }
+
+    // Add state
+    if (addressDetails.state) {
+      parts.push(addressDetails.state);
+    }
+
+    // Add country
+    if (addressDetails.country) {
+      parts.push(addressDetails.country);
+    }
+
+    // Format: "Street, City, State, Country"
+    return parts.length > 0 ? parts.join(", ") : addressDetails.displayName;
+  }
+
+  // Format display address for user confirmation
+  function formatDisplayAddress(addressDetails) {
+    let display = "";
+
+    if (addressDetails.street) {
+      display += `📍 ${addressDetails.street}\n`;
+    }
+
+    if (addressDetails.city || addressDetails.state) {
+      display += `📍 ${[addressDetails.city, addressDetails.state]
+        .filter(Boolean)
+        .join(", ")}\n`;
+    }
+
+    if (addressDetails.country) {
+      display += `🌍 ${addressDetails.country}`;
+    }
+
+    return display;
+  }
+
+  // Get current location using Geolocation API with iOS-specific handling
   async function getCurrentLocation() {
     setGettingLocation(true);
     setMsg({ type: "", text: "" });
+    setLocationAttempts((prev) => prev + 1);
 
     // Check if browser supports geolocation
     if (!navigator.geolocation) {
@@ -112,34 +181,50 @@ function ProfileTab({ token, user }) {
       return;
     }
 
+    // Increased timeout for iOS - give it more time to get a fix
+    const geolocationOptions = {
+      enableHighAccuracy: true,
+      timeout: 30000, // 30 seconds
+      maximumAge: 0, // Don't use cached location
+    };
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const { latitude, longitude } = position.coords;
-        setCurrentCoords({ latitude, longitude });
+        const { latitude, longitude, accuracy } = position.coords;
+        setCurrentCoords({ latitude, longitude, accuracy });
+
+        setMsg({
+          type: "info",
+          text: `📍 Location found (Accuracy: ${Math.round(accuracy)}m). Converting to address...`,
+        });
 
         // Reverse geocoding - convert coordinates to address
         try {
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+            { timeout: 8000 },
           );
+
+          if (!response.ok) throw new Error("Address lookup failed");
+
           const data = await response.json();
+          const addressDetails = extractAddressDetails(data);
+          const formattedAddress = formatAddress(addressDetails);
+          const displayAddress = formatDisplayAddress(addressDetails);
 
-          // Extract location from response
-          const locationName =
-            data.address?.city ||
-            data.address?.town ||
-            data.address?.village ||
-            data.address?.county ||
-            `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-
+          setFullAddress(addressDetails);
           setProfile((prev) => ({
             ...prev,
-            location: locationName,
+            location: formattedAddress,
           }));
+
+          const addressDisplay = displayAddress.trim()
+            ? `✅ Location updated:\n${displayAddress}`
+            : `✅ Location: ${formattedAddress}`;
 
           setMsg({
             type: "success",
-            text: `Location updated: ${locationName}`,
+            text: addressDisplay,
           });
         } catch (err) {
           console.error("Reverse geocoding error:", err);
@@ -151,36 +236,66 @@ function ProfileTab({ token, user }) {
           }));
           setMsg({
             type: "success",
-            text: `Location: ${coordLocation}`,
+            text: `✅ Location: ${coordLocation}\n(Try again later for address with street details)`,
           });
         }
       },
       (error) => {
-        // Handle geolocation errors
+        console.error("Geolocation error:", error);
+
         let errorMessage = "Unable to get location";
+        let errorType = "error";
 
         switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage =
-              "Location permission denied. Please enable location access in your browser settings.";
+              "📍 Location access denied. Please go to Settings > Safari > Location and grant permission to this website.";
             break;
+
           case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information is unavailable.";
+            errorMessage =
+              "📍 GPS signal not found. Try:\n• Move outdoors\n• Wait a moment\n• Enable WiFi\n• Retry location request";
+            errorType = "warning";
             break;
+
           case error.TIMEOUT:
-            errorMessage = "Location request timed out.";
+            if (locationAttempts < 3) {
+              errorMessage =
+                "📍 Location request timed out. Retrying... (Attempt " +
+                (locationAttempts + 1) +
+                "/3)";
+              errorType = "warning";
+              // Auto-retry after 2 seconds
+              setTimeout(() => {
+                getCurrentLocation();
+              }, 2000);
+              setGettingLocation(false);
+              setMsg({ type: errorType, text: errorMessage });
+              return;
+            } else {
+              errorMessage =
+                "📍 Could not determine location after 3 attempts. Please:\n• Check location services are enabled\n• Try manually entering your location\n• Ensure GPS/WiFi is turned on";
+              setLocationAttempts(0);
+            }
             break;
+
           default:
-            errorMessage = "An error occurred while getting your location.";
+            if (
+              error.message &&
+              error.message.includes("Only secure origins")
+            ) {
+              errorMessage =
+                "⚠️ Location requires HTTPS. This error should only appear on HTTP sites.";
+            } else {
+              errorMessage =
+                "📍 Error getting location: " +
+                (error.message || "Unknown error");
+            }
         }
 
-        setMsg({ type: "error", text: errorMessage });
+        setMsg({ type: errorType, text: errorMessage });
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      },
+      geolocationOptions,
     );
 
     setGettingLocation(false);
@@ -223,13 +338,49 @@ function ProfileTab({ token, user }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      setMsg({ type: "success", text: "Profile saved successfully!" });
+      setMsg({ type: "success", text: "✅ Profile saved successfully!" });
     } catch (err) {
-      setMsg({ type: "error", text: err.message || "Failed to save" });
+      setMsg({
+        type: "error",
+        text: err.message || "Failed to save profile",
+      });
     } finally {
       setSaving(false);
     }
   }
+
+  const getMsgStyle = (type) => {
+    const baseStyle = {
+      padding: "10px 14px",
+      borderRadius: "8px",
+      fontSize: "13px",
+      fontWeight: "bold",
+      marginBottom: 16,
+      whiteSpace: "pre-line",
+      lineHeight: "1.5",
+    };
+
+    const typeStyles = {
+      success: {
+        background: "rgb(209, 247, 224)",
+        color: "rgb(10, 107, 46)",
+      },
+      error: {
+        background: "rgb(255, 228, 228)",
+        color: "rgb(168, 28, 28)",
+      },
+      warning: {
+        background: "rgb(255, 243, 205)",
+        color: "rgb(133, 100, 4)",
+      },
+      info: {
+        background: "rgb(209, 236, 255)",
+        color: "rgb(10, 76, 140)",
+      },
+    };
+
+    return { ...baseStyle, ...(typeStyles[type] || typeStyles.info) };
+  };
 
   if (loading)
     return (
@@ -251,25 +402,7 @@ function ProfileTab({ token, user }) {
         My Profile
       </p>
 
-      {msg.text && (
-        <p
-          style={{
-            background:
-              msg.type === "success"
-                ? "rgb(209, 247, 224)"
-                : "rgb(255, 228, 228)",
-            color:
-              msg.type === "success" ? "rgb(10, 107, 46)" : "rgb(168, 28, 28)",
-            padding: "10px 14px",
-            borderRadius: "8px",
-            fontSize: "13px",
-            fontWeight: "bold",
-            marginBottom: 16,
-          }}
-        >
-          {msg.text}
-        </p>
-      )}
+      {msg.text && <p style={getMsgStyle(msg.type)}>{msg.text}</p>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         {/* Bio */}
@@ -399,14 +532,17 @@ function ProfileTab({ token, user }) {
               style={{
                 background: "none",
                 border: "none",
-                color: "rgb(19, 19, 103)",
+                color: gettingLocation
+                  ? "rgb(100, 100, 100)"
+                  : "rgb(19, 19, 103)",
                 fontSize: "12px",
                 fontWeight: "bold",
                 cursor: gettingLocation ? "not-allowed" : "pointer",
                 opacity: gettingLocation ? 0.6 : 1,
                 textDecoration: "underline",
+                fontFamily: "inherit",
               }}
-              title="Use your current GPS location"
+              title="Get your exact location with street address (requires location permission)"
             >
               {gettingLocation
                 ? "📍 Getting location..."
@@ -426,19 +562,60 @@ function ProfileTab({ token, user }) {
               boxSizing: "border-box",
             }}
             type="text"
-            placeholder="e.g. Lekki, Lagos"
+            placeholder="e.g. Street Name, Lekki, Lagos, Nigeria"
             value={profile.location}
             onChange={(e) =>
               setProfile((p) => ({ ...p, location: e.target.value }))
             }
           />
 
-          {currentCoords && (
-            <p style={{ fontSize: "11px", color: "gray", marginTop: 6 }}>
-              Coordinates: {currentCoords.latitude.toFixed(4)},{" "}
-              {currentCoords.longitude.toFixed(4)}
-            </p>
-          )}
+          {/* Show detailed address breakdown if available */}
+          {fullAddress &&
+            (fullAddress.street ||
+              fullAddress.city ||
+              fullAddress.state ||
+              fullAddress.country) && (
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: "gray",
+                  marginTop: 8,
+                  padding: "8px",
+                  background: "rgb(245, 245, 248)",
+                  borderRadius: "6px",
+                  lineHeight: "1.6",
+                }}
+              >
+                <p style={{ margin: "0 0 4px 0", fontWeight: "bold" }}>
+                  📍 Address Details:
+                </p>
+                {fullAddress.street && (
+                  <p style={{ margin: "2px 0" }}>
+                    🏠 Street: {fullAddress.street}
+                  </p>
+                )}
+                {fullAddress.city && (
+                  <p style={{ margin: "2px 0" }}>🏙️ City: {fullAddress.city}</p>
+                )}
+                {fullAddress.state && (
+                  <p style={{ margin: "2px 0" }}>
+                    📍 State: {fullAddress.state}
+                  </p>
+                )}
+                {fullAddress.country && (
+                  <p style={{ margin: "2px 0" }}>
+                    🌍 Country: {fullAddress.country}
+                  </p>
+                )}
+                {currentCoords && (
+                  <p style={{ margin: "2px 0" }}>
+                    📌 Coordinates: {currentCoords.latitude.toFixed(4)},
+                    {currentCoords.longitude.toFixed(4)} (Accuracy:
+                    {Math.round(currentCoords.accuracy)}m)
+                  </p>
+                )}
+              </div>
+            )}
         </div>
 
         {/* Services */}
