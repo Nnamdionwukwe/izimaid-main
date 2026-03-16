@@ -52,10 +52,10 @@ export default function SideBar({ isOpen, setIsOpen }) {
 
     switch (role) {
       case "admin":
-        navigate("/admin-dashboard");
+        navigate("/admin");
         break;
       case "maid":
-        navigate("/maid-dashboard");
+        navigate("/maid");
         break;
       case "customer":
       default:
