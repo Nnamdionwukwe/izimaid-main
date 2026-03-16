@@ -98,7 +98,6 @@ function LocationModal({
                 opacity: locating ? 0.5 : 1,
               }}
             >
-              <i className="fa fa-map-marker" aria-hidden="true" />
               <h5>
                 {locating ? "📍 Detecting location..." : "📍 Use My Location"}
               </h5>
@@ -384,7 +383,7 @@ export default function SubHeader() {
               onClick={() => setFindLocalIzimaid(true)}
             >
               <i className="fa fa-map-marker" aria-hidden="true" />
-              <p>Find My Local IziMaid</p>
+              <p>Find My Local Deusizi Sparkle Maid</p>
             </div>
 
             {findLocalIzimaid && <LocationModal {...modalProps} />}
