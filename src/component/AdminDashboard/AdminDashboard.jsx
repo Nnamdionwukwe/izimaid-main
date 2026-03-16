@@ -212,7 +212,7 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
           <h1 className={styles.headerTitle}>Deusizi Sparkle Admin</h1>
           <span className={styles.headerBadge}>{total} leads</span>
         </div>
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div className={styles.headerNav}>
           <button
             className={styles.logoutBtn}
             onClick={() => onNavigate("maids")}
