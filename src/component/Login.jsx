@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import styles from "./Login.module.css";
 
@@ -9,60 +9,63 @@ export default function Login({ onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleGoogleSuccess = useCallback(
-    async (tokenResponse) => {
-      setLoading(true);
-      setError(null);
+  // ── Handle redirect flow: Google redirects back to /login#access_token=xxx ──
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash) return;
 
-      try {
-        const res = await fetch(`${API_URL}/api/auth/google`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            access_token: tokenResponse.access_token,
-            role,
-          }),
-        });
+    const params = new URLSearchParams(hash.replace("#", "?"));
+    const access_token = params.get("access_token");
+    if (!access_token) return;
 
-        const data = await res.json();
+    // Clean the hash from the URL immediately
+    window.history.replaceState(null, "", window.location.pathname);
 
-        if (!res.ok) {
-          throw new Error(data.error || "Authentication failed");
-        }
+    // Retrieve role that was saved before redirect
+    const savedRole = sessionStorage.getItem("google_login_role") || "customer";
+    sessionStorage.removeItem("google_login_role");
 
-        // Support both token shapes:
-        //   { token, user }  or  { tokens: { accessToken }, user }
+    setLoading(true);
+    setError(null);
+
+    fetch(`${API_URL}/api/auth/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ access_token, role: savedRole }),
+    })
+      .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok) throw new Error(data.error || "Authentication failed");
         const token = data.token || data.tokens?.accessToken;
         if (!token) throw new Error("No token received from server");
-
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(data.user));
-
         onSuccess?.(data);
-      } catch (err) {
+      })
+      .catch((err) => {
         setError(err.message || "Something went wrong. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [role, onSuccess],
-  );
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const login = useGoogleLogin({
-    onSuccess: handleGoogleSuccess,
     onError: () => {
       setError("Google sign-in was cancelled or failed.");
       setLoading(false);
     },
-    // Fires when popup is closed manually or blocked
     onNonOAuthError: () => {
       setLoading(false);
     },
+    flow: "implicit",
+    ux_mode: "redirect",
+    redirect_uri: `${window.location.origin}/login`,
   });
 
   const handleLogin = () => {
     setError(null);
     setLoading(true);
+    // Save role before redirect so we can read it when Google comes back
+    sessionStorage.setItem("google_login_role", role);
     try {
       login();
     } catch {
@@ -76,12 +79,10 @@ export default function Login({ onSuccess }) {
       <div className={styles.left}>
         <div className={styles.leftPattern} />
         <div className={styles.leftGrid} />
-
         <div className={styles.brand}>
           <h1 className={styles.brandName}>Deusizi Sparkle</h1>
           <p className={styles.brandTagline}>Home services, simplified</p>
         </div>
-
         <div className={styles.leftContent}>
           <h2 className={styles.leftHeading}>
             Your home,
@@ -109,7 +110,6 @@ export default function Login({ onSuccess }) {
             </div>
           </div>
         </div>
-
         <div className={styles.leftFooter}>
           © {new Date().getFullYear()} Deusizi Sparkle · Abuja, Lagos, Nigeria
         </div>
@@ -125,7 +125,6 @@ export default function Login({ onSuccess }) {
             </p>
           </div>
 
-          {/* Role toggle */}
           <div className={styles.roleToggle}>
             <button
               className={`${styles.roleBtn} ${role === "customer" ? styles.roleBtnActive : ""}`}
@@ -149,7 +148,6 @@ export default function Login({ onSuccess }) {
             <div className={styles.dividerLine} />
           </div>
 
-          {/* Google button */}
           <button
             className={styles.googleBtn}
             onClick={handleLogin}
@@ -181,7 +179,6 @@ export default function Login({ onSuccess }) {
             {loading ? "Signing in…" : "Continue with Google"}
           </button>
 
-          {/* Error */}
           {error && (
             <div className={styles.error}>
               <div className={styles.errorDot} />

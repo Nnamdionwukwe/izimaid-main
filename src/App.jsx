@@ -54,6 +54,11 @@ function AppRoutes() {
   const token = getToken();
   const user = getUser();
 
+  // After Google redirect, the URL is /login#access_token=...
+  // We must let Login render so its useEffect can process the hash.
+  // Only redirect away if token exists AND there's no access_token hash.
+  const hasGoogleHash = window.location.hash.includes("access_token");
+
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
@@ -61,7 +66,7 @@ function AppRoutes() {
       <Route
         path="/login"
         element={
-          token ? (
+          token && !hasGoogleHash ? (
             <Navigate to={user.role === "admin" ? "/admin" : "/"} replace />
           ) : (
             <Login onSuccess={handleLoginSuccess} />
