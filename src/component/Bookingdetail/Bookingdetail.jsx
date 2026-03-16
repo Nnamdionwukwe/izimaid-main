@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import styles from "./BookingDetail.module.css";
+import styles from "./Bookingdetail.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
