@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MaidDashboard.module.css";
-
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const SERVICES_LIST = [
@@ -45,6 +44,7 @@ function initials(name) {
 }
 
 // ─── Profile Tab ──────────────────────────────────────────────
+
 function ProfileTab({ token, user }) {
   const [profile, setProfile] = useState({
     bio: "",
@@ -56,7 +56,23 @@ function ProfileTab({ token, user }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState({ type: "", text: "" });
+  const [gettingLocation, setGettingLocation] = useState(false);
+  const [currentCoords, setCurrentCoords] = useState(null);
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
+  const SERVICES_LIST = [
+    "Cleaning",
+    "Laundry",
+    "Cooking",
+    "Ironing",
+    "Organizing",
+    "Window Cleaning",
+    "Carpet Cleaning",
+    "Deep Cleaning",
+  ];
+
+  // Load profile on mount
   useEffect(() => {
     async function load() {
       try {
@@ -73,11 +89,102 @@ function ProfileTab({ token, user }) {
             location: data.maid.location || "",
           });
         }
-      } catch {}
+      } catch (err) {
+        console.error("Error loading profile:", err);
+      }
       setLoading(false);
     }
     load();
-  }, []);
+  }, [user.id, token, API_URL]);
+
+  // Get current location using Geolocation API
+  async function getCurrentLocation() {
+    setGettingLocation(true);
+    setMsg({ type: "", text: "" });
+
+    // Check if browser supports geolocation
+    if (!navigator.geolocation) {
+      setMsg({
+        type: "error",
+        text: "Geolocation is not supported by your browser",
+      });
+      setGettingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        setCurrentCoords({ latitude, longitude });
+
+        // Reverse geocoding - convert coordinates to address
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+          );
+          const data = await response.json();
+
+          // Extract location from response
+          const locationName =
+            data.address?.city ||
+            data.address?.town ||
+            data.address?.village ||
+            data.address?.county ||
+            `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+
+          setProfile((prev) => ({
+            ...prev,
+            location: locationName,
+          }));
+
+          setMsg({
+            type: "success",
+            text: `Location updated: ${locationName}`,
+          });
+        } catch (err) {
+          console.error("Reverse geocoding error:", err);
+          // Fallback to coordinates if reverse geocoding fails
+          const coordLocation = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+          setProfile((prev) => ({
+            ...prev,
+            location: coordLocation,
+          }));
+          setMsg({
+            type: "success",
+            text: `Location: ${coordLocation}`,
+          });
+        }
+      },
+      (error) => {
+        // Handle geolocation errors
+        let errorMessage = "Unable to get location";
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage =
+              "Location permission denied. Please enable location access in your browser settings.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information is unavailable.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out.";
+            break;
+          default:
+            errorMessage = "An error occurred while getting your location.";
+        }
+
+        setMsg({ type: "error", text: errorMessage });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      },
+    );
+
+    setGettingLocation(false);
+  }
 
   function toggleService(s) {
     setProfile((prev) => ({
@@ -93,8 +200,10 @@ function ProfileTab({ token, user }) {
       setMsg({ type: "error", text: "Please enter a valid hourly rate" });
       return;
     }
+
     setSaving(true);
     setMsg({ type: "", text: "" });
+
     try {
       const res = await fetch(`${API_URL}/api/maids/profile`, {
         method: "PATCH",
@@ -110,8 +219,10 @@ function ProfileTab({ token, user }) {
           location: profile.location,
         }),
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
+
       setMsg({ type: "success", text: "Profile saved successfully!" });
     } catch (err) {
       setMsg({ type: "error", text: err.message || "Failed to save" });
@@ -120,36 +231,105 @@ function ProfileTab({ token, user }) {
     }
   }
 
-  if (loading) return <div className={styles.loading}>Loading profile...</div>;
+  if (loading)
+    return (
+      <div style={{ padding: "20px", textAlign: "center", color: "gray" }}>
+        Loading profile...
+      </div>
+    );
 
   return (
     <div>
-      <p className={styles.sectionTitle}>My Profile</p>
+      <p
+        style={{
+          fontSize: 16,
+          fontWeight: "bold",
+          color: "rgb(19, 19, 103)",
+          margin: "0 0 14px",
+        }}
+      >
+        My Profile
+      </p>
+
       {msg.text && (
         <p
-          className={
-            msg.type === "success" ? styles.successMsg : styles.errorMsg
-          }
-          style={{ marginBottom: 16 }}
+          style={{
+            background:
+              msg.type === "success"
+                ? "rgb(209, 247, 224)"
+                : "rgb(255, 228, 228)",
+            color:
+              msg.type === "success" ? "rgb(10, 107, 46)" : "rgb(168, 28, 28)",
+            padding: "10px 14px",
+            borderRadius: "8px",
+            fontSize: "13px",
+            fontWeight: "bold",
+            marginBottom: 16,
+          }}
         >
           {msg.text}
         </p>
       )}
-      <div className={styles.form}>
-        <div className={styles.field}>
-          <label className={styles.label}>Bio</label>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {/* Bio */}
+        <div>
+          <label
+            style={{
+              fontSize: "13px",
+              fontWeight: "bold",
+              color: "rgb(47, 47, 47)",
+              display: "block",
+              marginBottom: 6,
+            }}
+          >
+            Bio
+          </label>
           <textarea
-            className={styles.textarea}
+            style={{
+              border: "1px solid rgb(228, 228, 228)",
+              borderRadius: "8px",
+              padding: "10px 14px",
+              fontSize: "14px",
+              fontFamily: "inherit",
+              width: "100%",
+              minHeight: "90px",
+              boxSizing: "border-box",
+              resize: "vertical",
+            }}
             placeholder="Tell customers about yourself, your experience and what makes you great..."
             value={profile.bio}
             onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
           />
         </div>
-        <div className={styles.row}>
-          <div className={styles.field}>
-            <label className={styles.label}>Hourly Rate (₦)*</label>
+
+        {/* Hourly Rate & Years Experience */}
+        <div
+          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
+        >
+          <div>
+            <label
+              style={{
+                fontSize: "13px",
+                fontWeight: "bold",
+                color: "rgb(47, 47, 47)",
+                display: "block",
+                marginBottom: 6,
+              }}
+            >
+              Hourly Rate (₦)*
+            </label>
             <input
-              className={styles.input}
+              style={{
+                height: "44px",
+                border: "1px solid rgb(228, 228, 228)",
+                borderRadius: "8px",
+                padding: "0 14px",
+                fontSize: "14px",
+                fontFamily: "inherit",
+                width: "100%",
+                boxSizing: "border-box",
+              }}
               type="number"
               placeholder="e.g. 3000"
               value={profile.hourly_rate}
@@ -159,10 +339,30 @@ function ProfileTab({ token, user }) {
               min="0"
             />
           </div>
-          <div className={styles.field}>
-            <label className={styles.label}>Years Experience</label>
+
+          <div>
+            <label
+              style={{
+                fontSize: "13px",
+                fontWeight: "bold",
+                color: "rgb(47, 47, 47)",
+                display: "block",
+                marginBottom: 6,
+              }}
+            >
+              Years Experience
+            </label>
             <input
-              className={styles.input}
+              style={{
+                height: "44px",
+                border: "1px solid rgb(228, 228, 228)",
+                borderRadius: "8px",
+                padding: "0 14px",
+                fontSize: "14px",
+                fontFamily: "inherit",
+                width: "100%",
+                boxSizing: "border-box",
+              }}
               type="number"
               placeholder="e.g. 3"
               value={profile.years_exp}
@@ -173,10 +373,58 @@ function ProfileTab({ token, user }) {
             />
           </div>
         </div>
-        <div className={styles.field}>
-          <label className={styles.label}>Location</label>
+
+        {/* Location with Geolocation Button */}
+        <div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 6,
+            }}
+          >
+            <label
+              style={{
+                fontSize: "13px",
+                fontWeight: "bold",
+                color: "rgb(47, 47, 47)",
+              }}
+            >
+              Location
+            </label>
+            <button
+              onClick={getCurrentLocation}
+              disabled={gettingLocation}
+              style={{
+                background: "none",
+                border: "none",
+                color: "rgb(19, 19, 103)",
+                fontSize: "12px",
+                fontWeight: "bold",
+                cursor: gettingLocation ? "not-allowed" : "pointer",
+                opacity: gettingLocation ? 0.6 : 1,
+                textDecoration: "underline",
+              }}
+              title="Use your current GPS location"
+            >
+              {gettingLocation
+                ? "📍 Getting location..."
+                : "📍 Use Current Location"}
+            </button>
+          </div>
+
           <input
-            className={styles.input}
+            style={{
+              height: "44px",
+              border: "1px solid rgb(228, 228, 228)",
+              borderRadius: "8px",
+              padding: "0 14px",
+              fontSize: "14px",
+              fontFamily: "inherit",
+              width: "100%",
+              boxSizing: "border-box",
+            }}
             type="text"
             placeholder="e.g. Lekki, Lagos"
             value={profile.location}
@@ -184,18 +432,77 @@ function ProfileTab({ token, user }) {
               setProfile((p) => ({ ...p, location: e.target.value }))
             }
           />
+
+          {currentCoords && (
+            <p style={{ fontSize: "11px", color: "gray", marginTop: 6 }}>
+              Coordinates: {currentCoords.latitude.toFixed(4)},{" "}
+              {currentCoords.longitude.toFixed(4)}
+            </p>
+          )}
         </div>
-        <div className={styles.field}>
-          <label className={styles.label}>Services Offered</label>
-          <div className={styles.serviceGrid}>
+
+        {/* Services */}
+        <div>
+          <label
+            style={{
+              fontSize: "13px",
+              fontWeight: "bold",
+              color: "rgb(47, 47, 47)",
+              display: "block",
+              marginBottom: 6,
+            }}
+          >
+            Services Offered
+          </label>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 8,
+            }}
+          >
             {SERVICES_LIST.map((s) => (
               <div
                 key={s}
-                className={`${styles.serviceItem} ${profile.services.includes(s) ? styles.serviceItemActive : ""}`}
                 onClick={() => toggleService(s)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "10px 12px",
+                  border: profile.services.includes(s)
+                    ? "1px solid rgb(19, 19, 103)"
+                    : "1px solid rgb(228, 228, 228)",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontSize: "13px",
+                  color: profile.services.includes(s)
+                    ? "rgb(19, 19, 103)"
+                    : "rgb(47, 47, 47)",
+                  background: profile.services.includes(s)
+                    ? "rgb(240, 240, 255)"
+                    : "white",
+                  fontWeight: profile.services.includes(s) ? "bold" : "normal",
+                }}
               >
                 <div
-                  className={`${styles.serviceCheck} ${profile.services.includes(s) ? styles.serviceCheckActive : ""}`}
+                  style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: 3,
+                    border: profile.services.includes(s)
+                      ? "2px solid rgb(19, 19, 103)"
+                      : "2px solid rgb(228, 228, 228)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    background: profile.services.includes(s)
+                      ? "rgb(19, 19, 103)"
+                      : "white",
+                    color: "white",
+                    fontSize: 10,
+                  }}
                 >
                   {profile.services.includes(s) && "✓"}
                 </div>
@@ -204,10 +511,23 @@ function ProfileTab({ token, user }) {
             ))}
           </div>
         </div>
+
+        {/* Save Button */}
         <button
-          className={styles.saveBtn}
           onClick={handleSave}
           disabled={saving}
+          style={{
+            height: "48px",
+            background: "rgb(19, 19, 103)",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            fontSize: "14px",
+            fontWeight: "bold",
+            cursor: saving ? "not-allowed" : "pointer",
+            opacity: saving ? 0.6 : 1,
+            fontFamily: "inherit",
+          }}
         >
           {saving ? "Saving..." : "Save Profile"}
         </button>
