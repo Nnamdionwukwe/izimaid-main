@@ -9,6 +9,7 @@ const FILTERS = [
   "confirmed",
   "in_progress",
   "completed",
+  "declined",
   "cancelled",
 ];
 
@@ -18,6 +19,7 @@ const STATUS_CLASS = {
   in_progress: styles.statusInProgress,
   completed: styles.statusCompleted,
   cancelled: styles.statusCancelled,
+  declined: styles.statusDeclined,
 };
 
 function formatDate(d) {
@@ -136,9 +138,27 @@ export default function MyBookings() {
                 <span
                   className={`${styles.statusBadge} ${STATUS_CLASS[b.status] || styles.statusPending}`}
                 >
-                  {b.status?.replace("_", " ")}
+                  {b.status === "in_progress"
+                    ? "In Progress"
+                    : b.status === "declined"
+                      ? "Declined"
+                      : b.status?.replace("_", " ")}
                 </span>
               </div>
+
+              {/* Declined Alert - Only show if declined with reason */}
+              {b.status === "declined" && b.declined_reason && (
+                <div className={styles.declinedAlert}>
+                  <div className={styles.declinedIcon}>❌</div>
+                  <div className={styles.declinedContent}>
+                    <p className={styles.declinedReason}>
+                      <span className={styles.reasonLabel}>Reason:</span>
+                      {b.declined_reason}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div className={styles.cardMeta}>
                 <div className={styles.metaItem}>
                   Duration:{" "}
