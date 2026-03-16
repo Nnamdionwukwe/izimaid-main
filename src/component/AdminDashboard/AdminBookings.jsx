@@ -1,26 +1,52 @@
 import { useState, useEffect, useCallback } from "react";
-import styles from "./AdminDashboard.module.css";
+import styles from "./AdminBookings.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-const STATUS_FILTERS = ["all", "new", "contacted", "converted", "lost"];
+const STATUS_FILTERS = [
+  "all",
+  "pending",
+  "confirmed",
+  "in_progress",
+  "completed",
+  "cancelled",
+];
 
 const STATUS_COLORS = {
-  new: styles.statusNew,
-  contacted: styles.statusContacted,
-  converted: styles.statusConverted,
-  lost: styles.statusLost,
+  pending: styles.statusPending,
+  confirmed: styles.statusConfirmed,
+  in_progress: styles.statusInProgress,
+  completed: styles.statusCompleted,
+  cancelled: styles.statusCancelled,
 };
 
+const ADMIN_STATUSES = [
+  "pending",
+  "confirmed",
+  "in_progress",
+  "completed",
+  "cancelled",
+];
+
 function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-NG", {
+  if (!dateStr) return "—";
+  return new Date(dateStr).toLocaleDateString("en-NG", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
 }
 
+function formatCurrency(amount) {
+  if (amount == null) return "—";
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+  }).format(amount);
+}
+
+// ── Stat card (same as AdminDashboard) ───────────────────────────────────────
 function StatCard({ label, value, color }) {
   return (
     <div className={styles.statCard}>
@@ -35,19 +61,20 @@ function StatCard({ label, value, color }) {
   );
 }
 
-function LeadDetailModal({ lead, onClose, onStatusUpdate }) {
-  const [status, setStatus] = useState(lead.status);
+// ── Booking detail modal ──────────────────────────────────────────────────────
+function BookingDetailModal({ booking, onClose, onStatusUpdate }) {
+  const [status, setStatus] = useState(booking.status);
   const [saving, setSaving] = useState(false);
 
   async function handleSave() {
-    if (status === lead.status) {
+    if (status === booking.status) {
       onClose();
       return;
     }
     setSaving(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${API_URL}/api/leads/${lead.id}`, {
+      const res = await fetch(`${API_URL}/api/bookings/${booking.id}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -57,7 +84,7 @@ function LeadDetailModal({ lead, onClose, onStatusUpdate }) {
       });
       if (res.ok) {
         const data = await res.json();
-        onStatusUpdate(data.lead);
+        onStatusUpdate(data.booking);
         onClose();
       }
     } catch (err) {
@@ -68,42 +95,34 @@ function LeadDetailModal({ lead, onClose, onStatusUpdate }) {
   }
 
   const rows = [
-    ["Email", lead.email],
-    ["Phone", lead.phone_number],
-    ["Address", lead.service_address],
-    ["ZIP", lead.zip_code],
-    lead.apartment_suite && ["Apartment", lead.apartment_suite],
-    ["Cleaning type", lead.cleaning_type?.replace("_", " ")],
-    ["Frequency", lead.frequency?.replace("_", " ")],
-    lead.residential_sqft && ["Sq ft (home)", lead.residential_sqft],
-    lead.bedrooms !== null &&
-      lead.bedrooms !== undefined && ["Bedrooms", lead.bedrooms],
-    lead.bathrooms !== null &&
-      lead.bathrooms !== undefined && ["Bathrooms", lead.bathrooms],
-    lead.commercial_sqft && ["Sq ft (office)", lead.commercial_sqft],
-    lead.offices !== null &&
-      lead.offices !== undefined && ["Offices", lead.offices],
-    lead.commercial_bathrooms !== null &&
-      lead.commercial_bathrooms !== undefined && [
-        "Office bathrooms",
-        lead.commercial_bathrooms,
-      ],
-    lead.recurring_plan && ["Recurring plan", lead.recurring_plan],
-    ["SMS opt-in", lead.text_me_messages ? "Yes" : "No"],
-    ["Submitted", formatDate(lead.created_at)],
+    ["Booking ID", booking.id],
+    ["Customer", booking.customer_name || booking.customer_id],
+    ["Maid", booking.maid_name || booking.maid_id],
+    ["Service date", formatDate(booking.service_date)],
+    [
+      "Duration",
+      booking.duration_hours ? `${booking.duration_hours} hrs` : "—",
+    ],
+    ["Address", booking.address],
+    booking.notes && ["Notes", booking.notes],
+    ["Total", formatCurrency(booking.total_amount)],
+    ["Payment", booking.payment_status || "unpaid"],
+    booking.paystack_reference && ["Paystack ref", booking.paystack_reference],
+    ["Created", formatDate(booking.created_at)],
   ].filter(Boolean);
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHandle} />
-        <p className={styles.modalName}>
-          {lead.first_name} {lead.last_name}
+
+        <p className={styles.modalName}>Booking #{booking.id?.slice(0, 8)}</p>
+        <p className={styles.modalSubtitle}>
+          {booking.customer_name} → {booking.maid_name}
         </p>
-        <p className={styles.modalSubtitle}>{lead.email}</p>
 
         <div className={styles.detailSection}>
-          <p className={styles.detailSectionTitle}>Lead details</p>
+          <p className={styles.detailSectionTitle}>Booking details</p>
           {rows.map(([k, v]) => (
             <div key={k} className={styles.detailRow}>
               <span className={styles.detailKey}>{k}</span>
@@ -119,10 +138,11 @@ function LeadDetailModal({ lead, onClose, onStatusUpdate }) {
             value={status}
             onChange={(e) => setStatus(e.target.value)}
           >
-            <option value="new">New</option>
-            <option value="contacted">Contacted</option>
-            <option value="converted">Converted</option>
-            <option value="lost">Lost</option>
+            {ADMIN_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -143,28 +163,30 @@ function LeadDetailModal({ lead, onClose, onStatusUpdate }) {
   );
 }
 
-export default function AdminDashboard({ onLogout, onNavigate }) {
-  const [leads, setLeads] = useState([]);
+// ── Main AdminBookings ────────────────────────────────────────────────────────
+export default function AdminBookings({ onNavigate }) {
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [selectedLead, setSelectedLead] = useState(null);
+  const [selectedBooking, setSelectedBooking] = useState(null);
   const LIMIT = 20;
 
-  const fetchLeads = useCallback(async () => {
+  const fetchBookings = useCallback(async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
       const params = new URLSearchParams({ page, limit: LIMIT });
       if (filter !== "all") params.set("status", filter);
-      const res = await fetch(`${API_URL}/api/leads?${params}`, {
+      const res = await fetch(`${API_URL}/api/bookings?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      setLeads(data.leads || []);
-      setTotal(data.total || 0);
+      setBookings(data.bookings || []);
+      // backend doesn't return total yet — use length as fallback
+      setTotal(data.total || data.bookings?.length || 0);
     } catch (err) {
       console.error(err);
     } finally {
@@ -173,51 +195,48 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
   }, [filter, page]);
 
   useEffect(() => {
-    fetchLeads();
-  }, [fetchLeads]);
-
-  // Reset to page 1 when filter changes
+    fetchBookings();
+  }, [fetchBookings]);
   useEffect(() => {
     setPage(1);
   }, [filter]);
 
-  const filtered = leads.filter((l) => {
+  const filtered = bookings.filter((b) => {
     if (!search) return true;
     const q = search.toLowerCase();
     return (
-      l.first_name?.toLowerCase().includes(q) ||
-      l.last_name?.toLowerCase().includes(q) ||
-      l.email?.toLowerCase().includes(q) ||
-      l.phone_number?.includes(q) ||
-      l.service_address?.toLowerCase().includes(q)
+      b.customer_name?.toLowerCase().includes(q) ||
+      b.maid_name?.toLowerCase().includes(q) ||
+      b.address?.toLowerCase().includes(q) ||
+      b.id?.toLowerCase().includes(q)
     );
   });
 
-  const counts = leads.reduce((acc, l) => {
-    acc[l.status] = (acc[l.status] || 0) + 1;
+  const counts = bookings.reduce((acc, b) => {
+    acc[b.status] = (acc[b.status] || 0) + 1;
     return acc;
   }, {});
 
   function handleStatusUpdate(updated) {
-    setLeads((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
+    setBookings((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
   }
 
   const totalPages = Math.ceil(total / LIMIT);
 
   return (
     <div className={styles.dashboard}>
-      {/* Header */}
+      {/* ── Header ── */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <h1 className={styles.headerTitle}>IziMaid Admin</h1>
-          <span className={styles.headerBadge}>{total} leads</span>
+          <h1 className={styles.headerTitle}>Bookings</h1>
+          <span className={styles.headerBadge}>{total} total</span>
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
           <button
             className={styles.logoutBtn}
-            onClick={() => onNavigate("bookings")}
+            onClick={() => onNavigate("leads")}
           >
-            📅 Bookings
+            📋 Leads
           </button>
           <button
             className={styles.logoutBtn}
@@ -225,29 +244,36 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
           >
             👥 Users
           </button>
-          <button className={styles.logoutBtn} onClick={onLogout}>
-            Logout
-          </button>
         </div>
       </div>
 
-      {/* Stats */}
+      {/* ── Stats ── */}
       <div className={styles.statsBar}>
         <StatCard label="Total" value={total} />
-        <StatCard label="New" value={counts.new || 0} color="#1a56c4" />
+        <StatCard label="Pending" value={counts.pending || 0} color="#856404" />
         <StatCard
-          label="Contacted"
-          value={counts.contacted || 0}
-          color="#856404"
+          label="Confirmed"
+          value={counts.confirmed || 0}
+          color="#1a56c4"
         />
         <StatCard
-          label="Converted"
-          value={counts.converted || 0}
+          label="Completed"
+          value={counts.completed || 0}
           color="#0a6b2e"
+        />
+        <StatCard
+          label="In Progress"
+          value={counts.in_progress || 0}
+          color="#6f42c1"
+        />
+        <StatCard
+          label="Cancelled"
+          value={counts.cancelled || 0}
+          color="#a81c1c"
         />
       </div>
 
-      {/* Filters */}
+      {/* ── Filters ── */}
       <div className={styles.filterBar}>
         {STATUS_FILTERS.map((f) => (
           <button
@@ -255,12 +281,14 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
             className={`${styles.filterBtn} ${filter === f ? styles.filterBtnActive : ""}`}
             onClick={() => setFilter(f)}
           >
-            {f.charAt(0).toUpperCase() + f.slice(1)}
+            {f === "in_progress"
+              ? "In Progress"
+              : f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
       </div>
 
-      {/* Search */}
+      {/* ── Search ── */}
       <div className={styles.searchWrap}>
         <svg
           className={styles.searchIcon}
@@ -276,67 +304,72 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
         </svg>
         <input
           className={styles.searchInput}
-          placeholder="Search by name, email, phone, address..."
+          placeholder="Search by customer, maid, address or booking ID…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
-      {/* Leads */}
+      {/* ── Bookings list ── */}
       {loading ? (
-        <div className={styles.loading}>Loading leads...</div>
+        <div className={styles.loading}>Loading bookings...</div>
       ) : filtered.length === 0 ? (
         <div className={styles.empty}>
-          <div className={styles.emptyIcon}>📋</div>
-          <p className={styles.emptyText}>No leads found</p>
+          <div className={styles.emptyIcon}>📅</div>
+          <p className={styles.emptyText}>No bookings found</p>
         </div>
       ) : (
         <div className={styles.leadsList}>
-          {filtered.map((lead) => (
-            <div key={lead.id} className={styles.leadCard}>
+          {filtered.map((booking) => (
+            <div key={booking.id} className={styles.leadCard}>
               <div className={styles.leadCardTop}>
                 <div>
                   <p className={styles.leadName}>
-                    {lead.first_name} {lead.last_name}
+                    {booking.customer_name || "Customer"}
                   </p>
-                  <p className={styles.leadEmail}>{lead.email}</p>
+                  <p className={styles.leadEmail}>
+                    Maid: {booking.maid_name || booking.maid_id}
+                  </p>
                 </div>
                 <span
-                  className={`${styles.statusBadge} ${STATUS_COLORS[lead.status] || styles.statusNew}`}
+                  className={`${styles.statusBadge} ${STATUS_COLORS[booking.status] || styles.statusPending}`}
                 >
-                  {lead.status}
+                  {booking.status?.replace("_", " ")}
                 </span>
               </div>
+
               <div className={styles.leadCardMeta}>
                 <span className={styles.metaTag}>
-                  {lead.cleaning_type?.replace("_", " ")}
+                  📅 {formatDate(booking.service_date)}
                 </span>
                 <span className={styles.metaTag}>
-                  {lead.frequency?.replace("_", " ")}
+                  ⏱ {booking.duration_hours}h
                 </span>
-                {lead.service_address && (
+                <span className={styles.metaTag}>
+                  💰 {formatCurrency(booking.total_amount)}
+                </span>
+                {booking.address && (
                   <span className={styles.metaTag}>
-                    {lead.service_address.split(",")[0]}
+                    📍 {booking.address.split(",")[0]}
                   </span>
                 )}
               </div>
+
               <div className={styles.leadCardActions}>
                 <button
                   className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
-                  onClick={() => setSelectedLead(lead)}
+                  onClick={() => setSelectedBooking(booking)}
                 >
                   View details
                 </button>
                 <button
                   className={styles.actionBtn}
-                  onClick={() => {
-                    setSelectedLead(lead);
-                  }}
+                  onClick={() => setSelectedBooking(booking)}
                 >
-                  Update
+                  Update status
                 </button>
                 <span className={styles.leadDate}>
-                  {formatDate(lead.created_at)}
+                  {formatDate(booking.created_at)}
                 </span>
               </div>
             </div>
@@ -344,7 +377,7 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
         </div>
       )}
 
-      {/* Pagination */}
+      {/* ── Pagination ── */}
       {totalPages > 1 && (
         <div className={styles.pagination}>
           <button
@@ -367,11 +400,11 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
         </div>
       )}
 
-      {/* Detail modal */}
-      {selectedLead && (
-        <LeadDetailModal
-          lead={selectedLead}
-          onClose={() => setSelectedLead(null)}
+      {/* ── Detail modal ── */}
+      {selectedBooking && (
+        <BookingDetailModal
+          booking={selectedBooking}
+          onClose={() => setSelectedBooking(null)}
           onStatusUpdate={handleStatusUpdate}
         />
       )}

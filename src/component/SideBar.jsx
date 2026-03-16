@@ -406,6 +406,13 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 <button className={styles.authBtn} onClick={handleAuthBtn}>
                   {token ? `Logout (${user.name?.split(" ")[0]})` : "Login"}
                 </button>
+                <button className={styles.authBtn} onClick={handleAuthBtn}>
+                  {role === "admin"
+                    ? "Admin Dashboard"
+                    : role === "maid"
+                      ? "Maid Dashboard"
+                      : "Login"}
+                </button>
               </div>
             )}
           </div>
