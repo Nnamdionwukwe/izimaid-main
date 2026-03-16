@@ -17,6 +17,7 @@ import Booking from "./component/Booking/Booking.jsx";
 import BookingDetail from "./component/Bookingdetail/Bookingdetail.jsx";
 import MyBookings from "./component/Mybookings/Mybookings.jsx";
 import MaidDashboard from "./component/MaidDashboard/MaidDashboard.jsx";
+import MaidDetail from "./component/MaidDetail.jsx";
 
 function App() {
   return (
@@ -82,6 +83,8 @@ function AppRoutes() {
       <Route path="/why-hire-us" element={<LearnMore />} />
       <Route path="/maids" element={<Maids />} />
       <Route path="/book/:maidId" element={<Booking />} />
+
+      <Route path="/maid/:maidId" element={<MaidDetail />} />
       <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="/bookings/:id" element={<BookingDetail />} />
 

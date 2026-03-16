@@ -92,7 +92,12 @@ export default function Maids() {
       ) : (
         <div className={styles.grid}>
           {filtered.map((maid) => (
-            <div key={maid.id} className={styles.card}>
+            <div
+              key={maid.id}
+              className={styles.card}
+              onClick={() => navigate(`/maid/${maid.id}`)}
+              style={{ cursor: "pointer" }}
+            >
               {maid.avatar ? (
                 <img
                   src={maid.avatar}
@@ -136,9 +141,10 @@ export default function Maids() {
                 <div style={{ marginTop: 10 }}>
                   <button
                     className={styles.bookBtn}
-                    onClick={() =>
-                      navigate(`/book/${maid.id}`, { state: { maid } })
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/book/${maid.id}`, { state: { maid } });
+                    }}
                   >
                     Book Now
                   </button>
