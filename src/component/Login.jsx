@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import styles from "./Login.module.css";
 
@@ -9,42 +9,47 @@ export default function Login({ onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const login = useGoogleLogin({
-    flow: "implicit",
-    onSuccess: async (tokenResponse) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`${API_URL}/api/auth/google`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            access_token: tokenResponse.access_token,
-            role,
-          }),
-        });
+  // Handle token exchange after Google redirects back
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash.includes("access_token")) return;
 
-        const data = await res.json();
+    const params = new URLSearchParams(hash.replace("#", ""));
+    const access_token = params.get("access_token");
+    if (!access_token) return;
 
-        if (!res.ok) throw new Error(data.error || "Authentication failed");
-        if (!data.token) throw new Error("No token received from server");
+    // Clean the hash from URL
+    window.history.replaceState(null, "", window.location.pathname);
 
+    const savedRole = sessionStorage.getItem("login_role") || "customer";
+    sessionStorage.removeItem("login_role");
+
+    setLoading(true);
+    setError(null);
+
+    fetch(`${API_URL}/api/auth/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ access_token, role: savedRole }),
+    })
+      .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok) throw new Error(data.error || "Authentication failed");
+        if (!data.token) throw new Error("No token received");
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-
         onSuccess?.(data);
-      } catch (err) {
-        setError(err.message || "Something went wrong. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    },
+      })
+      .catch((err) => setError(err.message || "Something went wrong."))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const login = useGoogleLogin({
+    flow: "implicit",
+    ux_mode: "redirect",
+    redirect_uri: window.location.origin + "/login",
     onError: () => {
-      setError("Google sign-in failed. Please try again.");
-      setLoading(false);
-    },
-    onNonOAuthError: () => {
-      setError("Sign-in was cancelled.");
+      setError("Google sign-in failed.");
       setLoading(false);
     },
   });
@@ -52,16 +57,12 @@ export default function Login({ onSuccess }) {
   const handleLogin = () => {
     setError(null);
     setLoading(true);
-    try {
-      login();
-    } catch {
-      setLoading(false);
-    }
+    sessionStorage.setItem("login_role", role);
+    login();
   };
 
   return (
     <div className={styles.page}>
-      {/* ─── Left panel ─── */}
       <div className={styles.left}>
         <div className={styles.leftPattern} />
         <div className={styles.leftGrid} />
@@ -101,7 +102,6 @@ export default function Login({ onSuccess }) {
         </div>
       </div>
 
-      {/* ─── Right panel ─── */}
       <div className={styles.right}>
         <div className={styles.formWrap}>
           <div className={styles.formHeader}>

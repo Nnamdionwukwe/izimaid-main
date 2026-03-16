@@ -11,7 +11,7 @@ import HomePage from "./component/HomePage";
 import RequestEstimate from "./component/RequestEstimate";
 import LearnMore from "./component/LearnMore/LearnMore";
 import Login from "./component/Login.jsx";
-import AdminApp from "./component/AdminDashboard/Adminapp";
+import AdminApp from "./component/AdminDashboard/AdminApp.jsx";
 
 function App() {
   return (
@@ -53,6 +53,7 @@ function AppRoutes() {
 
   const token = getToken();
   const user = getUser();
+  const hasGoogleHash = window.location.hash.includes("access_token");
 
   return (
     <Routes>
@@ -61,7 +62,7 @@ function AppRoutes() {
       <Route
         path="/login"
         element={
-          token ? (
+          token && !hasGoogleHash ? (
             <Navigate to={user.role === "admin" ? "/admin" : "/"} replace />
           ) : (
             <Login onSuccess={handleLoginSuccess} />
