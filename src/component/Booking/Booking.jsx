@@ -15,6 +15,44 @@ function initials(name) {
   );
 }
 
+// ── Extract detailed address from Nominatim response ─────────────────────────
+function extractAddressDetails(data) {
+  const address = data.address || {};
+
+  return {
+    street: address.road || address.house_number || "",
+    houseNumber: address.house_number || "",
+    city: address.city || address.town || address.village || "",
+    state: address.state || address.region || address.county || "",
+    country: address.country || "",
+    postalCode: address.postcode || "",
+    displayName: data.display_name || "",
+  };
+}
+
+// ── Format address nicely for saving ────────────────────────────────────────
+function formatAddress(addressDetails) {
+  const parts = [];
+
+  if (addressDetails.street) {
+    parts.push(addressDetails.street);
+  }
+
+  if (addressDetails.city) {
+    parts.push(addressDetails.city);
+  }
+
+  if (addressDetails.state) {
+    parts.push(addressDetails.state);
+  }
+
+  if (addressDetails.country) {
+    parts.push(addressDetails.country);
+  }
+
+  return parts.length > 0 ? parts.join(", ") : addressDetails.displayName;
+}
+
 export default function Booking() {
   const { maidId } = useParams();
   const { state } = useLocation();
@@ -30,6 +68,9 @@ export default function Booking() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(null);
+  const [gettingLocation, setGettingLocation] = useState(false);
+  const [locationError, setLocationError] = useState("");
+  const [detectedAddress, setDetectedAddress] = useState(null);
 
   const total =
     Number(maid.hourly_rate || 0) * Number(form.duration_hours || 0);
@@ -37,6 +78,109 @@ export default function Booking() {
   function handleChange(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setError("");
+  }
+
+  // Get current location using Geolocation API with iOS-specific handling
+  async function getCurrentLocation() {
+    setGettingLocation(true);
+    setLocationError("");
+    setDetectedAddress(null);
+
+    // Check if browser supports geolocation
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by your browser");
+      setGettingLocation(false);
+      return;
+    }
+
+    // Increased timeout for iOS - give it more time to get a fix
+    const geolocationOptions = {
+      enableHighAccuracy: true,
+      timeout: 30000, // 30 seconds
+      maximumAge: 0, // Don't use cached location
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude, accuracy } = position.coords;
+
+          // Fetch detailed address from Nominatim
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+            { timeout: 8000 },
+          );
+
+          if (!res.ok) throw new Error("Address lookup failed");
+
+          const data = await res.json();
+          const addressDetails = extractAddressDetails(data);
+          const formattedAddress = formatAddress(addressDetails);
+
+          setDetectedAddress(addressDetails);
+          setForm((prev) => ({
+            ...prev,
+            address: formattedAddress,
+          }));
+
+          setLocationError("");
+        } catch (err) {
+          console.error("Reverse geocoding error:", err);
+          setGettingLocation(false);
+
+          try {
+            // Fallback: Just get city/postcode if detailed lookup fails
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`,
+            );
+            const data = await res.json();
+            const city =
+              data.address?.city ||
+              data.address?.town ||
+              data.address?.village ||
+              data.address?.county ||
+              "";
+            const postcode = data.address?.postcode || "";
+            const country = data.address?.country || "";
+            const location =
+              [city, postcode, country].filter(Boolean).join(", ") ||
+              `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`;
+
+            setForm((prev) => ({
+              ...prev,
+              address: location,
+            }));
+
+            setDetectedAddress({
+              city,
+              postalCode: postcode,
+              country,
+              street: "",
+              state: "",
+            });
+
+            setLocationError("");
+          } catch {
+            setLocationError(
+              "Could not detect your location. Try entering it manually.",
+            );
+          }
+        }
+
+        setGettingLocation(false);
+      },
+      (err) => {
+        setGettingLocation(false);
+        setLocationError(
+          err.code === 1
+            ? "📍 Location access denied. Please allow location access or enter manually."
+            : err.code === 3
+              ? "📍 Location request timed out. Please try again or enter manually."
+              : "📍 Could not get your location. Try enabling GPS or entering manually.",
+        );
+      },
+      geolocationOptions,
+    );
   }
 
   async function handleSubmit() {
@@ -162,7 +306,39 @@ export default function Booking() {
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>Service Address*</label>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 6,
+            }}
+          >
+            <label className={styles.label}>Service Address*</label>
+            <button
+              onClick={getCurrentLocation}
+              disabled={gettingLocation}
+              style={{
+                background: "none",
+                border: "none",
+                color: gettingLocation
+                  ? "rgb(100, 100, 100)"
+                  : "rgb(19, 19, 103)",
+                fontSize: "12px",
+                fontWeight: "bold",
+                cursor: gettingLocation ? "not-allowed" : "pointer",
+                opacity: gettingLocation ? 0.6 : 1,
+                textDecoration: "underline",
+                fontFamily: "inherit",
+              }}
+              title="Use your current GPS location (requires location permission)"
+            >
+              {gettingLocation
+                ? "📍 Getting location..."
+                : "📍 Use Current Location"}
+            </button>
+          </div>
+
           <input
             className={styles.input}
             type="text"
@@ -171,6 +347,53 @@ export default function Booking() {
             onChange={handleChange}
             placeholder="e.g. 12 Banana Street, Lekki, Lagos"
           />
+
+          {/* Display detected address details */}
+          {detectedAddress &&
+            (detectedAddress.street ||
+              detectedAddress.city ||
+              detectedAddress.state ||
+              detectedAddress.country) && (
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: "gray",
+                  marginTop: 8,
+                  padding: "8px",
+                  background: "rgb(245, 245, 248)",
+                  borderRadius: "6px",
+                  lineHeight: "1.6",
+                }}
+              >
+                <p style={{ margin: "0 0 4px 0", fontWeight: "bold" }}>
+                  📍 Address Details:
+                </p>
+                {detectedAddress.street && (
+                  <p style={{ margin: "2px 0" }}>🏠 {detectedAddress.street}</p>
+                )}
+                {(detectedAddress.city || detectedAddress.state) && (
+                  <p style={{ margin: "2px 0" }}>
+                    🏙️{" "}
+                    {[detectedAddress.city, detectedAddress.state]
+                      .filter(Boolean)
+                      .join(", ")}
+                  </p>
+                )}
+                {detectedAddress.country && (
+                  <p style={{ margin: "2px 0" }}>
+                    🌍 {detectedAddress.country}
+                  </p>
+                )}
+              </div>
+            )}
+
+          {locationError && (
+            <p
+              style={{ color: "rgb(187, 19, 47)", fontSize: 12, marginTop: 4 }}
+            >
+              {locationError}
+            </p>
+          )}
         </div>
 
         <div className={styles.field}>
