@@ -39,27 +39,70 @@ export default function MyBookings({ token }) {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
+
+  // Get token from prop or localStorage
+  const finalToken = token || localStorage.getItem("token");
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
+    setError(null);
+
+    // Check if token exists
+    if (!finalToken) {
+      setError("No authentication token found. Please login.");
+      setLoading(false);
+      console.error("[MyBookings] No token available");
+      return;
+    }
+
     try {
+      console.log(`[MyBookings] Fetching bookings with filter: ${filter}`);
+      console.log(`[MyBookings] API URL: ${API_URL}`);
+      console.log(`[MyBookings] Token exists: ${!!finalToken}`);
+
       const params = new URLSearchParams({ limit: 50 });
       if (filter !== "all") params.set("status", filter);
 
-      const res = await fetch(`${API_URL}/api/bookings?${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const url = `${API_URL}/api/bookings?${params}`;
+      console.log(`[MyBookings] Request URL: ${url}`);
+
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${finalToken}`,
+        },
       });
 
-      if (!res.ok) throw new Error("Failed to fetch bookings");
+      console.log(`[MyBookings] Response status: ${res.status}`);
+
+      // Check if response is ok
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        const errorMsg =
+          errorData.error || `HTTP ${res.status}: ${res.statusText}`;
+        throw new Error(errorMsg);
+      }
+
       const data = await res.json();
+      console.log(
+        `[MyBookings] Received ${data.bookings?.length || 0} bookings`,
+      );
+      console.log("[MyBookings] Bookings:", data.bookings);
+
       setBookings(data.bookings || []);
     } catch (err) {
-      console.error("Error fetching bookings:", err);
+      console.error("[MyBookings] Error fetching bookings:", err);
+      setError(
+        err.message || "Failed to load bookings. Please try again later.",
+      );
+      setBookings([]);
     } finally {
       setLoading(false);
     }
-  }, [filter, token]);
+  }, [filter, finalToken]);
 
   useEffect(() => {
     fetchBookings();
@@ -97,12 +140,51 @@ export default function MyBookings({ token }) {
         ))}
       </div>
 
+      {/* Error message */}
+      {error && (
+        <div
+          style={{
+            padding: "14px",
+            background: "rgb(255, 243, 205)",
+            border: "1px solid rgb(255, 200, 0)",
+            borderRadius: "8px",
+            marginBottom: "16px",
+            color: "rgb(100, 80, 0)",
+            fontSize: "14px",
+          }}
+        >
+          <p style={{ margin: "0 0 8px" }}>
+            <strong>⚠️ Error loading bookings:</strong>
+          </p>
+          <p style={{ margin: 0 }}>{error}</p>
+          <button
+            onClick={() => fetchBookings()}
+            style={{
+              marginTop: "8px",
+              padding: "8px 12px",
+              background: "rgb(19, 19, 103)",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "12px",
+              fontWeight: "bold",
+            }}
+          >
+            Try Again
+          </button>
+        </div>
+      )}
+
       {/* Loading state */}
       {loading ? (
         <div className={styles.loading}>Loading your bookings...</div>
       ) : bookings.length === 0 ? (
         <div className={styles.empty}>
-          <p>No {filter !== "all" ? filter : ""} bookings</p>
+          <p>
+            No {filter !== "all" ? filter : ""} bookings
+            {error && " (Error loading bookings)"}
+          </p>
           <button className={styles.cta} onClick={() => navigate("/maids")}>
             Find a Maid
           </button>
@@ -133,7 +215,9 @@ export default function MyBookings({ token }) {
                   </div>
                 </div>
                 <span
-                  className={`${styles.statusBadge} ${STATUS_CLASS[booking.status] || styles.statusPending}`}
+                  className={`${styles.statusBadge} ${
+                    STATUS_CLASS[booking.status] || styles.statusPending
+                  }`}
                 >
                   {booking.status === "in_progress"
                     ? "In Progress"
@@ -205,16 +289,7 @@ export default function MyBookings({ token }) {
                   <>
                     <button
                       className={`${styles.actionBtn} ${styles.actionBtnSecondary}`}
-                      onClick={() =>
-                        navigate(`/book/${booking.maid_id}`, {
-                          state: {
-                            maid: {
-                              id: booking.maid_id,
-                              name: booking.maid_name,
-                            },
-                          },
-                        })
-                      }
+                      onClick={() => navigate(`/maid/${booking.maid_id}`)}
                     >
                       View Maid Profile
                     </button>
@@ -231,7 +306,11 @@ export default function MyBookings({ token }) {
                     <button
                       className={styles.actionBtn}
                       onClick={() => {
-                        if (window.confirm("Cancel this booking?")) {
+                        if (
+                          window.confirm(
+                            "Are you sure you want to cancel this booking?",
+                          )
+                        ) {
                           // Handle cancellation
                         }
                       }}
