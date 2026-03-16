@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import styles from "./Login.module.css";
 
@@ -9,7 +9,7 @@ export default function Login({ onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // ── Handle redirect flow: Google redirects back to /login#access_token=xxx ──
+  // ── Handle redirect return: /login#access_token=xxx ──────────────────────
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash) return;
@@ -18,16 +18,17 @@ export default function Login({ onSuccess }) {
     const access_token = params.get("access_token");
     if (!access_token) return;
 
-    // Clean the hash from the URL immediately
+    // Clean hash from URL immediately
     window.history.replaceState(null, "", window.location.pathname);
 
-    // Retrieve role that was saved before redirect
+    // Retrieve role saved before the redirect
     const savedRole = sessionStorage.getItem("google_login_role") || "customer";
     sessionStorage.removeItem("google_login_role");
 
     setLoading(true);
     setError(null);
 
+    // POST /api/auth/google  →  { token, user }
     fetch(`${API_URL}/api/auth/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -36,10 +37,11 @@ export default function Login({ onSuccess }) {
       .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
       .then(({ ok, data }) => {
         if (!ok) throw new Error(data.error || "Authentication failed");
-        const token = data.token || data.tokens?.accessToken;
-        if (!token) throw new Error("No token received from server");
-        localStorage.setItem("token", token);
+        if (!data.token) throw new Error("No token received from server");
+
+        localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
+
         onSuccess?.(data);
       })
       .catch((err) => {
@@ -48,23 +50,24 @@ export default function Login({ onSuccess }) {
       .finally(() => setLoading(false));
   }, []);
 
+  // ── Trigger Google redirect ───────────────────────────────────────────────
   const login = useGoogleLogin({
+    flow: "implicit",
+    ux_mode: "redirect",
+    redirect_uri: `${window.location.origin}/login`,
     onError: () => {
-      setError("Google sign-in was cancelled or failed.");
+      setError("Google sign-in failed. Please try again.");
       setLoading(false);
     },
     onNonOAuthError: () => {
       setLoading(false);
     },
-    flow: "implicit",
-    ux_mode: "redirect",
-    redirect_uri: `${window.location.origin}/login`,
   });
 
   const handleLogin = () => {
     setError(null);
     setLoading(true);
-    // Save role before redirect so we can read it when Google comes back
+    // Persist role across the redirect
     sessionStorage.setItem("google_login_role", role);
     try {
       login();
@@ -125,6 +128,7 @@ export default function Login({ onSuccess }) {
             </p>
           </div>
 
+          {/* Role toggle */}
           <div className={styles.roleToggle}>
             <button
               className={`${styles.roleBtn} ${role === "customer" ? styles.roleBtnActive : ""}`}
@@ -148,6 +152,7 @@ export default function Login({ onSuccess }) {
             <div className={styles.dividerLine} />
           </div>
 
+          {/* Google button */}
           <button
             className={styles.googleBtn}
             onClick={handleLogin}
