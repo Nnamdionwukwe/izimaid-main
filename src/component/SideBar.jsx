@@ -33,6 +33,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const role = user?.role || null;
 
   function handleAuthBtn() {
     if (token) {
@@ -40,6 +41,26 @@ export default function SideBar({ isOpen, setIsOpen }) {
       navigate("/login");
     } else {
       navigate("/login");
+    }
+  }
+
+  function handleBookingNavigation() {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    switch (role) {
+      case "admin":
+        navigate("/admin-dashboard");
+        break;
+      case "maid":
+        navigate("/maid-dashboard");
+        break;
+      case "customer":
+      default:
+        navigate("/my-bookings");
+        break;
     }
   }
 
@@ -171,13 +192,13 @@ export default function SideBar({ isOpen, setIsOpen }) {
 
           <div className={styles.SubHeader2}>
             <Link to="request-a-free-estimate" className={styles.sub1}>
-              <i class="fa fa-calendar" aria-hidden="true"></i>
+              <i className="fa fa-calendar" aria-hidden="true"></i>
 
               <p className={styles.subP}>Request a Free Estimate</p>
             </Link>
 
             <a href="tel: +2348030588774" className={styles.sub2}>
-              <i class="fa fa-phone" aria-hidden="true"></i>
+              <i className="fa fa-phone" aria-hidden="true"></i>
               <p>Call Us</p>
             </a>
           </div>
@@ -273,7 +294,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                               <div className={styles.residentialDI}>
                                 <div className={styles.residentialDI23}>
                                   <i
-                                    class="fa fa-th-large"
+                                    className="fa fa-th-large"
                                     aria-hidden="true"
                                   ></i>
                                   <p>What's Included</p>
@@ -281,7 +302,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
 
                                 <div className={styles.residentialDI23}>
                                   <i
-                                    class="fa fa-th-large"
+                                    className="fa fa-th-large"
                                     aria-hidden="true"
                                   ></i>
                                   <p className={styles.u}>
@@ -307,7 +328,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                               <div className={styles.residentialDI}>
                                 <div className={styles.residentialDI23}>
                                   <i
-                                    class="fa fa-th-large"
+                                    className="fa fa-th-large"
                                     aria-hidden="true"
                                   ></i>
                                   <p>Donate</p>
@@ -315,7 +336,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
 
                                 <div className={styles.residentialDI23}>
                                   <i
-                                    class="fa fa-th-large"
+                                    className="fa fa-th-large"
                                     aria-hidden="true"
                                   ></i>
                                   <p>IziBest Awards</p>
@@ -323,7 +344,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
 
                                 <div className={styles.residentialDI23}>
                                   <i
-                                    class="fa fa-th-large"
+                                    className="fa fa-th-large"
                                     aria-hidden="true"
                                   ></i>
                                   <p>Local Shelter/Agency Support</p>
@@ -331,7 +352,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
 
                                 <div className={styles.residentialDI23}>
                                   <i
-                                    class="fa fa-th-large"
+                                    className="fa fa-th-large"
                                     aria-hidden="true"
                                   ></i>
                                   <p>Board of Directors</p>
@@ -382,25 +403,31 @@ export default function SideBar({ isOpen, setIsOpen }) {
             )}
 
             <div className={styles.thirdHeader}>
-              <i class="fa fa-map-marker" aria-hidden="true"></i>
+              <i className="fa fa-map-marker" aria-hidden="true"></i>
 
               <p>Find My Local IziMaid</p>
             </div>
 
             <button
               className={styles.authBtn}
-              onClick={() => navigate("/my-bookings")}
+              onClick={handleBookingNavigation}
             >
-              My Bookings
+              {token && role === "admin"
+                ? "Admin Dashboard"
+                : token && role === "maid"
+                  ? "Maid Dashboard"
+                  : token
+                    ? "My Bookings"
+                    : "My Bookings"}
             </button>
 
             {isOpenFotter && (
               <div className={styles.icons}>
-                <i class="fa-brands fa-facebook"></i>
-                <i class="fa-brands fa-instagram"></i>
-                <i class="fa-brands fa-x-twitter"></i>
-                <i class="fa-brands fa-youtube"></i>
-                <i class="fa-brands fa-linkedin"></i>
+                <i className="fa-brands fa-facebook"></i>
+                <i className="fa-brands fa-instagram"></i>
+                <i className="fa-brands fa-x-twitter"></i>
+                <i className="fa-brands fa-youtube"></i>
+                <i className="fa-brands fa-linkedin"></i>
               </div>
             )}
 
@@ -413,13 +440,6 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 <button className={styles.authBtn} onClick={handleAuthBtn}>
                   {token ? `Logout (${user.name?.split(" ")[0]})` : "Login"}
                 </button>
-                {/* <button className={styles.authBtn} onClick={handleAuthBtn}>
-                  {role === "admin"
-                    ? "Admin Dashboard"
-                    : role === "maid"
-                      ? "Maid Dashboard"
-                      : "Login"}
-                </button> */}
               </div>
             )}
           </div>
