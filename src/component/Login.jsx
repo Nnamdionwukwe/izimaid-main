@@ -15,16 +15,6 @@ export default function Login({ onSuccess }) {
       setError(null);
 
       try {
-        // Exchange access token for ID token via Google userinfo
-        const userInfoRes = await fetch(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-          },
-        );
-        const userInfo = await userInfoRes.json();
-
-        // Send to our backend
         const res = await fetch(`${API_URL}/api/auth/google`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -40,8 +30,12 @@ export default function Login({ onSuccess }) {
           throw new Error(data.error || "Authentication failed");
         }
 
-        // Store token
-        localStorage.setItem("token", data.token);
+        // Support both token shapes:
+        //   { token, user }  or  { tokens: { accessToken }, user }
+        const token = data.token || data.tokens?.accessToken;
+        if (!token) throw new Error("No token received from server");
+
+        localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
         onSuccess?.(data);
@@ -60,12 +54,20 @@ export default function Login({ onSuccess }) {
       setError("Google sign-in was cancelled or failed.");
       setLoading(false);
     },
+    // Fires when popup is closed manually or blocked
+    onNonOAuthError: () => {
+      setLoading(false);
+    },
   });
 
   const handleLogin = () => {
     setError(null);
     setLoading(true);
-    login();
+    try {
+      login();
+    } catch {
+      setLoading(false);
+    }
   };
 
   return (
