@@ -403,7 +403,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 <p>Apply Locally</p>
                 <p>Applicar Localmente</p>
                 <p>Own a Franchise</p>
-                <button onClick={handleAuthBtn}>
+                <button className={styles.authBtn} onClick={handleAuthBtn}>
                   {token ? `Logout (${user.name?.split(" ")[0]})` : "Login"}
                 </button>
               </div>
