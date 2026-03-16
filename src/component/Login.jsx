@@ -1,35 +1,45 @@
 import { useState, useEffect } from "react";
-import { useGoogleLogin } from "@react-oauth/google";
 import styles from "./Login.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+function buildGoogleOAuthURL(role) {
+  const redirectUri = window.location.origin + "/login";
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: redirectUri,
+    response_type: "token",
+    scope: "openid email profile",
+    state: role,
+  });
+  return `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+}
 
 export default function Login({ onSuccess }) {
   const [role, setRole] = useState("customer");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // On mount — check if Google redirected back with access_token in hash
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash.includes("access_token")) return;
 
     const params = new URLSearchParams(hash.replace("#", ""));
     const access_token = params.get("access_token");
+    const state = params.get("state") || "customer";
+
     if (!access_token) return;
 
-    // Clean hash from URL immediately
+    // Clean hash immediately
     window.history.replaceState(null, "", window.location.pathname);
-
-    const savedRole = sessionStorage.getItem("login_role") || "customer";
-    sessionStorage.removeItem("login_role");
 
     setLoading(true);
 
     fetch(`${API_URL}/api/auth/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ access_token, role: savedRole }),
+      body: JSON.stringify({ access_token, role: state }),
     })
       .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
       .then(({ ok, data }) => {
@@ -45,37 +55,22 @@ export default function Login({ onSuccess }) {
       });
   }, []);
 
-  const login = useGoogleLogin({
-    flow: "implicit",
-    ux_mode: "redirect",
-    redirect_uri: window.location.origin + "/login",
-    onError: () => {
-      setError("Google sign-in failed. Please try again.");
-      setLoading(false);
-    },
-  });
-
   const handleLogin = () => {
     setError(null);
-    sessionStorage.setItem("login_role", role);
-    login();
+    window.location.href = buildGoogleOAuthURL(role);
   };
 
-  // If we're processing a redirect return, show loading screen
-  const isProcessingRedirect =
-    typeof window !== "undefined" &&
-    window.location.hash.includes("access_token");
-
-  if (isProcessingRedirect || loading) {
+  // Show loading while processing redirect return
+  if (window.location.hash.includes("access_token") || loading) {
     return (
       <div className={styles.page}>
         <div
           className={styles.right}
           style={{
             width: "100%",
+            display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            display: "flex",
           }}
         >
           <div className={styles.formWrap} style={{ textAlign: "center" }}>
