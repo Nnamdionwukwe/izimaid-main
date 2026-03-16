@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import AboutUs from "./AboutUs";
 import CleaningTips from "./CleaningTips";
@@ -15,6 +15,8 @@ export default function SubHeader() {
   const [findLocalIzimaid, setFindLocalIzimaid] = useState(false);
   const [pleaseEnter, setPleaseEnter] = useState(false);
   const [invalidZip, setInvalidZip] = useState(false);
+
+  const navigate = useNavigate();
 
   function handleInput(e) {
     setLocationInput(e.target.value);
@@ -39,11 +41,15 @@ export default function SubHeader() {
     setInvalidZip(false);
   }
 
+  // Replace handleSubmitLocation with:
   function handleSubmitLocation() {
-    // locationInput.length && setPleaseEnter(false);
-    invalidZip && locationInput.length
-      ? setPleaseEnter(false)
-      : setPleaseEnter(true);
+    if (!locationInput.length || locationInput.length < 2) {
+      setPleaseEnter(true);
+      return;
+    }
+    setPleaseEnter(false);
+    setFindLocalIzimaid(false);
+    navigate(`/maids?location=${encodeURIComponent(locationInput)}`);
   }
 
   return (

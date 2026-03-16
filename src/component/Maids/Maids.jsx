@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./Maids.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
@@ -25,9 +25,10 @@ function initials(name) {
 
 export default function Maids() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [maids, setMaids] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("location") || "");
   const [service, setService] = useState("All");
 
   useEffect(() => {
