@@ -76,10 +76,20 @@ export default function AdminMaidDashboard() {
       if (locFilter) p.append("location", locFilter);
       if (svcFilter) p.append("service", svcFilter);
 
-      const res = await fetch(`${API}/api/maids?${p}`, { headers: authHdr() });
+      const res = await fetch(`${API}/api/maids/admin/list?${p}`, {
+        headers: authHdr(),
+      });
+
       const data = await res.json();
 
-      setMaids((data.maids || []).map(normalise));
+      const seen = new Set();
+      const unique = (data.maids || []).map(normalise).filter((m) => {
+        if (seen.has(m.id)) return false;
+        seen.add(m.id);
+        return true;
+      });
+
+      setMaids(unique);
       setTotal(data.total || 0);
     } catch (e) {
       push("Failed to load maids", "error");
@@ -613,7 +623,7 @@ export default function AdminMaidDashboard() {
               ) : (
                 <div className={s.reviewsList}>
                   {reviews.map((r, i) => (
-                    <div key={i} className={s.reviewCard}>
+                    <div key={r.id ?? i} className={s.reviewCard}>
                       <div>
                         <div className={s.reviewMeta}>
                           <span className={s.reviewerName}>
