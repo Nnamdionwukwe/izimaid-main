@@ -11,7 +11,7 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
-import "./AdminMaidDashboard.css";
+import "./AdminMaidDashboard.module.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
