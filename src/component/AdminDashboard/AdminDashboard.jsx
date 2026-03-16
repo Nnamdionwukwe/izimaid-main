@@ -215,6 +215,12 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
         <div style={{ display: "flex", gap: "8px" }}>
           <button
             className={styles.logoutBtn}
+            onClick={() => onNavigate("maids")}
+          >
+            👩‍🔧 Maids
+          </button>
+          <button
+            className={styles.logoutBtn}
             onClick={() => onNavigate("bookings")}
           >
             📅 Bookings

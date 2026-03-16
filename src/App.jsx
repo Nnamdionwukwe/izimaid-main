@@ -34,6 +34,7 @@ function AppRoutes() {
   function getToken() {
     return localStorage.getItem("token");
   }
+
   function getUser() {
     return JSON.parse(localStorage.getItem("user") || "{}");
   }
@@ -84,6 +85,7 @@ function AppRoutes() {
       <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="/bookings/:id" element={<BookingDetail />} />
 
+      {/* Admin Dashboard - FIXED: Removed duplicate route */}
       <Route
         path="/admin"
         element={
@@ -93,6 +95,7 @@ function AppRoutes() {
         }
       />
 
+      {/* Maid Dashboard */}
       <Route
         path="/maid"
         element={
@@ -102,6 +105,7 @@ function AppRoutes() {
         }
       />
 
+      {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
