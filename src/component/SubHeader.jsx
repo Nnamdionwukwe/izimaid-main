@@ -17,6 +17,8 @@ export default function SubHeader() {
   const [invalidZip, setInvalidZip] = useState(false);
 
   const navigate = useNavigate();
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState("");
 
   function handleInput(e) {
     setLocationInput(e.target.value);
@@ -41,7 +43,6 @@ export default function SubHeader() {
     setInvalidZip(false);
   }
 
-  // Replace handleSubmitLocation with:
   function handleSubmitLocation() {
     if (!locationInput.length || locationInput.length < 2) {
       setPleaseEnter(true);
@@ -50,6 +51,60 @@ export default function SubHeader() {
     setPleaseEnter(false);
     setFindLocalIzimaid(false);
     navigate(`/maids?location=${encodeURIComponent(locationInput)}`);
+  }
+
+  // ─── 4. Add this new function ─────────────────────────────────
+  function handleUseMyLocation() {
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by your browser");
+      return;
+    }
+    setLocating(true);
+    setLocationError("");
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          // Reverse geocode using OpenStreetMap (free, no API key)
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+          );
+          const data = await res.json();
+          const city =
+            data.address?.city ||
+            data.address?.town ||
+            data.address?.village ||
+            data.address?.county ||
+            "";
+          const postcode = data.address?.postcode || "";
+          const location =
+            city ||
+            postcode ||
+            `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+          setLocating(false);
+          setFindLocalIzimaid(false);
+          navigate(`/maids?location=${encodeURIComponent(location)}`);
+        } catch {
+          setLocating(false);
+          setLocationError(
+            "Could not detect your location. Try entering it manually.",
+          );
+        }
+      },
+      (err) => {
+        setLocating(false);
+        if (err.code === 1) {
+          setLocationError(
+            "Location access denied. Please allow location access or enter manually.",
+          );
+        } else {
+          setLocationError(
+            "Could not get your location. Please enter it manually.",
+          );
+        }
+      },
+      { timeout: 8000 },
+    );
   }
 
   return (
@@ -118,11 +173,21 @@ export default function SubHeader() {
                     </h3>
                   )}
 
-                  <div className={styles.location}>
-                    <i class="fa fa-map-marker" aria-hidden="true"></i>
-
-                    <h5>Use My Location</h5>
+                  <div
+                    onClick={handleUseMyLocation}
+                    className={styles.location}
+                    style={{ cursor: "pointer", opacity: locating ? 0.5 : 1 }}
+                  >
+                    <i className="fa fa-map-marker" aria-hidden="true"></i>
+                    <h5>
+                      {locating ? "Detecting location..." : "Use My Location"}
+                    </h5>
                   </div>
+                  {locationError && (
+                    <h5 style={{ color: "red", fontSize: 11, marginTop: 4 }}>
+                      {locationError}
+                    </h5>
+                  )}
                 </div>
 
                 {pleaseEnter && (
