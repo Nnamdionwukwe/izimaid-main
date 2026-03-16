@@ -1,249 +1,294 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
-  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Search,
   Edit2,
   Eye,
   Star,
   MapPin,
   Clock,
-  Zap,
-  ArrowUp,
-  ArrowDown,
+  CheckCircle,
+  XCircle,
+  Trash2,
+  AlertTriangle,
+  Check,
+  X,
+  UserCheck,
+  UserX,
+  RefreshCw,
 } from "lucide-react";
-import "./AdminMaidDashboard.module.css";
+import s from "./AdminMaidDashboard.module.css";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+// ─── helpers ────────────────────────────────────────────────
+const toNum = (v, d = 0) => {
+  const n = Number(v);
+  return isNaN(n) ? d : n;
+};
+const fmtRate = (r) => toNum(r, 0).toFixed(1);
+const authHdr = () => ({
+  Authorization: `Bearer ${localStorage.getItem("token")}`,
+});
+
+function useToast() {
+  const [toasts, setToasts] = useState([]);
+  const push = useCallback((msg, type = "success") => {
+    const id = Date.now();
+    setToasts((t) => [...t, { id, msg, type }]);
+    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3500);
+  }, []);
+  return { toasts, push };
+}
+
+// ─── Component ───────────────────────────────────────────────
 export default function AdminMaidDashboard() {
+  // list state
   const [maids, setMaids] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedMaid, setSelectedMaid] = useState(null);
-  const [editingMaid, setEditingMaid] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterLocation, setFilterLocation] = useState("");
-  const [filterService, setFilterService] = useState("");
-  const [sortBy, setSortBy] = useState("rating");
-  const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [pageSize] = useState(10);
-  const [view, setView] = useState("list"); // "list", "detail", "edit"
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [locFilter, setLocFilter] = useState("");
+  const [svcFilter, setSvcFilter] = useState("");
+  const [sortBy, setSortBy] = useState("rating");
+  const PAGE_SIZE = 10;
+
+  // detail / edit state
+  const [view, setView] = useState("list"); // list | detail | edit
+  const [selected, setSelected] = useState(null);
+  const [editing, setEditing] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [revLoading, setRevLoading] = useState(false);
 
-  // Helper function to safely convert to number
-  const toNumber = (value, defaultValue = 0) => {
-    if (value === null || value === undefined) return defaultValue;
-    const num = Number(value);
-    return isNaN(num) ? defaultValue : num;
-  };
+  // confirm dialog
+  const [confirm, setConfirm] = useState(null); // { title, body, onConfirm }
 
-  // Helper function to format rating
-  const formatRating = (rating) => {
-    return toNumber(rating, 0).toFixed(1);
-  };
+  const { toasts, push } = useToast();
+  const searchRef = useRef(null);
 
-  // Fetch maids list
-  useEffect(() => {
-    fetchMaids();
-  }, [page, filterLocation, filterService, sortBy]);
-
-  const fetchMaids = async () => {
+  // ── Fetch list ─────────────────────────────────────────────
+  const fetchMaids = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({
-        page,
-        limit: pageSize,
-      });
+      const p = new URLSearchParams({ page, limit: PAGE_SIZE });
+      if (locFilter) p.append("location", locFilter);
+      if (svcFilter) p.append("service", svcFilter);
 
-      if (filterLocation) params.append("location", filterLocation);
-      if (filterService) params.append("service", filterService);
+      const res = await fetch(`${API}/api/maids?${p}`, { headers: authHdr() });
+      const data = await res.json();
 
-      const response = await fetch(`${API_BASE}/api/maids?${params}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      const data = await response.json();
-      // Ensure numeric fields are numbers
-      const processedMaids = (data.maids || []).map((maid) => ({
-        ...maid,
-        rating: toNumber(maid.rating, 0),
-        hourly_rate: toNumber(maid.hourly_rate, 0),
-        years_exp: toNumber(maid.years_exp, 0),
-        total_reviews: toNumber(maid.total_reviews, 0),
-      }));
-      setMaids(processedMaids);
+      setMaids((data.maids || []).map(normalise));
       setTotal(data.total || 0);
-    } catch (error) {
-      console.error("Error fetching maids:", error);
+    } catch (e) {
+      push("Failed to load maids", "error");
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, locFilter, svcFilter]);
 
-  const fetchMaidDetails = async (maidId) => {
+  useEffect(() => {
+    fetchMaids();
+  }, [fetchMaids]);
+
+  // ── Fetch detail ───────────────────────────────────────────
+  const openDetail = async (id) => {
     try {
-      const response = await fetch(`${API_BASE}/api/maids/${maidId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      const data = await response.json();
-      const maid = {
-        ...data.maid,
-        rating: toNumber(data.maid.rating, 0),
-        hourly_rate: toNumber(data.maid.hourly_rate, 0),
-        years_exp: toNumber(data.maid.years_exp, 0),
-        total_reviews: toNumber(data.maid.total_reviews, 0),
-      };
-      setSelectedMaid(maid);
+      const res = await fetch(`${API}/api/maids/${id}`, { headers: authHdr() });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setSelected(normalise(data.maid));
       setView("detail");
-      fetchMaidReviews(maidId);
-    } catch (error) {
-      console.error("Error fetching maid details:", error);
+      fetchReviews(id);
+    } catch (e) {
+      push(e.message || "Could not load maid", "error");
     }
   };
 
-  const fetchMaidReviews = async (maidId) => {
-    setLoadingReviews(true);
+  // ── Fetch reviews ──────────────────────────────────────────
+  const fetchReviews = async (id) => {
+    setRevLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/maids/${maidId}/reviews`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      const res = await fetch(`${API}/api/maids/${id}/reviews`, {
+        headers: authHdr(),
       });
-      const data = await response.json();
+      const data = await res.json();
       setReviews(data.reviews || []);
-    } catch (error) {
-      console.error("Error fetching reviews:", error);
+    } catch {
+      push("Could not load reviews", "error");
     } finally {
-      setLoadingReviews(false);
+      setRevLoading(false);
     }
   };
 
-  const handleEditClick = (maid) => {
-    setEditingMaid({ ...maid });
-    setView("edit");
-  };
-
+  // ── Admin: update maid profile ─────────────────────────────
   const handleSaveEdit = async () => {
     try {
-      const response = await fetch(`${API_BASE}/api/maids/profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          ...editingMaid,
-          hourly_rate: toNumber(editingMaid.hourly_rate),
-          years_exp: toNumber(editingMaid.years_exp),
-        }),
-      });
+      const body = {
+        bio: editing.bio,
+        hourly_rate: toNum(editing.hourly_rate),
+        years_exp: toNum(editing.years_exp),
+        services: editing.services,
+        location: editing.location,
+        is_available: editing.is_available,
+      };
 
-      const data = await response.json();
-      if (response.ok) {
-        const updatedMaid = {
-          ...data.profile,
-          rating: toNumber(data.profile.rating, 0),
-          hourly_rate: toNumber(data.profile.hourly_rate, 0),
-          years_exp: toNumber(data.profile.years_exp, 0),
-          total_reviews: toNumber(data.profile.total_reviews, 0),
-        };
-        setSelectedMaid(updatedMaid);
-        setEditingMaid(null);
-        setView("detail");
-        fetchMaids();
-      } else {
-        alert("Error updating profile: " + data.error);
-      }
-    } catch (error) {
-      console.error("Error saving edit:", error);
-      alert("Error saving changes");
+      const res = await fetch(`${API}/api/maids/${editing.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...authHdr() },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      const updated = normalise({ ...selected, ...data.profile });
+      setSelected(updated);
+      setMaids((ms) => ms.map((m) => (m.id === updated.id ? updated : m)));
+      setEditing(null);
+      setView("detail");
+      push("Profile updated");
+    } catch (e) {
+      push(e.message || "Update failed", "error");
     }
   };
 
-  const toggleAvailability = async (maidId, currentStatus) => {
-    try {
-      const response = await fetch(`${API_BASE}/api/maids/profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ is_available: !currentStatus }),
-      });
+  // ── Admin: activate / deactivate ──────────────────────────
+  const toggleActive = (maid, activate) => {
+    setConfirm({
+      title: activate ? "Activate maid?" : "Deactivate maid?",
+      body: activate
+        ? `${maid.name} will be visible to customers again.`
+        : `${maid.name} will be hidden from all listings.`,
+      isDanger: !activate,
+      onConfirm: async () => {
+        const endpoint = activate ? "activate" : "deactivate";
+        try {
+          const res = await fetch(`${API}/api/maids/${maid.id}/${endpoint}`, {
+            method: "PATCH",
+            headers: authHdr(),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error);
 
-      if (response.ok) {
-        fetchMaids();
-        if (selectedMaid?.id === maidId) {
-          fetchMaidDetails(maidId);
+          const updated = { ...maid, is_active: activate };
+          setMaids((ms) =>
+            ms.map((m) =>
+              m.id === maid.id ? { ...m, is_active: activate } : m,
+            ),
+          );
+          if (selected?.id === maid.id) setSelected(updated);
+          push(activate ? "Maid activated" : "Maid deactivated");
+        } catch (e) {
+          push(e.message || "Action failed", "error");
         }
-      }
-    } catch (error) {
-      console.error("Error toggling availability:", error);
-    }
+        setConfirm(null);
+      },
+    });
   };
 
-  const filteredMaids = maids.filter((maid) =>
-    maid.name?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  // ── Admin: delete review ───────────────────────────────────
+  const deleteReview = (review, idx) => {
+    setConfirm({
+      title: "Delete review?",
+      body: "This review will be permanently removed.",
+      isDanger: true,
+      onConfirm: async () => {
+        try {
+          const res = await fetch(
+            `${API}/api/maids/${selected.id}/reviews/${review.id}`,
+            { method: "DELETE", headers: authHdr() },
+          );
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error);
+          setReviews((rv) => rv.filter((_, i) => i !== idx));
+          push("Review deleted");
+        } catch (e) {
+          push(e.message || "Delete failed", "error");
+        }
+        setConfirm(null);
+      },
+    });
+  };
 
-  const sortedMaids = [...filteredMaids].sort((a, b) => {
-    if (sortBy === "rating") return toNumber(b.rating) - toNumber(a.rating);
-    if (sortBy === "rate")
-      return toNumber(b.hourly_rate) - toNumber(a.hourly_rate);
-    return 0;
-  });
+  // ── Helpers ────────────────────────────────────────────────
+  function normalise(m) {
+    return {
+      ...m,
+      rating: toNum(m.rating, 0),
+      hourly_rate: toNum(m.hourly_rate, 0),
+      years_exp: toNum(m.years_exp, 0),
+      total_reviews: toNum(m.total_reviews, 0),
+    };
+  }
 
-  const totalPages = Math.ceil(total / pageSize);
+  const filtered = maids
+    .filter((m) => m.name?.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) =>
+      sortBy === "rating"
+        ? toNum(b.rating) - toNum(a.rating)
+        : toNum(b.hourly_rate) - toNum(a.hourly_rate),
+    );
 
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const activeCount = maids.filter((m) => m.is_available).length;
+
+  // ── Render ─────────────────────────────────────────────────
   return (
-    <div className="admin-dashboard">
-      <div className="admin-container">
-        {/* Header */}
-        <div className="dashboard-header">
-          <div className="header-content">
-            <h1>Maid Management</h1>
-            <p>Manage and monitor all maid profiles and performance</p>
+    <div className={s.root}>
+      {/* Top bar */}
+      <nav className={s.topbar}>
+        <div className={s.topbarInner}>
+          <div className={s.brand}>
+            <span className={s.brandDot} />
+            Admin Console
           </div>
-          <div className="header-stats">
-            <div className="stat-card">
-              <p className="stat-label">Total Maids</p>
-              <p className="stat-value">{total}</p>
-            </div>
-            <div className="stat-card">
-              <p className="stat-label">Active Today</p>
-              <p className="stat-value">
-                {maids.filter((m) => m.is_available).length}
-              </p>
-            </div>
+          <div className={s.topbarStats}>
+            <span className={s.topbarStat}>
+              Total&nbsp;<strong>{total}</strong>
+            </span>
+            <span className={s.divider} />
+            <span className={s.topbarStat}>
+              Available&nbsp;<strong>{activeCount}</strong>
+            </span>
           </div>
         </div>
+      </nav>
 
+      <div className={s.container}>
+        {/* Page header */}
+        <div className={s.pageHeader}>
+          <h1 className={s.pageTitle}>
+            Maid <span>Management</span>
+          </h1>
+          <p className={s.pageSub}>
+            Review, edit, and manage all maid profiles
+          </p>
+        </div>
+
+        {/* ─── LIST VIEW ────────────────────────────────────── */}
         {view === "list" && (
           <>
-            {/* Filters */}
-            <div className="filters-section">
-              <div className="search-box">
-                <Search size={20} />
+            {/* Toolbar */}
+            <div className={s.toolbar}>
+              <div className={s.searchWrap}>
+                <Search size={15} />
                 <input
-                  type="text"
-                  placeholder="Search by name..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  ref={searchRef}
+                  className={s.searchInput}
+                  placeholder="Search by name…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
 
               <select
-                value={filterLocation}
+                className={s.select}
+                value={locFilter}
                 onChange={(e) => {
-                  setFilterLocation(e.target.value);
+                  setLocFilter(e.target.value);
                   setPage(1);
                 }}
-                className="filter-select"
               >
                 <option value="">All Locations</option>
                 <option value="Lagos">Lagos</option>
@@ -252,12 +297,12 @@ export default function AdminMaidDashboard() {
               </select>
 
               <select
-                value={filterService}
+                className={s.select}
+                value={svcFilter}
                 onChange={(e) => {
-                  setFilterService(e.target.value);
+                  setSvcFilter(e.target.value);
                   setPage(1);
                 }}
-                className="filter-select"
               >
                 <option value="">All Services</option>
                 <option value="residential">Residential</option>
@@ -266,100 +311,130 @@ export default function AdminMaidDashboard() {
               </select>
 
               <select
+                className={s.select}
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="filter-select"
               >
-                <option value="rating">Sort by Rating</option>
-                <option value="rate">Sort by Rate</option>
+                <option value="rating">By Rating</option>
+                <option value="rate">By Rate</option>
               </select>
+
+              <button
+                className={`${s.btn} ${s.btnGhost}`}
+                onClick={fetchMaids}
+                title="Refresh"
+              >
+                <RefreshCw size={15} />
+              </button>
             </div>
 
-            {/* Maids Table */}
-            <div className="maids-section">
+            {/* Table */}
+            <div className={s.card}>
               {loading ? (
-                <div className="loading">Loading maids...</div>
-              ) : sortedMaids.length === 0 ? (
-                <div className="no-data">No maids found</div>
+                <div className={s.loading}>
+                  <div className={s.spinner} />
+                  Loading maids…
+                </div>
+              ) : filtered.length === 0 ? (
+                <div className={s.empty}>No maids found</div>
               ) : (
                 <>
-                  <div className="table-wrapper">
-                    <table className="maids-table">
+                  <div className={s.tableWrap}>
+                    <table>
                       <thead>
                         <tr>
-                          <th>Name</th>
+                          <th>Maid</th>
                           <th>Location</th>
                           <th>Rating</th>
-                          <th>Rate/hr</th>
-                          <th>Experience</th>
+                          <th>Rate / hr</th>
+                          <th>Exp</th>
                           <th>Status</th>
-                          <th>Actions</th>
+                          <th></th>
                         </tr>
                       </thead>
                       <tbody>
-                        {sortedMaids.map((maid) => (
-                          <tr key={maid.id} className="maid-row">
-                            <td className="name-cell">
-                              <img
-                                src={maid.avatar || "/avatar-placeholder.png"}
-                                alt={maid.name}
-                              />
-                              <div>
-                                <p className="maid-name">
-                                  {maid.name || "N/A"}
-                                </p>
+                        {filtered.map((maid) => (
+                          <tr key={maid.id}>
+                            <td>
+                              <div className={s.nameCell}>
+                                <img
+                                  className={s.avatar}
+                                  src={maid.avatar || "/avatar-placeholder.png"}
+                                  alt={maid.name}
+                                  onError={(e) => {
+                                    e.target.src = "/avatar-placeholder.png";
+                                  }}
+                                />
+                                <p className={s.maidName}>{maid.name || "—"}</p>
                               </div>
                             </td>
                             <td>
-                              <div className="location-cell">
-                                <MapPin size={16} />
-                                {maid.location || "N/A"}
+                              <div className={s.locCell}>
+                                <MapPin size={13} />
+                                {maid.location || "—"}
                               </div>
                             </td>
                             <td>
-                              <div className="rating-cell">
-                                <Star size={16} className="star" />
-                                <span>{formatRating(maid.rating)}</span>
-                                <span className="review-count">
-                                  ({toNumber(maid.total_reviews)})
+                              <div className={s.ratingCell}>
+                                <Star size={13} className={s.starIcon} />
+                                <span className={s.ratingVal}>
+                                  {fmtRate(maid.rating)}
+                                </span>
+                                <span className={s.reviewCount}>
+                                  ({maid.total_reviews})
                                 </span>
                               </div>
                             </td>
                             <td>
-                              <p className="rate">
-                                ₦{toNumber(maid.hourly_rate).toLocaleString()}
-                                /hr
-                              </p>
-                            </td>
-                            <td>
-                              <p className="experience">
-                                {toNumber(maid.years_exp)} yrs
-                              </p>
-                            </td>
-                            <td>
-                              <span
-                                className={`status-badge ${maid.is_available ? "available" : "unavailable"}`}
-                              >
-                                {maid.is_available
-                                  ? "Available"
-                                  : "Unavailable"}
+                              <span className={s.rate}>
+                                ₦{toNum(maid.hourly_rate).toLocaleString()}
                               </span>
                             </td>
-                            <td className="actions-cell">
-                              <button
-                                className="btn-icon view-btn"
-                                onClick={() => fetchMaidDetails(maid.id)}
-                                title="View Details"
-                              >
-                                <Eye size={18} />
-                              </button>
-                              <button
-                                className="btn-icon edit-btn"
-                                onClick={() => handleEditClick(maid)}
-                                title="Edit"
-                              >
-                                <Edit2 size={18} />
-                              </button>
+                            <td>
+                              <span className={s.expText}>
+                                {maid.years_exp} yrs
+                              </span>
+                            </td>
+                            <td>
+                              <StatusBadge maid={maid} />
+                            </td>
+                            <td>
+                              <div className={s.actions}>
+                                <button
+                                  className={s.iconBtn}
+                                  title="View"
+                                  onClick={() => openDetail(maid.id)}
+                                >
+                                  <Eye size={14} />
+                                </button>
+                                <button
+                                  className={s.iconBtn}
+                                  title="Edit"
+                                  onClick={() => {
+                                    setEditing({ ...maid });
+                                    setView("edit");
+                                  }}
+                                >
+                                  <Edit2 size={14} />
+                                </button>
+                                <button
+                                  className={`${s.iconBtn} ${maid.is_active === false ? "" : s.danger}`}
+                                  title={
+                                    maid.is_active === false
+                                      ? "Activate"
+                                      : "Deactivate"
+                                  }
+                                  onClick={() =>
+                                    toggleActive(maid, maid.is_active === false)
+                                  }
+                                >
+                                  {maid.is_active === false ? (
+                                    <UserCheck size={14} />
+                                  ) : (
+                                    <UserX size={14} />
+                                  )}
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -368,24 +443,26 @@ export default function AdminMaidDashboard() {
                   </div>
 
                   {/* Pagination */}
-                  <div className="pagination">
-                    <button
-                      disabled={page === 1}
-                      onClick={() => setPage(page - 1)}
-                      className="pagination-btn"
-                    >
-                      <ArrowUp size={16} /> Previous
-                    </button>
-                    <span className="page-info">
-                      Page {page} of {totalPages}
+                  <div className={s.pagination}>
+                    <span className={s.pageInfo}>
+                      Page {page} of {totalPages} &nbsp;·&nbsp; {total} total
                     </span>
-                    <button
-                      disabled={page === totalPages}
-                      onClick={() => setPage(page + 1)}
-                      className="pagination-btn"
-                    >
-                      Next <ArrowDown size={16} />
-                    </button>
+                    <div className={s.pageButtons}>
+                      <button
+                        className={s.pageBtn}
+                        disabled={page === 1}
+                        onClick={() => setPage((p) => p - 1)}
+                      >
+                        <ChevronLeft size={14} /> Prev
+                      </button>
+                      <button
+                        className={s.pageBtn}
+                        disabled={page >= totalPages}
+                        onClick={() => setPage((p) => p + 1)}
+                      >
+                        Next <ChevronRight size={14} />
+                      </button>
+                    </div>
                   </div>
                 </>
               )}
@@ -393,266 +470,456 @@ export default function AdminMaidDashboard() {
           </>
         )}
 
-        {view === "detail" && selectedMaid && (
-          <div className="detail-view">
-            <button className="back-btn" onClick={() => setView("list")}>
-              ← Back to List
+        {/* ─── DETAIL VIEW ──────────────────────────────────── */}
+        {view === "detail" && selected && (
+          <div className={s.detailView}>
+            <button className={s.backBtn} onClick={() => setView("list")}>
+              <ChevronLeft size={15} /> Back to list
             </button>
 
-            <div className="detail-container">
-              <div className="detail-header">
-                <div className="detail-profile">
-                  <img
-                    src={selectedMaid.avatar || "/avatar-placeholder.png"}
-                    alt={selectedMaid.name}
-                  />
-                  <div className="profile-info">
-                    <h2>{selectedMaid.name || "N/A"}</h2>
-                    <p className="location-text">
-                      <MapPin size={16} /> {selectedMaid.location || "N/A"}
-                    </p>
-                    <p className="member-since">
-                      Member since{" "}
-                      {selectedMaid.member_since
-                        ? new Date(
-                            selectedMaid.member_since,
-                          ).toLocaleDateString()
-                        : "N/A"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="detail-actions">
-                  <button
-                    className={`btn-availability ${selectedMaid.is_available ? "available" : "unavailable"}`}
-                    onClick={() =>
-                      toggleAvailability(
-                        selectedMaid.id,
-                        selectedMaid.is_available,
-                      )
-                    }
-                  >
-                    <Zap size={18} />
-                    {selectedMaid.is_available
-                      ? "Mark Unavailable"
-                      : "Mark Available"}
-                  </button>
-                  <button
-                    className="btn-primary"
-                    onClick={() => handleEditClick(selectedMaid)}
-                  >
-                    <Edit2 size={18} /> Edit Profile
-                  </button>
-                </div>
-              </div>
-
-              <div className="detail-grid">
-                <div className="detail-card">
-                  <h3>Performance</h3>
-                  <div className="performance-metrics">
-                    <div className="metric">
-                      <p className="metric-label">Rating</p>
-                      <p className="metric-value">
-                        <Star className="star" size={20} />
-                        {formatRating(selectedMaid.rating)}
-                      </p>
-                    </div>
-                    <div className="metric">
-                      <p className="metric-label">Reviews</p>
-                      <p className="metric-value">
-                        {toNumber(selectedMaid.total_reviews)}
-                      </p>
-                    </div>
-                    <div className="metric">
-                      <p className="metric-label">Hourly Rate</p>
-                      <p className="metric-value">
-                        ₦{toNumber(selectedMaid.hourly_rate).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="detail-card">
-                  <h3>Experience</h3>
-                  <div className="experience-info">
-                    <p className="years">
-                      <Clock size={20} />
-                      <span>{toNumber(selectedMaid.years_exp)} Years</span>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="detail-card full-width">
-                  <h3>Bio</h3>
-                  <p className="bio-text">
-                    {selectedMaid.bio || "No bio provided"}
-                  </p>
-                </div>
-
-                <div className="detail-card full-width">
-                  <h3>Services</h3>
-                  <div className="services-list">
-                    {selectedMaid.services &&
-                    Array.isArray(selectedMaid.services) &&
-                    selectedMaid.services.length > 0 ? (
-                      selectedMaid.services.map((service, idx) => (
-                        <span key={idx} className="service-tag">
-                          {service}
-                        </span>
-                      ))
-                    ) : (
-                      <p>No services listed</p>
+            {/* Hero */}
+            <div className={s.detailHero}>
+              <div className={s.heroLeft}>
+                <img
+                  className={s.heroAvatar}
+                  src={selected.avatar || "/avatar-placeholder.png"}
+                  alt={selected.name}
+                  onError={(e) => {
+                    e.target.src = "/avatar-placeholder.png";
+                  }}
+                />
+                <div className={s.heroInfo}>
+                  <h2>{selected.name || "—"}</h2>
+                  <div className={s.heroMeta}>
+                    <span className={s.metaItem}>
+                      <MapPin />
+                      {selected.location || "—"}
+                    </span>
+                    {selected.member_since && (
+                      <span className={s.metaItem}>
+                        <Clock />
+                        Member since{" "}
+                        {new Date(selected.member_since).toLocaleDateString()}
+                      </span>
                     )}
+                    <StatusBadge maid={selected} />
                   </div>
                 </div>
               </div>
 
-              {/* Reviews Section */}
-              <div className="reviews-section">
-                <h3>Customer Reviews ({reviews.length})</h3>
-                {loadingReviews ? (
-                  <p>Loading reviews...</p>
-                ) : reviews.length === 0 ? (
-                  <p className="no-reviews">No reviews yet</p>
-                ) : (
-                  <div className="reviews-list">
-                    {reviews.map((review, idx) => (
-                      <div key={idx} className="review-card">
-                        <div className="review-header">
-                          <p className="reviewer-name">
-                            {review.customer_name || "Anonymous"}
-                          </p>
-                          <div className="rating-stars">
-                            {"⭐".repeat(toNumber(review.rating, 0))}
-                          </div>
+              <div className={s.heroActions}>
+                <button
+                  className={`${s.btn} ${selected.is_active === false ? s.btnGreen : s.btnRed}`}
+                  onClick={() =>
+                    toggleActive(selected, selected.is_active === false)
+                  }
+                >
+                  {selected.is_active === false ? (
+                    <>
+                      <UserCheck size={15} /> Activate
+                    </>
+                  ) : (
+                    <>
+                      <UserX size={15} /> Deactivate
+                    </>
+                  )}
+                </button>
+                <button
+                  className={`${s.btn} ${s.btnAmber}`}
+                  onClick={() => {
+                    setEditing({ ...selected });
+                    setView("edit");
+                  }}
+                >
+                  <Edit2 size={15} /> Edit Profile
+                </button>
+              </div>
+            </div>
+
+            {/* Stats strip */}
+            <div className={s.statsStrip}>
+              <div className={s.statTile}>
+                <p className={s.statTileLabel}>Rating</p>
+                <p className={`${s.statTileValue} ${s.amber}`}>
+                  {fmtRate(selected.rating)}
+                </p>
+              </div>
+              <div className={s.statTile}>
+                <p className={s.statTileLabel}>Reviews</p>
+                <p className={s.statTileValue}>{selected.total_reviews}</p>
+              </div>
+              <div className={s.statTile}>
+                <p className={s.statTileLabel}>Hourly Rate</p>
+                <p className={`${s.statTileValue} ${s.green}`}>
+                  ₦{toNum(selected.hourly_rate).toLocaleString()}
+                </p>
+              </div>
+              <div className={s.statTile}>
+                <p className={s.statTileLabel}>Experience</p>
+                <p className={`${s.statTileValue} ${s.accent}`}>
+                  {selected.years_exp} yrs
+                </p>
+              </div>
+            </div>
+
+            {/* Detail cards */}
+            <div className={s.detailGrid}>
+              <div className={`${s.detailCard} ${s.fullWidth}`}>
+                <p className={s.detailCardLabel}>Bio</p>
+                <p className={s.bioText}>
+                  {selected.bio || "No bio provided."}
+                </p>
+              </div>
+              <div className={`${s.detailCard} ${s.fullWidth}`}>
+                <p className={s.detailCardLabel}>Services</p>
+                <div className={s.services}>
+                  {selected.services?.length ? (
+                    selected.services.map((sv, i) => (
+                      <span key={i} className={s.serviceTag}>
+                        {sv}
+                      </span>
+                    ))
+                  ) : (
+                    <span className={s.bioText}>None listed</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Reviews */}
+            <div className={s.reviewsSection}>
+              <div className={s.reviewsHeader}>
+                <h3 className={s.reviewsTitle}>
+                  Reviews&nbsp;
+                  <span
+                    style={{
+                      color: "var(--c-muted)",
+                      fontFamily: "var(--ff-mono)",
+                      fontWeight: 400,
+                    }}
+                  >
+                    ({reviews.length})
+                  </span>
+                </h3>
+              </div>
+
+              {revLoading ? (
+                <div className={s.loading}>
+                  <div className={s.spinner} />
+                  Loading reviews…
+                </div>
+              ) : reviews.length === 0 ? (
+                <div className={s.empty}>No reviews yet</div>
+              ) : (
+                <div className={s.reviewsList}>
+                  {reviews.map((r, i) => (
+                    <div key={i} className={s.reviewCard}>
+                      <div>
+                        <div className={s.reviewMeta}>
+                          <span className={s.reviewerName}>
+                            {r.customer_name || "Anonymous"}
+                          </span>
+                          <span className={s.reviewStars}>
+                            {"⭐".repeat(toNum(r.rating, 0))}
+                          </span>
+                          <span className={s.reviewDate}>
+                            {r.created_at
+                              ? new Date(r.created_at).toLocaleDateString()
+                              : ""}
+                          </span>
                         </div>
-                        <p className="review-comment">
-                          {review.comment || "No comment"}
-                        </p>
-                        <p className="review-date">
-                          {review.created_at
-                            ? new Date(review.created_at).toLocaleDateString()
-                            : "N/A"}
+                        <p className={s.reviewComment}>
+                          {r.comment || "No comment"}
                         </p>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                      <button
+                        className={s.deleteReviewBtn}
+                        title="Delete review"
+                        onClick={() => deleteReview(r, i)}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {view === "edit" && editingMaid && (
-          <div className="edit-view">
-            <button className="back-btn" onClick={() => setView("detail")}>
-              ← Cancel
+        {/* ─── EDIT VIEW ────────────────────────────────────── */}
+        {view === "edit" && editing && (
+          <div className={s.editView}>
+            <button
+              className={s.backBtn}
+              onClick={() => setView(selected ? "detail" : "list")}
+            >
+              <ChevronLeft size={15} /> Cancel
             </button>
 
-            <div className="edit-form">
-              <h2>Edit Maid Profile</h2>
-
-              <div className="form-group">
-                <label>Bio</label>
-                <textarea
-                  value={editingMaid.bio || ""}
-                  onChange={(e) =>
-                    setEditingMaid({ ...editingMaid, bio: e.target.value })
-                  }
-                  rows="4"
-                />
+            <div className={s.editCard}>
+              <div className={s.editCardHeader}>
+                <h2>Edit Profile</h2>
+                <p>
+                  Changes are saved directly to the maid's profile via the admin
+                  API
+                </p>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Hourly Rate (₦)</label>
-                  <input
-                    type="number"
-                    value={toNumber(editingMaid.hourly_rate)}
+              <div className={s.editCardBody}>
+                {/* Bio */}
+                <div className={s.formGroup}>
+                  <label className={s.formLabel}>Bio</label>
+                  <textarea
+                    className={s.formTextarea}
+                    value={editing.bio || ""}
                     onChange={(e) =>
-                      setEditingMaid({
-                        ...editingMaid,
-                        hourly_rate: toNumber(e.target.value),
-                      })
+                      setEditing({ ...editing, bio: e.target.value })
                     }
+                    placeholder="Maid's professional bio…"
                   />
                 </div>
 
-                <div className="form-group">
-                  <label>Years of Experience</label>
+                {/* Rate + Exp */}
+                <div className={s.formRow}>
+                  <div className={s.formGroup}>
+                    <label className={s.formLabel}>Hourly Rate (₦)</label>
+                    <input
+                      className={s.formInput}
+                      type="number"
+                      min={0}
+                      value={toNum(editing.hourly_rate)}
+                      onChange={(e) =>
+                        setEditing({
+                          ...editing,
+                          hourly_rate: toNum(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                  <div className={s.formGroup}>
+                    <label className={s.formLabel}>Years of Experience</label>
+                    <input
+                      className={s.formInput}
+                      type="number"
+                      min={0}
+                      value={toNum(editing.years_exp)}
+                      onChange={(e) =>
+                        setEditing({
+                          ...editing,
+                          years_exp: toNum(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div className={s.formGroup}>
+                  <label className={s.formLabel}>Location</label>
                   <input
-                    type="number"
-                    value={toNumber(editingMaid.years_exp)}
+                    className={s.formInput}
+                    type="text"
+                    value={editing.location || ""}
                     onChange={(e) =>
-                      setEditingMaid({
-                        ...editingMaid,
-                        years_exp: toNumber(e.target.value),
-                      })
+                      setEditing({ ...editing, location: e.target.value })
                     }
+                    placeholder="e.g. Lagos"
                   />
                 </div>
-              </div>
 
-              <div className="form-group">
-                <label>Location</label>
-                <input
-                  type="text"
-                  value={editingMaid.location || ""}
-                  onChange={(e) =>
-                    setEditingMaid({ ...editingMaid, location: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Services (comma-separated)</label>
-                <input
-                  type="text"
-                  value={
-                    Array.isArray(editingMaid.services)
-                      ? editingMaid.services.join(", ")
-                      : ""
-                  }
-                  onChange={(e) =>
-                    setEditingMaid({
-                      ...editingMaid,
-                      services: e.target.value.split(",").map((s) => s.trim()),
-                    })
-                  }
-                />
-              </div>
-
-              <div className="form-group checkbox">
-                <label>
+                {/* Services */}
+                <div className={s.formGroup}>
+                  <label className={s.formLabel}>
+                    Services (comma-separated)
+                  </label>
                   <input
-                    type="checkbox"
-                    checked={editingMaid.is_available || false}
+                    className={s.formInput}
+                    type="text"
+                    value={
+                      Array.isArray(editing.services)
+                        ? editing.services.join(", ")
+                        : ""
+                    }
                     onChange={(e) =>
-                      setEditingMaid({
-                        ...editingMaid,
-                        is_available: e.target.checked,
+                      setEditing({
+                        ...editing,
+                        services: e.target.value
+                          .split(",")
+                          .map((x) => x.trim())
+                          .filter(Boolean),
                       })
                     }
+                    placeholder="e.g. residential, deep_clean"
                   />
-                  Available
-                </label>
-              </div>
+                </div>
 
-              <div className="form-actions">
-                <button
-                  className="btn-secondary"
-                  onClick={() => setView("detail")}
-                >
-                  Cancel
-                </button>
-                <button className="btn-primary" onClick={handleSaveEdit}>
-                  Save Changes
-                </button>
+                {/* Availability toggle */}
+                <div className={s.formGroup}>
+                  <label className={s.checkRow} htmlFor="availCheck">
+                    <input
+                      id="availCheck"
+                      type="checkbox"
+                      checked={editing.is_available || false}
+                      onChange={(e) =>
+                        setEditing({
+                          ...editing,
+                          is_available: e.target.checked,
+                        })
+                      }
+                    />
+                    <span className={s.checkLabel}>Mark as Available</span>
+                  </label>
+                </div>
+
+                <div className={s.formFooter}>
+                  <button
+                    className={`${s.btn} ${s.btnGhost}`}
+                    onClick={() => setView(selected ? "detail" : "list")}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className={`${s.btn} ${s.btnPrimary}`}
+                    onClick={handleSaveEdit}
+                  >
+                    <Check size={15} /> Save Changes
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* ── Confirm modal ─────────────────────────────────── */}
+      {confirm && (
+        <div className={s.overlay} onClick={() => setConfirm(null)}>
+          <div className={s.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={s.modalIcon}>
+              <AlertTriangle size={20} />
+            </div>
+            <h3>{confirm.title}</h3>
+            <p>{confirm.body}</p>
+            <div className={s.modalActions}>
+              <button
+                className={`${s.btn} ${s.btnGhost}`}
+                onClick={() => setConfirm(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className={`${s.btn} ${confirm.isDanger ? s.btnRed : s.btnPrimary}`}
+                onClick={confirm.onConfirm}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Toast stack ───────────────────────────────────── */}
+      <div className={s.toastWrap}>
+        {toasts.map((t) => (
+          <div key={t.id} className={`${s.toast} ${s[t.type]}`}>
+            {t.type === "success" ? <Check size={14} /> : <X size={14} />}
+            {t.msg}
+          </div>
+        ))}
+      </div>
     </div>
+  );
+}
+
+// ─── Sub-component ───────────────────────────────────────────
+function StatusBadge({ maid }) {
+  const s_mod = { root: "root" }; // reference to module
+  if (maid.is_active === false)
+    return (
+      <span
+        className="badge inactive"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "0.35rem",
+          padding: "0.3rem 0.65rem",
+          borderRadius: "20px",
+          fontSize: "0.72rem",
+          fontFamily: "'DM Mono',monospace",
+          fontWeight: 500,
+          letterSpacing: "0.3px",
+          background: "rgba(255,255,255,0.06)",
+          color: "#7878a0",
+        }}
+      >
+        <span
+          style={{
+            width: 5,
+            height: 5,
+            borderRadius: "50%",
+            background: "currentColor",
+            display: "inline-block",
+          }}
+        />
+        Inactive
+      </span>
+    );
+  if (maid.is_available)
+    return (
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "0.35rem",
+          padding: "0.3rem 0.65rem",
+          borderRadius: "20px",
+          fontSize: "0.72rem",
+          fontFamily: "'DM Mono',monospace",
+          fontWeight: 500,
+          letterSpacing: "0.3px",
+          background: "rgba(52,211,153,0.12)",
+          color: "#34d399",
+        }}
+      >
+        <span
+          style={{
+            width: 5,
+            height: 5,
+            borderRadius: "50%",
+            background: "currentColor",
+            display: "inline-block",
+          }}
+        />
+        Available
+      </span>
+    );
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "0.35rem",
+        padding: "0.3rem 0.65rem",
+        borderRadius: "20px",
+        fontSize: "0.72rem",
+        fontFamily: "'DM Mono',monospace",
+        fontWeight: 500,
+        letterSpacing: "0.3px",
+        background: "rgba(248,113,113,0.12)",
+        color: "#f87171",
+      }}
+    >
+      <span
+        style={{
+          width: 5,
+          height: 5,
+          borderRadius: "50%",
+          background: "currentColor",
+          display: "inline-block",
+        }}
+      />
+      Unavailable
+    </span>
   );
 }

@@ -209,7 +209,7 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <h1 className={styles.headerTitle}>IziMaid Admin</h1>
+          <h1 className={styles.headerTitle}>Deusizi Sparkle Admin</h1>
           <span className={styles.headerBadge}>{total} leads</span>
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
