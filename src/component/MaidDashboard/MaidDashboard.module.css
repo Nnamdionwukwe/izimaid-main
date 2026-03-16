@@ -482,3 +482,158 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+/* ── Declined Status Badge ──────────────────────────────────────────────────── */
+.statusDeclined {
+  background: linear-gradient(
+    135deg,
+    rgb(255, 140, 0) 0%,
+    rgb(255, 100, 0) 100%
+  );
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+/* ── Modal Overlay ──────────────────────────────────────────────────────────── */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    background: rgba(0, 0, 0, 0);
+  }
+  to {
+    background: rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* ── Modal Sheet (Bottom Sheet) ─────────────────────────────────────────────── */
+.modalSheet {
+  background: white;
+  border-radius: 16px 16px 0 0;
+  width: 100%;
+  max-width: 500px;
+  padding: 24px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* ── Modal Handle (Top indicator bar) ───────────────────────────────────────── */
+.modalHandle {
+  width: 40px;
+  height: 4px;
+  background: rgb(220, 220, 220);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+
+/* ── Modal Actions (Button container) ──────────────────────────────────────── */
+.modalActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* ── Modal Button ──────────────────────────────────────────────────────────── */
+.modalBtn {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid rgb(228, 228, 228);
+  background: white;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: rgb(47, 47, 47);
+}
+
+.modalBtn:hover:not(:disabled) {
+  background: rgb(245, 245, 245);
+  border-color: rgb(200, 200, 200);
+}
+
+.modalBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Modal Danger Button ───────────────────────────────────────────────────── */
+.modalBtnDanger {
+  background: rgb(187, 19, 47);
+  color: white;
+  border: none;
+}
+
+.modalBtnDanger:hover:not(:disabled) {
+  background: rgb(160, 15, 40);
+}
+
+/* ── Declined Reason Display ──────────────────────────────────────────────────── */
+.declineReasonBox {
+  padding: 12px;
+  background: linear-gradient(
+    135deg,
+    rgb(255, 250, 205) 0%,
+    rgb(255, 245, 170) 100%
+  );
+  border-left: 4px solid rgb(255, 140, 0);
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.declineReasonBox p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.declineReasonLabel {
+  font-weight: bold;
+  color: rgb(100, 80, 0);
+  margin-bottom: 4px;
+}
+
+.declineReasonText {
+  color: rgb(80, 60, 0);
+}
+
+/* ── Responsive Design ─────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .modalSheet {
+    max-width: 100%;
+    padding: 20px;
+  }
+
+  .modalActions {
+    flex-direction: column;
+  }
+
+  .modalBtn {
+    width: 100%;
+  }
+}

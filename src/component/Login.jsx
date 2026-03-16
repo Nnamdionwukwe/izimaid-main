@@ -51,7 +51,7 @@ export default function Login({ onSuccess }) {
       }).catch((err) => console.warn("Previous session logout failed:", err));
     }
 
-    // Authenticate with Google token
+    // Now authenticate with new credentials
     fetch(`${API_URL}/api/auth/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -62,27 +62,14 @@ export default function Login({ onSuccess }) {
         if (!ok) throw new Error(data.error || "Authentication failed");
         if (!data.token || !data.user) throw new Error("No token received");
 
-        // Store token first
+        // Store new credentials
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        // Fetch fresh user data from server to ensure role is correct
-        return fetch(`${API_URL}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${data.token}` },
-        })
-          .then((res) => {
-            if (!res.ok) return data.user; // Fallback to returned user
-            return res.json().then((meData) => meData.user);
-          })
-          .then((freshUser) => {
-            // Update localStorage with fresh user data
-            localStorage.setItem("user", JSON.stringify(freshUser));
-            setLoading(false);
-            onSuccess?.({ token: data.token, user: freshUser });
-          });
+        setLoading(false);
+        onSuccess?.(data);
       })
       .catch((err) => {
-        console.error("Login error:", err);
         setError(err.message || "Something went wrong. Please try again.");
         setLoading(false);
 
@@ -116,7 +103,7 @@ export default function Login({ onSuccess }) {
               style={{ margin: "0 auto 16px" }}
             />
             <p style={{ color: "#8a7b6a", fontSize: "14px" }}>
-              Signing you in...
+              {error ? "Signing in..." : "Signing you in..."}
             </p>
           </div>
         </div>
