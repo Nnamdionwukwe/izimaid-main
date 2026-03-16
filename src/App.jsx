@@ -11,7 +11,7 @@ import HomePage from "./component/HomePage";
 import RequestEstimate from "./component/RequestEstimate";
 import LearnMore from "./component/LearnMore/LearnMore";
 import Login from "./component/Login.jsx";
-import AdminApp from "./component/AdminDashboard/Adminapp.jsx";
+import AdminApp from "./component/AdminDashboard/AdminApp.jsx";
 
 function App() {
   return (
@@ -54,11 +54,6 @@ function AppRoutes() {
   const token = getToken();
   const user = getUser();
 
-  // After Google redirect, the URL is /login#access_token=...
-  // We must let Login render so its useEffect can process the hash.
-  // Only redirect away if token exists AND there's no access_token hash.
-  const hasGoogleHash = window.location.hash.includes("access_token");
-
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
@@ -66,7 +61,7 @@ function AppRoutes() {
       <Route
         path="/login"
         element={
-          token && !hasGoogleHash ? (
+          token ? (
             <Navigate to={user.role === "admin" ? "/admin" : "/"} replace />
           ) : (
             <Login onSuccess={handleLoginSuccess} />
