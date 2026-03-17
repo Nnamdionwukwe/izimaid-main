@@ -60,6 +60,8 @@ function ProfileTab({ token, user }) {
   const [currentCoords, setCurrentCoords] = useState(null);
   const [locationAttempts, setLocationAttempts] = useState(0);
   const [fullAddress, setFullAddress] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
 
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -120,27 +122,22 @@ function ProfileTab({ token, user }) {
   function formatAddress(addressDetails) {
     const parts = [];
 
-    // Add street if available
     if (addressDetails.street) {
       parts.push(addressDetails.street);
     }
 
-    // Add city
     if (addressDetails.city) {
       parts.push(addressDetails.city);
     }
 
-    // Add state
     if (addressDetails.state) {
       parts.push(addressDetails.state);
     }
 
-    // Add country
     if (addressDetails.country) {
       parts.push(addressDetails.country);
     }
 
-    // Format: "Street, City, State, Country"
     return parts.length > 0 ? parts.join(", ") : addressDetails.displayName;
   }
 
@@ -165,13 +162,69 @@ function ProfileTab({ token, user }) {
     return display;
   }
 
+  // Handle avatar upload
+  async function handleAvatarUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setMsg({ type: "error", text: "❌ Image must be less than 5MB" });
+      return;
+    }
+
+    // Check file type
+    if (!file.type.startsWith("image/")) {
+      setMsg({ type: "error", text: "❌ Please select an image file" });
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setAvatarPreview(event.target?.result);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to server
+    setUploadingAvatar(true);
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      const res = await fetch(`${API_URL}/api/maids/avatar`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      // Update localStorage
+      const updatedUser = { ...user, avatar: data.avatar_url };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      setMsg({ type: "success", text: "✅ Profile picture updated!" });
+    } catch (err) {
+      setMsg({
+        type: "error",
+        text: `❌ ${err.message || "Failed to upload image"}`,
+      });
+      setAvatarPreview(user?.avatar || null);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
+
   // Get current location using Geolocation API with iOS-specific handling
   async function getCurrentLocation() {
     setGettingLocation(true);
     setMsg({ type: "", text: "" });
     setLocationAttempts((prev) => prev + 1);
 
-    // Check if browser supports geolocation
     if (!navigator.geolocation) {
       setMsg({
         type: "error",
@@ -181,11 +234,10 @@ function ProfileTab({ token, user }) {
       return;
     }
 
-    // Increased timeout for iOS - give it more time to get a fix
     const geolocationOptions = {
       enableHighAccuracy: true,
-      timeout: 30000, // 30 seconds
-      maximumAge: 0, // Don't use cached location
+      timeout: 30000,
+      maximumAge: 0,
     };
 
     navigator.geolocation.getCurrentPosition(
@@ -198,7 +250,6 @@ function ProfileTab({ token, user }) {
           text: `📍 Location found (Accuracy: ${Math.round(accuracy)}m). Converting to address...`,
         });
 
-        // Reverse geocoding - convert coordinates to address
         try {
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
@@ -228,7 +279,6 @@ function ProfileTab({ token, user }) {
           });
         } catch (err) {
           console.error("Reverse geocoding error:", err);
-          // Fallback to coordinates if reverse geocoding fails
           const coordLocation = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
           setProfile((prev) => ({
             ...prev,
@@ -265,7 +315,6 @@ function ProfileTab({ token, user }) {
                 (locationAttempts + 1) +
                 "/3)";
               errorType = "warning";
-              // Auto-retry after 2 seconds
               setTimeout(() => {
                 getCurrentLocation();
               }, 2000);
@@ -405,6 +454,110 @@ function ProfileTab({ token, user }) {
       {msg.text && <p style={getMsgStyle(msg.type)}>{msg.text}</p>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {/* Profile Picture Upload */}
+        <div>
+          <label
+            style={{
+              fontSize: "13px",
+              fontWeight: "bold",
+              color: "rgb(47, 47, 47)",
+              display: "block",
+              marginBottom: 10,
+            }}
+          >
+            Profile Picture
+          </label>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              gap: 16,
+            }}
+          >
+            {/* Avatar Preview */}
+            <div
+              style={{
+                position: "relative",
+                width: 80,
+                height: 80,
+                borderRadius: "12px",
+                overflow: "hidden",
+                background: "rgb(240, 240, 245)",
+                border: "2px solid rgb(228, 228, 228)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              {avatarPreview ? (
+                <img
+                  src={avatarPreview}
+                  alt="Profile"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    fontSize: 32,
+                    fontWeight: "bold",
+                    color: "rgb(19, 19, 103)",
+                  }}
+                >
+                  {user.name
+                    ?.split(" ")
+                    .map((n) => n[0])
+                    .slice(0, 2)
+                    .join("")
+                    .toUpperCase() || "?"}
+                </div>
+              )}
+            </div>
+
+            {/* Upload Button */}
+            <div style={{ flex: 1 }}>
+              <label
+                style={{
+                  display: "inline-block",
+                  padding: "10px 16px",
+                  background: "rgb(19, 19, 103)",
+                  color: "white",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  fontWeight: "bold",
+                  cursor: uploadingAvatar ? "not-allowed" : "pointer",
+                  opacity: uploadingAvatar ? 0.6 : 1,
+                  border: "none",
+                  fontFamily: "inherit",
+                }}
+              >
+                {uploadingAvatar ? "📤 Uploading..." : "📸 Change Photo"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  disabled={uploadingAvatar}
+                  style={{ display: "none" }}
+                />
+              </label>
+              <p
+                style={{
+                  fontSize: "11px",
+                  color: "rgb(100, 100, 100)",
+                  margin: "6px 0 0",
+                }}
+              >
+                JPG, PNG (Max 5MB)
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Bio */}
         <div>
           <label
@@ -569,7 +722,6 @@ function ProfileTab({ token, user }) {
             }
           />
 
-          {/* Show detailed address breakdown if available */}
           {fullAddress &&
             (fullAddress.street ||
               fullAddress.city ||
@@ -1282,3 +1434,5 @@ export default function MaidDashboard({ onLogout }) {
     </div>
   );
 }
+
+// ─── Profile Tab ──────────────────────────────────────────────
