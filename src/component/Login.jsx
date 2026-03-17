@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
@@ -20,19 +21,42 @@ export default function Login({ onSuccess }) {
   const [role, setRole] = useState("customer");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("\n🔐 [LOGIN] Component mounted");
+    console.log("🔐 [LOGIN] API_URL:", API_URL);
+    console.log("🔐 [LOGIN] GOOGLE_CLIENT_ID set:", !!GOOGLE_CLIENT_ID);
+
     const hash = window.location.hash;
-    if (!hash.includes("access_token")) return;
+    console.log("🔐 [LOGIN] URL hash:", hash.slice(0, 50) + "...");
+
+    if (!hash.includes("access_token")) {
+      console.log("ℹ️ [LOGIN] No access_token in hash - normal login page");
+      return;
+    }
+
+    console.log("✅ [LOGIN] Google callback detected - processing...");
 
     const params = new URLSearchParams(hash.replace("#", ""));
     const access_token = params.get("access_token");
     const state = params.get("state") || "customer";
 
-    if (!access_token) return;
+    console.log(
+      "🔑 [LOGIN] access_token received (length:",
+      access_token?.length,
+      ")",
+    );
+    console.log("🔑 [LOGIN] state (role):", state);
+
+    if (!access_token) {
+      console.error("❌ [LOGIN] No access_token found in URL");
+      return;
+    }
 
     // Clean hash immediately to prevent re-processing on refresh
     window.history.replaceState(null, "", window.location.pathname);
+    console.log("✅ [LOGIN] URL cleaned");
 
     setLoading(true);
     setError(null);
@@ -40,36 +64,100 @@ export default function Login({ onSuccess }) {
     // First, logout any existing session to prevent duplicates
     const currentToken = localStorage.getItem("token");
     if (currentToken) {
-      // Clear localStorage before new login
+      console.log("🔄 [LOGIN] Existing token found - clearing...");
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      console.log("✅ [LOGIN] Old credentials cleared");
 
       // Optional: Call logout endpoint to clear server cache
       fetch(`${API_URL}/api/auth/logout`, {
         method: "POST",
         headers: { Authorization: `Bearer ${currentToken}` },
-      }).catch((err) => console.warn("Previous session logout failed:", err));
+      }).catch((err) =>
+        console.warn("⚠️ [LOGIN] Previous session logout failed:", err),
+      );
     }
 
     // Now authenticate with new credentials
+    console.log(
+      "📡 [LOGIN] Sending auth request to:",
+      API_URL + "/api/auth/google",
+    );
     fetch(`${API_URL}/api/auth/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ access_token, role: state }),
     })
-      .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
-      .then(({ ok, data }) => {
-        if (!ok) throw new Error(data.error || "Authentication failed");
-        if (!data.token || !data.user) throw new Error("No token received");
+      .then((res) => {
+        console.log("📊 [LOGIN] Response status:", res.status);
+        return res
+          .json()
+          .then((data) => ({ ok: res.ok, data, status: res.status }));
+      })
+      .then(({ ok, data, status }) => {
+        console.log("📦 [LOGIN] Response data:", data);
+
+        if (!ok) {
+          throw new Error(data.error || `Authentication failed (${status})`);
+        }
+
+        if (!data.token) {
+          throw new Error("No token in response");
+        }
+
+        if (!data.user) {
+          throw new Error("No user in response");
+        }
+
+        console.log("✅ [LOGIN] Auth response valid");
+        console.log(
+          "🔐 [LOGIN] Token preview:",
+          data.token.slice(0, 50) + "...",
+        );
+        console.log("👤 [LOGIN] User:", {
+          id: data.user.id,
+          email: data.user.email,
+          role: data.user.role,
+          name: data.user.name,
+        });
 
         // Store new credentials
+        console.log("💾 [LOGIN] Saving to localStorage...");
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
+        // Verify saved
+        const savedToken = localStorage.getItem("token");
+        const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+        console.log(
+          "✅ [LOGIN] Saved token preview:",
+          savedToken?.slice(0, 50) + "...",
+        );
+        console.log("✅ [LOGIN] Saved user:", {
+          id: savedUser.id,
+          email: savedUser.email,
+          role: savedUser.role,
+        });
+
+        if (savedToken !== data.token) {
+          console.error("❌ [LOGIN] Token mismatch after saving!");
+        }
+
         setLoading(false);
+        console.log("🔄 [LOGIN] Calling onSuccess callback...");
         onSuccess?.(data);
+
+        // Redirect based on role
+        const redirectPath =
+          data.user.role === "maid" ? "/maid" : "/my-bookings";
+        console.log("🔀 [LOGIN] Redirecting to:", redirectPath);
+        navigate(redirectPath);
+
+        console.log("\n✅ [LOGIN] LOGIN COMPLETE\n");
       })
       .catch((err) => {
+        console.error("❌ [LOGIN] Error:", err.message);
         setError(err.message || "Something went wrong. Please try again.");
         setLoading(false);
 
@@ -77,11 +165,14 @@ export default function Login({ onSuccess }) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
       });
-  }, []);
+  }, [onSuccess, navigate]);
 
   const handleLogin = () => {
+    console.log("🔘 [LOGIN] Login button clicked - Role:", role);
     setError(null);
-    window.location.href = buildGoogleOAuthURL(role);
+    const oauthUrl = buildGoogleOAuthURL(role);
+    console.log("🔐 [LOGIN] Redirecting to Google OAuth URL");
+    window.location.href = oauthUrl;
   };
 
   // Show loading while processing redirect return
@@ -103,8 +194,15 @@ export default function Login({ onSuccess }) {
               style={{ margin: "0 auto 16px" }}
             />
             <p style={{ color: "#8a7b6a", fontSize: "14px" }}>
-              {error ? "Signing in..." : "Signing you in..."}
+              {error ? "Something went wrong..." : "Signing you in..."}
             </p>
+            {error && (
+              <p
+                style={{ color: "#d9534f", fontSize: "12px", marginTop: "8px" }}
+              >
+                {error}
+              </p>
+            )}
           </div>
         </div>
       </div>
