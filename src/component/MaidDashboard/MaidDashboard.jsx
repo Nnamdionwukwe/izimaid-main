@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MaidDashboard.module.css";
+import { useAuth } from "../../context/AuthContext";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const SERVICES_LIST = [
