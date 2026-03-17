@@ -43,9 +43,18 @@ function initials(name) {
   );
 }
 
-// ─── Profile Tab ──────────────────────────────────────────────
+// ── Resolve avatar URL ─────────────────────────────────────────
+// Backend saves relative paths like /uploads/avatars/file.jpg
+// This converts them to absolute URLs the browser can fetch.
+function resolveAvatarUrl(url) {
+  if (!url) return null;
+  if (url.startsWith("data:")) return url; // blob preview — use as-is
+  if (url.startsWith("http")) return url; // already absolute — use as-is
+  return `${API_URL}${url.startsWith("/") ? "" : "/"}${url}`; // relative → absolute
+}
 
-function ProfileTab({ token, user }) {
+// ─── Profile Tab ──────────────────────────────────────────────
+function ProfileTab({ token, user, onUserUpdate }) {
   const [profile, setProfile] = useState({
     bio: "",
     hourly_rate: "",
@@ -61,22 +70,11 @@ function ProfileTab({ token, user }) {
   const [locationAttempts, setLocationAttempts] = useState(0);
   const [fullAddress, setFullAddress] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
+  // ✅ Resolve on init so a stored relative path renders correctly
+  const [avatarPreview, setAvatarPreview] = useState(
+    resolveAvatarUrl(user?.avatar),
+  );
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
-
-  const SERVICES_LIST = [
-    "Cleaning",
-    "Laundry",
-    "Cooking",
-    "Ironing",
-    "Organizing",
-    "Window Cleaning",
-    "Carpet Cleaning",
-    "Deep Cleaning",
-  ];
-
-  // Load profile on mount
   useEffect(() => {
     async function load() {
       try {
@@ -99,13 +97,16 @@ function ProfileTab({ token, user }) {
       setLoading(false);
     }
     load();
-  }, [user.id, token, API_URL]);
+  }, [user.id, token]);
 
-  // Extract detailed address from Nominatim response
+  // Sync preview when parent user prop changes
+  useEffect(() => {
+    if (user?.avatar) setAvatarPreview(resolveAvatarUrl(user.avatar));
+  }, [user?.avatar]);
+
   function extractAddressDetails(data) {
     const address = data.address || {};
-
-    const details = {
+    return {
       street: address.road || address.house_number || "",
       houseNumber: address.house_number || "",
       city: address.city || address.town || address.village || "",
@@ -114,79 +115,40 @@ function ProfileTab({ token, user }) {
       postalCode: address.postcode || "",
       displayName: data.display_name || "",
     };
-
-    return details;
   }
 
-  // Format address nicely
-  function formatAddress(addressDetails) {
-    const parts = [];
-
-    if (addressDetails.street) {
-      parts.push(addressDetails.street);
-    }
-
-    if (addressDetails.city) {
-      parts.push(addressDetails.city);
-    }
-
-    if (addressDetails.state) {
-      parts.push(addressDetails.state);
-    }
-
-    if (addressDetails.country) {
-      parts.push(addressDetails.country);
-    }
-
-    return parts.length > 0 ? parts.join(", ") : addressDetails.displayName;
+  function formatAddress(a) {
+    const parts = [a.street, a.city, a.state, a.country].filter(Boolean);
+    return parts.length > 0 ? parts.join(", ") : a.displayName;
   }
 
-  // Format display address for user confirmation
-  function formatDisplayAddress(addressDetails) {
+  function formatDisplayAddress(a) {
     let display = "";
-
-    if (addressDetails.street) {
-      display += `📍 ${addressDetails.street}\n`;
-    }
-
-    if (addressDetails.city || addressDetails.state) {
-      display += `📍 ${[addressDetails.city, addressDetails.state]
-        .filter(Boolean)
-        .join(", ")}\n`;
-    }
-
-    if (addressDetails.country) {
-      display += `🌍 ${addressDetails.country}`;
-    }
-
+    if (a.street) display += `📍 ${a.street}\n`;
+    if (a.city || a.state)
+      display += `📍 ${[a.city, a.state].filter(Boolean).join(", ")}\n`;
+    if (a.country) display += `🌍 ${a.country}`;
     return display;
   }
 
-  // Handle avatar upload
   async function handleAvatarUpload(e) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setMsg({ type: "error", text: "❌ Image must be less than 5MB" });
       return;
     }
-
-    // Check file type
     if (!file.type.startsWith("image/")) {
       setMsg({ type: "error", text: "❌ Please select an image file" });
       return;
     }
 
-    // Show preview
+    // Immediate blob preview while uploading
     const reader = new FileReader();
-    reader.onload = (event) => {
-      setAvatarPreview(event.target?.result);
-    };
+    reader.onload = (ev) => setAvatarPreview(ev.target?.result);
     reader.readAsDataURL(file);
 
-    // Upload to server
     setUploadingAvatar(true);
     const formData = new FormData();
     formData.append("avatar", file);
@@ -194,32 +156,32 @@ function ProfileTab({ token, user }) {
     try {
       const res = await fetch(`${API_URL}/api/maids/avatar`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // Update localStorage
-      const updatedUser = { ...user, avatar: data.avatar_url };
+      // ✅ Backend returns relative path — resolve before storing
+      const resolvedUrl = resolveAvatarUrl(data.avatar_url);
+      setAvatarPreview(resolvedUrl);
+
+      const updatedUser = { ...user, avatar: resolvedUrl };
       localStorage.setItem("user", JSON.stringify(updatedUser));
+      onUserUpdate?.(updatedUser);
 
       setMsg({ type: "success", text: "✅ Profile picture updated!" });
     } catch (err) {
+      setAvatarPreview(resolveAvatarUrl(user?.avatar));
       setMsg({
         type: "error",
         text: `❌ ${err.message || "Failed to upload image"}`,
       });
-      setAvatarPreview(user?.avatar || null);
     } finally {
       setUploadingAvatar(false);
     }
   }
 
-  // Get current location using Geolocation API with iOS-specific handling
   async function getCurrentLocation() {
     setGettingLocation(true);
     setMsg({ type: "", text: "" });
@@ -234,120 +196,75 @@ function ProfileTab({ token, user }) {
       return;
     }
 
-    const geolocationOptions = {
-      enableHighAccuracy: true,
-      timeout: 30000,
-      maximumAge: 0,
-    };
-
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude, accuracy } = position.coords;
         setCurrentCoords({ latitude, longitude, accuracy });
-
         setMsg({
           type: "info",
           text: `📍 Location found (Accuracy: ${Math.round(accuracy)}m). Converting to address...`,
         });
-
         try {
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
-            { timeout: 8000 },
           );
-
           if (!response.ok) throw new Error("Address lookup failed");
-
           const data = await response.json();
           const addressDetails = extractAddressDetails(data);
           const formattedAddress = formatAddress(addressDetails);
           const displayAddress = formatDisplayAddress(addressDetails);
-
           setFullAddress(addressDetails);
-          setProfile((prev) => ({
-            ...prev,
-            location: formattedAddress,
-          }));
-
-          const addressDisplay = displayAddress.trim()
-            ? `✅ Location updated:\n${displayAddress}`
-            : `✅ Location: ${formattedAddress}`;
-
+          setProfile((prev) => ({ ...prev, location: formattedAddress }));
           setMsg({
             type: "success",
-            text: addressDisplay,
+            text: displayAddress.trim()
+              ? `✅ Location updated:\n${displayAddress}`
+              : `✅ Location: ${formattedAddress}`,
           });
-        } catch (err) {
-          console.error("Reverse geocoding error:", err);
+        } catch {
           const coordLocation = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-          setProfile((prev) => ({
-            ...prev,
-            location: coordLocation,
-          }));
+          setProfile((prev) => ({ ...prev, location: coordLocation }));
           setMsg({
             type: "success",
-            text: `✅ Location: ${coordLocation}\n(Try again later for address with street details)`,
+            text: `✅ Location: ${coordLocation}\n(Try again later for street details)`,
           });
         }
+        setGettingLocation(false);
       },
       (error) => {
-        console.error("Geolocation error:", error);
-
         let errorMessage = "Unable to get location";
         let errorType = "error";
-
         switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage =
-              "📍 Location access denied. Please go to Settings > Safari > Location and grant permission to this website.";
+              "📍 Location access denied. Please grant permission in Settings.";
             break;
-
           case error.POSITION_UNAVAILABLE:
             errorMessage =
-              "📍 GPS signal not found. Try:\n• Move outdoors\n• Wait a moment\n• Enable WiFi\n• Retry location request";
+              "📍 GPS signal not found. Try:\n• Move outdoors\n• Enable WiFi\n• Retry";
             errorType = "warning";
             break;
-
           case error.TIMEOUT:
             if (locationAttempts < 3) {
-              errorMessage =
-                "📍 Location request timed out. Retrying... (Attempt " +
-                (locationAttempts + 1) +
-                "/3)";
+              errorMessage = `📍 Timed out. Retrying... (${locationAttempts + 1}/3)`;
               errorType = "warning";
-              setTimeout(() => {
-                getCurrentLocation();
-              }, 2000);
+              setTimeout(getCurrentLocation, 2000);
               setGettingLocation(false);
               setMsg({ type: errorType, text: errorMessage });
               return;
-            } else {
-              errorMessage =
-                "📍 Could not determine location after 3 attempts. Please:\n• Check location services are enabled\n• Try manually entering your location\n• Ensure GPS/WiFi is turned on";
-              setLocationAttempts(0);
             }
+            errorMessage =
+              "📍 Could not determine location after 3 attempts. Please enter manually.";
+            setLocationAttempts(0);
             break;
-
           default:
-            if (
-              error.message &&
-              error.message.includes("Only secure origins")
-            ) {
-              errorMessage =
-                "⚠️ Location requires HTTPS. This error should only appear on HTTP sites.";
-            } else {
-              errorMessage =
-                "📍 Error getting location: " +
-                (error.message || "Unknown error");
-            }
+            errorMessage = `📍 Error: ${error.message || "Unknown error"}`;
         }
-
         setMsg({ type: errorType, text: errorMessage });
+        setGettingLocation(false);
       },
-      geolocationOptions,
+      { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 },
     );
-
-    setGettingLocation(false);
   }
 
   function toggleService(s) {
@@ -364,10 +281,8 @@ function ProfileTab({ token, user }) {
       setMsg({ type: "error", text: "Please enter a valid hourly rate" });
       return;
     }
-
     setSaving(true);
     setMsg({ type: "", text: "" });
-
     try {
       const res = await fetch(`${API_URL}/api/maids/profile`, {
         method: "PATCH",
@@ -383,23 +298,18 @@ function ProfileTab({ token, user }) {
           location: profile.location,
         }),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-
       setMsg({ type: "success", text: "✅ Profile saved successfully!" });
     } catch (err) {
-      setMsg({
-        type: "error",
-        text: err.message || "Failed to save profile",
-      });
+      setMsg({ type: "error", text: err.message || "Failed to save profile" });
     } finally {
       setSaving(false);
     }
   }
 
   const getMsgStyle = (type) => {
-    const baseStyle = {
+    const base = {
       padding: "10px 14px",
       borderRadius: "8px",
       fontSize: "13px",
@@ -408,27 +318,13 @@ function ProfileTab({ token, user }) {
       whiteSpace: "pre-line",
       lineHeight: "1.5",
     };
-
-    const typeStyles = {
-      success: {
-        background: "rgb(209, 247, 224)",
-        color: "rgb(10, 107, 46)",
-      },
-      error: {
-        background: "rgb(255, 228, 228)",
-        color: "rgb(168, 28, 28)",
-      },
-      warning: {
-        background: "rgb(255, 243, 205)",
-        color: "rgb(133, 100, 4)",
-      },
-      info: {
-        background: "rgb(209, 236, 255)",
-        color: "rgb(10, 76, 140)",
-      },
+    const map = {
+      success: { background: "rgb(209,247,224)", color: "rgb(10,107,46)" },
+      error: { background: "rgb(255,228,228)", color: "rgb(168,28,28)" },
+      warning: { background: "rgb(255,243,205)", color: "rgb(133,100,4)" },
+      info: { background: "rgb(209,236,255)", color: "rgb(10,76,140)" },
     };
-
-    return { ...baseStyle, ...(typeStyles[type] || typeStyles.info) };
+    return { ...base, ...(map[type] || map.info) };
   };
 
   if (loading)
@@ -444,7 +340,7 @@ function ProfileTab({ token, user }) {
         style={{
           fontSize: 16,
           fontWeight: "bold",
-          color: "rgb(19, 19, 103)",
+          color: "rgb(19,19,103)",
           margin: "0 0 14px",
         }}
       >
@@ -454,28 +350,20 @@ function ProfileTab({ token, user }) {
       {msg.text && <p style={getMsgStyle(msg.type)}>{msg.text}</p>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {/* Profile Picture Upload */}
+        {/* Profile Picture */}
         <div>
           <label
             style={{
               fontSize: "13px",
               fontWeight: "bold",
-              color: "rgb(47, 47, 47)",
+              color: "rgb(47,47,47)",
               display: "block",
               marginBottom: 10,
             }}
           >
             Profile Picture
           </label>
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-end",
-              gap: 16,
-            }}
-          >
-            {/* Avatar Preview */}
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 16 }}>
             <div
               style={{
                 position: "relative",
@@ -483,8 +371,8 @@ function ProfileTab({ token, user }) {
                 height: 80,
                 borderRadius: "12px",
                 overflow: "hidden",
-                background: "rgb(240, 240, 245)",
-                border: "2px solid rgb(228, 228, 228)",
+                background: "rgb(240,240,245)",
+                border: "2px solid rgb(228,228,228)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -495,10 +383,11 @@ function ProfileTab({ token, user }) {
                 <img
                   src={avatarPreview}
                   alt="Profile"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  onError={(ev) => {
+                    // URL failed — fall back to initials
+                    ev.target.style.display = "none";
+                    setAvatarPreview(null);
                   }}
                 />
               ) : (
@@ -506,26 +395,19 @@ function ProfileTab({ token, user }) {
                   style={{
                     fontSize: 32,
                     fontWeight: "bold",
-                    color: "rgb(19, 19, 103)",
+                    color: "rgb(19,19,103)",
                   }}
                 >
-                  {user.name
-                    ?.split(" ")
-                    .map((n) => n[0])
-                    .slice(0, 2)
-                    .join("")
-                    .toUpperCase() || "?"}
+                  {initials(user.name)}
                 </div>
               )}
             </div>
-
-            {/* Upload Button */}
             <div style={{ flex: 1 }}>
               <label
                 style={{
                   display: "inline-block",
                   padding: "10px 16px",
-                  background: "rgb(19, 19, 103)",
+                  background: "rgb(19,19,103)",
                   color: "white",
                   borderRadius: "8px",
                   fontSize: "13px",
@@ -548,7 +430,7 @@ function ProfileTab({ token, user }) {
               <p
                 style={{
                   fontSize: "11px",
-                  color: "rgb(100, 100, 100)",
+                  color: "rgb(100,100,100)",
                   margin: "6px 0 0",
                 }}
               >
@@ -564,7 +446,7 @@ function ProfileTab({ token, user }) {
             style={{
               fontSize: "13px",
               fontWeight: "bold",
-              color: "rgb(47, 47, 47)",
+              color: "rgb(47,47,47)",
               display: "block",
               marginBottom: 6,
             }}
@@ -573,7 +455,7 @@ function ProfileTab({ token, user }) {
           </label>
           <textarea
             style={{
-              border: "1px solid rgb(228, 228, 228)",
+              border: "1px solid rgb(228,228,228)",
               borderRadius: "8px",
               padding: "10px 14px",
               fontSize: "14px",
@@ -589,7 +471,7 @@ function ProfileTab({ token, user }) {
           />
         </div>
 
-        {/* Hourly Rate & Years Experience */}
+        {/* Rate + Experience */}
         <div
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
         >
@@ -598,7 +480,7 @@ function ProfileTab({ token, user }) {
               style={{
                 fontSize: "13px",
                 fontWeight: "bold",
-                color: "rgb(47, 47, 47)",
+                color: "rgb(47,47,47)",
                 display: "block",
                 marginBottom: 6,
               }}
@@ -608,7 +490,7 @@ function ProfileTab({ token, user }) {
             <input
               style={{
                 height: "44px",
-                border: "1px solid rgb(228, 228, 228)",
+                border: "1px solid rgb(228,228,228)",
                 borderRadius: "8px",
                 padding: "0 14px",
                 fontSize: "14px",
@@ -619,19 +501,18 @@ function ProfileTab({ token, user }) {
               type="number"
               placeholder="e.g. 3000"
               value={profile.hourly_rate}
+              min="0"
               onChange={(e) =>
                 setProfile((p) => ({ ...p, hourly_rate: e.target.value }))
               }
-              min="0"
             />
           </div>
-
           <div>
             <label
               style={{
                 fontSize: "13px",
                 fontWeight: "bold",
-                color: "rgb(47, 47, 47)",
+                color: "rgb(47,47,47)",
                 display: "block",
                 marginBottom: 6,
               }}
@@ -641,7 +522,7 @@ function ProfileTab({ token, user }) {
             <input
               style={{
                 height: "44px",
-                border: "1px solid rgb(228, 228, 228)",
+                border: "1px solid rgb(228,228,228)",
                 borderRadius: "8px",
                 padding: "0 14px",
                 fontSize: "14px",
@@ -652,15 +533,15 @@ function ProfileTab({ token, user }) {
               type="number"
               placeholder="e.g. 3"
               value={profile.years_exp}
+              min="0"
               onChange={(e) =>
                 setProfile((p) => ({ ...p, years_exp: e.target.value }))
               }
-              min="0"
             />
           </div>
         </div>
 
-        {/* Location with Geolocation Button */}
+        {/* Location */}
         <div>
           <div
             style={{
@@ -674,7 +555,7 @@ function ProfileTab({ token, user }) {
               style={{
                 fontSize: "13px",
                 fontWeight: "bold",
-                color: "rgb(47, 47, 47)",
+                color: "rgb(47,47,47)",
               }}
             >
               Location
@@ -685,9 +566,7 @@ function ProfileTab({ token, user }) {
               style={{
                 background: "none",
                 border: "none",
-                color: gettingLocation
-                  ? "rgb(100, 100, 100)"
-                  : "rgb(19, 19, 103)",
+                color: gettingLocation ? "rgb(100,100,100)" : "rgb(19,19,103)",
                 fontSize: "12px",
                 fontWeight: "bold",
                 cursor: gettingLocation ? "not-allowed" : "pointer",
@@ -695,18 +574,16 @@ function ProfileTab({ token, user }) {
                 textDecoration: "underline",
                 fontFamily: "inherit",
               }}
-              title="Get your exact location with street address (requires location permission)"
             >
               {gettingLocation
                 ? "📍 Getting location..."
                 : "📍 Use Current Location"}
             </button>
           </div>
-
           <input
             style={{
               height: "44px",
-              border: "1px solid rgb(228, 228, 228)",
+              border: "1px solid rgb(228,228,228)",
               borderRadius: "8px",
               padding: "0 14px",
               fontSize: "14px",
@@ -721,7 +598,6 @@ function ProfileTab({ token, user }) {
               setProfile((p) => ({ ...p, location: e.target.value }))
             }
           />
-
           {fullAddress &&
             (fullAddress.street ||
               fullAddress.city ||
@@ -733,7 +609,7 @@ function ProfileTab({ token, user }) {
                   color: "gray",
                   marginTop: 8,
                   padding: "8px",
-                  background: "rgb(245, 245, 248)",
+                  background: "rgb(245,245,248)",
                   borderRadius: "6px",
                   lineHeight: "1.6",
                 }}
@@ -761,8 +637,8 @@ function ProfileTab({ token, user }) {
                 )}
                 {currentCoords && (
                   <p style={{ margin: "2px 0" }}>
-                    📌 Coordinates: {currentCoords.latitude.toFixed(4)},
-                    {currentCoords.longitude.toFixed(4)} (Accuracy:
+                    📌 Coordinates: {currentCoords.latitude.toFixed(4)},{" "}
+                    {currentCoords.longitude.toFixed(4)} (Accuracy:{" "}
                     {Math.round(currentCoords.accuracy)}m)
                   </p>
                 )}
@@ -776,7 +652,7 @@ function ProfileTab({ token, user }) {
             style={{
               fontSize: "13px",
               fontWeight: "bold",
-              color: "rgb(47, 47, 47)",
+              color: "rgb(47,47,47)",
               display: "block",
               marginBottom: 6,
             }}
@@ -784,70 +660,59 @@ function ProfileTab({ token, user }) {
             Services Offered
           </label>
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 8,
-            }}
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}
           >
-            {SERVICES_LIST.map((s) => (
-              <div
-                key={s}
-                onClick={() => toggleService(s)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: "10px 12px",
-                  border: profile.services.includes(s)
-                    ? "1px solid rgb(19, 19, 103)"
-                    : "1px solid rgb(228, 228, 228)",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontSize: "13px",
-                  color: profile.services.includes(s)
-                    ? "rgb(19, 19, 103)"
-                    : "rgb(47, 47, 47)",
-                  background: profile.services.includes(s)
-                    ? "rgb(240, 240, 255)"
-                    : "white",
-                  fontWeight: profile.services.includes(s) ? "bold" : "normal",
-                }}
-              >
+            {SERVICES_LIST.map((s) => {
+              const selected = profile.services.includes(s);
+              return (
                 <div
+                  key={s}
+                  onClick={() => toggleService(s)}
                   style={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: 3,
-                    border: profile.services.includes(s)
-                      ? "2px solid rgb(19, 19, 103)"
-                      : "2px solid rgb(228, 228, 228)",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                    background: profile.services.includes(s)
-                      ? "rgb(19, 19, 103)"
-                      : "white",
-                    color: "white",
-                    fontSize: 10,
+                    gap: 8,
+                    padding: "10px 12px",
+                    border: `1px solid ${selected ? "rgb(19,19,103)" : "rgb(228,228,228)"}`,
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    color: selected ? "rgb(19,19,103)" : "rgb(47,47,47)",
+                    background: selected ? "rgb(240,240,255)" : "white",
+                    fontWeight: selected ? "bold" : "normal",
                   }}
                 >
-                  {profile.services.includes(s) && "✓"}
+                  <div
+                    style={{
+                      width: 16,
+                      height: 16,
+                      borderRadius: 3,
+                      border: `2px solid ${selected ? "rgb(19,19,103)" : "rgb(228,228,228)"}`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      background: selected ? "rgb(19,19,103)" : "white",
+                      color: "white",
+                      fontSize: 10,
+                    }}
+                  >
+                    {selected && "✓"}
+                  </div>
+                  {s}
                 </div>
-                {s}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
-        {/* Save Button */}
+        {/* Save */}
         <button
           onClick={handleSave}
           disabled={saving}
           style={{
             height: "48px",
-            background: "rgb(19, 19, 103)",
+            background: "rgb(19,19,103)",
             color: "white",
             border: "none",
             borderRadius: "8px",
@@ -865,19 +730,13 @@ function ProfileTab({ token, user }) {
   );
 }
 
-// ── Decline Confirmation Modal ────────────────────────────────────────────
+// ─── Decline Modal ────────────────────────────────────────────
 function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
   const [reason, setReason] = useState("");
-
-  const handleConfirm = () => {
-    onConfirm(booking.id, reason);
-  };
-
   return (
     <div className={styles.modalOverlay} onClick={onCancel}>
       <div className={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHandle} />
-
         <div style={{ textAlign: "center", paddingTop: 16 }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
           <h2 style={{ fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
@@ -885,7 +744,7 @@ function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
           </h2>
           <p
             style={{
-              color: "rgb(100, 100, 100)",
+              color: "rgb(100,100,100)",
               fontSize: 14,
               marginBottom: 16,
             }}
@@ -894,7 +753,7 @@ function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
           </p>
           <p
             style={{
-              color: "rgb(100, 100, 100)",
+              color: "rgb(100,100,100)",
               fontSize: 12,
               marginBottom: 16,
             }}
@@ -902,7 +761,6 @@ function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
             {formatDate(booking.service_date)}
           </p>
         </div>
-
         <div style={{ marginBottom: 16 }}>
           <label
             style={{
@@ -910,7 +768,7 @@ function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
               fontSize: 13,
               fontWeight: "bold",
               marginBottom: 6,
-              color: "rgb(47, 47, 47)",
+              color: "rgb(47,47,47)",
             }}
           >
             Reason for declining (optional)
@@ -918,7 +776,7 @@ function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
           <textarea
             style={{
               width: "100%",
-              border: "1px solid rgb(228, 228, 228)",
+              border: "1px solid rgb(228,228,228)",
               borderRadius: "8px",
               padding: "10px",
               fontSize: 13,
@@ -933,7 +791,6 @@ function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
             disabled={isLoading}
           />
         </div>
-
         <div className={styles.modalActions}>
           <button
             className={styles.modalBtn}
@@ -944,10 +801,10 @@ function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
           </button>
           <button
             className={`${styles.modalBtn} ${styles.modalBtnDanger}`}
-            onClick={handleConfirm}
+            onClick={() => onConfirm(booking.id, reason)}
             disabled={isLoading}
             style={{
-              background: isLoading ? "rgb(200, 100, 100)" : "rgb(187, 19, 47)",
+              background: isLoading ? "rgb(200,100,100)" : "rgb(187,19,47)",
             }}
           >
             {isLoading ? "Declining..." : "Decline Booking"}
@@ -958,6 +815,7 @@ function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
   );
 }
 
+// ─── Bookings Tab ─────────────────────────────────────────────
 function BookingsTab({ token }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -995,9 +853,7 @@ function BookingsTab({ token }) {
         },
         body: JSON.stringify({ status }),
       });
-      if (res.ok) {
-        fetchBookings();
-      }
+      if (res.ok) fetchBookings();
     } catch (err) {
       console.error("Error updating booking status:", err);
     }
@@ -1018,18 +874,14 @@ function BookingsTab({ token }) {
           declined_by: "maid",
         }),
       });
-
       if (res.ok) {
         setDeclineModal(null);
         fetchBookings();
-
-        // Show success message
         alert("Booking declined. Customer has been notified.");
       } else {
         alert("Failed to decline booking. Please try again.");
       }
-    } catch (err) {
-      console.error("Error declining booking:", err);
+    } catch {
       alert("Error declining booking. Please try again.");
     } finally {
       setIsDeclining(false);
@@ -1065,9 +917,7 @@ function BookingsTab({ token }) {
           >
             {f === "in_progress"
               ? "In Progress"
-              : f === "declined"
-                ? "Declined"
-                : f.charAt(0).toUpperCase() + f.slice(1)}
+              : f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
       </div>
@@ -1091,14 +941,11 @@ function BookingsTab({ token }) {
                 <span
                   className={`${styles.statusBadge} ${STATUS_CLASS[b.status] || styles.statusPending}`}
                 >
-                  {b.status === "declined"
-                    ? "Declined"
-                    : b.status === "in_progress"
-                      ? "In Progress"
-                      : b.status?.replace("_", " ")}
+                  {b.status === "in_progress"
+                    ? "In Progress"
+                    : b.status?.replace("_", " ")}
                 </span>
               </div>
-
               <div className={styles.bookingMeta}>
                 <div className={styles.metaItem}>
                   Duration:{" "}
@@ -1114,17 +961,15 @@ function BookingsTab({ token }) {
                   Address: <span className={styles.metaValue}>{b.address}</span>
                 </div>
               </div>
-
-              {/* Show decline reason if exists */}
               {b.status === "declined" && b.declined_reason && (
                 <div
                   style={{
                     padding: "10px",
-                    background: "rgb(255, 243, 205)",
+                    background: "rgb(255,243,205)",
                     borderRadius: "6px",
                     marginBottom: "10px",
                     fontSize: "12px",
-                    color: "rgb(100, 80, 0)",
+                    color: "rgb(100,80,0)",
                   }}
                 >
                   <p style={{ margin: "0 0 4px", fontWeight: "bold" }}>
@@ -1133,7 +978,6 @@ function BookingsTab({ token }) {
                   <p style={{ margin: 0 }}>{b.declined_reason}</p>
                 </div>
               )}
-
               <div className={styles.bookingActions}>
                 {b.status === "pending" && (
                   <>
@@ -1177,8 +1021,6 @@ function BookingsTab({ token }) {
           ))}
         </div>
       )}
-
-      {/* Decline confirmation modal */}
       {declineModal && (
         <DeclineConfirmModal
           booking={declineModal}
@@ -1208,7 +1050,7 @@ function ReviewsTab({ token, user }) {
       setLoading(false);
     }
     load();
-  }, []);
+  }, [user.id, token]);
 
   const avg = reviews.length
     ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
@@ -1237,8 +1079,8 @@ function ReviewsTab({ token, user }) {
         </div>
       ) : (
         <div className={styles.reviewList}>
-          {reviews.map((r, i) => (
-            <div key={i} className={styles.reviewCard}>
+          {reviews.map((r) => (
+            <div key={r.id ?? r.created_at} className={styles.reviewCard}>
               <div className={styles.reviewTop}>
                 <span className={styles.reviewCustomer}>{r.customer_name}</span>
                 <span className={styles.reviewStars}>
@@ -1271,8 +1113,15 @@ export default function MaidDashboard({ onLogout }) {
     earnings: 0,
   });
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const [user, setUser] = useState(() =>
+    JSON.parse(localStorage.getItem("user") || "{}"),
+  );
   const token = localStorage.getItem("token");
+
+  function handleUserUpdate(updatedUser) {
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+  }
 
   useEffect(() => {
     if (!token || user.role !== "maid") {
@@ -1323,16 +1172,21 @@ export default function MaidDashboard({ onLogout }) {
     setSavingAvail(false);
   }
 
+  // ✅ Resolve header avatar the same way ProfileTab does
+  const headerAvatar = resolveAvatarUrl(user.avatar);
+
   return (
     <div className={styles.dashboard}>
-      {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          {user.avatar ? (
+          {headerAvatar ? (
             <img
-              src={user.avatar}
+              src={headerAvatar}
               alt={user.name}
               className={styles.headerAvatar}
+              onError={(ev) => {
+                ev.target.style.display = "none";
+              }}
             />
           ) : (
             <div className={styles.headerAvatarPlaceholder}>
@@ -1349,7 +1203,6 @@ export default function MaidDashboard({ onLogout }) {
         </button>
       </div>
 
-      {/* Availability toggle */}
       <div className={styles.availBar}>
         <div>
           <p className={styles.availLabel}>Availability</p>
@@ -1370,7 +1223,6 @@ export default function MaidDashboard({ onLogout }) {
         </button>
       </div>
 
-      {/* Stats */}
       <div className={styles.content}>
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
@@ -1394,7 +1246,6 @@ export default function MaidDashboard({ onLogout }) {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className={styles.tabs}>
         {[
           ["bookings", "Bookings"],
@@ -1428,11 +1279,15 @@ export default function MaidDashboard({ onLogout }) {
 
       <div className={styles.content}>
         {tab === "bookings" && <BookingsTab token={token} />}
-        {tab === "profile" && <ProfileTab token={token} user={user} />}
+        {tab === "profile" && (
+          <ProfileTab
+            token={token}
+            user={user}
+            onUserUpdate={handleUserUpdate}
+          />
+        )}
         {tab === "reviews" && <ReviewsTab token={token} user={user} />}
       </div>
     </div>
   );
 }
-
-// ─── Profile Tab ──────────────────────────────────────────────
