@@ -162,17 +162,18 @@ function ProfileTab({ token, user, onUserUpdate }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // ✅ Backend returns relative path — resolve before storing
-      const resolvedUrl = resolveAvatarUrl(data.avatar_url);
-      setAvatarPreview(resolvedUrl);
+      // ✅ Cloudinary returns a full HTTPS URL — use directly, no prefix needed
+      const avatarUrl = data.avatar_url;
+      setAvatarPreview(avatarUrl);
 
-      const updatedUser = { ...user, avatar: resolvedUrl };
+      const updatedUser = { ...user, avatar: avatarUrl };
       localStorage.setItem("user", JSON.stringify(updatedUser));
       onUserUpdate?.(updatedUser);
 
       setMsg({ type: "success", text: "✅ Profile picture updated!" });
     } catch (err) {
-      setAvatarPreview(resolveAvatarUrl(user?.avatar));
+      // Revert preview to current avatar on failure
+      setAvatarPreview(user?.avatar || null);
       setMsg({
         type: "error",
         text: `❌ ${err.message || "Failed to upload image"}`,
