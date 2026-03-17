@@ -18,6 +18,7 @@ import BookingDetail from "./component/Bookingdetail/Bookingdetail.jsx";
 import MyBookings from "./component/Mybookings/Mybookings.jsx";
 import MaidDashboard from "./component/MaidDashboard/MaidDashboard.jsx";
 import MaidDetail from "./component/MaidDetail.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 function App() {
   return (

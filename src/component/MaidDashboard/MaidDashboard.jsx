@@ -45,18 +45,11 @@ function initials(name) {
   );
 }
 
-// ── Resolve avatar URL ─────────────────────────────────────────
-// Backend saves relative paths like /uploads/avatars/file.jpg
-// This converts them to absolute URLs the browser can fetch.
-function resolveAvatarUrl(url) {
-  if (!url) return null;
-  if (url.startsWith("data:")) return url; // blob preview — use as-is
-  if (url.startsWith("http")) return url; // already absolute — use as-is
-  return `${API_URL}${url.startsWith("/") ? "" : "/"}${url}`; // relative → absolute
-}
-
 // ─── Profile Tab ──────────────────────────────────────────────
-function ProfileTab({ token, user, onUserUpdate }) {
+function ProfileTab({ token }) {
+  // ✅ Pull user + updateUser from context — no props needed
+  const { user, updateUser } = useAuth();
+
   const [profile, setProfile] = useState({
     bio: "",
     hourly_rate: "",
@@ -72,10 +65,8 @@ function ProfileTab({ token, user, onUserUpdate }) {
   const [locationAttempts, setLocationAttempts] = useState(0);
   const [fullAddress, setFullAddress] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  // ✅ Resolve on init so a stored relative path renders correctly
-  const [avatarPreview, setAvatarPreview] = useState(
-    resolveAvatarUrl(user?.avatar),
-  );
+  // Preview starts from context user so it's always in sync
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
 
   useEffect(() => {
     async function load() {
@@ -101,9 +92,9 @@ function ProfileTab({ token, user, onUserUpdate }) {
     load();
   }, [user.id, token]);
 
-  // Sync preview when parent user prop changes
+  // ✅ Keep preview in sync if context user.avatar changes elsewhere
   useEffect(() => {
-    if (user?.avatar) setAvatarPreview(resolveAvatarUrl(user.avatar));
+    if (user?.avatar) setAvatarPreview(user.avatar);
   }, [user?.avatar]);
 
   function extractAddressDetails(data) {
@@ -164,17 +155,16 @@ function ProfileTab({ token, user, onUserUpdate }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // ✅ Cloudinary returns a full HTTPS URL — use directly, no prefix needed
+      // Cloudinary returns a full HTTPS URL — use directly
       const avatarUrl = data.avatar_url;
       setAvatarPreview(avatarUrl);
 
-      const updatedUser = { ...user, avatar: avatarUrl };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      onUserUpdate?.(updatedUser);
+      // ✅ updateUser from context — re-renders every component using useAuth()
+      // including the header, navbar, or any other component across the whole app
+      updateUser({ ...user, avatar: avatarUrl });
 
       setMsg({ type: "success", text: "✅ Profile picture updated!" });
     } catch (err) {
-      // Revert preview to current avatar on failure
       setAvatarPreview(user?.avatar || null);
       setMsg({
         type: "error",
@@ -388,7 +378,6 @@ function ProfileTab({ token, user, onUserUpdate }) {
                   alt="Profile"
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   onError={(ev) => {
-                    // URL failed — fall back to initials
                     ev.target.style.display = "none";
                     setAvatarPreview(null);
                   }}
@@ -1037,7 +1026,9 @@ function BookingsTab({ token }) {
 }
 
 // ─── Reviews Tab ──────────────────────────────────────────────
-function ReviewsTab({ token, user }) {
+function ReviewsTab({ token }) {
+  // ✅ Read user from context
+  const { user } = useAuth();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -1106,6 +1097,11 @@ function ReviewsTab({ token, user }) {
 // ─── Main Dashboard ───────────────────────────────────────────
 export default function MaidDashboard({ onLogout }) {
   const navigate = useNavigate();
+
+  // ✅ user, token, logout all come from context
+  // No local user state, no handleUserUpdate — context handles everything
+  const { user, token, logout } = useAuth();
+
   const [tab, setTab] = useState("bookings");
   const [available, setAvailable] = useState(true);
   const [savingAvail, setSavingAvail] = useState(false);
@@ -1115,16 +1111,6 @@ export default function MaidDashboard({ onLogout }) {
     completed: 0,
     earnings: 0,
   });
-
-  const [user, setUser] = useState(() =>
-    JSON.parse(localStorage.getItem("user") || "{}"),
-  );
-  const token = localStorage.getItem("token");
-
-  function handleUserUpdate(updatedUser) {
-    setUser(updatedUser);
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-  }
 
   useEffect(() => {
     if (!token || user.role !== "maid") {
@@ -1175,16 +1161,20 @@ export default function MaidDashboard({ onLogout }) {
     setSavingAvail(false);
   }
 
-  // ✅ Resolve header avatar the same way ProfileTab does
-  const headerAvatar = resolveAvatarUrl(user.avatar);
+  // ✅ Context logout clears user state globally across the whole app
+  function handleLogout() {
+    logout();
+    onLogout?.();
+  }
 
   return (
     <div className={styles.dashboard}>
+      {/* Header — user.avatar from context so it updates instantly on upload */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          {headerAvatar ? (
+          {user.avatar ? (
             <img
-              src={headerAvatar}
+              src={user.avatar}
               alt={user.name}
               className={styles.headerAvatar}
               onError={(ev) => {
@@ -1201,11 +1191,12 @@ export default function MaidDashboard({ onLogout }) {
             <p className={styles.headerRole}>Maid · Deusizi Sparkle</p>
           </div>
         </div>
-        <button className={styles.logoutBtn} onClick={onLogout}>
+        <button className={styles.logoutBtn} onClick={handleLogout}>
           Logout
         </button>
       </div>
 
+      {/* Availability toggle */}
       <div className={styles.availBar}>
         <div>
           <p className={styles.availLabel}>Availability</p>
@@ -1226,6 +1217,7 @@ export default function MaidDashboard({ onLogout }) {
         </button>
       </div>
 
+      {/* Stats */}
       <div className={styles.content}>
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
@@ -1249,6 +1241,7 @@ export default function MaidDashboard({ onLogout }) {
         </div>
       </div>
 
+      {/* Tabs */}
       <div className={styles.tabs}>
         {[
           ["bookings", "Bookings"],
@@ -1282,14 +1275,9 @@ export default function MaidDashboard({ onLogout }) {
 
       <div className={styles.content}>
         {tab === "bookings" && <BookingsTab token={token} />}
-        {tab === "profile" && (
-          <ProfileTab
-            token={token}
-            user={user}
-            onUserUpdate={handleUserUpdate}
-          />
-        )}
-        {tab === "reviews" && <ReviewsTab token={token} user={user} />}
+        {/* ✅ No user or onUserUpdate props needed — tabs read from context directly */}
+        {tab === "profile" && <ProfileTab token={token} />}
+        {tab === "reviews" && <ReviewsTab token={token} />}
       </div>
     </div>
   );

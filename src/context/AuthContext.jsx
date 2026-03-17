@@ -7,17 +7,23 @@ export function AuthProvider({ children }) {
     JSON.parse(localStorage.getItem("user") || "{}"),
   );
 
+  const token = localStorage.getItem("token");
+
+  // Call this after a successful avatar upload, name change, etc.
+  // Re-renders every component using useAuth() instantly.
   function updateUser(updatedUser) {
     setUser(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
   }
 
-  function login(userData, token) {
+  // Call this after a successful login response
+  function login(userData, authToken) {
     localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", token);
+    localStorage.setItem("token", authToken);
     setUser(userData);
   }
 
+  // Call this on logout — clears everything globally
   function logout() {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
@@ -25,20 +31,13 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token: localStorage.getItem("token"),
-        updateUser,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{ user, token, updateUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
+// Use this hook in any component that needs the current user or token
 export function useAuth() {
   return useContext(AuthContext);
 }
