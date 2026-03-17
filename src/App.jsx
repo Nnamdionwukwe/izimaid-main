@@ -18,7 +18,7 @@ import BookingDetail from "./component/Bookingdetail/Bookingdetail.jsx";
 import MyBookings from "./component/Mybookings/Mybookings.jsx";
 import MaidDashboard from "./component/MaidDashboard/MaidDashboard.jsx";
 import MaidDetail from "./component/MaidDetail.jsx";
-import { AuthProvider } from "./context/AuthContext.jsx";
+import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 
 function App() {
   return (
@@ -35,40 +35,35 @@ function App() {
 function AppRoutes() {
   const navigate = useNavigate();
 
-  function getToken() {
-    return localStorage.getItem("token");
-  }
-
-  function getUser() {
-    return JSON.parse(localStorage.getItem("user") || "{}");
-  }
+  // ✅ user, token, and logout all come from context
+  // No more reading localStorage directly — context is the single source of truth
+  const { user, token, logout } = useAuth();
 
   function handleLoginSuccess() {
-    const user = getUser();
-    if (user.role === "admin") navigate("/admin", { replace: true });
-    else if (user.role === "maid") navigate("/maid", { replace: true });
+    // Context updates asynchronously so read localStorage for the immediate redirect
+    const freshUser = JSON.parse(localStorage.getItem("user") || "{}");
+    if (freshUser.role === "admin") navigate("/admin", { replace: true });
+    else if (freshUser.role === "maid") navigate("/maid", { replace: true });
     else navigate("/", { replace: true });
   }
 
+  // ✅ context logout clears user state globally — every component using
+  // useAuth() re-renders immediately and sees an empty user object
   function handleLogout() {
-    localStorage.clear();
+    logout();
     navigate("/login", { replace: true });
   }
 
   function ProtectedRoute({ children, adminOnly = false, maidOnly = false }) {
-    const token = getToken();
-    const user = getUser();
     if (!token) return <Navigate to="/login" replace />;
     if (adminOnly && user.role !== "admin") return <Navigate to="/" replace />;
     if (maidOnly && user.role !== "maid") return <Navigate to="/" replace />;
     return children;
   }
 
-  const token = getToken();
-  const user = getUser();
   const hasGoogleHash = window.location.hash.includes("access_token");
 
-  // Redirect logged-in users away from /login
+  // Redirect already-logged-in users away from /login
   function loginRedirect() {
     if (token && !hasGoogleHash) {
       if (user.role === "admin") return <Navigate to="/admin" replace />;
@@ -86,12 +81,11 @@ function AppRoutes() {
       <Route path="/why-hire-us" element={<LearnMore />} />
       <Route path="/maids" element={<Maids />} />
       <Route path="/book/:maidId" element={<Booking />} />
-
       <Route path="/maid/:maidId" element={<MaidDetail />} />
       <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="/bookings/:id" element={<BookingDetail />} />
 
-      {/* Admin Dashboard - FIXED: Removed duplicate route */}
+      {/* Admin Dashboard */}
       <Route
         path="/admin"
         element={
@@ -111,7 +105,7 @@ function AppRoutes() {
         }
       />
 
-      {/* Catch all - redirect to home */}
+      {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

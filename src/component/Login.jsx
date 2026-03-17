@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -21,7 +22,11 @@ export default function Login({ onSuccess }) {
   const [role, setRole] = useState("customer");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
   const navigate = useNavigate();
+  // ✅ login() from context — sets global user state AND writes localStorage
+  // replaces the manual localStorage.setItem("token") / localStorage.setItem("user") calls
+  const { login } = useAuth();
 
   useEffect(() => {
     console.log("\n🔐 [LOGIN] Component mounted");
@@ -61,7 +66,7 @@ export default function Login({ onSuccess }) {
     setLoading(true);
     setError(null);
 
-    // First, logout any existing session to prevent duplicates
+    // Clear any stale session before authenticating
     const currentToken = localStorage.getItem("token");
     if (currentToken) {
       console.log("🔄 [LOGIN] Existing token found - clearing...");
@@ -69,7 +74,6 @@ export default function Login({ onSuccess }) {
       localStorage.removeItem("user");
       console.log("✅ [LOGIN] Old credentials cleared");
 
-      // Optional: Call logout endpoint to clear server cache
       fetch(`${API_URL}/api/auth/logout`, {
         method: "POST",
         headers: { Authorization: `Bearer ${currentToken}` },
@@ -78,36 +82,26 @@ export default function Login({ onSuccess }) {
       );
     }
 
-    // Now authenticate with new credentials
     console.log(
       "📡 [LOGIN] Sending auth request to:",
       API_URL + "/api/auth/google",
     );
+
     fetch(`${API_URL}/api/auth/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ access_token, role: state }),
     })
-      .then((res) => {
-        console.log("📊 [LOGIN] Response status:", res.status);
-        return res
-          .json()
-          .then((data) => ({ ok: res.ok, data, status: res.status }));
-      })
+      .then((res) =>
+        res.json().then((data) => ({ ok: res.ok, data, status: res.status })),
+      )
       .then(({ ok, data, status }) => {
         console.log("📦 [LOGIN] Response data:", data);
 
-        if (!ok) {
+        if (!ok)
           throw new Error(data.error || `Authentication failed (${status})`);
-        }
-
-        if (!data.token) {
-          throw new Error("No token in response");
-        }
-
-        if (!data.user) {
-          throw new Error("No user in response");
-        }
+        if (!data.token) throw new Error("No token in response");
+        if (!data.user) throw new Error("No user in response");
 
         console.log("✅ [LOGIN] Auth response valid");
         console.log(
@@ -121,38 +115,27 @@ export default function Login({ onSuccess }) {
           name: data.user.name,
         });
 
-        // Store new credentials
-        console.log("💾 [LOGIN] Saving to localStorage...");
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+        // ✅ Single call replaces all the manual localStorage.setItem calls
+        // Updates context state globally so every component using useAuth()
+        // re-renders immediately with the correct user and avatar
+        login(data.user, data.token);
 
-        // Verify saved
-        const savedToken = localStorage.getItem("token");
-        const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
-
-        console.log(
-          "✅ [LOGIN] Saved token preview:",
-          savedToken?.slice(0, 50) + "...",
-        );
-        console.log("✅ [LOGIN] Saved user:", {
-          id: savedUser.id,
-          email: savedUser.email,
-          role: savedUser.role,
-        });
-
-        if (savedToken !== data.token) {
-          console.error("❌ [LOGIN] Token mismatch after saving!");
-        }
+        console.log("✅ [LOGIN] Context updated via login()");
 
         setLoading(false);
         console.log("🔄 [LOGIN] Calling onSuccess callback...");
         onSuccess?.(data);
 
-        // Redirect based on role
+        // ✅ Admin redirect added — was missing in the original
         const redirectPath =
-          data.user.role === "maid" ? "/maid" : "/my-bookings";
+          data.user.role === "admin"
+            ? "/admin"
+            : data.user.role === "maid"
+              ? "/maid"
+              : "/my-bookings";
+
         console.log("🔀 [LOGIN] Redirecting to:", redirectPath);
-        navigate(redirectPath);
+        navigate(redirectPath, { replace: true });
 
         console.log("\n✅ [LOGIN] LOGIN COMPLETE\n");
       })
@@ -165,7 +148,7 @@ export default function Login({ onSuccess }) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
       });
-  }, [onSuccess, navigate]);
+  }, [onSuccess, navigate, login]);
 
   const handleLogin = () => {
     console.log("🔘 [LOGIN] Login button clicked - Role:", role);
@@ -175,7 +158,6 @@ export default function Login({ onSuccess }) {
     window.location.href = oauthUrl;
   };
 
-  // Show loading while processing redirect return
   if (window.location.hash.includes("access_token") || loading) {
     return (
       <div className={styles.page}>
