@@ -9,6 +9,7 @@ const STATUS_FILTERS = [
   "confirmed",
   "in_progress",
   "completed",
+  "declined", // ✅ added
   "cancelled",
 ];
 
@@ -17,6 +18,7 @@ const STATUS_COLORS = {
   confirmed: styles.statusConfirmed,
   in_progress: styles.statusInProgress,
   completed: styles.statusCompleted,
+  declined: styles.statusDeclined, // ✅ added
   cancelled: styles.statusCancelled,
 };
 
@@ -25,6 +27,7 @@ const ADMIN_STATUSES = [
   "confirmed",
   "in_progress",
   "completed",
+  "declined", // ✅ added
   "cancelled",
 ];
 
@@ -46,7 +49,6 @@ function formatCurrency(amount) {
   }).format(amount);
 }
 
-// ── Stat card (same as AdminDashboard) ───────────────────────────────────────
 function StatCard({ label, value, color }) {
   return (
     <div className={styles.statCard}>
@@ -61,7 +63,7 @@ function StatCard({ label, value, color }) {
   );
 }
 
-// ── Booking detail modal ──────────────────────────────────────────────────────
+// ── Booking detail modal ──────────────────────────────────────
 function BookingDetailModal({ booking, onClose, onStatusUpdate }) {
   const [status, setStatus] = useState(booking.status);
   const [saving, setSaving] = useState(false);
@@ -109,6 +111,9 @@ function BookingDetailModal({ booking, onClose, onStatusUpdate }) {
     ["Payment", booking.payment_status || "unpaid"],
     booking.paystack_reference && ["Paystack ref", booking.paystack_reference],
     ["Created", formatDate(booking.created_at)],
+    // ✅ Show who declined and why if applicable
+    booking.declined_by && ["Declined by", booking.declined_by],
+    booking.declined_reason && ["Decline reason", booking.declined_reason],
   ].filter(Boolean);
 
   return (
@@ -120,6 +125,18 @@ function BookingDetailModal({ booking, onClose, onStatusUpdate }) {
         <p className={styles.modalSubtitle}>
           {booking.customer_name} → {booking.maid_name}
         </p>
+
+        {/* ✅ Decline reason banner shown prominently when status is declined */}
+        {booking.status === "declined" && booking.declined_reason && (
+          <div className={styles.declineBanner}>
+            <p className={styles.declineBannerTitle}>
+              ⚠️ Declined by {booking.declined_by || "unknown"}
+            </p>
+            <p className={styles.declineBannerReason}>
+              {booking.declined_reason}
+            </p>
+          </div>
+        )}
 
         <div className={styles.detailSection}>
           <p className={styles.detailSectionTitle}>Booking details</p>
@@ -163,7 +180,7 @@ function BookingDetailModal({ booking, onClose, onStatusUpdate }) {
   );
 }
 
-// ── Main AdminBookings ────────────────────────────────────────────────────────
+// ── Main AdminBookings ────────────────────────────────────────
 export default function AdminBookings({ onNavigate }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -185,7 +202,6 @@ export default function AdminBookings({ onNavigate }) {
       });
       const data = await res.json();
       setBookings(data.bookings || []);
-      // backend doesn't return total yet — use length as fallback
       setTotal(data.total || data.bookings?.length || 0);
     } catch (err) {
       console.error(err);
@@ -225,7 +241,7 @@ export default function AdminBookings({ onNavigate }) {
 
   return (
     <div className={styles.dashboard}>
-      {/* ── Header ── */}
+      {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <h1 className={styles.headerTitle}>Bookings</h1>
@@ -247,7 +263,7 @@ export default function AdminBookings({ onNavigate }) {
         </div>
       </div>
 
-      {/* ── Stats ── */}
+      {/* Stats */}
       <div className={styles.statsBar}>
         <StatCard label="Total" value={total} />
         <StatCard label="Pending" value={counts.pending || 0} color="#856404" />
@@ -267,13 +283,19 @@ export default function AdminBookings({ onNavigate }) {
           color="#6f42c1"
         />
         <StatCard
+          label="Declined"
+          value={counts.declined || 0}
+          color="#c47a1a"
+        />{" "}
+        {/* ✅ added */}
+        <StatCard
           label="Cancelled"
           value={counts.cancelled || 0}
           color="#a81c1c"
         />
       </div>
 
-      {/* ── Filters ── */}
+      {/* Filters */}
       <div className={styles.filterBar}>
         {STATUS_FILTERS.map((f) => (
           <button
@@ -288,7 +310,7 @@ export default function AdminBookings({ onNavigate }) {
         ))}
       </div>
 
-      {/* ── Search ── */}
+      {/* Search */}
       <div className={styles.searchWrap}>
         <svg
           className={styles.searchIcon}
@@ -310,7 +332,7 @@ export default function AdminBookings({ onNavigate }) {
         />
       </div>
 
-      {/* ── Bookings list ── */}
+      {/* Bookings list */}
       {loading ? (
         <div className={styles.loading}>Loading bookings...</div>
       ) : filtered.length === 0 ? (
@@ -355,6 +377,16 @@ export default function AdminBookings({ onNavigate }) {
                 )}
               </div>
 
+              {/* ✅ Inline decline reason on the card itself */}
+              {booking.status === "declined" && booking.declined_reason && (
+                <div className={styles.declineReason}>
+                  <span className={styles.declineReasonLabel}>
+                    Declined by {booking.declined_by || "unknown"}:
+                  </span>{" "}
+                  {booking.declined_reason}
+                </div>
+              )}
+
               <div className={styles.leadCardActions}>
                 <button
                   className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
@@ -377,7 +409,7 @@ export default function AdminBookings({ onNavigate }) {
         </div>
       )}
 
-      {/* ── Pagination ── */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className={styles.pagination}>
           <button
@@ -400,7 +432,7 @@ export default function AdminBookings({ onNavigate }) {
         </div>
       )}
 
-      {/* ── Detail modal ── */}
+      {/* Detail modal */}
       {selectedBooking && (
         <BookingDetailModal
           booking={selectedBooking}
