@@ -8,8 +8,6 @@ import {
   Star,
   MapPin,
   Clock,
-  CheckCircle,
-  XCircle,
   Trash2,
   AlertTriangle,
   Check,
@@ -19,10 +17,10 @@ import {
   RefreshCw,
 } from "lucide-react";
 import s from "./Adminmaiddashboard.module.css";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-// ─── helpers ────────────────────────────────────────────────
 const toNum = (v, d = 0) => {
   const n = Number(v);
   return isNaN(n) ? d : n;
@@ -42,9 +40,7 @@ function useToast() {
   return { toasts, push };
 }
 
-// ─── Component ───────────────────────────────────────────────
 export default function AdminMaidDashboard() {
-  // list state
   const [maids, setMaids] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -55,18 +51,17 @@ export default function AdminMaidDashboard() {
   const [sortBy, setSortBy] = useState("rating");
   const PAGE_SIZE = 10;
 
-  // detail / edit state
-  const [view, setView] = useState("list"); // list | detail | edit
+  const [view, setView] = useState("list");
   const [selected, setSelected] = useState(null);
   const [editing, setEditing] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [revLoading, setRevLoading] = useState(false);
-
-  // confirm dialog
-  const [confirm, setConfirm] = useState(null); // { title, body, onConfirm }
+  const [confirm, setConfirm] = useState(null);
 
   const { toasts, push } = useToast();
   const searchRef = useRef(null);
+
+  const navigate = useNavigate();
 
   // ── Fetch list ─────────────────────────────────────────────
   const fetchMaids = useCallback(async () => {
@@ -79,7 +74,6 @@ export default function AdminMaidDashboard() {
       const res = await fetch(`${API}/api/maids/admin/list?${p}`, {
         headers: authHdr(),
       });
-
       const data = await res.json();
 
       const seen = new Set();
@@ -91,7 +85,7 @@ export default function AdminMaidDashboard() {
 
       setMaids(unique);
       setTotal(data.total || 0);
-    } catch (e) {
+    } catch {
       push("Failed to load maids", "error");
     } finally {
       setLoading(false);
@@ -133,6 +127,7 @@ export default function AdminMaidDashboard() {
   };
 
   // ── Admin: update maid profile ─────────────────────────────
+  // ✅ Uses /api/maids/admin/:id
   const handleSaveEdit = async () => {
     try {
       const body = {
@@ -144,7 +139,7 @@ export default function AdminMaidDashboard() {
         is_available: editing.is_available,
       };
 
-      const res = await fetch(`${API}/api/maids/${editing.id}`, {
+      const res = await fetch(`${API}/api/maids/admin/${editing.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...authHdr() },
         body: JSON.stringify(body),
@@ -164,6 +159,7 @@ export default function AdminMaidDashboard() {
   };
 
   // ── Admin: activate / deactivate ──────────────────────────
+  // ✅ Uses /api/maids/admin/:id/activate|deactivate
   const toggleActive = (maid, activate) => {
     setConfirm({
       title: activate ? "Activate maid?" : "Deactivate maid?",
@@ -174,20 +170,23 @@ export default function AdminMaidDashboard() {
       onConfirm: async () => {
         const endpoint = activate ? "activate" : "deactivate";
         try {
-          const res = await fetch(`${API}/api/maids/${maid.id}/${endpoint}`, {
-            method: "PATCH",
-            headers: authHdr(),
-          });
+          const res = await fetch(
+            `${API}/api/maids/admin/${maid.id}/${endpoint}`,
+            {
+              method: "PATCH",
+              headers: authHdr(),
+            },
+          );
           const data = await res.json();
           if (!res.ok) throw new Error(data.error);
 
-          const updated = { ...maid, is_active: activate };
           setMaids((ms) =>
             ms.map((m) =>
               m.id === maid.id ? { ...m, is_active: activate } : m,
             ),
           );
-          if (selected?.id === maid.id) setSelected(updated);
+          if (selected?.id === maid.id)
+            setSelected({ ...maid, is_active: activate });
           push(activate ? "Maid activated" : "Maid deactivated");
         } catch (e) {
           push(e.message || "Action failed", "error");
@@ -198,6 +197,7 @@ export default function AdminMaidDashboard() {
   };
 
   // ── Admin: delete review ───────────────────────────────────
+  // ✅ Uses /api/maids/admin/:id/reviews/:reviewId
   const deleteReview = (review, idx) => {
     setConfirm({
       title: "Delete review?",
@@ -206,7 +206,7 @@ export default function AdminMaidDashboard() {
       onConfirm: async () => {
         try {
           const res = await fetch(
-            `${API}/api/maids/${selected.id}/reviews/${review.id}`,
+            `${API}/api/maids/admin/${selected.id}/reviews/${review.id}`,
             { method: "DELETE", headers: authHdr() },
           );
           const data = await res.json();
@@ -221,7 +221,6 @@ export default function AdminMaidDashboard() {
     });
   };
 
-  // ── Helpers ────────────────────────────────────────────────
   function normalise(m) {
     return {
       ...m,
@@ -243,7 +242,6 @@ export default function AdminMaidDashboard() {
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const activeCount = maids.filter((m) => m.is_available).length;
 
-  // ── Render ─────────────────────────────────────────────────
   return (
     <div className={s.root}>
       {/* Top bar */}
@@ -266,8 +264,10 @@ export default function AdminMaidDashboard() {
       </nav>
 
       <div className={s.container}>
-        {/* Page header */}
         <div className={s.pageHeader}>
+          <button className={s.backBtn} onClick={() => navigate("/admin")}>
+            <ChevronLeft size={15} /> Back
+          </button>
           <h1 className={s.pageTitle}>
             Maid <span>Management</span>
           </h1>
@@ -276,10 +276,9 @@ export default function AdminMaidDashboard() {
           </p>
         </div>
 
-        {/* ─── LIST VIEW ────────────────────────────────────── */}
+        {/* ─── LIST VIEW ──────────────────────────────────── */}
         {view === "list" && (
           <>
-            {/* Toolbar */}
             <div className={s.toolbar}>
               <div className={s.searchWrap}>
                 <Search size={15} />
@@ -338,7 +337,6 @@ export default function AdminMaidDashboard() {
               </button>
             </div>
 
-            {/* Table */}
             <div className={s.card}>
               {loading ? (
                 <div className={s.loading}>
@@ -452,7 +450,6 @@ export default function AdminMaidDashboard() {
                     </table>
                   </div>
 
-                  {/* Pagination */}
                   <div className={s.pagination}>
                     <span className={s.pageInfo}>
                       Page {page} of {totalPages} &nbsp;·&nbsp; {total} total
@@ -480,14 +477,13 @@ export default function AdminMaidDashboard() {
           </>
         )}
 
-        {/* ─── DETAIL VIEW ──────────────────────────────────── */}
+        {/* ─── DETAIL VIEW ────────────────────────────────── */}
         {view === "detail" && selected && (
           <div className={s.detailView}>
             <button className={s.backBtn} onClick={() => setView("list")}>
               <ChevronLeft size={15} /> Back to list
             </button>
 
-            {/* Hero */}
             <div className={s.detailHero}>
               <div className={s.heroLeft}>
                 <img
@@ -546,7 +542,6 @@ export default function AdminMaidDashboard() {
               </div>
             </div>
 
-            {/* Stats strip */}
             <div className={s.statsStrip}>
               <div className={s.statTile}>
                 <p className={s.statTileLabel}>Rating</p>
@@ -572,7 +567,6 @@ export default function AdminMaidDashboard() {
               </div>
             </div>
 
-            {/* Detail cards */}
             <div className={s.detailGrid}>
               <div className={`${s.detailCard} ${s.fullWidth}`}>
                 <p className={s.detailCardLabel}>Bio</p>
@@ -596,7 +590,6 @@ export default function AdminMaidDashboard() {
               </div>
             </div>
 
-            {/* Reviews */}
             <div className={s.reviewsSection}>
               <div className={s.reviewsHeader}>
                 <h3 className={s.reviewsTitle}>
@@ -657,7 +650,7 @@ export default function AdminMaidDashboard() {
           </div>
         )}
 
-        {/* ─── EDIT VIEW ────────────────────────────────────── */}
+        {/* ─── EDIT VIEW ──────────────────────────────────── */}
         {view === "edit" && editing && (
           <div className={s.editView}>
             <button
@@ -677,7 +670,6 @@ export default function AdminMaidDashboard() {
               </div>
 
               <div className={s.editCardBody}>
-                {/* Bio */}
                 <div className={s.formGroup}>
                   <label className={s.formLabel}>Bio</label>
                   <textarea
@@ -690,7 +682,6 @@ export default function AdminMaidDashboard() {
                   />
                 </div>
 
-                {/* Rate + Exp */}
                 <div className={s.formRow}>
                   <div className={s.formGroup}>
                     <label className={s.formLabel}>Hourly Rate (₦)</label>
@@ -724,7 +715,6 @@ export default function AdminMaidDashboard() {
                   </div>
                 </div>
 
-                {/* Location */}
                 <div className={s.formGroup}>
                   <label className={s.formLabel}>Location</label>
                   <input
@@ -738,7 +728,6 @@ export default function AdminMaidDashboard() {
                   />
                 </div>
 
-                {/* Services */}
                 <div className={s.formGroup}>
                   <label className={s.formLabel}>
                     Services (comma-separated)
@@ -764,7 +753,6 @@ export default function AdminMaidDashboard() {
                   />
                 </div>
 
-                {/* Availability toggle */}
                 <div className={s.formGroup}>
                   <label className={s.checkRow} htmlFor="availCheck">
                     <input
@@ -802,7 +790,7 @@ export default function AdminMaidDashboard() {
         )}
       </div>
 
-      {/* ── Confirm modal ─────────────────────────────────── */}
+      {/* Confirm modal */}
       {confirm && (
         <div className={s.overlay} onClick={() => setConfirm(null)}>
           <div className={s.modal} onClick={(e) => e.stopPropagation()}>
@@ -829,7 +817,7 @@ export default function AdminMaidDashboard() {
         </div>
       )}
 
-      {/* ── Toast stack ───────────────────────────────────── */}
+      {/* Toast stack */}
       <div className={s.toastWrap}>
         {toasts.map((t) => (
           <div key={t.id} className={`${s.toast} ${s[t.type]}`}>
@@ -842,13 +830,10 @@ export default function AdminMaidDashboard() {
   );
 }
 
-// ─── Sub-component ───────────────────────────────────────────
 function StatusBadge({ maid }) {
-  const s_mod = { root: "root" }; // reference to module
   if (maid.is_active === false)
     return (
       <span
-        className="badge inactive"
         style={{
           display: "inline-flex",
           alignItems: "center",
