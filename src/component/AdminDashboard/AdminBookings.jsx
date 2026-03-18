@@ -213,9 +213,33 @@ export default function AdminBookings({ onNavigate }) {
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
+
   useEffect(() => {
     setPage(1);
   }, [filter]);
+
+  // ✅ Silent background refresh every 30 seconds
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const refreshInterval = setInterval(async () => {
+      try {
+        const params = new URLSearchParams({ page, limit: LIMIT });
+        if (filter !== "all") params.set("status", filter);
+        const res = await fetch(`${API_URL}/api/bookings?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setBookings(data.bookings || []);
+        setTotal(data.total || data.bookings?.length || 0);
+      } catch (err) {
+        console.error("Background refresh error:", err);
+      }
+    }, 30000);
+
+    return () => clearInterval(refreshInterval);
+  }, [filter, page]);
 
   const filtered = bookings.filter((b) => {
     if (!search) return true;

@@ -181,6 +181,29 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
     setPage(1);
   }, [filter]);
 
+  // ✅ Silent background refresh every 30 seconds
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const refreshInterval = setInterval(async () => {
+      try {
+        const params = new URLSearchParams({ page, limit: LIMIT });
+        if (filter !== "all") params.set("status", filter);
+        const res = await fetch(`${API_URL}/api/leads?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setLeads(data.leads || []);
+        setTotal(data.total || 0);
+      } catch (err) {
+        console.error("Background refresh error:", err);
+      }
+    }, 30000);
+
+    return () => clearInterval(refreshInterval);
+  }, [filter, page]);
+
   const filtered = leads.filter((l) => {
     if (!search) return true;
     const q = search.toLowerCase();

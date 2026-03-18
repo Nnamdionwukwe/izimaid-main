@@ -326,6 +326,29 @@ export default function AdminUsers({ onBack }) {
     setPage(1);
   }, [filter]);
 
+  // ✅ Silent background refresh every 30 seconds
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const refreshInterval = setInterval(async () => {
+      try {
+        const params = new URLSearchParams({ page, limit: LIMIT });
+        if (filter !== "all") params.set("role", filter);
+        const res = await fetch(`${API_URL}/api/admin/users?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setUsers(data.users || []);
+        setTotal(data.users?.length || 0);
+      } catch (err) {
+        console.error("Background refresh error:", err);
+      }
+    }, 30000);
+
+    return () => clearInterval(refreshInterval);
+  }, [filter, page]);
+
   const filtered = users.filter((u) => {
     if (!search) return true;
     const q = search.toLowerCase();

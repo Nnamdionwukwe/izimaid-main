@@ -96,6 +96,39 @@ export default function AdminMaidDashboard() {
     fetchMaids();
   }, [fetchMaids]);
 
+  // ✅ Silent background refresh every 30 seconds
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const refreshInterval = setInterval(async () => {
+      try {
+        const p = new URLSearchParams({ page, limit: PAGE_SIZE });
+        if (locFilter) p.append("location", locFilter);
+        if (svcFilter) p.append("service", svcFilter);
+
+        const res = await fetch(`${API}/api/maids/admin/list?${p}`, {
+          headers: authHdr(),
+        });
+        const data = await res.json();
+
+        const seen = new Set();
+        const unique = (data.maids || []).map(normalise).filter((m) => {
+          if (seen.has(m.id)) return false;
+          seen.add(m.id);
+          return true;
+        });
+
+        setMaids(unique);
+        setTotal(data.total || 0);
+      } catch (err) {
+        console.error("Background refresh error:", err);
+      }
+    }, 30000);
+
+    return () => clearInterval(refreshInterval);
+  }, [page, locFilter, svcFilter]);
+
   // ── Fetch detail ───────────────────────────────────────────
   const openDetail = async (id) => {
     try {
