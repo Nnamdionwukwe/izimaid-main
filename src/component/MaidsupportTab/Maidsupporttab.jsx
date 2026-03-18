@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import styles from "./MaidSupportTab.module.css";
+import styles from "./MaidSupporttab.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -255,6 +255,33 @@ function TicketDetailModal({ ticket, onClose, onReplyAdded, token }) {
   const [reply, setReply] = useState("");
   const [isReplying, setIsReplying] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // ✅ SAFETY CHECK: If ticket is null or missing critical fields, don't render
+  if (!ticket || !ticket.id) {
+    return (
+      <div className={styles.modalOverlay} onClick={onClose}>
+        <div className={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.modalHandle} />
+          <p style={{ textAlign: "center", color: "gray" }}>
+            Loading ticket...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ Provide safe defaults for all properties
+  const ticketId = ticket.id || "";
+  const subject = ticket.subject || "Untitled";
+  const message = ticket.message || "No message";
+  const status = ticket.status || "open";
+  const priority = ticket.priority || "normal";
+  const category = ticket.category || "Other";
+  const created_at = ticket.created_at || new Date().toISOString();
+  const admin_notes = ticket.admin_notes || null;
+  const attachments = ticket.attachments || [];
+  const replies = ticket.replies || [];
 
   async function handleReply() {
     if (!reply.trim()) {
@@ -265,17 +292,14 @@ function TicketDetailModal({ ticket, onClose, onReplyAdded, token }) {
     setIsReplying(true);
 
     try {
-      const res = await fetch(
-        `${API_URL}/api/maid-support/${ticket.id}/reply`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ message: reply }),
+      const res = await fetch(`${API_URL}/api/maid-support/${ticketId}/reply`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({ message: reply }),
+      });
 
       if (!res.ok) throw new Error("Failed to add reply");
 
@@ -309,6 +333,12 @@ function TicketDetailModal({ ticket, onClose, onReplyAdded, token }) {
     return colors[s] || colors.open;
   };
 
+  // ✅ Safe status display
+  const displayStatus =
+    status === "in_progress"
+      ? "In Progress"
+      : status.charAt(0).toUpperCase() + status.slice(1);
+
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div
@@ -320,8 +350,8 @@ function TicketDetailModal({ ticket, onClose, onReplyAdded, token }) {
 
         <div className={styles.ticketHeader}>
           <div>
-            <h2 className={styles.ticketSubject}>{ticket.subject}</h2>
-            <p className={styles.ticketDate}>{formatDate(ticket.created_at)}</p>
+            <h2 className={styles.ticketSubject}>{subject}</h2>
+            <p className={styles.ticketDate}>{formatDate(created_at)}</p>
           </div>
           <button className={styles.closeBtn} onClick={onClose} title="Close">
             ✕
@@ -331,37 +361,35 @@ function TicketDetailModal({ ticket, onClose, onReplyAdded, token }) {
         <div className={styles.badgeGroup}>
           <span
             className={styles.badge}
-            style={{ background: getPriorityColor(ticket.priority) }}
+            style={{ background: getPriorityColor(priority) }}
           >
-            {ticket.priority.toUpperCase()}
+            {priority.toUpperCase()}
           </span>
           <span
             className={styles.badge}
-            style={{ background: getStatusColor(ticket.status) }}
+            style={{ background: getStatusColor(status) }}
           >
-            {ticket.status === "in_progress"
-              ? "In Progress"
-              : ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
+            {displayStatus}
           </span>
           <span
             className={styles.badge}
             style={{ background: "rgb(150, 150, 150)" }}
           >
-            {ticket.category}
+            {category}
           </span>
         </div>
 
         <div className={styles.messageBox}>
-          <p className={styles.messageText}>{ticket.message}</p>
+          <p className={styles.messageText}>{message}</p>
         </div>
 
-        {ticket.attachments && ticket.attachments.length > 0 && (
+        {attachments && attachments.length > 0 && (
           <div className={styles.attachmentsBox}>
             <p className={styles.attachmentTitle}>
-              📎 Attachments ({ticket.attachments.length})
+              📎 Attachments ({attachments.length})
             </p>
             <div className={styles.attachmentsList}>
-              {ticket.attachments.map((att) => (
+              {attachments.map((att) => (
                 <a
                   key={att.id}
                   href={att.media_url}
@@ -384,18 +412,18 @@ function TicketDetailModal({ ticket, onClose, onReplyAdded, token }) {
           </div>
         )}
 
-        {ticket.admin_notes && (
+        {admin_notes && (
           <div className={styles.notesBox}>
             <p className={styles.notesTitle}>📝 Admin Notes</p>
-            <p className={styles.notesText}>{ticket.admin_notes}</p>
+            <p className={styles.notesText}>{admin_notes}</p>
           </div>
         )}
 
-        {ticket.replies && ticket.replies.length > 0 && (
+        {replies && replies.length > 0 && (
           <div className={styles.repliesBox}>
             <p className={styles.repliesTitle}>💬 Conversation</p>
             <div className={styles.repliesList}>
-              {ticket.replies.map((r) => (
+              {replies.map((r) => (
                 <div key={r.id} className={styles.replyItem}>
                   <p className={styles.replyDate}>{formatDate(r.created_at)}</p>
                   <p className={styles.replyText}>{r.message}</p>
@@ -405,7 +433,7 @@ function TicketDetailModal({ ticket, onClose, onReplyAdded, token }) {
           </div>
         )}
 
-        {ticket.status !== "closed" && (
+        {status !== "closed" && (
           <div className={styles.replyFormBox}>
             {error && (
               <div className={styles.errorBox}>
@@ -492,8 +520,21 @@ export default function MaidSupportTab({ token }) {
       const res = await fetch(`${API_URL}/api/maid-support/${ticketId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      if (!res.ok) {
+        console.error("Failed to fetch ticket");
+        return;
+      }
+
       const data = await res.json();
-      setSelectedTicket(data);
+      // ✅ Ensure ticket has required properties before setting
+      if (data && data.ticket) {
+        setSelectedTicket({
+          ...data.ticket,
+          replies: data.replies || [],
+          attachments: data.attachments || [],
+        });
+      }
     } catch (err) {
       console.error("Error fetching ticket details:", err);
     }
