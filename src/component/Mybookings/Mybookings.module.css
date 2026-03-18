@@ -455,3 +455,52 @@
     justify-content: center;
   }
 }
+
+/* ── Chat button on booking card ───────────────────────────────────── */
+.chatBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.chatBtn:hover {
+  background: rgb(14, 14, 75);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(19, 19, 103, 0.3);
+}
+.chatBtn:active {
+  transform: scale(0.97);
+}
+
+/* Ensure cardActions spaces both buttons */
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgb(240, 240, 240);
+}
+
+/* On very small screens stack them */
+@media (max-width: 360px) {
+  .cardActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .chatBtn,
+  .supportBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}

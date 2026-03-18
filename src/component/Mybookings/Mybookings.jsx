@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Mybookings.module.css";
+import Chat from "../Chat/Chat";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const FILTERS = [
@@ -32,11 +33,16 @@ function formatDate(d) {
   });
 }
 
+// Bookings where chat makes sense
+const CHAT_STATUSES = ["confirmed", "in_progress", "completed", "pending"];
+
 export default function MyBookings() {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  // Chat state — which booking is the user chatting in
+  const [chatBooking, setChatBooking] = useState(null);
 
   useEffect(() => {
     async function fetchBookings() {
@@ -64,8 +70,7 @@ export default function MyBookings() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-
-    const refreshInterval = setInterval(async () => {
+    const id = setInterval(async () => {
       try {
         const params = new URLSearchParams({ limit: 50 });
         if (filter !== "all") params.set("status", filter);
@@ -78,17 +83,38 @@ export default function MyBookings() {
         console.error("Background refresh error:", err);
       }
     }, 30000);
-
-    return () => clearInterval(refreshInterval);
+    return () => clearInterval(id);
   }, [filter]);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const isMaid = user.role === "maid";
 
-  // Navigate to support page with booking pre-filled
   function handleGetSupport(e, booking) {
-    e.stopPropagation(); // Prevent card click from firing
+    e.stopPropagation();
     navigate("/customersupport", { state: { booking } });
+  }
+
+  function handleOpenChat(e, booking) {
+    e.stopPropagation();
+    setChatBooking(booking);
+  }
+
+  // If a chat is open, render the Chat component full-screen
+  if (chatBooking) {
+    const otherName = isMaid
+      ? chatBooking.customer_name
+      : chatBooking.maid_name;
+    const otherAvatar = isMaid
+      ? chatBooking.customer_avatar
+      : chatBooking.maid_avatar;
+    return (
+      <Chat
+        bookingId={chatBooking.id}
+        otherName={otherName}
+        otherAvatar={otherAvatar}
+        onClose={() => setChatBooking(null)}
+      />
+    );
   }
 
   return (
@@ -214,17 +240,28 @@ export default function MyBookings() {
                 </div>
               </div>
 
-              {/* Support button — visible for non-maid users on relevant statuses */}
-              {!isMaid && (
-                <div className={styles.cardActions}>
+              {/* Action buttons row */}
+              <div className={styles.cardActions}>
+                {/* 💬 Chat button — shown when booking status makes sense */}
+                {CHAT_STATUSES.includes(b.status) && (
+                  <button
+                    className={styles.chatBtn}
+                    onClick={(e) => handleOpenChat(e, b)}
+                  >
+                    💬 Chat
+                  </button>
+                )}
+
+                {/* 🎫 Support button — only for customers */}
+                {!isMaid && (
                   <button
                     className={styles.supportBtn}
                     onClick={(e) => handleGetSupport(e, b)}
                   >
-                    🎫 Get Support
+                    🎫 Support
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ))}
         </div>
