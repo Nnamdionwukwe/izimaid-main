@@ -586,7 +586,10 @@ function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
           {loading && <p className={styles.loadingReplies}>Loading replies…</p>}
 
           {replies.map((r) => {
-            const isAdmin = r.is_admin || r.role === "admin";
+            const isAdmin =
+              r.is_admin === true ||
+              r.role === "admin" ||
+              (ticket.user_id && r.user_id && r.user_id !== ticket.user_id);
             return (
               <div
                 key={r.id}
