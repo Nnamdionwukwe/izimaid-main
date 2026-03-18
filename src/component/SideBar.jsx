@@ -36,12 +36,9 @@ export default function SideBar({ isOpen, setIsOpen }) {
   const role = user?.role || null;
 
   function handleAuthBtn() {
-    if (token) {
-      localStorage.clear();
-      navigate("/login");
-    } else {
-      navigate("/login");
-    }
+    localStorage.clear();
+    navigate("/login");
+    window.location.reload();
   }
 
   function handleBookingNavigation() {
