@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./MaidDashboard.module.css";
 import { useAuth } from "../../context/AuthContext";
 import MaidSupportTab from "../MaidsupportTab/Maidsupporttab";
+import MaidChat from "../MaidChat/MaidChat";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -811,7 +812,7 @@ function FloatingToast({ message, type, visible }) {
 }
 
 // ─── Bookings Tab ─────────────────────────────────────────────
-function BookingsTab({ token, onDeclineMessage, onGetSupport }) {
+function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -1043,7 +1044,31 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport }) {
                   </p>
                 )}
 
-                {/* ── Get Support button on every card ── */}
+                {/* ── 💬 Chat button ── */}
+                {["pending", "confirmed", "in_progress", "completed"].includes(
+                  b.status,
+                ) && (
+                  <button
+                    className={styles.actionBtn}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      color: "white",
+                      background: "rgb(19,19,103)",
+                      borderColor: "rgb(19,19,103)",
+                      fontSize: 12,
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenChat(b);
+                    }}
+                  >
+                    💬 Chat
+                  </button>
+                )}
+
+                {/* ── 🎫 Get Support button ── */}
                 <button
                   className={styles.actionBtn}
                   style={{
@@ -1170,6 +1195,8 @@ export default function MaidDashboard({ onLogout }) {
   });
   // Prefill booking for support tab
   const [supportPrefill, setSupportPrefill] = useState(null);
+  // Active chat booking
+  const [chatBooking, setChatBooking] = useState(null);
   // Open support ticket count for tab badge
   const [supportOpenCount, setSupportOpenCount] = useState(0);
 
@@ -1272,6 +1299,11 @@ export default function MaidDashboard({ onLogout }) {
     setToast({ visible: true, message, type });
   }
 
+  // Called from BookingsTab "💬 Chat" button
+  function handleOpenChat(booking) {
+    setChatBooking(booking);
+  }
+
   // Called from BookingsTab "Get Support" button
   function handleGetSupport(booking) {
     setSupportPrefill(booking);
@@ -1297,6 +1329,18 @@ export default function MaidDashboard({ onLogout }) {
   function handleLogout() {
     logout();
     onLogout?.();
+  }
+
+  // If chat is open render full-screen
+  if (chatBooking) {
+    return (
+      <MaidChat
+        bookingId={chatBooking.id}
+        otherName={chatBooking.customer_name}
+        otherAvatar={chatBooking.customer_avatar}
+        onClose={() => setChatBooking(null)}
+      />
+    );
   }
 
   return (
@@ -1430,6 +1474,7 @@ export default function MaidDashboard({ onLogout }) {
             token={token}
             onDeclineMessage={handleDeclineMessage}
             onGetSupport={handleGetSupport}
+            onOpenChat={handleOpenChat}
           />
         )}
         {tab === "profile" && <ProfileTab token={token} />}
