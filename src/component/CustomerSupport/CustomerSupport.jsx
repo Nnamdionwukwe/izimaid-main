@@ -724,6 +724,7 @@ function TicketsList({ onNew, onOpen }) {
   const [unreadMap, setUnreadMap] = useState({}); // { [ticketId]: unreadCount }
   const [lastSync, setLastSync] = useState(null);
   const [syncing, setSyncing] = useState(false);
+  const navigate = useNavigate();
 
   const fetchTickets = useCallback(
     async (silent = false) => {
@@ -794,6 +795,12 @@ function TicketsList({ onNew, onOpen }) {
           </p>
         </div>
         <div className={styles.headerActions}>
+          <button
+            className={styles.newBtn}
+            onClick={() => navigate("/my-bookings")}
+          >
+            &larr;
+          </button>
           <button
             className={`${styles.syncBtn} ${syncing ? styles.syncBtnSyncing : ""}`}
             onClick={() => fetchTickets(false)}
