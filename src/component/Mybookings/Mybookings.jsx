@@ -101,6 +101,14 @@ export default function MyBookings() {
       {!isMaid && (
         <button
           className={styles.newBookingBtn}
+          onClick={() => navigate("/customersupport")}
+        >
+          Customer Support
+        </button>
+      )}
+      {!isMaid && (
+        <button
+          className={styles.newBookingBtn}
           onClick={() => navigate("/maids")}
         >
           + New Booking
