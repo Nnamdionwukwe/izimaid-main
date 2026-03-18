@@ -266,6 +266,12 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
           >
             🧹 Maid Support
           </button>
+          <button
+            className={styles.logoutBtn}
+            onClick={() => onNavigate("chats")}
+          >
+            🎫 Customer and Maid Chat
+          </button>
           <button className={styles.logoutBtn} onClick={onLogout}>
             Logout
           </button>

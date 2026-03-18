@@ -1,0 +1,771 @@
+/* ── Base ──────────────────────────────────────────────────────────── */
+.page {
+  padding: 20px 16px 80px;
+  font-family: Arial, Helvetica, sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ── Header ────────────────────────────────────────────────────────── */
+.listHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.pageTitle {
+  font-size: 22px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 6px 0 4px;
+}
+.pageSub {
+  font-size: 13px;
+  color: gray;
+  margin: 0;
+}
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 28px;
+  flex-shrink: 0;
+}
+.backBtn {
+  background: none;
+  border: none;
+  color: rgb(19, 19, 103);
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.backBtn:hover {
+  text-decoration: underline;
+}
+
+/* ── Sync ──────────────────────────────────────────────────────────── */
+.syncBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1.5px solid rgb(220, 220, 235);
+  background: white;
+  font-size: 18px;
+  color: rgb(19, 19, 103);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.syncBtn:hover {
+  background: rgb(240, 240, 255);
+}
+.syncBtnSyncing {
+  animation: spinBtn 1s linear infinite;
+  opacity: 0.6;
+}
+@keyframes spinBtn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.syncStatus {
+  font-size: 11px;
+  color: #aaa;
+  margin: -10px 0 14px;
+  text-align: right;
+}
+
+/* ── Search ────────────────────────────────────────────────────────── */
+.searchRow {
+  position: relative;
+  margin-bottom: 12px;
+}
+.searchInput {
+  width: 100%;
+  padding: 11px 36px 11px 14px;
+  border: 1.5px solid rgb(220, 220, 230);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+  color: rgb(30, 30, 30);
+}
+.searchInput:focus {
+  border-color: rgb(19, 19, 103);
+}
+.clearSearch {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #aaa;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.clearSearch:hover {
+  color: #555;
+}
+
+/* ── Result count ──────────────────────────────────────────────────── */
+.resultCount {
+  font-size: 12px;
+  color: #aaa;
+  margin: 0 0 10px;
+}
+
+/* ── Skeleton ──────────────────────────────────────────────────────── */
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.skeletonRow {
+  height: 86px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eeeef5 25%, #f5f5fc 50%, #eeeef5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ── Conversation List ─────────────────────────────────────────────── */
+.convList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.convRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  border: 1.5px solid rgb(228, 228, 240);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition:
+    box-shadow 0.15s,
+    transform 0.1s,
+    border-color 0.15s;
+}
+.convRow:hover {
+  box-shadow: 0 4px 16px rgba(19, 19, 103, 0.1);
+  transform: translateY(-1px);
+  border-color: rgb(19, 19, 103);
+}
+
+.convRowAvatars {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.convRowAvatars .avatar,
+.convRowAvatars .avatarFallback {
+  border: 2px solid white;
+}
+.convRowAvatars > *:last-child {
+  margin-left: -10px;
+}
+
+.convRowBody {
+  flex: 1;
+  min-width: 0;
+}
+.convRowTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.convNames {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgb(30, 30, 30);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.convVs {
+  color: rgb(19, 19, 103);
+  margin: 0 4px;
+}
+.convTime {
+  font-size: 11px;
+  color: #bbb;
+  flex-shrink: 0;
+}
+
+.convLastMsg {
+  font-size: 12px;
+  color: #777;
+  margin: 0 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.noMsg {
+  font-style: italic;
+  color: #ccc;
+}
+
+.convRowMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.convMsgCount {
+  font-size: 11px;
+  color: #888;
+}
+.convServiceDate {
+  font-size: 11px;
+  color: #888;
+}
+.convBookingBadge {
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: capitalize;
+}
+.convId {
+  font-size: 10px;
+  color: #ccc;
+  font-family: monospace;
+}
+.convChevron {
+  font-size: 20px;
+  color: rgb(180, 180, 200);
+  flex-shrink: 0;
+}
+
+/* ── Pagination ────────────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+.pageBtn {
+  padding: 8px 18px;
+  border: 1.5px solid rgb(19, 19, 103);
+  border-radius: 8px;
+  background: white;
+  color: rgb(19, 19, 103);
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.pageBtn:hover:not(:disabled) {
+  background: rgb(19, 19, 103);
+  color: white;
+}
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: #ccc;
+  color: #ccc;
+}
+.pageInfo {
+  font-size: 13px;
+  color: gray;
+}
+
+/* ── Empty State ───────────────────────────────────────────────────── */
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+}
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+.emptyTitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: rgb(50, 50, 50);
+  margin: 0 0 6px;
+}
+.emptySub {
+  font-size: 13px;
+  color: gray;
+  margin: 0;
+}
+
+/* ── Error box ─────────────────────────────────────────────────────── */
+.errorBox {
+  padding: 12px 14px;
+  background: #fff0f0;
+  border: 1px solid #ffcccc;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #c62828;
+  margin-bottom: 16px;
+}
+
+/* ── Avatar ────────────────────────────────────────────────────────── */
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  flex-shrink: 0;
+}
+.avatarFallback {
+  border-radius: 50%;
+  background: rgb(19, 19, 103);
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Detail View ───────────────────────────────────────────────────── */
+.detailWrap {
+}
+.detailNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 8px;
+}
+.refreshRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lastRefresh {
+  font-size: 11px;
+  color: #bbb;
+  white-space: nowrap;
+}
+.refreshBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1.5px solid rgb(220, 220, 235);
+  background: white;
+  font-size: 16px;
+  color: rgb(19, 19, 103);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.refreshBtn:hover {
+  background: rgb(240, 240, 255);
+}
+
+/* ── Skeleton detail ───────────────────────────────────────────────── */
+.skeletonDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skeletonHeader {
+  height: 100px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eeeef5 25%, #f5f5fc 50%, #eeeef5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+.skeletonThread {
+  height: 400px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eeeef5 25%, #f5f5fc 50%, #eeeef5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+/* ── Detail card ───────────────────────────────────────────────────── */
+.detailCard {
+  background: white;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* ── Participants bar ──────────────────────────────────────────────── */
+.participantsBar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid rgb(240, 240, 240);
+  background: rgb(249, 249, 255);
+  flex-wrap: wrap;
+}
+.participant {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 140px;
+}
+.participantRight {
+  justify-content: flex-end;
+  text-align: right;
+}
+.participantRight .avatar,
+.participantRight .avatarFallback {
+  order: 2;
+}
+.participantRight > div {
+  order: 1;
+}
+
+.participantName {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgb(30, 30, 30);
+  margin: 0 0 2px;
+}
+.participantRole {
+  font-size: 11px;
+  color: gray;
+  margin: 0 0 1px;
+}
+.participantEmail {
+  font-size: 11px;
+  color: #aaa;
+  margin: 0;
+}
+
+.convArrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.arrowLine {
+  display: block;
+  width: 40px;
+  height: 1.5px;
+  background: rgb(200, 200, 230);
+}
+.convMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.msgCount {
+  font-size: 12px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+}
+.serviceDate {
+  font-size: 11px;
+  color: gray;
+}
+.bookingBadge {
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: capitalize;
+}
+.amount {
+  font-size: 11px;
+  font-weight: bold;
+  color: #388e3c;
+}
+
+/* ── Admin view banner ─────────────────────────────────────────────── */
+.adminViewBanner {
+  padding: 8px 20px;
+  background: rgb(255, 248, 225);
+  border-bottom: 1px solid rgb(255, 236, 153);
+  font-size: 11px;
+  color: rgb(133, 100, 4);
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+
+/* ── Chat Thread ───────────────────────────────────────────────────── */
+.thread {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 300px;
+  max-height: 58vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  background: rgb(252, 252, 255);
+}
+.noMessages {
+  font-size: 13px;
+  color: #ccc;
+  text-align: center;
+  padding: 40px 0;
+  font-style: italic;
+}
+
+/* ── Message bubbles ───────────────────────────────────────────────── */
+.bubbleWrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+.bubbleWrapLeft {
+  justify-content: flex-start;
+}
+.bubbleWrapRight {
+  justify-content: flex-end;
+}
+
+.bubbleAvatar {
+  flex-shrink: 0;
+}
+
+.bubble {
+  max-width: 72%;
+  padding: 10px 13px;
+  border-radius: 14px;
+  position: relative;
+}
+
+/* Customer — right side, dark blue */
+.bubbleCustomer {
+  background: rgb(19, 19, 103);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.bubbleCustomer .senderLabel {
+  color: rgba(255, 255, 255, 0.7);
+}
+.bubbleCustomer .bubbleTime {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Maid — left side, light */
+.bubbleMaid {
+  background: white;
+  color: rgb(30, 30, 30);
+  border: 1.5px solid rgb(220, 220, 240);
+  border-bottom-left-radius: 4px;
+}
+.bubbleMaid .senderLabel {
+  color: rgb(19, 19, 103);
+}
+.bubbleMaid .bubbleTime {
+  color: #bbb;
+}
+
+/* Other sender (edge case) */
+.bubbleOther {
+  background: rgb(240, 240, 248);
+  color: rgb(60, 60, 60);
+  border-bottom-left-radius: 4px;
+}
+
+.senderLabel {
+  display: block;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+.bubbleText {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 5px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.bubbleMeta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+}
+.bubbleTime {
+  font-size: 10px;
+  display: block;
+}
+.readTick {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Media in bubbles ──────────────────────────────────────────────── */
+.mediaBubble {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: block;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.mediaImg {
+  max-width: 220px;
+  max-height: 180px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+  transition: opacity 0.15s;
+}
+.mediaImg:hover {
+  opacity: 0.9;
+}
+.videoThumb {
+  width: 160px;
+  height: 100px;
+  background: rgb(20, 20, 60);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.playIcon {
+  font-size: 26px;
+  color: white;
+  opacity: 0.85;
+}
+.mediaCaption {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* ── Thread footer ─────────────────────────────────────────────────── */
+.threadFooter {
+  padding: 12px 20px;
+  border-top: 1px solid rgb(240, 240, 240);
+  background: rgb(249, 249, 255);
+}
+.threadFooterNote {
+  font-size: 11px;
+  color: #aaa;
+}
+
+/* ── Lightbox ──────────────────────────────────────────────────────── */
+.lightboxOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.lightboxContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.lightboxMedia {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 10px;
+  object-fit: contain;
+  display: block;
+}
+.lightboxClose {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+  color: rgb(30, 30, 30);
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.lightboxName {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin: 0;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .participantsBar {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .participantRight {
+    justify-content: flex-start;
+  }
+  .participantRight .avatar,
+  .participantRight .avatarFallback {
+    order: 0;
+  }
+  .participantRight > div {
+    order: 0;
+  }
+  .convArrow {
+    flex-direction: row;
+  }
+  .convMeta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .arrowLine {
+    width: 20px;
+  }
+  .bubble {
+    max-width: 88%;
+  }
+  .thread {
+    max-height: 50vh;
+    padding: 14px 10px;
+  }
+  .convNames {
+    font-size: 13px;
+  }
+}

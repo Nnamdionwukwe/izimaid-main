@@ -1,0 +1,637 @@
+import { useState, useEffect, useRef, useCallback } from "react";
+import styles from "./AdminChats.module.css";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const CONVERSATIONS_URL = `${API_URL}/api/chat/admin`;
+const POLL_INTERVAL = 30000; // 30s
+
+const BOOKING_STATUS_STYLES = {
+  pending: { bg: "#fff8e1", color: "#f59e0b" },
+  confirmed: { bg: "#e3f2fd", color: "#1976d2" },
+  completed: { bg: "#e8f5e9", color: "#388e3c" },
+  cancelled: { bg: "#fce4ec", color: "#c62828" },
+};
+
+function getToken() {
+  return localStorage.getItem("token");
+}
+function authH() {
+  return { Authorization: `Bearer ${getToken()}` };
+}
+
+function formatDate(d) {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString("en-NG", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function timeAgo(d) {
+  if (!d) return "—";
+  const m = Math.floor((Date.now() - new Date(d)) / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
+
+function Avatar({ name, src, size = 36 }) {
+  const [err, setErr] = useState(false);
+  const initials = name
+    ? name
+        .split(" ")
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : "?";
+  if (src && !err) {
+    return (
+      <img
+        src={src}
+        alt={name}
+        className={styles.avatar}
+        style={{ width: size, height: size }}
+        onError={() => setErr(true)}
+      />
+    );
+  }
+  return (
+    <div
+      className={styles.avatarFallback}
+      style={{ width: size, height: size, fontSize: size * 0.36 }}
+    >
+      {initials}
+    </div>
+  );
+}
+
+// ─── Lightbox ───────────────────────────────────────────────────────
+function Lightbox({ item, onClose }) {
+  if (!item) return null;
+  return (
+    <div className={styles.lightboxOverlay} onClick={onClose}>
+      <div
+        className={styles.lightboxContent}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className={styles.lightboxClose} onClick={onClose}>
+          ×
+        </button>
+        {item.media_type === "video" ? (
+          <video
+            src={item.media_url}
+            controls
+            autoPlay
+            className={styles.lightboxMedia}
+          />
+        ) : (
+          <img
+            src={item.media_url}
+            alt={item.content}
+            className={styles.lightboxMedia}
+          />
+        )}
+        {item.content && <p className={styles.lightboxName}>{item.content}</p>}
+      </div>
+    </div>
+  );
+}
+
+// ─── Single message bubble ───────────────────────────────────────────
+function MessageBubble({ msg, conversation, onMediaClick }) {
+  const isCustomer = msg.sender_id === conversation.customer_id;
+  const isMaid = msg.sender_id === conversation.maid_id;
+
+  const bubbleClass = isCustomer
+    ? styles.bubbleCustomer
+    : isMaid
+      ? styles.bubbleMaid
+      : styles.bubbleOther;
+
+  const label = isCustomer
+    ? `👤 ${conversation.customer_name}`
+    : isMaid
+      ? `🧹 ${conversation.maid_name}`
+      : msg.sender_name || "Unknown";
+
+  const hasMedia =
+    msg.media_url &&
+    (msg.message_type === "image" || msg.message_type === "video");
+
+  return (
+    <div
+      className={`${styles.bubbleWrap} ${isCustomer ? styles.bubbleWrapRight : styles.bubbleWrapLeft}`}
+    >
+      {!isCustomer && (
+        <div className={styles.bubbleAvatar}>
+          <Avatar
+            name={isMaid ? conversation.maid_name : msg.sender_name}
+            src={msg.sender_avatar}
+            size={28}
+          />
+        </div>
+      )}
+      <div className={`${styles.bubble} ${bubbleClass}`}>
+        <span className={styles.senderLabel}>{label}</span>
+        {hasMedia && (
+          <button
+            className={styles.mediaBubble}
+            onClick={() => onMediaClick(msg)}
+            type="button"
+          >
+            {msg.message_type === "video" ? (
+              <div className={styles.videoThumb}>
+                <span className={styles.playIcon}>▶</span>
+                <span className={styles.mediaCaption}>Video</span>
+              </div>
+            ) : (
+              <img
+                src={msg.media_url}
+                alt={msg.content || "image"}
+                className={styles.mediaImg}
+              />
+            )}
+          </button>
+        )}
+        {msg.content && !hasMedia && (
+          <p className={styles.bubbleText}>{msg.content}</p>
+        )}
+        {msg.content && hasMedia && (
+          <p className={styles.mediaCaption}>{msg.content}</p>
+        )}
+        <div className={styles.bubbleMeta}>
+          <span className={styles.bubbleTime}>
+            {formatDate(msg.created_at)}
+          </span>
+          {msg.is_read && isCustomer && (
+            <span className={styles.readTick} title="Read">
+              ✓✓
+            </span>
+          )}
+        </div>
+      </div>
+      {isCustomer && (
+        <div className={styles.bubbleAvatar}>
+          <Avatar
+            name={conversation.customer_name}
+            src={msg.sender_avatar}
+            size={28}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Conversation Detail ─────────────────────────────────────────────
+function ConversationDetail({ conversationId, onBack }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [lastRefresh, setLastRefresh] = useState(null);
+  const [lightboxMsg, setLightboxMsg] = useState(null);
+  const [error, setError] = useState("");
+  const threadRef = useRef(null);
+
+  const fetchConversation = useCallback(
+    async (silent = false) => {
+      if (!silent) setLoading(true);
+      setError("");
+      try {
+        const res = await fetch(`${CONVERSATIONS_URL}/${conversationId}`, {
+          headers: authH(),
+        });
+        if (!res.ok) throw new Error("Failed to load conversation");
+        const json = await res.json();
+        setData(json);
+        setLastRefresh(new Date());
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        if (!silent) setLoading(false);
+      }
+    },
+    [conversationId],
+  );
+
+  useEffect(() => {
+    fetchConversation(false);
+  }, [conversationId]);
+
+  // Scroll to bottom on new messages
+  useEffect(() => {
+    if (data && threadRef.current) {
+      threadRef.current.scrollTop = threadRef.current.scrollHeight;
+    }
+  }, [data?.messages?.length]);
+
+  // Auto-refresh
+  useEffect(() => {
+    const id = setInterval(() => fetchConversation(true), POLL_INTERVAL);
+    return () => clearInterval(id);
+  }, [fetchConversation]);
+
+  const conv = data?.conversation;
+  const messages = data?.messages || [];
+  const bkStatus = conv ? BOOKING_STATUS_STYLES[conv.booking_status] || {} : {};
+
+  return (
+    <div className={styles.detailWrap}>
+      {/* Nav bar */}
+      <div className={styles.detailNav}>
+        <button className={styles.backBtn} onClick={onBack}>
+          ← All Conversations
+        </button>
+        <div className={styles.refreshRow}>
+          {lastRefresh && (
+            <span className={styles.lastRefresh}>
+              Updated {timeAgo(lastRefresh)}
+            </span>
+          )}
+          <button
+            className={styles.refreshBtn}
+            onClick={() => fetchConversation(false)}
+            title="Refresh"
+          >
+            ↻
+          </button>
+        </div>
+      </div>
+
+      {loading && (
+        <div className={styles.skeletonDetail}>
+          <div className={styles.skeletonHeader} />
+          <div className={styles.skeletonThread} />
+        </div>
+      )}
+
+      {error && !loading && <div className={styles.errorBox}>{error}</div>}
+
+      {!loading && conv && (
+        <div className={styles.detailCard}>
+          {/* Participants header */}
+          <div className={styles.participantsBar}>
+            <div className={styles.participant}>
+              <Avatar
+                name={conv.customer_name}
+                src={conv.customer_avatar}
+                size={44}
+              />
+              <div>
+                <p className={styles.participantName}>{conv.customer_name}</p>
+                <p className={styles.participantRole}>👤 Customer</p>
+                {conv.customer_email && (
+                  <p className={styles.participantEmail}>
+                    {conv.customer_email}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.convArrow}>
+              <span className={styles.arrowLine} />
+              <div className={styles.convMeta}>
+                <span className={styles.msgCount}>
+                  💬 {messages.length} messages
+                </span>
+                {conv.service_date && (
+                  <span className={styles.serviceDate}>
+                    📅{" "}
+                    {new Date(conv.service_date).toLocaleDateString("en-NG", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
+                )}
+                {conv.booking_status && (
+                  <span
+                    className={styles.bookingBadge}
+                    style={{ background: bkStatus.bg, color: bkStatus.color }}
+                  >
+                    {conv.booking_status.replace("_", " ")}
+                  </span>
+                )}
+                {conv.total_amount && (
+                  <span className={styles.amount}>
+                    ₦{Number(conv.total_amount).toLocaleString()}
+                  </span>
+                )}
+              </div>
+              <span className={styles.arrowLine} />
+            </div>
+
+            <div className={`${styles.participant} ${styles.participantRight}`}>
+              <Avatar name={conv.maid_name} src={conv.maid_avatar} size={44} />
+              <div>
+                <p className={styles.participantName}>{conv.maid_name}</p>
+                <p className={styles.participantRole}>🧹 Maid</p>
+                {conv.maid_email && (
+                  <p className={styles.participantEmail}>{conv.maid_email}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Admin read-only badge */}
+          <div className={styles.adminViewBanner}>
+            🛡️ Admin read-only view · Messages are not marked as read by this
+            action
+          </div>
+
+          {/* Thread */}
+          <div className={styles.thread} ref={threadRef}>
+            {messages.length === 0 && (
+              <p className={styles.noMessages}>
+                No messages in this conversation yet.
+              </p>
+            )}
+            {messages.map((msg) => (
+              <MessageBubble
+                key={msg.id}
+                msg={msg}
+                conversation={conv}
+                onMediaClick={setLightboxMsg}
+              />
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div className={styles.threadFooter}>
+            <span className={styles.threadFooterNote}>
+              Conversation started {formatDate(conv.created_at)}
+              {conv.address && ` · ${conv.address}`}
+            </span>
+          </div>
+        </div>
+      )}
+
+      <Lightbox item={lightboxMsg} onClose={() => setLightboxMsg(null)} />
+    </div>
+  );
+}
+
+// ─── Conversation Row (list item) ────────────────────────────────────
+function ConversationRow({ conv, onClick }) {
+  const bkStyle = BOOKING_STATUS_STYLES[conv.booking_status] || {};
+  return (
+    <div className={styles.convRow} onClick={onClick}>
+      <div className={styles.convRowAvatars}>
+        <Avatar
+          name={conv.customer_name}
+          src={conv.customer_avatar}
+          size={38}
+        />
+        <Avatar name={conv.maid_name} src={conv.maid_avatar} size={38} />
+      </div>
+      <div className={styles.convRowBody}>
+        <div className={styles.convRowTop}>
+          <span className={styles.convNames}>
+            {conv.customer_name} <span className={styles.convVs}>↔</span>{" "}
+            {conv.maid_name}
+          </span>
+          <span className={styles.convTime}>
+            {timeAgo(conv.last_message_at || conv.updated_at)}
+          </span>
+        </div>
+        <p className={styles.convLastMsg}>
+          {conv.last_message ? (
+            conv.last_message.length > 80 ? (
+              conv.last_message.slice(0, 80) + "…"
+            ) : (
+              conv.last_message
+            )
+          ) : (
+            <em className={styles.noMsg}>No messages yet</em>
+          )}
+        </p>
+        <div className={styles.convRowMeta}>
+          <span className={styles.convMsgCount}>
+            💬 {conv.message_count ?? 0}
+          </span>
+          {conv.service_date && (
+            <span className={styles.convServiceDate}>
+              📅{" "}
+              {new Date(conv.service_date).toLocaleDateString("en-NG", {
+                day: "numeric",
+                month: "short",
+              })}
+            </span>
+          )}
+          {conv.booking_status && (
+            <span
+              className={styles.convBookingBadge}
+              style={{ background: bkStyle.bg, color: bkStyle.color }}
+            >
+              {conv.booking_status.replace("_", " ")}
+            </span>
+          )}
+          <span className={styles.convId}>
+            #{conv.booking_id?.toString().slice(0, 8)}
+          </span>
+        </div>
+      </div>
+      <span className={styles.convChevron}>›</span>
+    </div>
+  );
+}
+
+// ─── Main AdminChats ─────────────────────────────────────────────────
+export default function AdminChats({ onBack }) {
+  const [conversations, setConversations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [lastSync, setLastSync] = useState(null);
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [selectedId, setSelectedId] = useState(null);
+  const LIMIT = 20;
+
+  const fetchConversations = useCallback(
+    async (silent = false, pg = page, q = search) => {
+      if (!silent) setLoading(true);
+      else setSyncing(true);
+      try {
+        const params = new URLSearchParams({ page: pg, limit: LIMIT });
+        if (q.trim()) params.set("search", q.trim());
+        const res = await fetch(`${CONVERSATIONS_URL}?${params}`, {
+          headers: authH(),
+        });
+        const data = await res.json();
+        setConversations(data.conversations || []);
+        setTotal(data.total || 0);
+        setTotalPages(data.pages || 1);
+        setLastSync(new Date());
+      } catch {
+      } finally {
+        if (!silent) setLoading(false);
+        else setSyncing(false);
+      }
+    },
+    [page, search],
+  );
+
+  useEffect(() => {
+    fetchConversations(false, page, search);
+  }, [page, search]);
+
+  // Background poll (only when on list view)
+  useEffect(() => {
+    if (selectedId) return;
+    const id = setInterval(
+      () => fetchConversations(true, page, search),
+      POLL_INTERVAL,
+    );
+    return () => clearInterval(id);
+  }, [fetchConversations, selectedId, page, search]);
+
+  // Search with debounce
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setPage(1);
+      setSearch(searchInput);
+    }, 350);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  // Detail view
+  if (selectedId) {
+    return (
+      <div className={styles.page}>
+        <ConversationDetail
+          conversationId={selectedId}
+          onBack={() => setSelectedId(null)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.page}>
+      {/* Header */}
+      <div className={styles.listHeader}>
+        <div>
+          <button className={styles.backBtn} onClick={onBack}>
+            ← Dashboard
+          </button>
+          <h1 className={styles.pageTitle}>💬 Chats</h1>
+          <p className={styles.pageSub}>
+            Read-only view of all customer ↔ maid conversations
+          </p>
+        </div>
+        <div className={styles.headerActions}>
+          <button
+            className={`${styles.syncBtn} ${syncing ? styles.syncBtnSyncing : ""}`}
+            onClick={() => fetchConversations(false, page, search)}
+            title="Refresh"
+          >
+            ↻
+          </button>
+        </div>
+      </div>
+
+      {/* Sync status */}
+      {lastSync && (
+        <p className={styles.syncStatus}>
+          {syncing
+            ? "Checking for updates…"
+            : `Last updated ${timeAgo(lastSync)}`}
+        </p>
+      )}
+
+      {/* Search */}
+      <div className={styles.searchRow}>
+        <input
+          className={styles.searchInput}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          placeholder="🔍  Search by customer name, maid name or booking ID…"
+        />
+        {searchInput && (
+          <button
+            className={styles.clearSearch}
+            onClick={() => setSearchInput("")}
+          >
+            ×
+          </button>
+        )}
+      </div>
+
+      {/* Result count */}
+      {!loading && (
+        <p className={styles.resultCount}>
+          {total} conversation{total !== 1 ? "s" : ""}
+          {search ? ` matching "${search}"` : ""}
+        </p>
+      )}
+
+      {/* List */}
+      {loading ? (
+        <div className={styles.skeletonList}>
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className={styles.skeletonRow}
+              style={{ animationDelay: `${i * 0.07}s` }}
+            />
+          ))}
+        </div>
+      ) : conversations.length === 0 ? (
+        <div className={styles.emptyState}>
+          <div className={styles.emptyIcon}>💬</div>
+          <p className={styles.emptyTitle}>
+            {search ? "No matching conversations" : "No conversations yet"}
+          </p>
+          <p className={styles.emptySub}>
+            {search
+              ? "Try searching by name or booking ID."
+              : "Conversations between customers and maids will appear here."}
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className={styles.convList}>
+            {conversations.map((c) => (
+              <ConversationRow
+                key={c.id}
+                conv={c}
+                onClick={() => setSelectedId(c.id)}
+              />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className={styles.pagination}>
+              <button
+                className={styles.pageBtn}
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                ← Prev
+              </button>
+              <span className={styles.pageInfo}>
+                Page {page} of {totalPages}
+              </span>
+              <button
+                className={styles.pageBtn}
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next →
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
