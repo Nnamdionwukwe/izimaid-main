@@ -8,7 +8,7 @@ export default function FixedHeader() {
   return (
     <>
       <div className={styles.SubHeader1}>
-        <a href="https://izimaid-sage.vercel.app">
+        <a href="https://deusizisparkle.com">
           <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
         </a>
 
