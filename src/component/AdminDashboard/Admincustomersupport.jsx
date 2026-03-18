@@ -327,7 +327,7 @@ function TicketPanel({
           <div className={styles.thread} ref={threadRef}>
             <div
               className={styles.bubbleWrap}
-              style={{ alignItems: "flex-end" }}
+              style={{ alignItems: "flex-start" }}
             >
               <div className={`${styles.bubble} ${styles.bubbleCustomer}`}>
                 <p className={styles.bubbleText}>{ticket.message}</p>
@@ -344,12 +344,18 @@ function TicketPanel({
             )}
 
             {replies.map((r) => {
-              const isAdm = r.is_admin || r.role === "admin";
+              // A reply is from the admin if:
+              // 1. explicitly flagged as admin, OR
+              // 2. the reply's user_id differs from the ticket owner's user_id
+              const isAdm =
+                r.is_admin === true ||
+                r.role === "admin" ||
+                (ticket.user_id && r.user_id && r.user_id !== ticket.user_id);
               return (
                 <div
                   key={r.id}
                   className={styles.bubbleWrap}
-                  style={{ alignItems: isAdm ? "flex-start" : "flex-end" }}
+                  style={{ alignItems: isAdm ? "flex-end" : "flex-start" }}
                 >
                   {isAdm && <span className={styles.adminTag}>You</span>}
                   <div
