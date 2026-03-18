@@ -670,7 +670,7 @@ export default function AdminCustomerSupport({ onBack }) {
           </button>
           <div>
             <div className={styles.titleRow}>
-              <h1 className={styles.pageTitle}>Support Tickets</h1>
+              <h1 className={styles.pageTitle}>Customer Support Tickets</h1>
               {totalUnread > 0 && (
                 <span className={styles.totalUnreadBadge}>
                   {totalUnread > 99 ? "99+" : totalUnread}
