@@ -1188,7 +1188,7 @@ export default function MaidDashboard({ onLogout }) {
             .reduce((s, x) => s + Number(x.total_amount), 0),
         });
       } catch {}
-    }, 15000); // 15 seconds
+    }, 30000); // 30 seconds
 
     return () => clearInterval(refreshInterval);
   }, [token, user, navigate, updateUser]);

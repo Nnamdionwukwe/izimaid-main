@@ -60,6 +60,28 @@ export default function MyBookings() {
     fetchBookings();
   }, [filter]);
 
+  // ✅ Silent background refresh every 30 seconds
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const refreshInterval = setInterval(async () => {
+      try {
+        const params = new URLSearchParams({ limit: 50 });
+        if (filter !== "all") params.set("status", filter);
+        const res = await fetch(`${API_URL}/api/bookings?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setBookings(data.bookings || []);
+      } catch (err) {
+        console.error("Background refresh error:", err);
+      }
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(refreshInterval);
+  }, [filter]);
+
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const isMaid = user.role === "maid";
 
