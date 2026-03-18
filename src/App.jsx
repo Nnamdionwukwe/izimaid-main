@@ -85,7 +85,6 @@ function AppRoutes() {
       <Route path="/maid/:maidId" element={<MaidDetail />} />
       <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="/bookings/:id" element={<BookingDetail />} />
-      <Route path="/customersupport" element={<CustomerSupport />} />
 
       {/* Admin Dashboard */}
       <Route
@@ -103,6 +102,15 @@ function AppRoutes() {
         element={
           <ProtectedRoute maidOnly>
             <MaidDashboard onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/customersupport"
+        element={
+          <ProtectedRoute>
+            <CustomerSupport />
           </ProtectedRoute>
         }
       />

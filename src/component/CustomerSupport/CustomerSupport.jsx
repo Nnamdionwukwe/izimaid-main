@@ -37,6 +37,147 @@ function formatDate(d) {
   });
 }
 
+// ─── Media Preview Grid ─────────────────────────────────────────────
+const MAX_FILES = 5;
+const ACCEPTED = "image/*,video/*";
+
+function MediaPreviewGrid({ files, onRemove }) {
+  if (!files.length) return null;
+  return (
+    <div className={styles.previewGrid}>
+      {files.map((f, i) => {
+        const isVideo = f.file.type.startsWith("video/");
+        return (
+          <div key={i} className={styles.previewItem}>
+            {isVideo ? (
+              <video src={f.preview} className={styles.previewMedia} muted />
+            ) : (
+              <img
+                src={f.preview}
+                alt={f.file.name}
+                className={styles.previewMedia}
+              />
+            )}
+            <button
+              type="button"
+              className={styles.previewRemove}
+              onClick={() => onRemove(i)}
+              aria-label="Remove"
+            >
+              ×
+            </button>
+            <span className={styles.previewType}>{isVideo ? "🎥" : "🖼️"}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Attachment Gallery (existing ticket) ───────────────────────────
+function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
+  const [deleting, setDeleting] = useState(null);
+  const [lightbox, setLightbox] = useState(null);
+
+  async function handleDelete(att) {
+    if (!window.confirm("Remove this attachment?")) return;
+    setDeleting(att.id);
+    try {
+      const token = localStorage.getItem("token");
+      await fetch(`${API_URL}/api/support/${ticketId}/media/${att.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      onDeleted(att.id);
+    } catch {
+      /* ignore */
+    } finally {
+      setDeleting(null);
+    }
+  }
+
+  if (!attachments.length) return null;
+
+  return (
+    <>
+      <div className={styles.attSection}>
+        <p className={styles.attTitle}>📎 Attachments ({attachments.length})</p>
+        <div className={styles.attGrid}>
+          {attachments.map((a) => {
+            const isVideo = a.media_type === "video";
+            return (
+              <div key={a.id} className={styles.attItem}>
+                <button
+                  type="button"
+                  className={styles.attThumb}
+                  onClick={() => setLightbox(a)}
+                >
+                  {isVideo ? (
+                    <div className={styles.attVideoThumb}>
+                      <span className={styles.attPlayIcon}>▶</span>
+                    </div>
+                  ) : (
+                    <img
+                      src={a.media_url}
+                      alt={a.file_name}
+                      className={styles.attImg}
+                    />
+                  )}
+                </button>
+                <p className={styles.attName}>{a.file_name?.slice(0, 18)}</p>
+                {canDelete && (
+                  <button
+                    className={styles.attDelete}
+                    onClick={() => handleDelete(a)}
+                    disabled={deleting === a.id}
+                  >
+                    {deleting === a.id ? "…" : "✕"}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          className={styles.lightboxOverlay}
+          onClick={() => setLightbox(null)}
+        >
+          <div
+            className={styles.lightboxContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className={styles.lightboxClose}
+              onClick={() => setLightbox(null)}
+            >
+              ×
+            </button>
+            {lightbox.media_type === "video" ? (
+              <video
+                src={lightbox.media_url}
+                controls
+                className={styles.lightboxMedia}
+                autoPlay
+              />
+            ) : (
+              <img
+                src={lightbox.media_url}
+                alt={lightbox.file_name}
+                className={styles.lightboxMedia}
+              />
+            )}
+            <p className={styles.lightboxName}>{lightbox.file_name}</p>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 // ─── New Ticket Form ────────────────────────────────────────────────
 function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
   const [subject, setSubject] = useState(
@@ -53,6 +194,41 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
   const [priority, setPriority] = useState("normal");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [mediaFiles, setMediaFiles] = useState([]); // { file, preview }
+  const [uploadProgress, setUploadProgress] = useState(""); // status text
+  const fileInputRef = useState(null);
+
+  function handleFileChange(e) {
+    const picked = Array.from(e.target.files || []);
+    const remaining = MAX_FILES - mediaFiles.length;
+    const toAdd = picked.slice(0, remaining).map((f) => ({
+      file: f,
+      preview: URL.createObjectURL(f),
+    }));
+    setMediaFiles((prev) => [...prev, ...toAdd]);
+    e.target.value = "";
+  }
+
+  function removeFile(index) {
+    setMediaFiles((prev) => {
+      URL.revokeObjectURL(prev[index].preview);
+      return prev.filter((_, i) => i !== index);
+    });
+  }
+
+  async function uploadFilesToTicket(ticketId, token) {
+    for (let i = 0; i < mediaFiles.length; i++) {
+      setUploadProgress(`Uploading file ${i + 1} of ${mediaFiles.length}…`);
+      const form = new FormData();
+      form.append("file", mediaFiles[i].file);
+      await fetch(`${API_URL}/api/support/${ticketId}/media`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      });
+    }
+    setUploadProgress("");
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -74,6 +250,10 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to submit");
+      // Upload attachments if any
+      if (mediaFiles.length > 0) {
+        await uploadFilesToTicket(data.ticket.id, token);
+      }
       onSuccess(data.ticket);
     } catch (err) {
       setError(err.message);
@@ -179,6 +359,35 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
           <span className={styles.charCount}>{message.length}/2000</span>
         </div>
 
+        {/* Attachments */}
+        <div className={styles.field}>
+          <label className={styles.label}>
+            Attachments{" "}
+            <span className={styles.labelHint}>
+              (photos/videos, up to {MAX_FILES})
+            </span>
+          </label>
+          <MediaPreviewGrid files={mediaFiles} onRemove={removeFile} />
+          {mediaFiles.length < MAX_FILES && (
+            <label className={styles.uploadZone}>
+              <input
+                type="file"
+                accept={ACCEPTED}
+                multiple
+                className={styles.hiddenInput}
+                onChange={handleFileChange}
+              />
+              <span className={styles.uploadIcon}>📎</span>
+              <span className={styles.uploadText}>
+                Tap to attach photos or videos
+              </span>
+              <span className={styles.uploadHint}>
+                {mediaFiles.length}/{MAX_FILES} attached
+              </span>
+            </label>
+          )}
+        </div>
+
         {error && <div className={styles.errorBox}>{error}</div>}
 
         <button
@@ -186,7 +395,14 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
           className={styles.submitBtn}
           disabled={submitting}
         >
-          {submitting ? <span className={styles.spinner} /> : "Submit Ticket"}
+          {submitting ? (
+            <span className={styles.spinnerRow}>
+              <span className={styles.spinner} />
+              {uploadProgress || "Submitting…"}
+            </span>
+          ) : (
+            `Submit Ticket${mediaFiles.length ? ` (+${mediaFiles.length} file${mediaFiles.length > 1 ? "s" : ""})` : ""}`
+          )}
         </button>
       </form>
     </div>
@@ -196,9 +412,16 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
 // ─── Ticket Detail View ─────────────────────────────────────────────
 function TicketDetail({ ticket, onBack }) {
   const [replies, setReplies] = useState([]);
+  const [attachments, setAttachments] = useState([]);
   const [replyMsg, setReplyMsg] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  const userId = JSON.parse(localStorage.getItem("user") || "{}").id;
+  const isOwner = ticket.user_id === userId;
+  const isOpen = ticket.status !== "closed" && ticket.status !== "resolved";
 
   useEffect(() => {
     async function load() {
@@ -209,6 +432,7 @@ function TicketDetail({ ticket, onBack }) {
         });
         const data = await res.json();
         setReplies(data.replies || []);
+        setAttachments(data.attachments || []);
       } catch {
         /* ignore */
       } finally {
@@ -243,6 +467,38 @@ function TicketDetail({ ticket, onBack }) {
     }
   }
 
+  async function handleMediaUpload(e) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const remaining = MAX_FILES - attachments.length;
+    const toUpload = files.slice(0, remaining);
+    setUploadingMedia(true);
+    setUploadError("");
+    try {
+      const token = localStorage.getItem("token");
+      for (const file of toUpload) {
+        const form = new FormData();
+        form.append("file", file);
+        const res = await fetch(`${API_URL}/api/support/${ticket.id}/media`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: form,
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setAttachments((prev) => [...prev, data.attachment]);
+        } else {
+          setUploadError(data.error || "Upload failed");
+        }
+      }
+    } catch {
+      setUploadError("Upload failed. Please try again.");
+    } finally {
+      setUploadingMedia(false);
+      e.target.value = "";
+    }
+  }
+
   const st = STATUS_STYLES[ticket.status] || STATUS_STYLES.open;
   const cat = CATEGORIES.find((c) => c.value === ticket.category);
 
@@ -270,6 +526,16 @@ function TicketDetail({ ticket, onBack }) {
             Opened {formatDate(ticket.created_at)}
           </p>
         </div>
+
+        {/* Attachment Gallery */}
+        <AttachmentGallery
+          attachments={attachments}
+          ticketId={ticket.id}
+          canDelete={isOwner && isOpen}
+          onDeleted={(id) =>
+            setAttachments((prev) => prev.filter((a) => a.id !== id))
+          }
+        />
 
         <div className={styles.thread}>
           {/* Original message */}
@@ -301,15 +567,47 @@ function TicketDetail({ ticket, onBack }) {
           })}
         </div>
 
-        {ticket.status !== "closed" && ticket.status !== "resolved" && (
+        {isOpen && (
           <div className={styles.replyBox}>
-            <textarea
-              className={styles.replyInput}
-              value={replyMsg}
-              onChange={(e) => setReplyMsg(e.target.value)}
-              placeholder="Add a reply…"
-              rows={3}
-            />
+            <div className={styles.replyInputWrap}>
+              <textarea
+                className={styles.replyInput}
+                value={replyMsg}
+                onChange={(e) => setReplyMsg(e.target.value)}
+                placeholder="Add a reply…"
+                rows={3}
+              />
+              {uploadError && (
+                <p className={styles.uploadErrInline}>{uploadError}</p>
+              )}
+              <div className={styles.replyToolbar}>
+                {attachments.length < MAX_FILES && (
+                  <label
+                    className={styles.attachBtn}
+                    title="Attach photo/video"
+                  >
+                    <input
+                      type="file"
+                      accept={ACCEPTED}
+                      multiple
+                      className={styles.hiddenInput}
+                      onChange={handleMediaUpload}
+                      disabled={uploadingMedia}
+                    />
+                    {uploadingMedia ? (
+                      <span className={styles.spinnerDark} />
+                    ) : (
+                      <>
+                        📎 <span className={styles.attachLabel}>Attach</span>
+                      </>
+                    )}
+                  </label>
+                )}
+                <span className={styles.attCount}>
+                  {attachments.length}/{MAX_FILES} files
+                </span>
+              </div>
+            </div>
             <button
               className={styles.replyBtn}
               onClick={sendReply}
@@ -469,7 +767,7 @@ export default function CustomerSupport() {
             </button>
             <button
               className={styles.ghostBtn}
-              onClick={() => navigate("/bookings")}
+              onClick={() => navigate("/my-bookings")}
             >
               Back to Bookings
             </button>

@@ -627,3 +627,312 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+/* ── Upload Zone (new ticket form) ─────────────────────────────────── */
+.labelHint {
+  font-size: 11px;
+  font-weight: normal;
+  color: #aaa;
+}
+.uploadZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 20px 16px;
+  border: 2px dashed rgb(200, 210, 240);
+  border-radius: 10px;
+  background: rgb(248, 249, 255);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+  text-align: center;
+}
+.uploadZone:hover {
+  border-color: rgb(19, 19, 103);
+  background: rgb(243, 244, 255);
+}
+.uploadIcon {
+  font-size: 26px;
+}
+.uploadText {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(60, 60, 120);
+}
+.uploadHint {
+  font-size: 11px;
+  color: #aaa;
+}
+.hiddenInput {
+  display: none;
+}
+
+/* ── Preview Grid ──────────────────────────────────────────────────── */
+.previewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.previewItem {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: rgb(240, 240, 245);
+}
+.previewMedia {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.previewRemove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  color: white;
+  border: none;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.previewType {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  font-size: 13px;
+}
+
+/* ── Submit button with progress text ──────────────────────────────── */
+.spinnerRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+/* ── Attachment Gallery (ticket detail) ─────────────────────────────── */
+.attSection {
+  padding: 14px 20px 0;
+}
+.attTitle {
+  font-size: 12px;
+  font-weight: bold;
+  color: gray;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.attGrid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.attItem {
+  position: relative;
+  width: 72px;
+}
+.attThumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgb(220, 220, 235);
+  background: rgb(240, 240, 248);
+  cursor: pointer;
+  padding: 0;
+  display: block;
+  transition: transform 0.1s;
+}
+.attThumb:hover {
+  transform: scale(1.04);
+}
+.attImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.attVideoThumb {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(30, 30, 80);
+}
+.attPlayIcon {
+  color: white;
+  font-size: 22px;
+  opacity: 0.85;
+}
+.attName {
+  font-size: 10px;
+  color: gray;
+  margin: 4px 0 0;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attDelete {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgb(220, 50, 50);
+  color: white;
+  border: 2px solid white;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+.attDelete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Lightbox ──────────────────────────────────────────────────────── */
+.lightboxOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.lightboxContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.lightboxMedia {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 10px;
+  object-fit: contain;
+  display: block;
+}
+.lightboxClose {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+  color: rgb(30, 30, 30);
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.lightboxName {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin: 0;
+}
+
+/* ── Reply box with toolbar ────────────────────────────────────────── */
+.replyInputWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.replyToolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attachBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: rgb(245, 245, 255);
+  border: 1.5px solid rgb(200, 210, 240);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(60, 60, 120);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.attachBtn:hover {
+  background: rgb(235, 235, 255);
+  border-color: rgb(19, 19, 103);
+}
+.attachLabel {
+  font-size: 12px;
+}
+.attCount {
+  font-size: 11px;
+  color: #bbb;
+  margin-left: auto;
+}
+.uploadErrInline {
+  font-size: 12px;
+  color: #c62828;
+  margin: 0;
+  padding: 6px 10px;
+  background: #fff0f0;
+  border-radius: 6px;
+}
+
+/* ── Dark spinner (for light backgrounds) ──────────────────────────── */
+.spinnerDark {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(60, 60, 120, 0.3);
+  border-top-color: rgb(19, 19, 103);
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ── Responsive: reply box on mobile ──────────────────────────────── */
+@media (max-width: 480px) {
+  .replyBox {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .replyBtn {
+    width: 100%;
+  }
+  .previewGrid {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  }
+}
