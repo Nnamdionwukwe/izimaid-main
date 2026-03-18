@@ -1,0 +1,629 @@
+/* ── Base Page ─────────────────────────────────────────────────────── */
+.page {
+  padding: 20px 16px 80px;
+  font-family: Arial, Helvetica, sans-serif;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── List View ─────────────────────────────────────────────────────── */
+.listHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.pageTitle {
+  font-size: 22px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 0 0 4px;
+}
+.pageSub {
+  font-size: 13px;
+  color: gray;
+  margin: 0;
+}
+
+/* ── Filter Row ────────────────────────────────────────────────────── */
+.filterRow {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-bottom: 20px;
+  padding-bottom: 2px;
+}
+.filterRow::-webkit-scrollbar {
+  display: none;
+}
+.filterBtn {
+  flex-shrink: 0;
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1px solid rgb(228, 228, 228);
+  background: white;
+  font-size: 12px;
+  font-weight: bold;
+  color: gray;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.filterBtnActive {
+  background: rgb(19, 19, 103);
+  color: white;
+  border-color: rgb(19, 19, 103);
+}
+
+/* ── Ticket Cards ──────────────────────────────────────────────────── */
+.ticketList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ticketCard {
+  background: white;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition:
+    box-shadow 0.15s,
+    transform 0.1s;
+}
+.ticketCard:hover {
+  box-shadow: 0 4px 16px rgba(19, 19, 103, 0.1);
+  transform: translateY(-1px);
+}
+.tcTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+.tcCat {
+  font-size: 12px;
+  color: gray;
+  font-weight: 600;
+}
+.tcStatus {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.tcSubject {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgb(30, 30, 30);
+  margin: 0 0 4px;
+}
+.tcSnippet {
+  font-size: 12px;
+  color: gray;
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+.tcDate {
+  font-size: 11px;
+  color: #bbb;
+  margin: 0;
+}
+
+/* ── Empty State ───────────────────────────────────────────────────── */
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+}
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+.emptyTitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: rgb(50, 50, 50);
+  margin: 0 0 6px;
+}
+.emptySub {
+  font-size: 13px;
+  color: gray;
+  margin: 0 0 20px;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────── */
+.newBtn {
+  padding: 10px 22px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.newBtn:hover {
+  background: rgb(14, 14, 75);
+}
+
+.ghostBtn {
+  padding: 10px 22px;
+  background: white;
+  color: rgb(19, 19, 103);
+  border: 2px solid rgb(19, 19, 103);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.ghostBtn:hover {
+  background: rgb(245, 245, 255);
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: rgb(19, 19, 103);
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 20px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.backBtn:hover {
+  text-decoration: underline;
+}
+
+/* ── Form Wrap ─────────────────────────────────────────────────────── */
+.formWrap {
+}
+.formHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.formTitle {
+  font-size: 20px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 0 0 4px;
+}
+.formSub {
+  font-size: 12px;
+  color: gray;
+  margin: 0;
+}
+
+/* ── Booking Tag ───────────────────────────────────────────────────── */
+.bookingTag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgb(235, 240, 255);
+  border: 1px solid rgb(200, 215, 255);
+  border-radius: 10px;
+  font-size: 13px;
+  color: rgb(40, 40, 100);
+  margin-bottom: 20px;
+}
+.bookingTagIcon {
+  font-size: 18px;
+}
+
+/* ── Form Fields ───────────────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+.label {
+  font-size: 13px;
+  font-weight: bold;
+  color: rgb(50, 50, 50);
+}
+.req {
+  color: #e53935;
+  margin-left: 2px;
+}
+
+.input {
+  padding: 12px 14px;
+  border: 1.5px solid rgb(220, 220, 220);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  color: rgb(30, 30, 30);
+}
+.input:focus {
+  border-color: rgb(19, 19, 103);
+}
+
+.textarea {
+  padding: 12px 14px;
+  border: 1.5px solid rgb(220, 220, 220);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.15s;
+  color: rgb(30, 30, 30);
+  line-height: 1.5;
+}
+.textarea:focus {
+  border-color: rgb(19, 19, 103);
+}
+
+.charCount {
+  font-size: 11px;
+  color: #bbb;
+  text-align: right;
+  margin-top: -4px;
+}
+
+/* ── Category Grid ─────────────────────────────────────────────────── */
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.catBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border: 1.5px solid rgb(220, 220, 220);
+  border-radius: 10px;
+  background: white;
+  font-size: 12px;
+  font-weight: 600;
+  color: gray;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.catBtn:hover {
+  border-color: rgb(19, 19, 103);
+  color: rgb(19, 19, 103);
+  background: rgb(245, 245, 255);
+}
+.catBtnActive {
+  border-color: rgb(19, 19, 103);
+  background: rgb(19, 19, 103);
+  color: white;
+}
+.catBtnActive:hover {
+  background: rgb(14, 14, 75);
+  color: white;
+}
+.catIcon {
+  font-size: 22px;
+}
+
+/* ── Priority Row ──────────────────────────────────────────────────── */
+.priorityRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.priBtn {
+  padding: 8px 18px;
+  border: 1.5px solid rgb(220, 220, 220);
+  border-radius: 20px;
+  background: white;
+  font-size: 12px;
+  font-weight: bold;
+  color: gray;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.priBtn:hover {
+  background: rgb(248, 248, 248);
+}
+.priBtnActive {
+  font-weight: bold;
+}
+
+/* ── Submit Button ─────────────────────────────────────────────────── */
+.submitBtn {
+  height: 50px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.submitBtn:hover:not(:disabled) {
+  background: rgb(14, 14, 75);
+}
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Error Box ─────────────────────────────────────────────────────── */
+.errorBox {
+  padding: 12px 14px;
+  background: #fff0f0;
+  border: 1px solid #ffcccc;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #c62828;
+}
+
+/* ── Success Screen ────────────────────────────────────────────────── */
+.successWrap {
+  text-align: center;
+  padding: 60px 20px;
+}
+.successIcon {
+  font-size: 56px;
+  margin-bottom: 16px;
+}
+.successTitle {
+  font-size: 22px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 0 0 10px;
+}
+.successSub {
+  font-size: 14px;
+  color: gray;
+  margin: 0 0 28px;
+  line-height: 1.6;
+}
+.successActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ── Detail View ───────────────────────────────────────────────────── */
+.detailWrap {
+}
+.detailCard {
+  background: white;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.detailTop {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgb(240, 240, 240);
+}
+.detailMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.catPill {
+  font-size: 12px;
+  padding: 4px 10px;
+  background: rgb(240, 240, 248);
+  color: rgb(60, 60, 120);
+  border-radius: 20px;
+  font-weight: 600;
+}
+.statusPill {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.detailTitle {
+  font-size: 17px;
+  font-weight: bold;
+  color: rgb(30, 30, 30);
+  margin: 0 0 6px;
+}
+.detailDate {
+  font-size: 12px;
+  color: gray;
+  margin: 0;
+}
+
+/* ── Chat Thread ───────────────────────────────────────────────────── */
+.thread {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 200px;
+}
+.bubble {
+  max-width: 85%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  position: relative;
+}
+.bubbleUser {
+  align-self: flex-end;
+  background: rgb(19, 19, 103);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.bubbleAdmin {
+  align-self: flex-start;
+  background: rgb(245, 245, 255);
+  color: rgb(30, 30, 30);
+  border-bottom-left-radius: 4px;
+  border: 1px solid rgb(220, 220, 240);
+}
+.adminLabel {
+  display: block;
+  font-size: 10px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.bubbleText {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 6px;
+  white-space: pre-wrap;
+}
+.bubbleTime {
+  font-size: 10px;
+  opacity: 0.65;
+  display: block;
+  text-align: right;
+}
+.bubbleUser .bubbleTime {
+  color: rgba(255, 255, 255, 0.75);
+}
+.loadingReplies {
+  font-size: 13px;
+  color: gray;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* ── Reply Box ─────────────────────────────────────────────────────── */
+.replyBox {
+  padding: 16px 20px;
+  border-top: 1px solid rgb(240, 240, 240);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+.replyInput {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid rgb(220, 220, 220);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  transition: border-color 0.15s;
+  line-height: 1.4;
+}
+.replyInput:focus {
+  border-color: rgb(19, 19, 103);
+}
+.replyBtn {
+  padding: 10px 18px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  white-space: nowrap;
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.replyBtn:hover:not(:disabled) {
+  background: rgb(14, 14, 75);
+}
+.replyBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Spinner ───────────────────────────────────────────────────────── */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Utility ───────────────────────────────────────────────────────── */
+.center {
+  text-align: center;
+  padding: 60px 20px;
+  color: gray;
+  font-size: 14px;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .categoryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .listHeader {
+    flex-direction: column;
+  }
+  .newBtn {
+    width: 100%;
+    text-align: center;
+  }
+  .successActions {
+    flex-direction: column;
+    align-items: center;
+  }
+  .successActions .newBtn,
+  .successActions .ghostBtn {
+    width: 100%;
+    max-width: 280px;
+  }
+  .bubble {
+    max-width: 95%;
+  }
+  .replyBox {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .replyBtn {
+    width: 100%;
+  }
+}
+@media (min-width: 481px) and (max-width: 640px) {
+  .categoryGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

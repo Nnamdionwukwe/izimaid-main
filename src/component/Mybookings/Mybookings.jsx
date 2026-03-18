@@ -60,7 +60,7 @@ export default function MyBookings() {
     fetchBookings();
   }, [filter]);
 
-  // ✅ Silent background refresh every 30 seconds
+  // Silent background refresh every 30 seconds
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -77,13 +77,19 @@ export default function MyBookings() {
       } catch (err) {
         console.error("Background refresh error:", err);
       }
-    }, 30000); // 30 seconds
+    }, 30000);
 
     return () => clearInterval(refreshInterval);
   }, [filter]);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const isMaid = user.role === "maid";
+
+  // Navigate to support page with booking pre-filled
+  function handleGetSupport(e, booking) {
+    e.stopPropagation(); // Prevent card click from firing
+    navigate("/support", { state: { booking } });
+  }
 
   return (
     <div className={styles.page}>
@@ -168,7 +174,7 @@ export default function MyBookings() {
                 </span>
               </div>
 
-              {/* Declined Alert - Only show if declined with reason */}
+              {/* Declined Alert */}
               {b.status === "declined" && b.declined_reason && (
                 <div className={styles.declinedAlert}>
                   <div className={styles.declinedIcon}>❌</div>
@@ -199,6 +205,18 @@ export default function MyBookings() {
                   </span>
                 </div>
               </div>
+
+              {/* Support button — visible for non-maid users on relevant statuses */}
+              {!isMaid && (
+                <div className={styles.cardActions}>
+                  <button
+                    className={styles.supportBtn}
+                    onClick={(e) => handleGetSupport(e, b)}
+                  >
+                    🎫 Get Support
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

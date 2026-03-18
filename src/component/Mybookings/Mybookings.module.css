@@ -407,3 +407,51 @@
   font-weight: bold;
   margin-right: 4px;
 }
+
+/* ── ADD THESE STYLES to your existing Mybookings.module.css ─────────
+   Paste anywhere in the file (e.g. after the last existing rule)
+────────────────────────────────────────────────────────────────────── */
+
+/* Card action row — sits below cardMeta */
+.cardActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgb(240, 240, 240);
+}
+
+/* Support button on each booking card */
+.supportBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: rgb(245, 245, 255);
+  color: rgb(19, 19, 103);
+  border: 1.5px solid rgb(200, 210, 240);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.supportBtn:hover {
+  background: rgb(235, 235, 255);
+  border-color: rgb(19, 19, 103);
+}
+.supportBtn:active {
+  transform: scale(0.97);
+}
+
+/* Responsive: full-width support button on small screens */
+@media (max-width: 400px) {
+  .cardActions {
+    justify-content: stretch;
+  }
+  .supportBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -19,6 +19,7 @@ import MyBookings from "./component/Mybookings/Mybookings.jsx";
 import MaidDashboard from "./component/MaidDashboard/MaidDashboard.jsx";
 import MaidDetail from "./component/MaidDetail.jsx";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
+import CustomerSupport from "./component/CustomerSupport/CustomerSupport.jsx";
 
 function App() {
   return (
@@ -84,6 +85,7 @@ function AppRoutes() {
       <Route path="/maid/:maidId" element={<MaidDetail />} />
       <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="/bookings/:id" element={<BookingDetail />} />
+      <Route path="/customersupport" element={<CustomerSupport />} />
 
       {/* Admin Dashboard */}
       <Route
