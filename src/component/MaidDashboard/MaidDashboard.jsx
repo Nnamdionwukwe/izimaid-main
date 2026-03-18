@@ -1176,6 +1176,11 @@ function ReviewsTab({ token }) {
   );
 }
 
+// 15000   // 15 seconds (more frequent)
+// 30000   // 30 seconds (default)
+// 60000   // 1 minute (less frequent)
+//  300000  // 5 minutes (minimal API calls)
+
 // ─── Main Dashboard ───────────────────────────────────────────
 export default function MaidDashboard({ onLogout }) {
   const navigate = useNavigate();
@@ -1268,7 +1273,7 @@ export default function MaidDashboard({ onLogout }) {
             .reduce((s, x) => s + Number(x.total_amount), 0),
         });
       } catch {}
-    }, 30000);
+    }, 60000);
 
     return () => clearInterval(refreshInterval);
   }, [token, user, navigate, updateUser]);
