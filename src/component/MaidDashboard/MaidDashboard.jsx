@@ -807,8 +807,56 @@ function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
   );
 }
 
+// ─── Floating Toast Message ──────────────────────────────────
+function FloatingToast({ message, type, visible }) {
+  if (!visible) return null;
+
+  const getToastStyle = () => {
+    const base = {
+      position: "fixed",
+      bottom: 24,
+      right: 24,
+      padding: "14px 18px",
+      borderRadius: "8px",
+      fontSize: "14px",
+      fontWeight: "bold",
+      maxWidth: 400,
+      zIndex: 10000,
+      animation: "slideIn 0.3s ease-in-out",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+    };
+
+    const types = {
+      success: { background: "rgb(209,247,224)", color: "rgb(10,107,46)" },
+      error: { background: "rgb(255,228,228)", color: "rgb(168,28,28)" },
+      warning: { background: "rgb(255,243,205)", color: "rgb(133,100,4)" },
+      info: { background: "rgb(209,236,255)", color: "rgb(10,76,140)" },
+    };
+
+    return { ...base, ...(types[type] || types.info) };
+  };
+
+  return (
+    <>
+      <style>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
+      <div style={getToastStyle()}>{message}</div>
+    </>
+  );
+}
+
 // ─── Bookings Tab ─────────────────────────────────────────────
-function BookingsTab({ token }) {
+function BookingsTab({ token, onDeclineMessage }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -834,6 +882,28 @@ function BookingsTab({ token }) {
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
+
+  // ✅ Silent background refresh every 30 seconds
+  useEffect(() => {
+    const token_val = localStorage.getItem("token");
+    if (!token_val) return;
+
+    const refreshInterval = setInterval(async () => {
+      try {
+        const params = new URLSearchParams({ limit: 50 });
+        if (filter !== "all") params.set("status", filter);
+        const res = await fetch(`${API_URL}/api/bookings?${params}`, {
+          headers: { Authorization: `Bearer ${token_val}` },
+        });
+        const data = await res.json();
+        setBookings(data.bookings || []);
+      } catch (err) {
+        console.error("Background refresh error:", err);
+      }
+    }, 30000);
+
+    return () => clearInterval(refreshInterval);
+  }, [filter]);
 
   async function updateStatus(id, status) {
     try {
@@ -869,12 +939,24 @@ function BookingsTab({ token }) {
       if (res.ok) {
         setDeclineModal(null);
         fetchBookings();
-        alert("Booking declined. Customer has been notified.");
+        // ✅ Show floating toast message instead of alert
+        onDeclineMessage({
+          message: "✅ Booking declined. Customer has been notified.",
+          type: "success",
+        });
       } else {
-        alert("Failed to decline booking. Please try again.");
+        // ✅ Show error toast instead of alert
+        onDeclineMessage({
+          message: "❌ Failed to decline booking. Please try again.",
+          type: "error",
+        });
       }
     } catch {
-      alert("Error declining booking. Please try again.");
+      // ✅ Show error toast instead of alert
+      onDeclineMessage({
+        message: "❌ Error declining booking. Please try again.",
+        type: "error",
+      });
     } finally {
       setIsDeclining(false);
     }
@@ -1094,8 +1176,6 @@ function ReviewsTab({ token }) {
   );
 }
 
-// ... (all previous code stays the same until main export) ...
-
 // ─── Main Dashboard ───────────────────────────────────────────
 export default function MaidDashboard({ onLogout }) {
   const navigate = useNavigate();
@@ -1109,6 +1189,11 @@ export default function MaidDashboard({ onLogout }) {
     pending: 0,
     completed: 0,
     earnings: 0,
+  });
+  const [toast, setToast] = useState({
+    visible: false,
+    message: "",
+    type: "success",
   });
 
   // ✅ Background refresh every 30 seconds
@@ -1149,10 +1234,7 @@ export default function MaidDashboard({ onLogout }) {
     loadStats();
 
     // ✅ Silent background refresh every 30 seconds
-    // User never sees loading screens — data just updates in the background
     const refreshInterval = setInterval(async () => {
-      // Refresh user data from /api/auth/me
-      // This keeps avatar and profile in sync across all tabs
       try {
         const res = await fetch(`${API_URL}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -1165,14 +1247,12 @@ export default function MaidDashboard({ onLogout }) {
         }
       } catch {}
 
-      // Refresh profile (availability status)
       try {
         const res = await fetch(`${API_URL}/api/maids/${user.id}`);
         const data = await res.json();
         if (res.ok && data.maid) setAvailable(data.maid.is_available);
       } catch {}
 
-      // Refresh stats
       try {
         const res = await fetch(`${API_URL}/api/bookings?limit=200`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -1188,10 +1268,24 @@ export default function MaidDashboard({ onLogout }) {
             .reduce((s, x) => s + Number(x.total_amount), 0),
         });
       } catch {}
-    }, 30000); // 30 seconds
+    }, 30000);
 
     return () => clearInterval(refreshInterval);
   }, [token, user, navigate, updateUser]);
+
+  // ✅ Toast auto-hide
+  useEffect(() => {
+    if (toast.visible) {
+      const timer = setTimeout(() => {
+        setToast({ ...toast, visible: false });
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.visible]);
+
+  function handleDeclineMessage({ message, type }) {
+    setToast({ visible: true, message, type });
+  }
 
   async function toggleAvailability() {
     setSavingAvail(true);
@@ -1321,13 +1415,19 @@ export default function MaidDashboard({ onLogout }) {
       </div>
 
       <div className={styles.content}>
-        {tab === "bookings" && <BookingsTab token={token} />}
+        {tab === "bookings" && (
+          <BookingsTab token={token} onDeclineMessage={handleDeclineMessage} />
+        )}
         {tab === "profile" && <ProfileTab token={token} />}
         {tab === "reviews" && <ReviewsTab token={token} />}
       </div>
+
+      {/* ✅ Floating Toast Message */}
+      <FloatingToast
+        message={toast.message}
+        type={toast.type}
+        visible={toast.visible}
+      />
     </div>
   );
 }
-
-// ─── Bookings Tab ─────────────────────────────────────────────
-// [All previous code for BookingsTab, ProfileTab, ReviewsTab stays the same]
