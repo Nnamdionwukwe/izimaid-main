@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import styles from "./AdminChats.module.css";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const CONVERSATIONS_URL = `${API_URL}/api/chat/admin`;
@@ -442,7 +443,7 @@ function ConversationRow({ conv, onClick }) {
 }
 
 // ─── Main AdminChats ─────────────────────────────────────────────────
-export default function AdminChats({ onBack }) {
+export default function AdminChats() {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -454,6 +455,7 @@ export default function AdminChats({ onBack }) {
   const [total, setTotal] = useState(0);
   const [selectedId, setSelectedId] = useState(null);
   const LIMIT = 20;
+  const navigate = useNavigate();
 
   const fetchConversations = useCallback(
     async (silent = false, pg = page, q = search) => {
@@ -519,7 +521,7 @@ export default function AdminChats({ onBack }) {
       {/* Header */}
       <div className={styles.listHeader}>
         <div>
-          <button className={styles.backBtn} onClick={onBack}>
+          <button className={styles.backBtn} onClick={() => navigate("/admin")}>
             ← Dashboard
           </button>
           <h1 className={styles.pageTitle}>💬 Chats</h1>
