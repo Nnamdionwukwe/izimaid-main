@@ -48,9 +48,7 @@ function initials(name) {
 
 // ─── Profile Tab ──────────────────────────────────────────────
 function ProfileTab({ token }) {
-  // ✅ Pull user + updateUser from context — no props needed
   const { user, updateUser } = useAuth();
-
   const [profile, setProfile] = useState({
     bio: "",
     hourly_rate: "",
@@ -66,7 +64,6 @@ function ProfileTab({ token }) {
   const [locationAttempts, setLocationAttempts] = useState(0);
   const [fullAddress, setFullAddress] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  // Preview starts from context user so it's always in sync
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
 
   useEffect(() => {
@@ -93,7 +90,6 @@ function ProfileTab({ token }) {
     load();
   }, [user.id, token]);
 
-  // ✅ Keep preview in sync if context user.avatar changes elsewhere
   useEffect(() => {
     if (user?.avatar) setAvatarPreview(user.avatar);
   }, [user?.avatar]);
@@ -110,25 +106,22 @@ function ProfileTab({ token }) {
       displayName: data.display_name || "",
     };
   }
-
   function formatAddress(a) {
     const parts = [a.street, a.city, a.state, a.country].filter(Boolean);
     return parts.length > 0 ? parts.join(", ") : a.displayName;
   }
-
   function formatDisplayAddress(a) {
-    let display = "";
-    if (a.street) display += `📍 ${a.street}\n`;
+    let d = "";
+    if (a.street) d += `📍 ${a.street}\n`;
     if (a.city || a.state)
-      display += `📍 ${[a.city, a.state].filter(Boolean).join(", ")}\n`;
-    if (a.country) display += `🌍 ${a.country}`;
-    return display;
+      d += `📍 ${[a.city, a.state].filter(Boolean).join(", ")}\n`;
+    if (a.country) d += `🌍 ${a.country}`;
+    return d;
   }
 
   async function handleAvatarUpload(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (file.size > 5 * 1024 * 1024) {
       setMsg({ type: "error", text: "❌ Image must be less than 5MB" });
       return;
@@ -137,16 +130,12 @@ function ProfileTab({ token }) {
       setMsg({ type: "error", text: "❌ Please select an image file" });
       return;
     }
-
-    // Immediate blob preview while uploading
     const reader = new FileReader();
     reader.onload = (ev) => setAvatarPreview(ev.target?.result);
     reader.readAsDataURL(file);
-
     setUploadingAvatar(true);
     const formData = new FormData();
     formData.append("avatar", file);
-
     try {
       const res = await fetch(`${API_URL}/api/maids/avatar`, {
         method: "POST",
@@ -155,15 +144,8 @@ function ProfileTab({ token }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-
-      // Cloudinary returns a full HTTPS URL — use directly
-      const avatarUrl = data.avatar_url;
-      setAvatarPreview(avatarUrl);
-
-      // ✅ updateUser from context — re-renders every component using useAuth()
-      // including the header, navbar, or any other component across the whole app
-      updateUser({ ...user, avatar: avatarUrl });
-
+      setAvatarPreview(data.avatar_url);
+      updateUser({ ...user, avatar: data.avatar_url });
       setMsg({ type: "success", text: "✅ Profile picture updated!" });
     } catch (err) {
       setAvatarPreview(user?.avatar || null);
@@ -180,7 +162,6 @@ function ProfileTab({ token }) {
     setGettingLocation(true);
     setMsg({ type: "", text: "" });
     setLocationAttempts((prev) => prev + 1);
-
     if (!navigator.geolocation) {
       setMsg({
         type: "error",
@@ -189,7 +170,6 @@ function ProfileTab({ token }) {
       setGettingLocation(false);
       return;
     }
-
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude, accuracy } = position.coords;
@@ -340,11 +320,9 @@ function ProfileTab({ token }) {
       >
         My Profile
       </p>
-
       {msg.text && <p style={getMsgStyle(msg.type)}>{msg.text}</p>}
-
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {/* Profile Picture */}
+        {/* Avatar */}
         <div>
           <label
             style={{
@@ -432,7 +410,6 @@ function ProfileTab({ token }) {
             </div>
           </div>
         </div>
-
         {/* Bio */}
         <div>
           <label
@@ -458,13 +435,12 @@ function ProfileTab({ token }) {
               boxSizing: "border-box",
               resize: "vertical",
             }}
-            placeholder="Tell customers about yourself, your experience and what makes you great..."
+            placeholder="Tell customers about yourself..."
             value={profile.bio}
             onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
           />
         </div>
-
-        {/* Rate + Experience */}
+        {/* Rate + Exp */}
         <div
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
         >
@@ -533,7 +509,6 @@ function ProfileTab({ token }) {
             />
           </div>
         </div>
-
         {/* Location */}
         <div>
           <div
@@ -638,7 +613,6 @@ function ProfileTab({ token }) {
               </div>
             )}
         </div>
-
         {/* Services */}
         <div>
           <label
@@ -698,8 +672,6 @@ function ProfileTab({ token }) {
             })}
           </div>
         </div>
-
-        {/* Save */}
         <button
           onClick={handleSave}
           disabled={saving}
@@ -808,56 +780,38 @@ function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
   );
 }
 
-// ─── Floating Toast Message ──────────────────────────────────
+// ─── Floating Toast ───────────────────────────────────────────
 function FloatingToast({ message, type, visible }) {
   if (!visible) return null;
-
-  const getToastStyle = () => {
-    const base = {
-      position: "fixed",
-      bottom: 24,
-      right: 24,
-      padding: "14px 18px",
-      borderRadius: "8px",
-      fontSize: "14px",
-      fontWeight: "bold",
-      maxWidth: 400,
-      zIndex: 10000,
-      animation: "slideIn 0.3s ease-in-out",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-    };
-
-    const types = {
-      success: { background: "rgb(209,247,224)", color: "rgb(10,107,46)" },
-      error: { background: "rgb(255,228,228)", color: "rgb(168,28,28)" },
-      warning: { background: "rgb(255,243,205)", color: "rgb(133,100,4)" },
-      info: { background: "rgb(209,236,255)", color: "rgb(10,76,140)" },
-    };
-
-    return { ...base, ...(types[type] || types.info) };
+  const base = {
+    position: "fixed",
+    bottom: 24,
+    right: 24,
+    padding: "14px 18px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: "bold",
+    maxWidth: 400,
+    zIndex: 10000,
+    animation: "slideIn 0.3s ease-in-out",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
   };
-
+  const types = {
+    success: { background: "rgb(209,247,224)", color: "rgb(10,107,46)" },
+    error: { background: "rgb(255,228,228)", color: "rgb(168,28,28)" },
+    warning: { background: "rgb(255,243,205)", color: "rgb(133,100,4)" },
+    info: { background: "rgb(209,236,255)", color: "rgb(10,76,140)" },
+  };
   return (
     <>
-      <style>{`
-        @keyframes slideIn {
-          from {
-            transform: translateX(400px);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-      `}</style>
-      <div style={getToastStyle()}>{message}</div>
+      <style>{`@keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }`}</style>
+      <div style={{ ...base, ...(types[type] || types.info) }}>{message}</div>
     </>
   );
 }
 
 // ─── Bookings Tab ─────────────────────────────────────────────
-function BookingsTab({ token, onDeclineMessage }) {
+function BookingsTab({ token, onDeclineMessage, onGetSupport }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -884,12 +838,10 @@ function BookingsTab({ token, onDeclineMessage }) {
     fetchBookings();
   }, [fetchBookings]);
 
-  // ✅ Silent background refresh every 30 seconds (ONLY for BookingsTab)
   useEffect(() => {
     const token_val = localStorage.getItem("token");
     if (!token_val) return;
-
-    const refreshInterval = setInterval(async () => {
+    const id = setInterval(async () => {
       try {
         const params = new URLSearchParams({ limit: 50 });
         if (filter !== "all") params.set("status", filter);
@@ -902,8 +854,7 @@ function BookingsTab({ token, onDeclineMessage }) {
         console.error("Background refresh error:", err);
       }
     }, 30000);
-
-    return () => clearInterval(refreshInterval);
+    return () => clearInterval(id);
   }, [filter]);
 
   async function updateStatus(id, status) {
@@ -940,20 +891,16 @@ function BookingsTab({ token, onDeclineMessage }) {
       if (res.ok) {
         setDeclineModal(null);
         fetchBookings();
-        // ✅ Show floating toast message instead of alert
         onDeclineMessage({
           message: "✅ Booking declined. Customer has been notified.",
           type: "success",
         });
-      } else {
-        // ✅ Show error toast instead of alert
+      } else
         onDeclineMessage({
           message: "❌ Failed to decline booking. Please try again.",
           type: "error",
         });
-      }
     } catch {
-      // ✅ Show error toast instead of alert
       onDeclineMessage({
         message: "❌ Error declining booking. Please try again.",
         type: "error",
@@ -996,6 +943,7 @@ function BookingsTab({ token, onDeclineMessage }) {
           </button>
         ))}
       </div>
+
       {loading ? (
         <div className={styles.loading}>Loading...</div>
       ) : bookings.length === 0 ? (
@@ -1021,6 +969,7 @@ function BookingsTab({ token, onDeclineMessage }) {
                     : b.status?.replace("_", " ")}
                 </span>
               </div>
+
               <div className={styles.bookingMeta}>
                 <div className={styles.metaItem}>
                   Duration:{" "}
@@ -1036,6 +985,7 @@ function BookingsTab({ token, onDeclineMessage }) {
                   Address: <span className={styles.metaValue}>{b.address}</span>
                 </div>
               </div>
+
               {b.status === "declined" && b.declined_reason && (
                 <div
                   style={{
@@ -1053,6 +1003,7 @@ function BookingsTab({ token, onDeclineMessage }) {
                   <p style={{ margin: 0 }}>{b.declined_reason}</p>
                 </div>
               )}
+
               <div className={styles.bookingActions}>
                 {b.status === "pending" && (
                   <>
@@ -1091,11 +1042,33 @@ function BookingsTab({ token, onDeclineMessage }) {
                     Declined on {formatDate(b.updated_at)}
                   </p>
                 )}
+
+                {/* ── Get Support button on every card ── */}
+                <button
+                  className={styles.actionBtn}
+                  style={{
+                    marginLeft: "auto",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    color: "rgb(19,19,103)",
+                    borderColor: "rgb(200,210,240)",
+                    background: "rgb(245,245,255)",
+                    fontSize: 12,
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onGetSupport(b);
+                  }}
+                >
+                  🎫 Get Support
+                </button>
               </div>
             </div>
           ))}
         </div>
       )}
+
       {declineModal && (
         <DeclineConfirmModal
           booking={declineModal}
@@ -1110,7 +1083,6 @@ function BookingsTab({ token, onDeclineMessage }) {
 
 // ─── Reviews Tab ──────────────────────────────────────────────
 function ReviewsTab({ token }) {
-  // ✅ Read user from context
   const { user } = useAuth();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1196,15 +1168,16 @@ export default function MaidDashboard({ onLogout }) {
     message: "",
     type: "success",
   });
+  // Prefill booking for support tab
+  const [supportPrefill, setSupportPrefill] = useState(null);
+  // Open support ticket count for tab badge
+  const [supportOpenCount, setSupportOpenCount] = useState(0);
 
-  // ✅ Load initial data on mount only
   useEffect(() => {
     if (!token || user.role !== "maid") {
       navigate("/login");
       return;
     }
-
-    // Load profile once on mount
     async function loadProfile() {
       try {
         const res = await fetch(`${API_URL}/api/maids/${user.id}`);
@@ -1212,8 +1185,6 @@ export default function MaidDashboard({ onLogout }) {
         if (res.ok && data.maid) setAvailable(data.maid.is_available);
       } catch {}
     }
-
-    // Load stats once on mount
     async function loadStats() {
       try {
         const res = await fetch(`${API_URL}/api/bookings?limit=200`, {
@@ -1231,17 +1202,29 @@ export default function MaidDashboard({ onLogout }) {
         });
       } catch {}
     }
-
+    async function loadSupportCount() {
+      try {
+        const res = await fetch(`${API_URL}/api/maid-support?limit=50`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        const tickets = data.tickets || [];
+        setSupportOpenCount(
+          tickets.filter(
+            (t) => t.status === "open" || t.status === "in_progress",
+          ).length,
+        );
+      } catch {}
+    }
     loadProfile();
     loadStats();
+    loadSupportCount();
   }, [token, user, navigate]);
 
-  // ✅ Auto-refresh stats every 30 seconds (matches BookingsTab refresh)
   useEffect(() => {
     const token_val = localStorage.getItem("token");
     if (!token_val) return;
-
-    const refreshInterval = setInterval(async () => {
+    const id = setInterval(async () => {
       try {
         const res = await fetch(`${API_URL}/api/bookings?limit=200`, {
           headers: { Authorization: `Bearer ${token_val}` },
@@ -1259,23 +1242,40 @@ export default function MaidDashboard({ onLogout }) {
       } catch (err) {
         console.error("Background refresh error:", err);
       }
+      // Refresh support count too
+      try {
+        const sr = await fetch(`${API_URL}/api/maid-support?limit=50`, {
+          headers: { Authorization: `Bearer ${token_val}` },
+        });
+        const sd = await sr.json();
+        const st = sd.tickets || [];
+        setSupportOpenCount(
+          st.filter((t) => t.status === "open" || t.status === "in_progress")
+            .length,
+        );
+      } catch {}
     }, 30000);
-
-    return () => clearInterval(refreshInterval);
+    return () => clearInterval(id);
   }, []);
 
-  // ✅ Toast auto-hide
   useEffect(() => {
     if (toast.visible) {
-      const timer = setTimeout(() => {
-        setToast({ ...toast, visible: false });
-      }, 4000);
+      const timer = setTimeout(
+        () => setToast({ ...toast, visible: false }),
+        4000,
+      );
       return () => clearTimeout(timer);
     }
   }, [toast.visible]);
 
   function handleDeclineMessage({ message, type }) {
     setToast({ visible: true, message, type });
+  }
+
+  // Called from BookingsTab "Get Support" button
+  function handleGetSupport(booking) {
+    setSupportPrefill(booking);
+    setTab("support");
   }
 
   async function toggleAvailability() {
@@ -1328,7 +1328,7 @@ export default function MaidDashboard({ onLogout }) {
         </button>
       </div>
 
-      {/* Availability toggle */}
+      {/* Availability */}
       <div className={styles.availBar}>
         <div>
           <p className={styles.availLabel}>Availability</p>
@@ -1384,7 +1384,10 @@ export default function MaidDashboard({ onLogout }) {
           <button
             key={key}
             className={`${styles.tab} ${tab === key ? styles.tabActive : ""}`}
-            onClick={() => setTab(key)}
+            onClick={() => {
+              setTab(key);
+              if (key !== "support") setSupportPrefill(null);
+            }}
           >
             {label}
             {key === "bookings" && stats.pending > 0 && (
@@ -1402,20 +1405,40 @@ export default function MaidDashboard({ onLogout }) {
                 {stats.pending}
               </span>
             )}
+            {key === "support" && supportOpenCount > 0 && (
+              <span
+                style={{
+                  marginLeft: 6,
+                  background: "rgb(19,19,103)",
+                  color: "white",
+                  fontSize: 10,
+                  padding: "1px 6px",
+                  borderRadius: 10,
+                  fontWeight: "bold",
+                }}
+              >
+                {supportOpenCount > 99 ? "99+" : supportOpenCount}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
       <div className={styles.content}>
         {tab === "bookings" && (
-          <BookingsTab token={token} onDeclineMessage={handleDeclineMessage} />
+          <BookingsTab
+            token={token}
+            onDeclineMessage={handleDeclineMessage}
+            onGetSupport={handleGetSupport}
+          />
         )}
         {tab === "profile" && <ProfileTab token={token} />}
         {tab === "reviews" && <ReviewsTab token={token} />}
-        {tab === "support" && <MaidSupportTab token={token} />}
+        {tab === "support" && (
+          <MaidSupportTab token={token} prefillBooking={supportPrefill} />
+        )}
       </div>
 
-      {/* ✅ Floating Toast Message */}
       <FloatingToast
         message={toast.message}
         type={toast.type}

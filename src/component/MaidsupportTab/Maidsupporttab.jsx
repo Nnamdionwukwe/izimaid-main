@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import styles from "./Maidsupporttab.module.css";
+import styles from "./MaidSupportTab.module.css";
 // Maid support tab — embedded in MaidDashboard, no router dependency
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
@@ -207,7 +207,7 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
   );
   const [message, setMessage] = useState(
     prefillBooking
-      ? `Hi, I have an issue with my booking on ${prefillBooking.service_date ? new Date(prefillBooking.service_date).toLocaleDateString("en-NG") : ""} with ${prefillBooking.maid_name || ""}.\n\n`
+      ? `Hi, I have an issue with my booking on ${prefillBooking.service_date ? new Date(prefillBooking.service_date).toLocaleDateString("en-NG") : ""} with customer ${prefillBooking.customer_name || ""}.\n\n`
       : "",
   );
   const [category, setCategory] = useState(prefillBooking ? "booking" : "");
@@ -290,7 +290,8 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
         <div className={styles.bookingTag}>
           <span className={styles.bookingTagIcon}>📅</span>
           <span>
-            Linked to booking with <strong>{prefillBooking.maid_name}</strong>
+            Linked to booking with customer{" "}
+            <strong>{prefillBooking.customer_name}</strong>
             {prefillBooking.service_date &&
               ` on ${new Date(prefillBooking.service_date).toLocaleDateString("en-NG")}`}
           </span>
@@ -864,11 +865,16 @@ function TicketsList({ onNew, onOpen }) {
 
 // ─── Main ───────────────────────────────────────────────────────────
 // Designed as an embedded tab — no routing, accepts token as prop
-export default function MaidSupportTab({ token }) {
-  const [view, setView] = useState("list");
+export default function MaidSupportTab({ token, prefillBooking = null }) {
+  const [view, setView] = useState(prefillBooking ? "new" : "list");
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [successTicket, setSuccessTicket] = useState(null);
   const [onRepliesLoaded, setOnRepliesLoaded] = useState(null);
+
+  // If a new booking is passed in (from Get Support button), open the new form
+  useEffect(() => {
+    if (prefillBooking) setView("new");
+  }, [prefillBooking]);
 
   function handleSuccess(ticket) {
     setSuccessTicket(ticket);
@@ -879,7 +885,7 @@ export default function MaidSupportTab({ token }) {
     return (
       <div className={styles.page}>
         <NewTicketForm
-          prefillBooking={null}
+          prefillBooking={prefillBooking}
           onSuccess={handleSuccess}
           onCancel={() => setView("list")}
         />
