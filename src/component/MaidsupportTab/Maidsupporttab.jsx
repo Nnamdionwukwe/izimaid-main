@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import styles from "./MaidSupporttab.module.css";
+import styles from "./Maidsupporttab.module.css";
 // Maid support tab — embedded in MaidDashboard, no router dependency
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
