@@ -987,3 +987,161 @@
     max-width: 78%;
   }
 }
+
+/* ── NEW: Unread badges on ticket rows ─────────────────────────────── */
+.rowUnread {
+  border-color: rgb(19, 19, 103) !important;
+  box-shadow: 0 0 0 2px rgba(19, 19, 103, 0.1);
+}
+
+.rowUnreadBadge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 20px;
+  background: rgb(19, 19, 103);
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePop {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.rowNewMsg {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  background: rgb(235, 235, 255);
+  border: 1px solid rgba(19, 19, 103, 0.2);
+  border-radius: 6px;
+  padding: 4px 10px;
+  display: inline-block;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── NEW: Title row with total unread badge ─────────────────────────── */
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.totalUnreadBadge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 20px;
+  background: #f44336;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: badgePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── NEW: List count with unread note ───────────────────────────────── */
+.listUnreadNote {
+  color: rgb(19, 19, 103);
+  font-weight: bold;
+}
+
+/* ── NEW: Refresh button spinning state ─────────────────────────────── */
+.refreshBtnSpin {
+  animation: spinBtn 1s linear infinite;
+  opacity: 0.6;
+}
+@keyframes spinBtn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── NEW: Panel refresh button ──────────────────────────────────────── */
+.panelTopRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.panelRefreshBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1.5px solid #dde;
+  background: white;
+  font-size: 14px;
+  color: rgb(19, 19, 103);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.panelRefreshBtn:hover {
+  background: #ebebff;
+}
+.panelRefreshBtnSpin {
+  animation: spinBtn 0.8s linear infinite;
+}
+
+/* ── NEW: Panel ID row with last sync ───────────────────────────────── */
+.panelIdRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.panelLastSync {
+  font-size: 11px;
+  color: #bbb;
+  white-space: nowrap;
+}
+
+/* ── NEW: Thread tab reply count badge ──────────────────────────────── */
+.tabCount {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 20px;
+  background: rgba(19, 19, 103, 0.12);
+  color: rgb(19, 19, 103);
+  font-size: 10px;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2px;
+}
+.tabActive .tabCount {
+  background: rgba(19, 19, 103, 0.2);
+}

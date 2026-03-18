@@ -3,6 +3,7 @@ import styles from "./Admincustomersupport.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const SUPPORT_URL = `${API_URL}/api/customer-support`;
+const POLL_INTERVAL = 30000;
 
 const STATUS_CONFIG = {
   open: { label: "Open", color: "#f59e0b", bg: "#fff8e1" },
@@ -50,6 +51,14 @@ function auth() {
   return { Authorization: `Bearer ${localStorage.getItem("token")}` };
 }
 
+// Track replies seen per ticket in sessionStorage (admin)
+function getAdminSeen(ticketId) {
+  return parseInt(sessionStorage.getItem(`admin_seen_${ticketId}`) || "0", 10);
+}
+function setAdminSeen(ticketId, n) {
+  sessionStorage.setItem(`admin_seen_${ticketId}`, String(n));
+}
+
 // ─── Stat Card ──────────────────────────────────────────────────────
 function StatCard({ label, value, bg, color }) {
   return (
@@ -63,7 +72,7 @@ function StatCard({ label, value, bg, color }) {
 }
 
 // ─── Ticket Row ─────────────────────────────────────────────────────
-function TicketRow({ ticket, isActive, onClick }) {
+function TicketRow({ ticket, isActive, onClick, unread }) {
   const st = STATUS_CONFIG[ticket.status] || STATUS_CONFIG.open;
   const pri = PRIORITY_CONFIG[ticket.priority] || PRIORITY_CONFIG.normal;
   const cat = CATEGORIES[ticket.category] || {
@@ -73,7 +82,7 @@ function TicketRow({ ticket, isActive, onClick }) {
 
   return (
     <button
-      className={`${styles.row} ${isActive ? styles.rowActive : ""}`}
+      className={`${styles.row} ${isActive ? styles.rowActive : ""} ${unread > 0 ? styles.rowUnread : ""}`}
       onClick={onClick}
     >
       <div className={styles.rowHeader}>
@@ -83,7 +92,7 @@ function TicketRow({ ticket, isActive, onClick }) {
           <p className={styles.rowMeta}>
             <span className={styles.rowId}>#{ticket.id.slice(0, 8)}</span>
             <span className={styles.rowDot}>·</span>
-            <span>{timeAgo(ticket.created_at)}</span>
+            <span>{timeAgo(ticket.updated_at || ticket.created_at)}</span>
             {ticket.attachment_count > 0 && (
               <>
                 <span className={styles.rowDot}>·</span>
@@ -93,6 +102,11 @@ function TicketRow({ ticket, isActive, onClick }) {
           </p>
         </div>
         <div className={styles.rowBadges}>
+          {unread > 0 && (
+            <span className={styles.rowUnreadBadge}>
+              {unread > 9 ? "9+" : unread}
+            </span>
+          )}
           <span
             className={styles.rowStatus}
             style={{ background: st.bg, color: st.color }}
@@ -105,12 +119,23 @@ function TicketRow({ ticket, isActive, onClick }) {
         </div>
       </div>
       <p className={styles.rowSnippet}>{ticket.message?.slice(0, 100)}…</p>
+      {unread > 0 && (
+        <div className={styles.rowNewMsg}>
+          🔔 {unread} new customer message{unread > 1 ? "s" : ""}
+        </div>
+      )}
     </button>
   );
 }
 
-// ─── Ticket Panel (detail + reply) ──────────────────────────────────
-function TicketPanel({ ticket, onClose, onUpdated, isMobile }) {
+// ─── Ticket Panel ───────────────────────────────────────────────────
+function TicketPanel({
+  ticket,
+  onClose,
+  onUpdated,
+  isMobile,
+  onRepliesViewed,
+}) {
   const [replies, setReplies] = useState([]);
   const [attachments, setAttachments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -121,31 +146,56 @@ function TicketPanel({ ticket, onClose, onUpdated, isMobile }) {
   const [saving, setSaving] = useState(false);
   const [saveOk, setSaveOk] = useState(false);
   const [lightbox, setLightbox] = useState(null);
-  const [tab, setTab] = useState("thread"); // "thread" | "manage"
+  const [tab, setTab] = useState("thread");
+  const [lastRefresh, setLastRefresh] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
   const threadRef = useRef(null);
 
+  const fetchDetail = useCallback(
+    async (silent = false) => {
+      if (!silent) setLoading(true);
+      else setRefreshing(true);
+      try {
+        const res = await fetch(`${SUPPORT_URL}/${ticket.id}`, {
+          headers: auth(),
+        });
+        const d = await res.json();
+        setReplies(d.replies || []);
+        setAttachments(d.attachments || []);
+        setLastRefresh(new Date());
+        const total = (d.replies || []).length;
+        setAdminSeen(ticket.id, total);
+        if (onRepliesViewed) onRepliesViewed(ticket.id, total);
+      } catch {
+      } finally {
+        if (!silent) setLoading(false);
+        else setRefreshing(false);
+      }
+    },
+    [ticket.id, onRepliesViewed],
+  );
+
+  // Load on open / ticket change
   useEffect(() => {
     setStatus(ticket.status);
     setNotes(ticket.admin_notes || "");
     setReplies([]);
     setAttachments([]);
-    setLoading(true);
-    fetch(`${SUPPORT_URL}/${ticket.id}`, { headers: auth() })
-      .then((r) => r.json())
-      .then((d) => {
-        setReplies(d.replies || []);
-        setAttachments(d.attachments || []);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    fetchDetail(false);
   }, [ticket.id]);
 
-  // Scroll thread to bottom when replies load
+  // Auto-scroll to bottom
   useEffect(() => {
     if (!loading && threadRef.current) {
       threadRef.current.scrollTop = threadRef.current.scrollHeight;
     }
   }, [loading, replies.length]);
+
+  // Background poll
+  useEffect(() => {
+    const id = setInterval(() => fetchDetail(true), POLL_INTERVAL);
+    return () => clearInterval(id);
+  }, [fetchDetail]);
 
   async function sendReply() {
     if (!replyMsg.trim()) return;
@@ -158,8 +208,12 @@ function TicketPanel({ ticket, onClose, onUpdated, isMobile }) {
       });
       const d = await res.json();
       if (res.ok) {
-        setReplies((p) => [...p, d.reply]);
+        const updated = [...replies, d.reply];
+        setReplies(updated);
+        setAdminSeen(ticket.id, updated.length);
+        if (onRepliesViewed) onRepliesViewed(ticket.id, updated.length);
         setReplyMsg("");
+        setLastRefresh(new Date());
       }
     } catch {
     } finally {
@@ -197,7 +251,7 @@ function TicketPanel({ ticket, onClose, onUpdated, isMobile }) {
 
   return (
     <div className={`${styles.panel} ${isMobile ? styles.panelMobile : ""}`}>
-      {/* Panel top bar */}
+      {/* Top bar */}
       <div className={styles.panelTop}>
         <button className={styles.panelBack} onClick={onClose}>
           {isMobile ? "← Back" : "✕"}
@@ -208,20 +262,36 @@ function TicketPanel({ ticket, onClose, onUpdated, isMobile }) {
           </span>
           <span style={{ color: pri.dot }}>● {pri.label}</span>
         </div>
-        <span
-          className={styles.panelTopStatus}
-          style={{ background: st.bg, color: st.color }}
-        >
-          {st.label}
-        </span>
+        <div className={styles.panelTopRight}>
+          <span
+            className={styles.panelTopStatus}
+            style={{ background: st.bg, color: st.color }}
+          >
+            {st.label}
+          </span>
+          <button
+            className={`${styles.panelRefreshBtn} ${refreshing ? styles.panelRefreshBtnSpin : ""}`}
+            onClick={() => fetchDetail(false)}
+            title="Refresh thread"
+          >
+            ↻
+          </button>
+        </div>
       </div>
 
-      {/* Subject + ID */}
+      {/* Title */}
       <div className={styles.panelTitleBar}>
         <h2 className={styles.panelSubject}>{ticket.subject}</h2>
-        <p className={styles.panelId}>
-          #{ticket.id.slice(0, 8)} · {fmtDate(ticket.created_at)}
-        </p>
+        <div className={styles.panelIdRow}>
+          <p className={styles.panelId}>
+            #{ticket.id.slice(0, 8)} · {fmtDate(ticket.created_at)}
+          </p>
+          {lastRefresh && (
+            <span className={styles.panelLastSync}>
+              Updated {timeAgo(lastRefresh)}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}
@@ -230,7 +300,10 @@ function TicketPanel({ ticket, onClose, onUpdated, isMobile }) {
           className={`${styles.tab} ${tab === "thread" ? styles.tabActive : ""}`}
           onClick={() => setTab("thread")}
         >
-          💬 Thread
+          💬 Thread{" "}
+          {replies.length > 0 && (
+            <span className={styles.tabCount}>{replies.length}</span>
+          )}
         </button>
         <button
           className={`${styles.tab} ${tab === "manage" ? styles.tabActive : ""}`}
@@ -248,11 +321,10 @@ function TicketPanel({ ticket, onClose, onUpdated, isMobile }) {
         )}
       </div>
 
-      {/* Thread tab */}
+      {/* ── Thread tab ── */}
       {tab === "thread" && (
         <>
           <div className={styles.thread} ref={threadRef}>
-            {/* Original message */}
             <div
               className={styles.bubbleWrap}
               style={{ alignItems: "flex-end" }}
@@ -267,7 +339,7 @@ function TicketPanel({ ticket, onClose, onUpdated, isMobile }) {
 
             {loading && (
               <div className={styles.threadLoading}>
-                <span className={styles.spinnerDark} /> Loading…
+                <span className={styles.spinnerDark} /> Loading thread…
               </div>
             )}
 
@@ -293,14 +365,13 @@ function TicketPanel({ ticket, onClose, onUpdated, isMobile }) {
             })}
           </div>
 
-          {/* Reply input */}
           {isOpen ? (
             <div className={styles.replyArea}>
               <textarea
                 className={styles.replyInput}
                 value={replyMsg}
                 onChange={(e) => setReplyMsg(e.target.value)}
-                placeholder="Type your reply…"
+                placeholder="Type your reply to the customer…"
                 rows={3}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && (e.metaKey || e.ctrlKey))
@@ -324,14 +395,13 @@ function TicketPanel({ ticket, onClose, onUpdated, isMobile }) {
             </div>
           ) : (
             <div className={styles.closedNote}>
-              🔒 This ticket is {ticket.status}. Switch to Manage tab to reopen
-              it.
+              🔒 Ticket is {ticket.status}. Switch to Manage to reopen it.
             </div>
           )}
         </>
       )}
 
-      {/* Manage tab */}
+      {/* ── Manage tab ── */}
       {tab === "manage" && (
         <div className={styles.manageTab}>
           <div className={styles.manageField}>
@@ -388,45 +458,27 @@ function TicketPanel({ ticket, onClose, onUpdated, isMobile }) {
             )}
           </button>
 
-          {/* Ticket info summary */}
           <div className={styles.infoGrid}>
-            <div className={styles.infoItem}>
-              <span className={styles.infoKey}>Category</span>
-              <span className={styles.infoVal}>
-                {cat.icon} {cat.label}
-              </span>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoKey}>Priority</span>
-              <span className={styles.infoVal} style={{ color: pri.dot }}>
-                ● {pri.label}
-              </span>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoKey}>Opened</span>
-              <span className={styles.infoVal}>
-                {fmtDate(ticket.created_at)}
-              </span>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoKey}>Updated</span>
-              <span className={styles.infoVal}>
-                {fmtDate(ticket.updated_at)}
-              </span>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoKey}>Replies</span>
-              <span className={styles.infoVal}>{replies.length}</span>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoKey}>Attachments</span>
-              <span className={styles.infoVal}>{attachments.length}</span>
-            </div>
+            {[
+              ["Category", `${cat.icon} ${cat.label}`],
+              ["Priority", `● ${pri.label}`, pri.dot],
+              ["Opened", fmtDate(ticket.created_at)],
+              ["Updated", fmtDate(ticket.updated_at)],
+              ["Replies", replies.length],
+              ["Attachments", attachments.length],
+            ].map(([k, v, c]) => (
+              <div key={k} className={styles.infoItem}>
+                <span className={styles.infoKey}>{k}</span>
+                <span className={styles.infoVal} style={c ? { color: c } : {}}>
+                  {v}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {/* Files tab */}
+      {/* ── Files tab ── */}
       {tab === "files" && (
         <div className={styles.filesTab}>
           {attachments.length === 0 ? (
@@ -460,7 +512,6 @@ function TicketPanel({ ticket, onClose, onUpdated, isMobile }) {
         </div>
       )}
 
-      {/* Lightbox */}
       {lightbox && (
         <div className={styles.lightbox} onClick={() => setLightbox(null)}>
           <div
@@ -499,6 +550,8 @@ export default function AdminCustomerSupport({ onBack }) {
   const [tickets, setTickets] = useState([]);
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [lastSync, setLastSync] = useState(null);
   const [selected, setSelected] = useState(null);
   const [statusFilter, setStatus] = useState("all");
   const [catFilter, setCat] = useState("all");
@@ -506,7 +559,7 @@ export default function AdminCustomerSupport({ onBack }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotal] = useState(1);
-  // Detect mobile: panel becomes full-screen sheet
+  const [unreadMap, setUnreadMap] = useState({});
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
@@ -515,29 +568,52 @@ export default function AdminCustomerSupport({ onBack }) {
     return () => window.removeEventListener("resize", fn);
   }, []);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const p = new URLSearchParams({ page, limit: 20, sort });
-      if (statusFilter !== "all") p.set("status", statusFilter);
-      if (catFilter !== "all") p.set("category", catFilter);
-      const [tr, sr] = await Promise.all([
-        fetch(`${SUPPORT_URL}?${p}`, { headers: auth() }),
-        fetch(`${SUPPORT_URL}/stats`, { headers: auth() }),
-      ]);
-      const td = await tr.json();
-      const sd = await sr.json();
-      setTickets(td.tickets || []);
-      setTotal(td.pages || 1);
-      setStats(sd);
-    } catch {
-    } finally {
-      setLoading(false);
-    }
-  }, [page, sort, statusFilter, catFilter]);
+  const load = useCallback(
+    async (silent = false) => {
+      if (!silent) setLoading(true);
+      else setSyncing(true);
+      try {
+        const p = new URLSearchParams({ page, limit: 20, sort });
+        if (statusFilter !== "all") p.set("status", statusFilter);
+        if (catFilter !== "all") p.set("category", catFilter);
+        const [tr, sr] = await Promise.all([
+          fetch(`${SUPPORT_URL}?${p}`, { headers: auth() }),
+          fetch(`${SUPPORT_URL}/stats`, { headers: auth() }),
+        ]);
+        const td = await tr.json();
+        const sd = await sr.json();
+        const list = td.tickets || [];
+        setTickets(list);
+        setTotal(td.pages || 1);
+        setStats(sd);
+        setLastSync(new Date());
+        // Compute unread: customer replies since admin last viewed
+        setUnreadMap((prev) => {
+          const next = { ...prev };
+          list.forEach((t) => {
+            const replyCount = t.reply_count ?? 0;
+            const seen = getAdminSeen(t.id);
+            next[t.id] = Math.max(0, replyCount - seen);
+          });
+          return next;
+        });
+      } catch {
+      } finally {
+        if (!silent) setLoading(false);
+        else setSyncing(false);
+      }
+    },
+    [page, sort, statusFilter, catFilter],
+  );
 
   useEffect(() => {
-    load();
+    load(false);
+  }, [load]);
+
+  // Background poll
+  useEffect(() => {
+    const id = setInterval(() => load(true), POLL_INTERVAL);
+    return () => clearInterval(id);
   }, [load]);
 
   function handleUpdated(updated) {
@@ -549,6 +625,11 @@ export default function AdminCustomerSupport({ onBack }) {
     );
   }
 
+  function handleRepliesViewed(ticketId, total) {
+    setAdminSeen(ticketId, total);
+    setUnreadMap((prev) => ({ ...prev, [ticketId]: 0 }));
+  }
+
   const filtered = tickets.filter((t) => {
     if (!search.trim()) return true;
     const q = search.toLowerCase();
@@ -556,6 +637,8 @@ export default function AdminCustomerSupport({ onBack }) {
       t.subject?.toLowerCase().includes(q) || t.id?.toLowerCase().includes(q)
     );
   });
+
+  const totalUnread = Object.values(unreadMap).reduce((s, n) => s + n, 0);
 
   const statusTabs = [
     { key: "all", label: "All" },
@@ -580,13 +663,28 @@ export default function AdminCustomerSupport({ onBack }) {
             ←
           </button>
           <div>
-            <h1 className={styles.pageTitle}>Support Tickets</h1>
+            <div className={styles.titleRow}>
+              <h1 className={styles.pageTitle}>Support Tickets</h1>
+              {totalUnread > 0 && (
+                <span className={styles.totalUnreadBadge}>
+                  {totalUnread > 99 ? "99+" : totalUnread}
+                </span>
+              )}
+            </div>
             <p className={styles.pageSub}>
-              Manage &amp; respond to customer issues
+              {syncing
+                ? "Checking for updates…"
+                : lastSync
+                  ? `Last updated ${timeAgo(lastSync)}`
+                  : "Manage & respond to customer issues"}
             </p>
           </div>
         </div>
-        <button className={styles.refreshBtn} onClick={load} title="Refresh">
+        <button
+          className={`${styles.refreshBtn} ${syncing ? styles.refreshBtnSpin : ""}`}
+          onClick={() => load(false)}
+          title="Refresh"
+        >
           ↻
         </button>
       </div>
@@ -619,7 +717,7 @@ export default function AdminCustomerSupport({ onBack }) {
         />
       </div>
 
-      {/* ── Search + filters ── */}
+      {/* ── Toolbar ── */}
       <div className={styles.toolbar}>
         <div className={styles.searchWrap}>
           <span className={styles.searchIcon}>🔍</span>
@@ -684,7 +782,6 @@ export default function AdminCustomerSupport({ onBack }) {
       <div
         className={`${styles.body} ${showPanel && !isMobile ? styles.bodySplit : ""}`}
       >
-        {/* Ticket list — hidden on mobile when panel open */}
         {(!showPanel || !isMobile) && (
           <div className={styles.listCol}>
             {loading ? (
@@ -707,12 +804,19 @@ export default function AdminCustomerSupport({ onBack }) {
               <>
                 <div className={styles.listCount}>
                   {filtered.length} ticket{filtered.length !== 1 ? "s" : ""}
+                  {totalUnread > 0 && (
+                    <span className={styles.listUnreadNote}>
+                      {" "}
+                      · {totalUnread} unread
+                    </span>
+                  )}
                 </div>
                 {filtered.map((t) => (
                   <TicketRow
                     key={t.id}
                     ticket={t}
                     isActive={selected?.id === t.id}
+                    unread={unreadMap[t.id] || 0}
                     onClick={() => setSelected(t)}
                   />
                 ))}
@@ -742,13 +846,13 @@ export default function AdminCustomerSupport({ onBack }) {
           </div>
         )}
 
-        {/* Detail panel */}
         {showPanel && (
           <TicketPanel
             ticket={selected}
             onClose={() => setSelected(null)}
             onUpdated={handleUpdated}
             isMobile={isMobile}
+            onRepliesViewed={handleRepliesViewed}
           />
         )}
       </div>
