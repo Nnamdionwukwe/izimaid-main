@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import styles from "./AdminCustomerSupport.module.css";
+import styles from "./Admincustomersupport.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const SUPPORT_URL = `${API_URL}/api/customer-support`;
