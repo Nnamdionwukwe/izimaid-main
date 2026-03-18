@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MaidDashboard.module.css";
 import { useAuth } from "../../context/AuthContext";
+import MaidSupportTab from "../MaidsupportTab/Maidsupporttab";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -1378,6 +1379,7 @@ export default function MaidDashboard({ onLogout }) {
           ["bookings", "Bookings"],
           ["profile", "My Profile"],
           ["reviews", "Reviews"],
+          ["support", "Support"],
         ].map(([key, label]) => (
           <button
             key={key}
@@ -1410,6 +1412,7 @@ export default function MaidDashboard({ onLogout }) {
         )}
         {tab === "profile" && <ProfileTab token={token} />}
         {tab === "reviews" && <ReviewsTab token={token} />}
+        {tab === "support" && <MaidSupportTab token={token} />}
       </div>
 
       {/* ✅ Floating Toast Message */}

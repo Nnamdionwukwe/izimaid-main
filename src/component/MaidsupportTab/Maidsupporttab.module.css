@@ -1,0 +1,761 @@
+/* ═════════════════════════════════════════════════════════════════
+   MAID SUPPORT TAB - RESPONSIVE CSS MODULE
+   Mobile-first design for all screen sizes
+   ═════════════════════════════════════════════════════════════════ */
+
+/* ─── Section Title ─────────────────────────────────────────────── */
+.sectionTitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 0 0 14px;
+}
+
+/* ─── Stats Grid ────────────────────────────────────────────────── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.statCard {
+  background: white;
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid rgb(228, 228, 228);
+  text-align: center;
+}
+
+.statLabel {
+  font-size: 10px;
+  color: gray;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 6px;
+  font-weight: bold;
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 0;
+}
+
+/* ─── Filter Tabs ──────────────────────────────────────────────── */
+.filterTabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+}
+
+.filterTabs::-webkit-scrollbar {
+  display: none;
+}
+
+.filterTab {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border: 1px solid rgb(228, 228, 228);
+  background: white;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  color: gray;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.filterTab:hover {
+  border-color: rgb(19, 19, 103);
+}
+
+.filterTabActive {
+  background: rgb(19, 19, 103);
+  color: white;
+  border-color: rgb(19, 19, 103);
+}
+
+/* ─── Create Button ─────────────────────────────────────────────── */
+.createBtn {
+  width: 100%;
+  padding: 12px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 14px;
+  font-family: inherit;
+}
+
+.createBtn:active {
+  background: rgb(15, 15, 70);
+}
+
+/* ─── Tickets List ──────────────────────────────────────────────── */
+.ticketsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ticketCard {
+  background: white;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ticketCard:active {
+  background: rgb(245, 245, 248);
+}
+
+.ticketCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ticketCardTitle {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgb(30, 30, 30);
+  margin: 0 0 4px;
+}
+
+.ticketCardDate {
+  font-size: 11px;
+  color: gray;
+  margin: 0;
+}
+
+.ticketCardBadges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.priorityBadge,
+.statusBadge {
+  font-size: 10px;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 12px;
+  color: white;
+  white-space: nowrap;
+}
+
+.ticketCardMessage {
+  font-size: 13px;
+  color: rgb(100, 100, 100);
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.ticketCardMeta {
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  color: gray;
+  flex-wrap: wrap;
+}
+
+/* ─── Loading & Empty States ───────────────────────────────────── */
+.loading,
+.empty {
+  text-align: center;
+  padding: 30px 20px;
+  color: gray;
+  font-size: 14px;
+}
+
+/* ─── MODAL STYLES ──────────────────────────────────────────────── */
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    background: rgba(0, 0, 0, 0);
+  }
+  to {
+    background: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.modalSheet {
+  background: white;
+  border-radius: 16px 16px 0 0;
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.modalHandle {
+  width: 40px;
+  height: 4px;
+  background: rgb(220, 220, 220);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 0 0 16px;
+}
+
+/* ─── Form Groups ──────────────────────────────────────────────── */
+.formGroup {
+  margin-bottom: 14px;
+}
+
+.label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  color: rgb(47, 47, 47);
+  margin-bottom: 6px;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: rgb(19, 19, 103);
+  box-shadow: 0 0 0 3px rgba(19, 19, 103, 0.1);
+}
+
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+  background: rgb(245, 245, 245);
+  opacity: 0.6;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ─── Priority Group ───────────────────────────────────────────── */
+.priorityGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+.priorityBtn {
+  padding: 8px;
+  border: 1px solid rgb(228, 228, 228);
+  background: white;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  color: gray;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.priorityBtn:active {
+  background: rgb(245, 245, 248);
+}
+
+.priorityBtnActive {
+  background: rgb(19, 19, 103);
+  color: white;
+  border-color: rgb(19, 19, 103);
+}
+
+/* ─── File Input ───────────────────────────────────────────────── */
+.fileInput {
+  display: block;
+  padding: 12px;
+  border: 2px dashed rgb(228, 228, 228);
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  background: rgb(250, 250, 252);
+  font-weight: bold;
+  color: rgb(100, 100, 100);
+  transition: all 0.2s;
+  margin-bottom: 8px;
+}
+
+.fileInput:hover {
+  border-color: rgb(19, 19, 103);
+  background: rgb(240, 240, 255);
+  color: rgb(19, 19, 103);
+}
+
+.fileSelected {
+  color: rgb(10, 107, 46);
+  font-weight: bold;
+}
+
+.fileHint {
+  font-size: 11px;
+  color: gray;
+  margin: 6px 0 0;
+  line-height: 1.4;
+}
+
+/* ─── Preview ──────────────────────────────────────────────────── */
+.preview {
+  margin: 12px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgb(245, 245, 248);
+  max-height: 200px;
+}
+
+.preview img,
+.preview video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ─── Error Box ────────────────────────────────────────────────── */
+.errorBox {
+  background: rgb(255, 228, 228);
+  border-left: 4px solid rgb(255, 60, 60);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.errorBox p {
+  font-size: 12px;
+  color: rgb(168, 28, 28);
+  margin: 0;
+  font-weight: bold;
+}
+
+/* ─── Modal Actions ────────────────────────────────────────────── */
+.modalActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.btnCancel,
+.btnSubmit,
+.btnReply {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.btnCancel {
+  background: white;
+  border: 1px solid rgb(228, 228, 228);
+  color: rgb(100, 100, 100);
+}
+
+.btnCancel:active:not(:disabled) {
+  background: rgb(245, 245, 245);
+}
+
+.btnSubmit,
+.btnReply {
+  background: rgb(19, 19, 103);
+  color: white;
+}
+
+.btnSubmit:active:not(:disabled),
+.btnReply:active:not(:disabled) {
+  background: rgb(15, 15, 70);
+}
+
+.btnCancel:disabled,
+.btnSubmit:disabled,
+.btnReply:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── TICKET DETAIL MODAL ──────────────────────────────────────── */
+
+.ticketHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgb(228, 228, 228);
+}
+
+.ticketSubject {
+  font-size: 16px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 0 0 4px;
+}
+
+.ticketDate {
+  font-size: 11px;
+  color: gray;
+  margin: 0;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: gray;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badgeGroup {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.badge {
+  font-size: 10px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 12px;
+  color: white;
+  display: inline-block;
+}
+
+.messageBox {
+  background: rgb(250, 250, 252);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.messageText {
+  font-size: 13px;
+  color: rgb(60, 60, 60);
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ─── Attachments ──────────────────────────────────────────────── */
+.attachmentsBox {
+  background: rgb(250, 250, 252);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.attachmentTitle {
+  font-size: 12px;
+  font-weight: bold;
+  color: rgb(47, 47, 47);
+  margin: 0 0 8px;
+}
+
+.attachmentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attachmentItem {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid rgb(228, 228, 228);
+  text-decoration: none;
+  color: inherit;
+}
+
+.attachmentItem:active {
+  background: rgb(245, 245, 248);
+}
+
+.attachmentIcon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.attachmentName {
+  font-size: 12px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 0;
+  word-break: break-word;
+}
+
+.attachmentSize {
+  font-size: 10px;
+  color: gray;
+  margin: 2px 0 0;
+}
+
+/* ─── Notes Box ────────────────────────────────────────────────── */
+.notesBox {
+  background: rgb(255, 250, 205);
+  padding: 12px;
+  border-left: 4px solid rgb(255, 150, 0);
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.notesTitle {
+  font-size: 12px;
+  font-weight: bold;
+  color: rgb(100, 80, 0);
+  margin: 0 0 6px;
+}
+
+.notesText {
+  font-size: 12px;
+  color: rgb(80, 60, 0);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Replies Box ──────────────────────────────────────────────── */
+.repliesBox {
+  margin-bottom: 12px;
+}
+
+.repliesTitle {
+  font-size: 12px;
+  font-weight: bold;
+  color: rgb(47, 47, 47);
+  margin: 0 0 8px;
+}
+
+.repliesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.replyItem {
+  background: white;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.replyDate {
+  font-size: 10px;
+  color: gray;
+  margin: 0 0 4px;
+  font-weight: bold;
+}
+
+.replyText {
+  font-size: 12px;
+  color: rgb(60, 60, 60);
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ─── Reply Form ───────────────────────────────────────────────── */
+.replyFormBox {
+  background: rgb(250, 250, 252);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.replyInput {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  box-sizing: border-box;
+  min-height: 70px;
+  resize: vertical;
+  margin-bottom: 8px;
+}
+
+.replyInput:focus {
+  outline: none;
+  border-color: rgb(19, 19, 103);
+  box-shadow: 0 0 0 3px rgba(19, 19, 103, 0.1);
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   TABLET & DESKTOP BREAKPOINTS
+   ═════════════════════════════════════════════════════════════════ */
+
+@media screen and (min-width: 640px) {
+  .statsGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .statCard {
+    padding: 14px;
+  }
+
+  .priorityGroup {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .modalSheet {
+    border-radius: 12px;
+    max-height: 90vh;
+  }
+
+  .ticketCard {
+    padding: 14px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .sectionTitle {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .statCard {
+    padding: 16px;
+  }
+
+  .statLabel {
+    font-size: 11px;
+  }
+
+  .statValue {
+    font-size: 24px;
+  }
+
+  .filterTabs {
+    margin-bottom: 14px;
+  }
+
+  .filterTab {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .createBtn {
+    padding: 14px;
+    font-size: 15px;
+    margin-bottom: 16px;
+  }
+
+  .ticketCard {
+    padding: 16px;
+  }
+
+  .ticketCardTitle {
+    font-size: 15px;
+  }
+
+  .ticketCardMessage {
+    font-size: 14px;
+  }
+
+  .modalTitle {
+    font-size: 20px;
+  }
+
+  .label {
+    font-size: 14px;
+  }
+
+  .input,
+  .select,
+  .textarea {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .fileInput {
+    padding: 14px;
+    font-size: 14px;
+  }
+
+  .ticketSubject {
+    font-size: 18px;
+  }
+}
+
+/* ─── Print Media ──────────────────────────────────────────────── */
+@media print {
+  .filterTabs,
+  .createBtn,
+  .modalOverlay {
+    display: none;
+  }
+
+  .ticketCard {
+    page-break-inside: avoid;
+  }
+}
