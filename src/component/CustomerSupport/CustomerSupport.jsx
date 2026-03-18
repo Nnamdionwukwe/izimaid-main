@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./CustomerSupport.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const SUPPORT_URL = `${API_URL}/api/customer-support`;
+const POLL_INTERVAL = 30000; // 30s background refresh
 
 const CATEGORIES = [
   { value: "booking", label: "Booking Issue", icon: "📅" },
@@ -28,6 +29,9 @@ const STATUS_STYLES = {
   closed: { bg: "#f5f5f5", color: "#757575", label: "Closed" },
 };
 
+const MAX_FILES = 5;
+const ACCEPTED = "image/*,video/*";
+
 function formatDate(d) {
   return new Date(d).toLocaleDateString("en-NG", {
     day: "numeric",
@@ -38,10 +42,31 @@ function formatDate(d) {
   });
 }
 
-// ─── Media Preview Grid ─────────────────────────────────────────────
-const MAX_FILES = 5;
-const ACCEPTED = "image/*,video/*";
+function timeAgo(d) {
+  const m = Math.floor((Date.now() - new Date(d)) / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
 
+function getToken() {
+  return localStorage.getItem("token");
+}
+function authH() {
+  return { Authorization: `Bearer ${getToken()}` };
+}
+
+// ─── Unread store (persisted in sessionStorage per ticket) ──────────
+function getSeenCount(ticketId) {
+  return parseInt(sessionStorage.getItem(`seen_${ticketId}`) || "0", 10);
+}
+function setSeenCount(ticketId, n) {
+  sessionStorage.setItem(`seen_${ticketId}`, String(n));
+}
+
+// ─── Media Preview Grid ─────────────────────────────────────────────
 function MediaPreviewGrid({ files, onRemove }) {
   if (!files.length) return null;
   return (
@@ -63,7 +88,6 @@ function MediaPreviewGrid({ files, onRemove }) {
               type="button"
               className={styles.previewRemove}
               onClick={() => onRemove(i)}
-              aria-label="Remove"
             >
               ×
             </button>
@@ -75,7 +99,7 @@ function MediaPreviewGrid({ files, onRemove }) {
   );
 }
 
-// ─── Attachment Gallery (existing ticket) ───────────────────────────
+// ─── Attachment Gallery ─────────────────────────────────────────────
 function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
   const [deleting, setDeleting] = useState(null);
   const [lightbox, setLightbox] = useState(null);
@@ -84,21 +108,18 @@ function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
     if (!window.confirm("Remove this attachment?")) return;
     setDeleting(att.id);
     try {
-      const token = localStorage.getItem("token");
       await fetch(`${SUPPORT_URL}/${ticketId}/media/${att.id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: authH(),
       });
       onDeleted(att.id);
     } catch {
-      /* ignore */
     } finally {
       setDeleting(null);
     }
   }
 
   if (!attachments.length) return null;
-
   return (
     <>
       <div className={styles.attSection}>
@@ -140,8 +161,6 @@ function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
           })}
         </div>
       </div>
-
-      {/* Lightbox */}
       {lightbox && (
         <div
           className={styles.lightboxOverlay}
@@ -195,36 +214,33 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
   const [priority, setPriority] = useState("normal");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [mediaFiles, setMediaFiles] = useState([]); // { file, preview }
-  const [uploadProgress, setUploadProgress] = useState(""); // status text
-  const fileInputRef = useState(null);
+  const [mediaFiles, setMediaFiles] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState("");
 
   function handleFileChange(e) {
     const picked = Array.from(e.target.files || []);
-    const remaining = MAX_FILES - mediaFiles.length;
-    const toAdd = picked.slice(0, remaining).map((f) => ({
-      file: f,
-      preview: URL.createObjectURL(f),
-    }));
+    const toAdd = picked
+      .slice(0, MAX_FILES - mediaFiles.length)
+      .map((f) => ({ file: f, preview: URL.createObjectURL(f) }));
     setMediaFiles((prev) => [...prev, ...toAdd]);
     e.target.value = "";
   }
 
-  function removeFile(index) {
+  function removeFile(i) {
     setMediaFiles((prev) => {
-      URL.revokeObjectURL(prev[index].preview);
-      return prev.filter((_, i) => i !== index);
+      URL.revokeObjectURL(prev[i].preview);
+      return prev.filter((_, idx) => idx !== i);
     });
   }
 
-  async function uploadFilesToTicket(ticketId, token) {
+  async function uploadFiles(ticketId) {
     for (let i = 0; i < mediaFiles.length; i++) {
       setUploadProgress(`Uploading file ${i + 1} of ${mediaFiles.length}…`);
       const form = new FormData();
       form.append("media", mediaFiles[i].file);
       await fetch(`${SUPPORT_URL}/${ticketId}/media`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: authH(),
         body: form,
       });
     }
@@ -240,21 +256,16 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
     setError("");
     setSubmitting(true);
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${SUPPORT_URL}`, {
+      const res = await fetch(SUPPORT_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { ...authH(), "Content-Type": "application/json" },
         body: JSON.stringify({ subject, message, category, priority }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to submit");
-      // Upload attachments if any
-      if (mediaFiles.length > 0) {
-        await uploadFilesToTicket(data.ticket.id, token);
-      }
+      if (mediaFiles.length) await uploadFiles(data.ticket.id);
+      // seed seen count so new ticket shows 0 unread
+      setSeenCount(data.ticket.id, 0);
       onSuccess(data.ticket);
     } catch (err) {
       setError(err.message);
@@ -287,7 +298,6 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
       )}
 
       <form onSubmit={handleSubmit} className={styles.form}>
-        {/* Category */}
         <div className={styles.field}>
           <label className={styles.label}>
             Category <span className={styles.req}>*</span>
@@ -307,7 +317,6 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
           </div>
         </div>
 
-        {/* Priority */}
         <div className={styles.field}>
           <label className={styles.label}>Priority</label>
           <div className={styles.priorityRow}>
@@ -329,7 +338,6 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
           </div>
         </div>
 
-        {/* Subject */}
         <div className={styles.field}>
           <label className={styles.label}>
             Subject <span className={styles.req}>*</span>
@@ -344,7 +352,6 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
           <span className={styles.charCount}>{subject.length}/120</span>
         </div>
 
-        {/* Message */}
         <div className={styles.field}>
           <label className={styles.label}>
             Message <span className={styles.req}>*</span>
@@ -360,7 +367,6 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
           <span className={styles.charCount}>{message.length}/2000</span>
         </div>
 
-        {/* Attachments */}
         <div className={styles.field}>
           <label className={styles.label}>
             Attachments{" "}
@@ -411,7 +417,7 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
 }
 
 // ─── Ticket Detail View ─────────────────────────────────────────────
-function TicketDetail({ ticket, onBack }) {
+function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
   const [replies, setReplies] = useState([]);
   const [attachments, setAttachments] = useState([]);
   const [replyMsg, setReplyMsg] = useState("");
@@ -419,50 +425,71 @@ function TicketDetail({ ticket, onBack }) {
   const [loading, setLoading] = useState(true);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [lastRefresh, setLastRefresh] = useState(null);
+  const threadRef = useRef(null);
 
   const userId = JSON.parse(localStorage.getItem("user") || "{}").id;
   const isOwner = ticket.user_id === userId;
   const isOpen = ticket.status !== "closed" && ticket.status !== "resolved";
 
-  useEffect(() => {
-    async function load() {
+  const fetchDetail = useCallback(
+    async (silent = false) => {
+      if (!silent) setLoading(true);
       try {
-        const token = localStorage.getItem("token");
         const res = await fetch(`${SUPPORT_URL}/${ticket.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: authH(),
         });
         const data = await res.json();
         setReplies(data.replies || []);
         setAttachments(data.attachments || []);
+        setLastRefresh(new Date());
+        // mark all current replies as seen
+        setSeenCount(ticket.id, (data.replies || []).length);
+        if (onRepliesLoaded)
+          onRepliesLoaded(ticket.id, (data.replies || []).length);
       } catch {
-        /* ignore */
       } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
       }
-    }
-    load();
+    },
+    [ticket.id, onRepliesLoaded],
+  );
+
+  // Initial load
+  useEffect(() => {
+    fetchDetail(false);
   }, [ticket.id]);
+
+  // Auto-scroll thread to bottom when new replies arrive
+  useEffect(() => {
+    if (threadRef.current)
+      threadRef.current.scrollTop = threadRef.current.scrollHeight;
+  }, [replies.length]);
+
+  // Background poll every 30s
+  useEffect(() => {
+    const id = setInterval(() => fetchDetail(true), POLL_INTERVAL);
+    return () => clearInterval(id);
+  }, [fetchDetail]);
 
   async function sendReply() {
     if (!replyMsg.trim()) return;
     setSending(true);
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch(`${SUPPORT_URL}/${ticket.id}/reply`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { ...authH(), "Content-Type": "application/json" },
         body: JSON.stringify({ message: replyMsg }),
       });
       const data = await res.json();
       if (res.ok) {
-        setReplies((prev) => [...prev, data.reply]);
+        const updated = [...replies, data.reply];
+        setReplies(updated);
+        setSeenCount(ticket.id, updated.length);
+        if (onRepliesLoaded) onRepliesLoaded(ticket.id, updated.length);
         setReplyMsg("");
       }
     } catch {
-      /* ignore */
     } finally {
       setSending(false);
     }
@@ -471,26 +498,21 @@ function TicketDetail({ ticket, onBack }) {
   async function handleMediaUpload(e) {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
-    const remaining = MAX_FILES - attachments.length;
-    const toUpload = files.slice(0, remaining);
+    const toUpload = files.slice(0, MAX_FILES - attachments.length);
     setUploadingMedia(true);
     setUploadError("");
     try {
-      const token = localStorage.getItem("token");
       for (const file of toUpload) {
         const form = new FormData();
         form.append("media", file);
         const res = await fetch(`${SUPPORT_URL}/${ticket.id}/media`, {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: authH(),
           body: form,
         });
         const data = await res.json();
-        if (res.ok) {
-          setAttachments((prev) => [...prev, data.attachment]);
-        } else {
-          setUploadError(data.error || "Upload failed");
-        }
+        if (res.ok) setAttachments((prev) => [...prev, data.attachment]);
+        else setUploadError(data.error || "Upload failed");
       }
     } catch {
       setUploadError("Upload failed. Please try again.");
@@ -505,9 +527,25 @@ function TicketDetail({ ticket, onBack }) {
 
   return (
     <div className={styles.detailWrap}>
-      <button className={styles.backBtn} onClick={onBack}>
-        ← Back to Tickets
-      </button>
+      <div className={styles.detailNav}>
+        <button className={styles.backBtn} onClick={onBack}>
+          ← Back to Tickets
+        </button>
+        <div className={styles.refreshRow}>
+          {lastRefresh && (
+            <span className={styles.lastRefresh}>
+              Updated {timeAgo(lastRefresh)}
+            </span>
+          )}
+          <button
+            className={styles.refreshBtn}
+            onClick={() => fetchDetail(false)}
+            title="Refresh"
+          >
+            ↻
+          </button>
+        </div>
+      </div>
 
       <div className={styles.detailCard}>
         <div className={styles.detailTop}>
@@ -528,7 +566,6 @@ function TicketDetail({ ticket, onBack }) {
           </p>
         </div>
 
-        {/* Attachment Gallery */}
         <AttachmentGallery
           attachments={attachments}
           ticketId={ticket.id}
@@ -538,8 +575,7 @@ function TicketDetail({ ticket, onBack }) {
           }
         />
 
-        <div className={styles.thread}>
-          {/* Original message */}
+        <div className={styles.thread} ref={threadRef}>
           <div className={`${styles.bubble} ${styles.bubbleUser}`}>
             <p className={styles.bubbleText}>{ticket.message}</p>
             <span className={styles.bubbleTime}>
@@ -623,48 +659,158 @@ function TicketDetail({ ticket, onBack }) {
   );
 }
 
+// ─── Ticket Card with unread badge + live refresh ───────────────────
+function TicketCard({ ticket: initialTicket, unread, onClick }) {
+  const [ticket, setTicket] = useState(initialTicket);
+
+  // Sync if parent updates the ticket (e.g. after list refresh)
+  useEffect(() => {
+    setTicket(initialTicket);
+  }, [initialTicket]);
+
+  const st = STATUS_STYLES[ticket.status] || STATUS_STYLES.open;
+  const cat = CATEGORIES.find((c) => c.value === ticket.category);
+
+  return (
+    <div
+      className={`${styles.ticketCard} ${unread > 0 ? styles.ticketCardUnread : ""}`}
+      onClick={onClick}
+    >
+      <div className={styles.tcTop}>
+        <span className={styles.tcCat}>
+          {cat?.icon} {cat?.label || ticket.category}
+        </span>
+        <div className={styles.tcRight}>
+          {unread > 0 && (
+            <span
+              className={styles.unreadBadge}
+              title={`${unread} new message${unread > 1 ? "s" : ""}`}
+            >
+              {unread > 9 ? "9+" : unread}
+            </span>
+          )}
+          <span
+            className={styles.tcStatus}
+            style={{ background: st.bg, color: st.color }}
+          >
+            {st.label}
+          </span>
+        </div>
+      </div>
+      <p className={styles.tcSubject}>{ticket.subject}</p>
+      <p className={styles.tcSnippet}>{ticket.message?.slice(0, 80)}…</p>
+      <div className={styles.tcFooter}>
+        <span className={styles.tcDate}>
+          {timeAgo(ticket.updated_at || ticket.created_at)}
+        </span>
+        {unread > 0 && (
+          <span className={styles.newMsgPill}>
+            🔔 {unread} new message{unread > 1 ? "s" : ""}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Tickets List ───────────────────────────────────────────────────
 function TicketsList({ onNew, onOpen }) {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [unreadMap, setUnreadMap] = useState({}); // { [ticketId]: unreadCount }
+  const [lastSync, setLastSync] = useState(null);
+  const [syncing, setSyncing] = useState(false);
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
+  const fetchTickets = useCallback(
+    async (silent = false) => {
+      if (!silent) setLoading(true);
+      else setSyncing(true);
       try {
-        const token = localStorage.getItem("token");
         const params = new URLSearchParams({ limit: 50 });
         if (filter !== "all") params.set("status", filter);
         const res = await fetch(`${SUPPORT_URL}?${params}`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: authH(),
         });
         const data = await res.json();
-        setTickets(data.tickets || []);
+        const list = data.tickets || [];
+        setTickets(list);
+        setLastSync(new Date());
+        // Calculate unread: compare reply_count (or use stored seen count)
+        setUnreadMap((prev) => {
+          const next = { ...prev };
+          list.forEach((t) => {
+            const replyCount = t.reply_count ?? 0;
+            const seen = getSeenCount(t.id);
+            next[t.id] = Math.max(0, replyCount - seen);
+          });
+          return next;
+        });
       } catch {
-        /* ignore */
       } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
+        else setSyncing(false);
       }
-    }
-    load();
+    },
+    [filter],
+  );
+
+  useEffect(() => {
+    fetchTickets(false);
   }, [filter]);
 
+  // Background poll
+  useEffect(() => {
+    const id = setInterval(() => fetchTickets(true), POLL_INTERVAL);
+    return () => clearInterval(id);
+  }, [fetchTickets]);
+
+  // Called from TicketDetail when replies are seen — clears unread for that ticket
+  function handleRepliesLoaded(ticketId, totalReplies) {
+    setSeenCount(ticketId, totalReplies);
+    setUnreadMap((prev) => ({ ...prev, [ticketId]: 0 }));
+  }
+
+  const totalUnread = Object.values(unreadMap).reduce((s, n) => s + n, 0);
   const filters = ["all", "open", "in_progress", "resolved", "closed"];
 
   return (
     <div className={styles.listWrap}>
       <div className={styles.listHeader}>
         <div>
-          <h1 className={styles.pageTitle}>Support</h1>
+          <div className={styles.titleRow}>
+            <h1 className={styles.pageTitle}>Support</h1>
+            {totalUnread > 0 && (
+              <span className={styles.totalUnreadBadge}>
+                {totalUnread > 99 ? "99+" : totalUnread}
+              </span>
+            )}
+          </div>
           <p className={styles.pageSub}>
             Get help with your bookings and account
           </p>
         </div>
-        <button className={styles.newBtn} onClick={onNew}>
-          + New Ticket
-        </button>
+        <div className={styles.headerActions}>
+          <button
+            className={`${styles.syncBtn} ${syncing ? styles.syncBtnSyncing : ""}`}
+            onClick={() => fetchTickets(false)}
+            title="Refresh tickets"
+          >
+            ↻
+          </button>
+          <button className={styles.newBtn} onClick={onNew}>
+            + New Ticket
+          </button>
+        </div>
       </div>
+
+      {lastSync && (
+        <p className={styles.syncStatus}>
+          {syncing
+            ? "Checking for updates…"
+            : `Last updated ${timeAgo(lastSync)}`}
+        </p>
+      )}
 
       <div className={styles.filterRow}>
         {filters.map((f) => (
@@ -681,7 +827,15 @@ function TicketsList({ onNew, onOpen }) {
       </div>
 
       {loading ? (
-        <div className={styles.center}>Loading tickets…</div>
+        <div className={styles.skeletonList}>
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className={styles.skeletonCard}
+              style={{ animationDelay: `${i * 0.1}s` }}
+            />
+          ))}
+        </div>
       ) : tickets.length === 0 ? (
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}>🎫</div>
@@ -693,39 +847,21 @@ function TicketsList({ onNew, onOpen }) {
         </div>
       ) : (
         <div className={styles.ticketList}>
-          {tickets.map((t) => {
-            const st = STATUS_STYLES[t.status] || STATUS_STYLES.open;
-            const cat = CATEGORIES.find((c) => c.value === t.category);
-            return (
-              <div
-                key={t.id}
-                className={styles.ticketCard}
-                onClick={() => onOpen(t)}
-              >
-                <div className={styles.tcTop}>
-                  <span className={styles.tcCat}>
-                    {cat?.icon} {cat?.label || t.category}
-                  </span>
-                  <span
-                    className={styles.tcStatus}
-                    style={{ background: st.bg, color: st.color }}
-                  >
-                    {st.label}
-                  </span>
-                </div>
-                <p className={styles.tcSubject}>{t.subject}</p>
-                <p className={styles.tcSnippet}>{t.message?.slice(0, 80)}…</p>
-                <p className={styles.tcDate}>{formatDate(t.created_at)}</p>
-              </div>
-            );
-          })}
+          {tickets.map((t) => (
+            <TicketCard
+              key={t.id}
+              ticket={t}
+              unread={unreadMap[t.id] || 0}
+              onClick={() => onOpen(t, handleRepliesLoaded)}
+            />
+          ))}
         </div>
       )}
     </div>
   );
 }
 
-// ─── Main Support Page ──────────────────────────────────────────────
+// ─── Main ───────────────────────────────────────────────────────────
 export default function CustomerSupport() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -734,6 +870,7 @@ export default function CustomerSupport() {
   const [view, setView] = useState(prefillBooking ? "new" : "list");
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [successTicket, setSuccessTicket] = useState(null);
+  const [onRepliesLoaded, setOnRepliesLoaded] = useState(null);
 
   function handleSuccess(ticket) {
     setSuccessTicket(ticket);
@@ -781,7 +918,11 @@ export default function CustomerSupport() {
   if (view === "detail" && selectedTicket) {
     return (
       <div className={styles.page}>
-        <TicketDetail ticket={selectedTicket} onBack={() => setView("list")} />
+        <TicketDetail
+          ticket={selectedTicket}
+          onBack={() => setView("list")}
+          onRepliesLoaded={onRepliesLoaded}
+        />
       </div>
     );
   }
@@ -790,8 +931,9 @@ export default function CustomerSupport() {
     <div className={styles.page}>
       <TicketsList
         onNew={() => setView("new")}
-        onOpen={(t) => {
+        onOpen={(t, repliesLoadedCb) => {
           setSelectedTicket(t);
+          setOnRepliesLoaded(() => repliesLoadedCb);
           setView("detail");
         }}
       />

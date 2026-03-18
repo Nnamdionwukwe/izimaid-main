@@ -20,11 +20,48 @@
   font-weight: bold;
   color: rgb(19, 19, 103);
   margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.titleBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f44336;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 20px;
+  animation: popIn 0.3s ease;
+}
+@keyframes popIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 .pageSub {
   font-size: 13px;
   color: gray;
   margin: 0;
+}
+.listHeaderRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.lastUpdatedSmall {
+  font-size: 11px;
+  color: #bbb;
 }
 
 /* ── Filter Row ────────────────────────────────────────────────────── */
@@ -58,37 +95,84 @@
   border-color: rgb(19, 19, 103);
 }
 
+/* ── Skeleton loading ──────────────────────────────────────────────── */
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skeletonCard {
+  height: 110px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eeeef5 25%, #f5f5fc 50%, #eeeef5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
 /* ── Ticket Cards ──────────────────────────────────────────────────── */
 .ticketList {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
+
 .ticketCard {
   background: white;
-  border: 1px solid rgb(228, 228, 228);
+  border: 1.5px solid rgb(228, 228, 240);
   border-radius: 12px;
-  padding: 16px;
+  padding: 14px 16px;
   cursor: pointer;
   transition:
     box-shadow 0.15s,
-    transform 0.1s;
+    transform 0.1s,
+    border-color 0.15s;
+  position: relative;
+  overflow: hidden;
 }
 .ticketCard:hover {
   box-shadow: 0 4px 16px rgba(19, 19, 103, 0.1);
   transform: translateY(-1px);
 }
+/* Unread highlight */
+.ticketCardUnread {
+  border-color: rgb(19, 19, 103);
+  background: linear-gradient(135deg, rgb(248, 248, 255) 0%, white 100%);
+}
+.ticketCardUnread::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: rgb(19, 19, 103);
+  border-radius: 12px 0 0 12px;
+}
+
 .tcTop {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   gap: 8px;
 }
 .tcCat {
   font-size: 12px;
   color: gray;
   font-weight: 600;
+}
+.tcTopRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 .tcStatus {
   font-size: 11px;
@@ -97,6 +181,22 @@
   border-radius: 20px;
   white-space: nowrap;
 }
+
+/* Unread badge */
+.unreadBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #f44336;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+  animation: popIn 0.25s ease;
+}
+
 .tcSubject {
   font-size: 14px;
   font-weight: bold;
@@ -106,13 +206,70 @@
 .tcSnippet {
   font-size: 12px;
   color: gray;
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   line-height: 1.4;
+}
+
+/* Card footer: timestamp + refresh button */
+.tcFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .tcDate {
   font-size: 11px;
   color: #bbb;
-  margin: 0;
+}
+
+.cardRefreshBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgb(220, 220, 235);
+  background: white;
+  color: rgb(19, 19, 103);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  padding: 0;
+  flex-shrink: 0;
+}
+.cardRefreshBtn:hover:not(:disabled) {
+  background: rgb(240, 240, 255);
+  border-color: rgb(19, 19, 103);
+}
+.cardRefreshBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* New reply banner inside the card */
+.newReplyBanner {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: rgb(235, 240, 255);
+  border: 1px solid rgb(200, 215, 255);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(19, 19, 103);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: slideDown 0.2s ease;
+}
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Empty State ───────────────────────────────────────────────────── */
@@ -178,7 +335,6 @@
   font-weight: bold;
   cursor: pointer;
   padding: 0;
-  margin-bottom: 20px;
   font-family: inherit;
   display: inline-flex;
   align-items: center;
@@ -188,9 +344,70 @@
   text-decoration: underline;
 }
 
-/* ── Form Wrap ─────────────────────────────────────────────────────── */
-.formWrap {
+/* ── Detail nav bar ────────────────────────────────────────────────── */
+.detailNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 10px;
 }
+.detailNavRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.refreshingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgb(19, 19, 103);
+  animation: pulse 1s ease infinite;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+.lastUpdated {
+  font-size: 11px;
+  color: #bbb;
+}
+.manualRefreshBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid rgb(220, 220, 235);
+  background: white;
+  color: rgb(19, 19, 103);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  padding: 0;
+}
+.manualRefreshBtn:hover:not(:disabled) {
+  background: rgb(240, 240, 255);
+}
+.manualRefreshBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Form Wrap ─────────────────────────────────────────────────────── */
 .formHeader {
   display: flex;
   align-items: flex-start;
@@ -210,7 +427,6 @@
   margin: 0;
 }
 
-/* ── Booking Tag ───────────────────────────────────────────────────── */
 .bookingTag {
   display: flex;
   align-items: center;
@@ -279,7 +495,6 @@
 .textarea:focus {
   border-color: rgb(19, 19, 103);
 }
-
 .charCount {
   font-size: 11px;
   color: #bbb;
@@ -376,7 +591,6 @@
   cursor: not-allowed;
 }
 
-/* ── Error Box ─────────────────────────────────────────────────────── */
 .errorBox {
   padding: 12px 14px;
   background: #fff0f0;
@@ -415,8 +629,6 @@
 }
 
 /* ── Detail View ───────────────────────────────────────────────────── */
-.detailWrap {
-}
 .detailCard {
   background: white;
   border: 1px solid rgb(228, 228, 228);
@@ -467,6 +679,8 @@
   flex-direction: column;
   gap: 14px;
   min-height: 200px;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 .bubble {
   max-width: 85%;
@@ -526,6 +740,12 @@
   gap: 10px;
   align-items: flex-end;
 }
+.replyInputWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 .replyInput {
   flex: 1;
   padding: 10px 14px;
@@ -540,6 +760,46 @@
 }
 .replyInput:focus {
   border-color: rgb(19, 19, 103);
+}
+.replyToolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attachBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: rgb(245, 245, 255);
+  border: 1.5px solid rgb(200, 210, 240);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(60, 60, 120);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.attachBtn:hover {
+  background: rgb(235, 235, 255);
+  border-color: rgb(19, 19, 103);
+}
+.attachLabel {
+  font-size: 12px;
+}
+.attCount {
+  font-size: 11px;
+  color: #bbb;
+  margin-left: auto;
+}
+.uploadErrInline {
+  font-size: 12px;
+  color: #c62828;
+  margin: 0;
+  padding: 6px 10px;
+  background: #fff0f0;
+  border-radius: 6px;
 }
 .replyBtn {
   padding: 10px 18px;
@@ -566,164 +826,7 @@
   cursor: not-allowed;
 }
 
-/* ── Spinner ───────────────────────────────────────────────────────── */
-.spinner {
-  width: 16px;
-  height: 16px;
-  border: 2.5px solid rgba(255, 255, 255, 0.4);
-  border-top-color: white;
-  border-radius: 50%;
-  display: inline-block;
-  animation: spin 0.6s linear infinite;
-}
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* ── Utility ───────────────────────────────────────────────────────── */
-.center {
-  text-align: center;
-  padding: 60px 20px;
-  color: gray;
-  font-size: 14px;
-}
-
-/* ── Responsive ────────────────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .categoryGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .listHeader {
-    flex-direction: column;
-  }
-  .newBtn {
-    width: 100%;
-    text-align: center;
-  }
-  .successActions {
-    flex-direction: column;
-    align-items: center;
-  }
-  .successActions .newBtn,
-  .successActions .ghostBtn {
-    width: 100%;
-    max-width: 280px;
-  }
-  .bubble {
-    max-width: 95%;
-  }
-  .replyBox {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .replyBtn {
-    width: 100%;
-  }
-}
-@media (min-width: 481px) and (max-width: 640px) {
-  .categoryGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* ── Upload Zone (new ticket form) ─────────────────────────────────── */
-.labelHint {
-  font-size: 11px;
-  font-weight: normal;
-  color: #aaa;
-}
-.uploadZone {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 20px 16px;
-  border: 2px dashed rgb(200, 210, 240);
-  border-radius: 10px;
-  background: rgb(248, 249, 255);
-  cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background 0.15s;
-  text-align: center;
-}
-.uploadZone:hover {
-  border-color: rgb(19, 19, 103);
-  background: rgb(243, 244, 255);
-}
-.uploadIcon {
-  font-size: 26px;
-}
-.uploadText {
-  font-size: 13px;
-  font-weight: 600;
-  color: rgb(60, 60, 120);
-}
-.uploadHint {
-  font-size: 11px;
-  color: #aaa;
-}
-.hiddenInput {
-  display: none;
-}
-
-/* ── Preview Grid ──────────────────────────────────────────────────── */
-.previewGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 8px;
-  margin-bottom: 4px;
-}
-.previewItem {
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  aspect-ratio: 1;
-  background: rgb(240, 240, 245);
-}
-.previewMedia {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.previewRemove {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.65);
-  color: white;
-  border: none;
-  font-size: 14px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-.previewType {
-  position: absolute;
-  bottom: 4px;
-  left: 4px;
-  font-size: 13px;
-}
-
-/* ── Submit button with progress text ──────────────────────────────── */
-.spinnerRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-}
-
-/* ── Attachment Gallery (ticket detail) ─────────────────────────────── */
+/* ── Attachment Gallery ─────────────────────────────────────────────── */
 .attSection {
   padding: 14px 20px 0;
 }
@@ -864,55 +967,103 @@
   margin: 0;
 }
 
-/* ── Reply box with toolbar ────────────────────────────────────────── */
-.replyInputWrap {
-  flex: 1;
+/* ── Upload Zone ───────────────────────────────────────────────────── */
+.labelHint {
+  font-size: 11px;
+  font-weight: normal;
+  color: #aaa;
+}
+.uploadZone {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 6px;
+  padding: 20px 16px;
+  border: 2px dashed rgb(200, 210, 240);
+  border-radius: 10px;
+  background: rgb(248, 249, 255);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+  text-align: center;
 }
-.replyToolbar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.uploadZone:hover {
+  border-color: rgb(19, 19, 103);
+  background: rgb(243, 244, 255);
 }
-.attachBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
-  background: rgb(245, 245, 255);
-  border: 1.5px solid rgb(200, 210, 240);
-  border-radius: 20px;
-  font-size: 12px;
+.uploadIcon {
+  font-size: 26px;
+}
+.uploadText {
+  font-size: 13px;
   font-weight: 600;
   color: rgb(60, 60, 120);
-  cursor: pointer;
-  transition: all 0.15s;
-  font-family: inherit;
 }
-.attachBtn:hover {
-  background: rgb(235, 235, 255);
-  border-color: rgb(19, 19, 103);
-}
-.attachLabel {
-  font-size: 12px;
-}
-.attCount {
+.uploadHint {
   font-size: 11px;
-  color: #bbb;
-  margin-left: auto;
+  color: #aaa;
 }
-.uploadErrInline {
-  font-size: 12px;
-  color: #c62828;
-  margin: 0;
-  padding: 6px 10px;
-  background: #fff0f0;
-  border-radius: 6px;
+.hiddenInput {
+  display: none;
 }
 
-/* ── Dark spinner (for light backgrounds) ──────────────────────────── */
+/* ── Preview Grid ──────────────────────────────────────────────────── */
+.previewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.previewItem {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: rgb(240, 240, 245);
+}
+.previewMedia {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.previewRemove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  color: white;
+  border: none;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.previewType {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  font-size: 13px;
+}
+
+/* ── Spinners ──────────────────────────────────────────────────────── */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.6s linear infinite;
+}
 .spinnerDark {
   width: 14px;
   height: 14px;
@@ -922,9 +1073,51 @@
   display: inline-block;
   animation: spin 0.6s linear infinite;
 }
+.spinnerRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
 
-/* ── Responsive: reply box on mobile ──────────────────────────────── */
+/* ── Utility ───────────────────────────────────────────────────────── */
+.center {
+  text-align: center;
+  padding: 60px 20px;
+  color: gray;
+  font-size: 14px;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
+  .categoryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .listHeader {
+    flex-direction: column;
+  }
+  .listHeaderRight {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .newBtn {
+    width: 100%;
+    text-align: center;
+  }
+  .successActions {
+    flex-direction: column;
+    align-items: center;
+  }
+  .successActions .newBtn,
+  .successActions .ghostBtn {
+    width: 100%;
+    max-width: 280px;
+  }
+  .bubble {
+    max-width: 95%;
+  }
   .replyBox {
     flex-direction: column;
     align-items: stretch;
@@ -935,4 +1128,227 @@
   .previewGrid {
     grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
   }
+  .thread {
+    max-height: 50vh;
+  }
+}
+@media (min-width: 481px) and (max-width: 640px) {
+  .categoryGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── NEW: Unread badge on ticket card ──────────────────────────────── */
+.ticketCardUnread {
+  border-color: rgb(19, 19, 103) !important;
+  box-shadow: 0 0 0 2px rgba(19, 19, 103, 0.1);
+}
+
+.tcRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.unreadBadge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 20px;
+  background: rgb(19, 19, 103);
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePop {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.tcFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.newMsgPill {
+  font-size: 11px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  background: rgb(235, 235, 255);
+  border: 1px solid rgba(19, 19, 103, 0.2);
+  border-radius: 20px;
+  padding: 3px 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── NEW: Title row with total unread ──────────────────────────────── */
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.totalUnreadBadge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 20px;
+  background: #f44336;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: badgePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── NEW: Header actions (refresh + new button) ─────────────────────── */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.syncBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1.5px solid rgb(220, 220, 235);
+  background: white;
+  font-size: 18px;
+  color: rgb(19, 19, 103);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.syncBtn:hover {
+  background: rgb(240, 240, 255);
+}
+.syncBtnSyncing {
+  animation: spinBtn 1s linear infinite;
+  color: rgb(19, 19, 103);
+  opacity: 0.6;
+}
+@keyframes spinBtn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── NEW: Sync status line ──────────────────────────────────────────── */
+.syncStatus {
+  font-size: 11px;
+  color: #aaa;
+  margin: -14px 0 14px;
+  text-align: right;
+}
+
+/* ── NEW: Detail nav bar (back + refresh) ───────────────────────────── */
+.detailNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 8px;
+}
+
+.refreshRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.lastRefresh {
+  font-size: 11px;
+  color: #bbb;
+  white-space: nowrap;
+}
+
+.refreshBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1.5px solid rgb(220, 220, 235);
+  background: white;
+  font-size: 16px;
+  color: rgb(19, 19, 103);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.refreshBtn:hover {
+  background: rgb(240, 240, 255);
+}
+
+/* ── NEW: Thread scrollable container ───────────────────────────────── */
+.thread {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 200px;
+  max-height: 60vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+/* ── NEW: Skeleton loading cards ────────────────────────────────────── */
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skeletonCard {
+  height: 110px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eeeef5 25%, #f5f5fc 50%, #eeeef5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ── Patch: remove old .tcDate float, use .tcFooter instead ─────────── */
+.tcDate {
+  font-size: 11px;
+  color: #bbb;
+  margin: 0;
 }
