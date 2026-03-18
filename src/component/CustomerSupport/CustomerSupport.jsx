@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./CustomerSupport.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const SUPPORT_URL = `${API_URL}/api/customer-support`;
 
 const CATEGORIES = [
   { value: "booking", label: "Booking Issue", icon: "📅" },
@@ -84,7 +85,7 @@ function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
     setDeleting(att.id);
     try {
       const token = localStorage.getItem("token");
-      await fetch(`${API_URL}/api/support/${ticketId}/media/${att.id}`, {
+      await fetch(`${SUPPORT_URL}/${ticketId}/media/${att.id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -220,8 +221,8 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
     for (let i = 0; i < mediaFiles.length; i++) {
       setUploadProgress(`Uploading file ${i + 1} of ${mediaFiles.length}…`);
       const form = new FormData();
-      form.append("file", mediaFiles[i].file);
-      await fetch(`${API_URL}/api/support/${ticketId}/media`, {
+      form.append("media", mediaFiles[i].file);
+      await fetch(`${SUPPORT_URL}/${ticketId}/media`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: form,
@@ -240,7 +241,7 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
     setSubmitting(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${API_URL}/api/support`, {
+      const res = await fetch(`${SUPPORT_URL}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -427,7 +428,7 @@ function TicketDetail({ ticket, onBack }) {
     async function load() {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`${API_URL}/api/support/${ticket.id}`, {
+        const res = await fetch(`${SUPPORT_URL}/${ticket.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -447,7 +448,7 @@ function TicketDetail({ ticket, onBack }) {
     setSending(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${API_URL}/api/support/${ticket.id}/reply`, {
+      const res = await fetch(`${SUPPORT_URL}/${ticket.id}/reply`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -478,8 +479,8 @@ function TicketDetail({ ticket, onBack }) {
       const token = localStorage.getItem("token");
       for (const file of toUpload) {
         const form = new FormData();
-        form.append("file", file);
-        const res = await fetch(`${API_URL}/api/support/${ticket.id}/media`, {
+        form.append("media", file);
+        const res = await fetch(`${SUPPORT_URL}/${ticket.id}/media`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: form,
@@ -635,7 +636,7 @@ function TicketsList({ onNew, onOpen }) {
         const token = localStorage.getItem("token");
         const params = new URLSearchParams({ limit: 50 });
         if (filter !== "all") params.set("status", filter);
-        const res = await fetch(`${API_URL}/api/support?${params}`, {
+        const res = await fetch(`${SUPPORT_URL}?${params}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
