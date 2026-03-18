@@ -88,7 +88,7 @@ export default function MyBookings() {
   // Navigate to support page with booking pre-filled
   function handleGetSupport(e, booking) {
     e.stopPropagation(); // Prevent card click from firing
-    navigate("/support", { state: { booking } });
+    navigate("/customersupport", { state: { booking } });
   }
 
   return (
