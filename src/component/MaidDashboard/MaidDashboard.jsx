@@ -883,7 +883,7 @@ function BookingsTab({ token, onDeclineMessage }) {
     fetchBookings();
   }, [fetchBookings]);
 
-  // ✅ Silent background refresh every 30 seconds
+  // ✅ Silent background refresh every 30 seconds (ONLY for BookingsTab)
   useEffect(() => {
     const token_val = localStorage.getItem("token");
     if (!token_val) return;
@@ -1176,15 +1176,10 @@ function ReviewsTab({ token }) {
   );
 }
 
-// 15000   // 15 seconds (more frequent)
-// 30000   // 30 seconds (default)
-// 60000   // 1 minute (less frequent)
-//  300000  // 5 minutes (minimal API calls)
-
 // ─── Main Dashboard ───────────────────────────────────────────
 export default function MaidDashboard({ onLogout }) {
   const navigate = useNavigate();
-  const { user, token, logout, updateUser } = useAuth();
+  const { user, token, logout } = useAuth();
 
   const [tab, setTab] = useState("bookings");
   const [available, setAvailable] = useState(true);
@@ -1201,14 +1196,14 @@ export default function MaidDashboard({ onLogout }) {
     type: "success",
   });
 
-  // ✅ Background refresh every 30 seconds
+  // ✅ Load initial data on mount only
   useEffect(() => {
     if (!token || user.role !== "maid") {
       navigate("/login");
       return;
     }
 
-    // Immediate load on mount
+    // Load profile once on mount
     async function loadProfile() {
       try {
         const res = await fetch(`${API_URL}/api/maids/${user.id}`);
@@ -1217,6 +1212,7 @@ export default function MaidDashboard({ onLogout }) {
       } catch {}
     }
 
+    // Load stats once on mount
     async function loadStats() {
       try {
         const res = await fetch(`${API_URL}/api/bookings?limit=200`, {
@@ -1237,30 +1233,17 @@ export default function MaidDashboard({ onLogout }) {
 
     loadProfile();
     loadStats();
+  }, [token, user, navigate]);
 
-    // ✅ Silent background refresh every 30 seconds
+  // ✅ Auto-refresh stats every 30 seconds (matches BookingsTab refresh)
+  useEffect(() => {
+    const token_val = localStorage.getItem("token");
+    if (!token_val) return;
+
     const refreshInterval = setInterval(async () => {
       try {
-        const res = await fetch(`${API_URL}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.user) {
-            updateUser({ ...user, ...data.user });
-          }
-        }
-      } catch {}
-
-      try {
-        const res = await fetch(`${API_URL}/api/maids/${user.id}`);
-        const data = await res.json();
-        if (res.ok && data.maid) setAvailable(data.maid.is_available);
-      } catch {}
-
-      try {
         const res = await fetch(`${API_URL}/api/bookings?limit=200`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token_val}` },
         });
         const data = await res.json();
         const b = data.bookings || [];
@@ -1272,11 +1255,13 @@ export default function MaidDashboard({ onLogout }) {
             .filter((x) => x.status === "completed")
             .reduce((s, x) => s + Number(x.total_amount), 0),
         });
-      } catch {}
-    }, 60000);
+      } catch (err) {
+        console.error("Background refresh error:", err);
+      }
+    }, 30000);
 
     return () => clearInterval(refreshInterval);
-  }, [token, user, navigate, updateUser]);
+  }, []);
 
   // ✅ Toast auto-hide
   useEffect(() => {
