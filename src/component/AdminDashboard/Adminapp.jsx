@@ -4,6 +4,7 @@ import AdminUsers from "./Adminusers.jsx";
 import AdminBookings from "./AdminBookings.jsx";
 import AdminMaidDashboard from "./Adminmaiddashboard.jsx";
 import AdminCustomerSupport from "./Admincustomersupport.jsx";
+import AdminMaidSupport from "./AdminMaidSupport.jsx";
 
 export default function AdminApp({ onLogout }) {
   const [view, setView] = useState("leads"); // "leads" | "users" | "bookings" | "maids" | "support"
@@ -22,6 +23,9 @@ export default function AdminApp({ onLogout }) {
 
   if (view === "support") {
     return <AdminCustomerSupport onBack={() => setView("leads")} />;
+  }
+  if (view === "maid-support") {
+    return <AdminMaidSupport onBack={() => setView("leads")} />;
   }
 
   return <AdminDashboard onLogout={onLogout} onNavigate={setView} />;

@@ -1,17 +1,36 @@
-import { useState, useEffect, useCallback } from "react";
-import styles from "./Maidsupporttab.module.css";
+import { useState, useEffect, useRef, useCallback } from "react";
+import styles from "./MaidSupporttab.module.css";
+// Maid support tab — embedded in MaidDashboard, no router dependency
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const SUPPORT_URL = `${API_URL}/api/maid-support`;
+const POLL_INTERVAL = 30000; // 30s background refresh
 
-const SUPPORT_CATEGORIES = [
-  "Payment Issue",
-  "Booking Problem",
-  "Technical Issue",
-  "Safety Concern",
-  "Other",
+const CATEGORIES = [
+  { value: "booking", label: "Job Issue", icon: "📋" },
+  { value: "payment", label: "Payment", icon: "💳" },
+  { value: "customer", label: "Customer Issue", icon: "👤" },
+  { value: "account", label: "Account", icon: "👤" },
+  { value: "technical", label: "Technical", icon: "⚙️" },
+  { value: "other", label: "Other", icon: "💬" },
 ];
 
-const PRIORITY_LEVELS = ["low", "normal", "high", "urgent"];
+const PRIORITIES = [
+  { value: "low", label: "Low", color: "#4caf50" },
+  { value: "normal", label: "Normal", color: "#2196f3" },
+  { value: "high", label: "High", color: "#ff9800" },
+  { value: "urgent", label: "Urgent", color: "#f44336" },
+];
+
+const STATUS_STYLES = {
+  open: { bg: "#fff8e1", color: "#f59e0b", label: "Open" },
+  in_progress: { bg: "#e3f2fd", color: "#1976d2", label: "In Progress" },
+  resolved: { bg: "#e8f5e9", color: "#388e3c", label: "Resolved" },
+  closed: { bg: "#f5f5f5", color: "#757575", label: "Closed" },
+};
+
+const MAX_FILES = 5;
+const ACCEPTED = "image/*,video/*";
 
 function formatDate(d) {
   return new Date(d).toLocaleDateString("en-NG", {
@@ -23,437 +42,618 @@ function formatDate(d) {
   });
 }
 
-// ─── Create Support Ticket Modal ──────────────────────────────────
-function CreateTicketModal({ onClose, onCreate, token }) {
-  const [form, setForm] = useState({
-    subject: "",
-    message: "",
-    category: SUPPORT_CATEGORIES[0],
-    priority: "normal",
-  });
-  const [file, setFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
+function timeAgo(d) {
+  const m = Math.floor((Date.now() - new Date(d)) / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
 
-  function handleFileSelect(e) {
-    const selectedFile = e.target.files?.[0];
-    if (!selectedFile) return;
+function getToken() {
+  return localStorage.getItem("token");
+}
+function authH() {
+  return { Authorization: `Bearer ${getToken()}` };
+}
 
-    // Validate file size
-    if (selectedFile.size > 100 * 1024 * 1024) {
-      setError("❌ File must be less than 100MB");
-      return;
+// ─── Unread store (persisted in sessionStorage per ticket) ──────────
+function getSeenCount(ticketId) {
+  return parseInt(sessionStorage.getItem(`maid_seen_${ticketId}`) || "0", 10);
+}
+function setSeenCount(ticketId, n) {
+  sessionStorage.setItem(`maid_seen_${ticketId}`, String(n));
+}
+
+// ─── Media Preview Grid ─────────────────────────────────────────────
+function MediaPreviewGrid({ files, onRemove }) {
+  if (!files.length) return null;
+  return (
+    <div className={styles.previewGrid}>
+      {files.map((f, i) => {
+        const isVideo = f.file.type.startsWith("video/");
+        return (
+          <div key={i} className={styles.previewItem}>
+            {isVideo ? (
+              <video src={f.preview} className={styles.previewMedia} muted />
+            ) : (
+              <img
+                src={f.preview}
+                alt={f.file.name}
+                className={styles.previewMedia}
+              />
+            )}
+            <button
+              type="button"
+              className={styles.previewRemove}
+              onClick={() => onRemove(i)}
+            >
+              ×
+            </button>
+            <span className={styles.previewType}>{isVideo ? "🎥" : "🖼️"}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Attachment Gallery ─────────────────────────────────────────────
+function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
+  const [deleting, setDeleting] = useState(null);
+  const [lightbox, setLightbox] = useState(null);
+
+  async function handleDelete(att) {
+    if (!window.confirm("Remove this attachment?")) return;
+    setDeleting(att.id);
+    try {
+      await fetch(`${SUPPORT_URL}/${ticketId}/media/${att.id}`, {
+        method: "DELETE",
+        headers: authH(),
+      });
+      onDeleted(att.id);
+    } catch {
+    } finally {
+      setDeleting(null);
     }
-
-    // Validate file type
-    const validTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-      "video/mp4",
-      "video/quicktime",
-      "video/x-msvideo",
-      "video/x-ms-wmv",
-    ];
-
-    if (!validTypes.includes(selectedFile.type)) {
-      setError("❌ Invalid file type. Only images and videos allowed.");
-      return;
-    }
-
-    setFile(selectedFile);
-    setError("");
-
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (ev) => setPreviewUrl(ev.target?.result);
-    reader.readAsDataURL(selectedFile);
   }
 
-  async function handleSubmit() {
-    if (!form.subject.trim() || !form.message.trim()) {
-      setError("❌ Subject and message are required");
+  if (!attachments.length) return null;
+  return (
+    <>
+      <div className={styles.attSection}>
+        <p className={styles.attTitle}>📎 Attachments ({attachments.length})</p>
+        <div className={styles.attGrid}>
+          {attachments.map((a) => {
+            const isVideo = a.media_type === "video";
+            return (
+              <div key={a.id} className={styles.attItem}>
+                <button
+                  type="button"
+                  className={styles.attThumb}
+                  onClick={() => setLightbox(a)}
+                >
+                  {isVideo ? (
+                    <div className={styles.attVideoThumb}>
+                      <span className={styles.attPlayIcon}>▶</span>
+                    </div>
+                  ) : (
+                    <img
+                      src={a.media_url}
+                      alt={a.file_name}
+                      className={styles.attImg}
+                    />
+                  )}
+                </button>
+                <p className={styles.attName}>{a.file_name?.slice(0, 18)}</p>
+                {canDelete && (
+                  <button
+                    className={styles.attDelete}
+                    onClick={() => handleDelete(a)}
+                    disabled={deleting === a.id}
+                  >
+                    {deleting === a.id ? "…" : "✕"}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      {lightbox && (
+        <div
+          className={styles.lightboxOverlay}
+          onClick={() => setLightbox(null)}
+        >
+          <div
+            className={styles.lightboxContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className={styles.lightboxClose}
+              onClick={() => setLightbox(null)}
+            >
+              ×
+            </button>
+            {lightbox.media_type === "video" ? (
+              <video
+                src={lightbox.media_url}
+                controls
+                className={styles.lightboxMedia}
+                autoPlay
+              />
+            ) : (
+              <img
+                src={lightbox.media_url}
+                alt={lightbox.file_name}
+                className={styles.lightboxMedia}
+              />
+            )}
+            <p className={styles.lightboxName}>{lightbox.file_name}</p>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ─── New Ticket Form ────────────────────────────────────────────────
+function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
+  const [subject, setSubject] = useState(
+    prefillBooking
+      ? `Issue with booking #${prefillBooking.id?.slice(0, 8)}`
+      : "",
+  );
+  const [message, setMessage] = useState(
+    prefillBooking
+      ? `Hi, I have an issue with my booking on ${prefillBooking.service_date ? new Date(prefillBooking.service_date).toLocaleDateString("en-NG") : ""} with ${prefillBooking.maid_name || ""}.\n\n`
+      : "",
+  );
+  const [category, setCategory] = useState(prefillBooking ? "booking" : "");
+  const [priority, setPriority] = useState("normal");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [mediaFiles, setMediaFiles] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState("");
+
+  function handleFileChange(e) {
+    const picked = Array.from(e.target.files || []);
+    const toAdd = picked
+      .slice(0, MAX_FILES - mediaFiles.length)
+      .map((f) => ({ file: f, preview: URL.createObjectURL(f) }));
+    setMediaFiles((prev) => [...prev, ...toAdd]);
+    e.target.value = "";
+  }
+
+  function removeFile(i) {
+    setMediaFiles((prev) => {
+      URL.revokeObjectURL(prev[i].preview);
+      return prev.filter((_, idx) => idx !== i);
+    });
+  }
+
+  async function uploadFiles(ticketId) {
+    for (let i = 0; i < mediaFiles.length; i++) {
+      setUploadProgress(`Uploading file ${i + 1} of ${mediaFiles.length}…`);
+      const form = new FormData();
+      form.append("media", mediaFiles[i].file);
+      await fetch(`${SUPPORT_URL}/${ticketId}/media`, {
+        method: "POST",
+        headers: authH(),
+        body: form,
+      });
+    }
+    setUploadProgress("");
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!subject.trim() || !message.trim() || !category) {
+      setError("Please fill in all required fields.");
       return;
     }
-
-    setIsSubmitting(true);
-
+    setError("");
+    setSubmitting(true);
     try {
-      // 1. Create ticket
-      const ticketRes = await fetch(`${API_URL}/api/maid-support`, {
+      const res = await fetch(SUPPORT_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          subject: form.subject,
-          message: form.message,
-          category: form.category,
-          priority: form.priority,
-        }),
+        headers: { ...authH(), "Content-Type": "application/json" },
+        body: JSON.stringify({ subject, message, category, priority }),
       });
-
-      if (!ticketRes.ok) throw new Error("Failed to create ticket");
-
-      const ticketData = await ticketRes.json();
-      const ticketId = ticketData.ticket.id;
-
-      // 2. Upload media if selected
-      if (file) {
-        const formData = new FormData();
-        formData.append("media", file);
-
-        await fetch(`${API_URL}/api/maid-support/${ticketId}/media`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData,
-        });
-      }
-
-      // Close and refresh
-      onCreate();
-      onClose();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to submit");
+      if (mediaFiles.length) await uploadFiles(data.ticket.id);
+      // seed seen count so new ticket shows 0 unread
+      setSeenCount(data.ticket.id, 0);
+      onSuccess(data.ticket);
     } catch (err) {
-      setError(`❌ ${err.message}`);
+      setError(err.message);
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   }
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalHandle} />
-
-        <h2 className={styles.modalTitle}>Create Support Ticket</h2>
-
-        {error && (
-          <div className={styles.errorBox}>
-            <p>{error}</p>
-          </div>
-        )}
-
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Subject *</label>
-          <input
-            type="text"
-            className={styles.input}
-            placeholder="Brief description of issue"
-            value={form.subject}
-            onChange={(e) => setForm({ ...form, subject: e.target.value })}
-            disabled={isSubmitting}
-          />
+    <div className={styles.formWrap}>
+      <div className={styles.formHeader}>
+        <button className={styles.backBtn} onClick={onCancel}>
+          ← Back
+        </button>
+        <div>
+          <h2 className={styles.formTitle}>New Support Ticket</h2>
+          <p className={styles.formSub}>We typically reply within 24 hours</p>
         </div>
+      </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Category *</label>
-          <select
-            className={styles.select}
-            value={form.category}
-            onChange={(e) => setForm({ ...form, category: e.target.value })}
-            disabled={isSubmitting}
-          >
-            {SUPPORT_CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+      {prefillBooking && (
+        <div className={styles.bookingTag}>
+          <span className={styles.bookingTagIcon}>📅</span>
+          <span>
+            Linked to booking with <strong>{prefillBooking.maid_name}</strong>
+            {prefillBooking.service_date &&
+              ` on ${new Date(prefillBooking.service_date).toLocaleDateString("en-NG")}`}
+          </span>
         </div>
+      )}
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Priority</label>
-          <div className={styles.priorityGroup}>
-            {PRIORITY_LEVELS.map((p) => (
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.field}>
+          <label className={styles.label}>
+            Category <span className={styles.req}>*</span>
+          </label>
+          <div className={styles.categoryGrid}>
+            {CATEGORIES.map((c) => (
               <button
-                key={p}
-                className={`${styles.priorityBtn} ${
-                  form.priority === p ? styles.priorityBtnActive : ""
-                }`}
-                onClick={() => setForm({ ...form, priority: p })}
-                disabled={isSubmitting}
+                type="button"
+                key={c.value}
+                className={`${styles.catBtn} ${category === c.value ? styles.catBtnActive : ""}`}
+                onClick={() => setCategory(c.value)}
               >
-                {p.charAt(0).toUpperCase() + p.slice(1)}
+                <span className={styles.catIcon}>{c.icon}</span>
+                <span>{c.label}</span>
               </button>
             ))}
           </div>
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Message *</label>
+        <div className={styles.field}>
+          <label className={styles.label}>Priority</label>
+          <div className={styles.priorityRow}>
+            {PRIORITIES.map((p) => (
+              <button
+                type="button"
+                key={p.value}
+                className={`${styles.priBtn} ${priority === p.value ? styles.priBtnActive : ""}`}
+                style={
+                  priority === p.value
+                    ? { borderColor: p.color, color: p.color }
+                    : {}
+                }
+                onClick={() => setPriority(p.value)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>
+            Subject <span className={styles.req}>*</span>
+          </label>
+          <input
+            className={styles.input}
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder="Brief description of your issue"
+            maxLength={120}
+          />
+          <span className={styles.charCount}>{subject.length}/120</span>
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>
+            Message <span className={styles.req}>*</span>
+          </label>
           <textarea
             className={styles.textarea}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
             placeholder="Describe your issue in detail..."
-            value={form.message}
-            onChange={(e) => setForm({ ...form, message: e.target.value })}
-            disabled={isSubmitting}
             rows={5}
+            maxLength={2000}
           />
+          <span className={styles.charCount}>{message.length}/2000</span>
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>📎 Attach Photo or Video</label>
-          <label className={styles.fileInput}>
-            {file ? (
-              <div className={styles.fileSelected}>✓ {file.name}</div>
-            ) : (
-              <>📁 Choose File</>
-            )}
-            <input
-              type="file"
-              accept="image/*,video/*"
-              onChange={handleFileSelect}
-              disabled={isSubmitting}
-              style={{ display: "none" }}
-            />
+        <div className={styles.field}>
+          <label className={styles.label}>
+            Attachments{" "}
+            <span className={styles.labelHint}>
+              (photos/videos, up to {MAX_FILES})
+            </span>
           </label>
-          <p className={styles.fileHint}>
-            Images: JPG, PNG, GIF, WebP (max 5MB)
-            <br />
-            Videos: MP4, MOV, AVI, WMV (max 100MB)
-          </p>
+          <MediaPreviewGrid files={mediaFiles} onRemove={removeFile} />
+          {mediaFiles.length < MAX_FILES && (
+            <label className={styles.uploadZone}>
+              <input
+                type="file"
+                accept={ACCEPTED}
+                multiple
+                className={styles.hiddenInput}
+                onChange={handleFileChange}
+              />
+              <span className={styles.uploadIcon}>📎</span>
+              <span className={styles.uploadText}>
+                Tap to attach photos or videos
+              </span>
+              <span className={styles.uploadHint}>
+                {mediaFiles.length}/{MAX_FILES} attached
+              </span>
+            </label>
+          )}
         </div>
 
-        {previewUrl && (
-          <div className={styles.preview}>
-            {file?.type.startsWith("image/") ? (
-              <img src={previewUrl} alt="Preview" />
-            ) : (
-              <video controls style={{ width: "100%" }}>
-                <source src={previewUrl} />
-              </video>
-            )}
-          </div>
-        )}
+        {error && <div className={styles.errorBox}>{error}</div>}
 
-        <div className={styles.modalActions}>
-          <button
-            className={styles.btnCancel}
-            onClick={onClose}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </button>
-          <button
-            className={styles.btnSubmit}
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Creating..." : "Create Ticket"}
-          </button>
-        </div>
-      </div>
+        <button
+          type="submit"
+          className={styles.submitBtn}
+          disabled={submitting}
+        >
+          {submitting ? (
+            <span className={styles.spinnerRow}>
+              <span className={styles.spinner} />
+              {uploadProgress || "Submitting…"}
+            </span>
+          ) : (
+            `Submit Ticket${mediaFiles.length ? ` (+${mediaFiles.length} file${mediaFiles.length > 1 ? "s" : ""})` : ""}`
+          )}
+        </button>
+      </form>
     </div>
   );
 }
 
-// ─── Support Ticket Detail Modal ──────────────────────────────────
-function TicketDetailModal({ ticket, onClose, onReplyAdded, token }) {
-  const [reply, setReply] = useState("");
-  const [isReplying, setIsReplying] = useState(false);
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+// ─── Ticket Detail View ─────────────────────────────────────────────
+function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
+  const [replies, setReplies] = useState([]);
+  const [attachments, setAttachments] = useState([]);
+  const [replyMsg, setReplyMsg] = useState("");
+  const [sending, setSending] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [lastRefresh, setLastRefresh] = useState(null);
+  const threadRef = useRef(null);
 
-  // ✅ SAFETY CHECK: If ticket is null or missing critical fields, don't render
-  if (!ticket || !ticket.id) {
-    return (
-      <div className={styles.modalOverlay} onClick={onClose}>
-        <div className={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
-          <div className={styles.modalHandle} />
-          <p style={{ textAlign: "center", color: "gray" }}>
-            Loading ticket...
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const userId = JSON.parse(localStorage.getItem("user") || "{}").id;
+  const isOwner = ticket.user_id === userId;
+  const isOpen = ticket.status !== "closed" && ticket.status !== "resolved";
 
-  // ✅ Provide safe defaults for all properties
-  const ticketId = ticket.id || "";
-  const subject = ticket.subject || "Untitled";
-  const message = ticket.message || "No message";
-  const status = ticket.status || "open";
-  const priority = ticket.priority || "normal";
-  const category = ticket.category || "Other";
-  const created_at = ticket.created_at || new Date().toISOString();
-  const admin_notes = ticket.admin_notes || null;
-  const attachments = ticket.attachments || [];
-  const replies = ticket.replies || [];
+  const fetchDetail = useCallback(
+    async (silent = false) => {
+      if (!silent) setLoading(true);
+      try {
+        const res = await fetch(`${SUPPORT_URL}/${ticket.id}`, {
+          headers: authH(),
+        });
+        const data = await res.json();
+        setReplies(data.replies || []);
+        setAttachments(data.attachments || []);
+        setLastRefresh(new Date());
+        // mark all current replies as seen
+        setSeenCount(ticket.id, (data.replies || []).length);
+        if (onRepliesLoaded)
+          onRepliesLoaded(ticket.id, (data.replies || []).length);
+      } catch {
+      } finally {
+        if (!silent) setLoading(false);
+      }
+    },
+    [ticket.id, onRepliesLoaded],
+  );
 
-  async function handleReply() {
-    if (!reply.trim()) {
-      setError("❌ Message cannot be empty");
-      return;
-    }
+  // Initial load
+  useEffect(() => {
+    fetchDetail(false);
+  }, [ticket.id]);
 
-    setIsReplying(true);
+  // Auto-scroll thread to bottom when new replies arrive
+  useEffect(() => {
+    if (threadRef.current)
+      threadRef.current.scrollTop = threadRef.current.scrollHeight;
+  }, [replies.length]);
 
+  // Background poll every 30s
+  useEffect(() => {
+    const id = setInterval(() => fetchDetail(true), POLL_INTERVAL);
+    return () => clearInterval(id);
+  }, [fetchDetail]);
+
+  async function sendReply() {
+    if (!replyMsg.trim()) return;
+    setSending(true);
     try {
-      const res = await fetch(`${API_URL}/api/maid-support/${ticketId}/reply`, {
+      const res = await fetch(`${SUPPORT_URL}/${ticket.id}/reply`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ message: reply }),
+        headers: { ...authH(), "Content-Type": "application/json" },
+        body: JSON.stringify({ message: replyMsg }),
       });
-
-      if (!res.ok) throw new Error("Failed to add reply");
-
-      setReply("");
-      setError("");
-      onReplyAdded();
-    } catch (err) {
-      setError(`❌ ${err.message}`);
+      const data = await res.json();
+      if (res.ok) {
+        const updated = [...replies, data.reply];
+        setReplies(updated);
+        setSeenCount(ticket.id, updated.length);
+        if (onRepliesLoaded) onRepliesLoaded(ticket.id, updated.length);
+        setReplyMsg("");
+      }
+    } catch {
     } finally {
-      setIsReplying(false);
+      setSending(false);
     }
   }
 
-  const getPriorityColor = (p) => {
-    const colors = {
-      low: "rgb(100, 150, 255)",
-      normal: "rgb(100, 150, 255)",
-      high: "rgb(255, 150, 0)",
-      urgent: "rgb(255, 60, 60)",
-    };
-    return colors[p] || colors.normal;
-  };
+  async function handleMediaUpload(e) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const toUpload = files.slice(0, MAX_FILES - attachments.length);
+    setUploadingMedia(true);
+    setUploadError("");
+    try {
+      for (const file of toUpload) {
+        const form = new FormData();
+        form.append("media", file);
+        const res = await fetch(`${SUPPORT_URL}/${ticket.id}/media`, {
+          method: "POST",
+          headers: authH(),
+          body: form,
+        });
+        const data = await res.json();
+        if (res.ok) setAttachments((prev) => [...prev, data.attachment]);
+        else setUploadError(data.error || "Upload failed");
+      }
+    } catch {
+      setUploadError("Upload failed. Please try again.");
+    } finally {
+      setUploadingMedia(false);
+      e.target.value = "";
+    }
+  }
 
-  const getStatusColor = (s) => {
-    const colors = {
-      open: "rgb(255, 150, 0)",
-      in_progress: "rgb(100, 150, 255)",
-      resolved: "rgb(100, 200, 100)",
-      closed: "rgb(150, 150, 150)",
-    };
-    return colors[s] || colors.open;
-  };
-
-  // ✅ Safe status display
-  const displayStatus =
-    status === "in_progress"
-      ? "In Progress"
-      : status.charAt(0).toUpperCase() + status.slice(1);
+  const st = STATUS_STYLES[ticket.status] || STATUS_STYLES.open;
+  const cat = CATEGORIES.find((c) => c.value === ticket.category);
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div
-        className={styles.modalSheet}
-        onClick={(e) => e.stopPropagation()}
-        style={{ maxHeight: "95vh" }}
-      >
-        <div className={styles.modalHandle} />
-
-        <div className={styles.ticketHeader}>
-          <div>
-            <h2 className={styles.ticketSubject}>{subject}</h2>
-            <p className={styles.ticketDate}>{formatDate(created_at)}</p>
-          </div>
-          <button className={styles.closeBtn} onClick={onClose} title="Close">
-            ✕
+    <div className={styles.detailWrap}>
+      <div className={styles.detailNav}>
+        <button className={styles.backBtn} onClick={onBack}>
+          ← Back to Tickets
+        </button>
+        <div className={styles.refreshRow}>
+          {lastRefresh && (
+            <span className={styles.lastRefresh}>
+              Updated {timeAgo(lastRefresh)}
+            </span>
+          )}
+          <button
+            className={styles.refreshBtn}
+            onClick={() => fetchDetail(false)}
+            title="Refresh"
+          >
+            ↻
           </button>
         </div>
+      </div>
 
-        <div className={styles.badgeGroup}>
-          <span
-            className={styles.badge}
-            style={{ background: getPriorityColor(priority) }}
-          >
-            {priority.toUpperCase()}
-          </span>
-          <span
-            className={styles.badge}
-            style={{ background: getStatusColor(status) }}
-          >
-            {displayStatus}
-          </span>
-          <span
-            className={styles.badge}
-            style={{ background: "rgb(150, 150, 150)" }}
-          >
-            {category}
-          </span>
-        </div>
-
-        <div className={styles.messageBox}>
-          <p className={styles.messageText}>{message}</p>
-        </div>
-
-        {attachments && attachments.length > 0 && (
-          <div className={styles.attachmentsBox}>
-            <p className={styles.attachmentTitle}>
-              📎 Attachments ({attachments.length})
-            </p>
-            <div className={styles.attachmentsList}>
-              {attachments.map((att) => (
-                <a
-                  key={att.id}
-                  href={att.media_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.attachmentItem}
-                >
-                  <span className={styles.attachmentIcon}>
-                    {att.media_type === "video" ? "🎬" : "🖼️"}
-                  </span>
-                  <div>
-                    <p className={styles.attachmentName}>{att.file_name}</p>
-                    <p className={styles.attachmentSize}>
-                      {(att.file_size / 1024 / 1024).toFixed(2)} MB
-                    </p>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {admin_notes && (
-          <div className={styles.notesBox}>
-            <p className={styles.notesTitle}>📝 Admin Notes</p>
-            <p className={styles.notesText}>{admin_notes}</p>
-          </div>
-        )}
-
-        {replies && replies.length > 0 && (
-          <div className={styles.repliesBox}>
-            <p className={styles.repliesTitle}>💬 Conversation</p>
-            <div className={styles.repliesList}>
-              {replies.map((r) => (
-                <div key={r.id} className={styles.replyItem}>
-                  <p className={styles.replyDate}>{formatDate(r.created_at)}</p>
-                  <p className={styles.replyText}>{r.message}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {status !== "closed" && (
-          <div className={styles.replyFormBox}>
-            {error && (
-              <div className={styles.errorBox}>
-                <p>{error}</p>
-              </div>
-            )}
-            <textarea
-              className={styles.replyInput}
-              placeholder="Add a reply to your support ticket..."
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-              disabled={isReplying}
-              rows={4}
-            />
-            <button
-              className={styles.btnReply}
-              onClick={handleReply}
-              disabled={isReplying}
+      <div className={styles.detailCard}>
+        <div className={styles.detailTop}>
+          <div className={styles.detailMeta}>
+            <span className={styles.catPill}>
+              {cat?.icon} {cat?.label || ticket.category}
+            </span>
+            <span
+              className={styles.statusPill}
+              style={{ background: st.bg, color: st.color }}
             >
-              {isReplying ? "Sending..." : "Send Reply"}
+              {st.label}
+            </span>
+          </div>
+          <h2 className={styles.detailTitle}>{ticket.subject}</h2>
+          <p className={styles.detailDate}>
+            Opened {formatDate(ticket.created_at)}
+          </p>
+        </div>
+
+        <AttachmentGallery
+          attachments={attachments}
+          ticketId={ticket.id}
+          canDelete={isOwner && isOpen}
+          onDeleted={(id) =>
+            setAttachments((prev) => prev.filter((a) => a.id !== id))
+          }
+        />
+
+        <div className={styles.thread} ref={threadRef}>
+          <div className={`${styles.bubble} ${styles.bubbleUser}`}>
+            <p className={styles.bubbleText}>{ticket.message}</p>
+            <span className={styles.bubbleTime}>
+              {formatDate(ticket.created_at)}
+            </span>
+          </div>
+
+          {loading && <p className={styles.loadingReplies}>Loading replies…</p>}
+
+          {replies.map((r) => {
+            const isAdmin =
+              r.is_admin === true ||
+              r.role === "admin" ||
+              (ticket.user_id && r.user_id && r.user_id !== ticket.user_id);
+            return (
+              <div
+                key={r.id}
+                className={`${styles.bubble} ${isAdmin ? styles.bubbleAdmin : styles.bubbleUser}`}
+              >
+                {isAdmin && (
+                  <span className={styles.adminLabel}>Support Team</span>
+                )}
+                <p className={styles.bubbleText}>{r.message}</p>
+                <span className={styles.bubbleTime}>
+                  {formatDate(r.created_at)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {isOpen && (
+          <div className={styles.replyBox}>
+            <div className={styles.replyInputWrap}>
+              <textarea
+                className={styles.replyInput}
+                value={replyMsg}
+                onChange={(e) => setReplyMsg(e.target.value)}
+                placeholder="Add a reply…"
+                rows={3}
+              />
+              {uploadError && (
+                <p className={styles.uploadErrInline}>{uploadError}</p>
+              )}
+              <div className={styles.replyToolbar}>
+                {attachments.length < MAX_FILES && (
+                  <label
+                    className={styles.attachBtn}
+                    title="Attach photo/video"
+                  >
+                    <input
+                      type="file"
+                      accept={ACCEPTED}
+                      multiple
+                      className={styles.hiddenInput}
+                      onChange={handleMediaUpload}
+                      disabled={uploadingMedia}
+                    />
+                    {uploadingMedia ? (
+                      <span className={styles.spinnerDark} />
+                    ) : (
+                      <>
+                        📎 <span className={styles.attachLabel}>Attach</span>
+                      </>
+                    )}
+                  </label>
+                )}
+                <span className={styles.attCount}>
+                  {attachments.length}/{MAX_FILES} files
+                </span>
+              </div>
+            </div>
+            <button
+              className={styles.replyBtn}
+              onClick={sendReply}
+              disabled={sending || !replyMsg.trim()}
+            >
+              {sending ? <span className={styles.spinner} /> : "Send"}
             </button>
           </div>
         )}
@@ -462,130 +662,162 @@ function TicketDetailModal({ ticket, onClose, onReplyAdded, token }) {
   );
 }
 
-// ─── Main Support Tab ──────────────────────────────────────────────
-export default function MaidSupportTab({ token }) {
+// ─── Ticket Card with unread badge + live refresh ───────────────────
+function TicketCard({ ticket: initialTicket, unread, onClick }) {
+  const [ticket, setTicket] = useState(initialTicket);
+
+  // Sync if parent updates the ticket (e.g. after list refresh)
+  useEffect(() => {
+    setTicket(initialTicket);
+  }, [initialTicket]);
+
+  const st = STATUS_STYLES[ticket.status] || STATUS_STYLES.open;
+  const cat = CATEGORIES.find((c) => c.value === ticket.category);
+
+  return (
+    <div
+      className={`${styles.ticketCard} ${unread > 0 ? styles.ticketCardUnread : ""}`}
+      onClick={onClick}
+    >
+      <div className={styles.tcTop}>
+        <span className={styles.tcCat}>
+          {cat?.icon} {cat?.label || ticket.category}
+        </span>
+        <div className={styles.tcRight}>
+          {unread > 0 && (
+            <span
+              className={styles.unreadBadge}
+              title={`${unread} new message${unread > 1 ? "s" : ""}`}
+            >
+              {unread > 9 ? "9+" : unread}
+            </span>
+          )}
+          <span
+            className={styles.tcStatus}
+            style={{ background: st.bg, color: st.color }}
+          >
+            {st.label}
+          </span>
+        </div>
+      </div>
+      <p className={styles.tcSubject}>{ticket.subject}</p>
+      <p className={styles.tcSnippet}>{ticket.message?.slice(0, 80)}…</p>
+      <div className={styles.tcFooter}>
+        <span className={styles.tcDate}>
+          {timeAgo(ticket.updated_at || ticket.created_at)}
+        </span>
+        {unread > 0 && (
+          <span className={styles.newMsgPill}>
+            🔔 {unread} new message{unread > 1 ? "s" : ""}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Tickets List ───────────────────────────────────────────────────
+function TicketsList({ onNew, onOpen }) {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState(null);
-  const [stats, setStats] = useState({
-    total: 0,
-    open: 0,
-    in_progress: 0,
-    resolved: 0,
-  });
+  const [unreadMap, setUnreadMap] = useState({}); // { [ticketId]: unreadCount }
+  const [lastSync, setLastSync] = useState(null);
+  const [syncing, setSyncing] = useState(false);
 
-  const fetchTickets = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ limit: 50 });
-      if (filter !== "all") params.set("status", filter);
-
-      const res = await fetch(`${API_URL}/api/maid-support?${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const data = await res.json();
-      setTickets(data.tickets || []);
-
-      // Calculate stats
-      const allRes = await fetch(`${API_URL}/api/maid-support?limit=200`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const allData = await allRes.json();
-      const allTickets = allData.tickets || [];
-
-      setStats({
-        total: allTickets.length,
-        open: allTickets.filter((t) => t.status === "open").length,
-        in_progress: allTickets.filter((t) => t.status === "in_progress")
-          .length,
-        resolved: allTickets.filter(
-          (t) => t.status === "resolved" || t.status === "closed",
-        ).length,
-      });
-    } catch (err) {
-      console.error("Error fetching tickets:", err);
-    }
-    setLoading(false);
-  }, [filter, token]);
+  const fetchTickets = useCallback(
+    async (silent = false) => {
+      if (!silent) setLoading(true);
+      else setSyncing(true);
+      try {
+        const params = new URLSearchParams({ limit: 50 });
+        if (filter !== "all") params.set("status", filter);
+        const res = await fetch(`${SUPPORT_URL}?${params}`, {
+          headers: authH(),
+        });
+        const data = await res.json();
+        const list = data.tickets || [];
+        setTickets(list);
+        setLastSync(new Date());
+        // Calculate unread: compare reply_count (or use stored seen count)
+        setUnreadMap((prev) => {
+          const next = { ...prev };
+          list.forEach((t) => {
+            const replyCount = t.reply_count ?? 0;
+            const seen = getSeenCount(t.id);
+            next[t.id] = Math.max(0, replyCount - seen);
+          });
+          return next;
+        });
+      } catch {
+      } finally {
+        if (!silent) setLoading(false);
+        else setSyncing(false);
+      }
+    },
+    [filter],
+  );
 
   useEffect(() => {
-    fetchTickets();
+    fetchTickets(false);
+  }, [filter]);
+
+  // Background poll
+  useEffect(() => {
+    const id = setInterval(() => fetchTickets(true), POLL_INTERVAL);
+    return () => clearInterval(id);
   }, [fetchTickets]);
 
-  async function handleSelectTicket(ticketId) {
-    try {
-      const res = await fetch(`${API_URL}/api/maid-support/${ticketId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) {
-        console.error("Failed to fetch ticket");
-        return;
-      }
-
-      const data = await res.json();
-      // ✅ Ensure ticket has required properties before setting
-      if (data && data.ticket) {
-        setSelectedTicket({
-          ...data.ticket,
-          replies: data.replies || [],
-          attachments: data.attachments || [],
-        });
-      }
-    } catch (err) {
-      console.error("Error fetching ticket details:", err);
-    }
+  // Called from TicketDetail when replies are seen — clears unread for that ticket
+  function handleRepliesLoaded(ticketId, totalReplies) {
+    setSeenCount(ticketId, totalReplies);
+    setUnreadMap((prev) => ({ ...prev, [ticketId]: 0 }));
   }
 
-  const FILTERS = ["all", "open", "in_progress", "resolved", "closed"];
+  const totalUnread = Object.values(unreadMap).reduce((s, n) => s + n, 0);
+  const filters = ["all", "open", "in_progress", "resolved", "closed"];
 
   return (
-    <div>
-      <p className={styles.sectionTitle}>Support Tickets</p>
-
-      {/* Stats */}
-      <div className={styles.statsGrid}>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Total</p>
-          <p className={styles.statValue}>{stats.total}</p>
+    <div className={styles.listWrap}>
+      <div className={styles.listHeader}>
+        <div>
+          <div className={styles.titleRow}>
+            <h1 className={styles.pageTitle}>Support</h1>
+            {totalUnread > 0 && (
+              <span className={styles.totalUnreadBadge}>
+                {totalUnread > 99 ? "99+" : totalUnread}
+              </span>
+            )}
+          </div>
+          <p className={styles.pageSub}>Get help with your work and account</p>
         </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Open</p>
-          <p className={styles.statValue} style={{ color: "rgb(255, 150, 0)" }}>
-            {stats.open}
-          </p>
-        </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>In Progress</p>
-          <p
-            className={styles.statValue}
-            style={{ color: "rgb(100, 150, 255)" }}
+        <div className={styles.headerActions}>
+          <button
+            className={`${styles.syncBtn} ${syncing ? styles.syncBtnSyncing : ""}`}
+            onClick={() => fetchTickets(false)}
+            title="Refresh tickets"
           >
-            {stats.in_progress}
-          </p>
-        </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Resolved</p>
-          <p
-            className={styles.statValue}
-            style={{ color: "rgb(100, 200, 100)" }}
-          >
-            {stats.resolved}
-          </p>
+            ↻
+          </button>
+          <button className={styles.newBtn} onClick={onNew}>
+            + New Ticket
+          </button>
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className={styles.filterTabs}>
-        {FILTERS.map((f) => (
+      {lastSync && (
+        <p className={styles.syncStatus}>
+          {syncing
+            ? "Checking for updates…"
+            : `Last updated ${timeAgo(lastSync)}`}
+        </p>
+      )}
+
+      <div className={styles.filterRow}>
+        {filters.map((f) => (
           <button
             key={f}
-            className={`${styles.filterTab} ${
-              filter === f ? styles.filterTabActive : ""
-            }`}
+            className={`${styles.filterBtn} ${filter === f ? styles.filterBtnActive : ""}`}
             onClick={() => setFilter(f)}
           >
             {f === "in_progress"
@@ -595,106 +827,111 @@ export default function MaidSupportTab({ token }) {
         ))}
       </div>
 
-      {/* Create Button */}
-      <button
-        className={styles.createBtn}
-        onClick={() => setShowCreateModal(true)}
-      >
-        ➕ New Support Ticket
-      </button>
-
-      {/* Tickets List */}
       {loading ? (
-        <div className={styles.loading}>Loading tickets...</div>
+        <div className={styles.skeletonList}>
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className={styles.skeletonCard}
+              style={{ animationDelay: `${i * 0.1}s` }}
+            />
+          ))}
+        </div>
       ) : tickets.length === 0 ? (
-        <div className={styles.empty}>
-          No {filter !== "all" ? filter : ""} support tickets
+        <div className={styles.emptyState}>
+          <div className={styles.emptyIcon}>🎫</div>
+          <p className={styles.emptyTitle}>No tickets yet</p>
+          <p className={styles.emptySub}>Have an issue? We're here to help.</p>
+          <button className={styles.newBtn} onClick={onNew}>
+            Open a Ticket
+          </button>
         </div>
       ) : (
-        <div className={styles.ticketsList}>
-          {tickets.map((ticket) => (
-            <div
-              key={ticket.id}
-              className={styles.ticketCard}
-              onClick={() => handleSelectTicket(ticket.id)}
-            >
-              <div className={styles.ticketCardTop}>
-                <div>
-                  <h3 className={styles.ticketCardTitle}>{ticket.subject}</h3>
-                  <p className={styles.ticketCardDate}>
-                    {formatDate(ticket.created_at)}
-                  </p>
-                </div>
-                <div className={styles.ticketCardBadges}>
-                  <span
-                    className={styles.priorityBadge}
-                    style={{
-                      background:
-                        ticket.priority === "urgent"
-                          ? "rgb(255, 60, 60)"
-                          : ticket.priority === "high"
-                            ? "rgb(255, 150, 0)"
-                            : "rgb(150, 150, 150)",
-                    }}
-                  >
-                    {ticket.priority}
-                  </span>
-                  <span
-                    className={styles.statusBadge}
-                    style={{
-                      background:
-                        ticket.status === "open"
-                          ? "rgb(255, 150, 0)"
-                          : ticket.status === "in_progress"
-                            ? "rgb(100, 150, 255)"
-                            : ticket.status === "resolved"
-                              ? "rgb(100, 200, 100)"
-                              : "rgb(150, 150, 150)",
-                    }}
-                  >
-                    {ticket.status === "in_progress"
-                      ? "In Progress"
-                      : ticket.status}
-                  </span>
-                </div>
-              </div>
-
-              <p className={styles.ticketCardMessage}>
-                {ticket.message.substring(0, 100)}
-                {ticket.message.length > 100 ? "..." : ""}
-              </p>
-
-              <div className={styles.ticketCardMeta}>
-                <span>{ticket.category}</span>
-                {ticket.attachment_count > 0 && (
-                  <span>📎 {ticket.attachment_count} file(s)</span>
-                )}
-              </div>
-            </div>
+        <div className={styles.ticketList}>
+          {tickets.map((t) => (
+            <TicketCard
+              key={t.id}
+              ticket={t}
+              unread={unreadMap[t.id] || 0}
+              onClick={() => onOpen(t, handleRepliesLoaded)}
+            />
           ))}
         </div>
       )}
+    </div>
+  );
+}
 
-      {/* Modals */}
-      {showCreateModal && (
-        <CreateTicketModal
-          onClose={() => setShowCreateModal(false)}
-          onCreate={fetchTickets}
-          token={token}
+// ─── Main ───────────────────────────────────────────────────────────
+// Designed as an embedded tab — no routing, accepts token as prop
+export default function MaidSupportTab({ token }) {
+  const [view, setView] = useState("list");
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [successTicket, setSuccessTicket] = useState(null);
+  const [onRepliesLoaded, setOnRepliesLoaded] = useState(null);
+
+  function handleSuccess(ticket) {
+    setSuccessTicket(ticket);
+    setView("success");
+  }
+
+  if (view === "new") {
+    return (
+      <div className={styles.page}>
+        <NewTicketForm
+          prefillBooking={null}
+          onSuccess={handleSuccess}
+          onCancel={() => setView("list")}
         />
-      )}
+      </div>
+    );
+  }
 
-      {selectedTicket && (
-        <TicketDetailModal
+  if (view === "success") {
+    return (
+      <div className={styles.page}>
+        <div className={styles.successWrap}>
+          <div className={styles.successIcon}>✅</div>
+          <h2 className={styles.successTitle}>Ticket Submitted!</h2>
+          <p className={styles.successSub}>
+            Your ticket <strong>#{successTicket?.id?.slice(0, 8)}</strong> has
+            been created. We'll get back to you within 24 hours.
+          </p>
+          <div className={styles.successActions}>
+            <button className={styles.newBtn} onClick={() => setView("list")}>
+              View My Tickets
+            </button>
+            <button className={styles.ghostBtn} onClick={() => setView("list")}>
+              Back to Tickets
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (view === "detail" && selectedTicket) {
+    return (
+      <div className={styles.page}>
+        <TicketDetail
           ticket={selectedTicket}
-          onClose={() => setSelectedTicket(null)}
-          onReplyAdded={() => {
-            fetchTickets();
-            handleSelectTicket(selectedTicket.id);
-          }}
-          token={token}
+          onBack={() => setView("list")}
+          onRepliesLoaded={onRepliesLoaded}
         />
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.page}>
+      <TicketsList
+        onNew={() => setView("new")}
+        onOpen={(t, repliesLoadedCb) => {
+          setSelectedTicket(t);
+          setOnRepliesLoaded(() => repliesLoadedCb);
+          setView("detail");
+        }}
+      />
     </div>
   );
 }
