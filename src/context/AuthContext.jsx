@@ -10,19 +10,17 @@ export function AuthProvider({ children }) {
 
   const token = localStorage.getItem("token");
 
-  // ✅ On every app load, re-fetch the user's profile from the database
-  // This ensures the avatar and any other profile data is always up to date
-  // regardless of which device last updated it
   useEffect(() => {
     if (!token || !user?.id) return;
 
+    // ✅ Fetch fresh user on every app load
+    // Ensures avatar and profile stay consistent across all devices
     fetch(`${API_URL}/api/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!data?.user) return;
-        // Merge fresh data — preserves role/token fields not returned by /me
         const refreshed = { ...user, ...data.user };
         setUser(refreshed);
         localStorage.setItem("user", JSON.stringify(refreshed));
@@ -30,7 +28,7 @@ export function AuthProvider({ children }) {
       .catch(() => {
         // Silently fail — user still works from localStorage cache
       });
-  }, []); // runs once on mount
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function updateUser(updatedUser) {
     setUser(updatedUser);

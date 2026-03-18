@@ -1094,13 +1094,12 @@ function ReviewsTab({ token }) {
   );
 }
 
+// ... (all previous code stays the same until main export) ...
+
 // ─── Main Dashboard ───────────────────────────────────────────
 export default function MaidDashboard({ onLogout }) {
   const navigate = useNavigate();
-
-  // ✅ user, token, logout all come from context
-  // No local user state, no handleUserUpdate — context handles everything
-  const { user, token, logout } = useAuth();
+  const { user, token, logout, updateUser } = useAuth();
 
   const [tab, setTab] = useState("bookings");
   const [available, setAvailable] = useState(true);
@@ -1112,11 +1111,14 @@ export default function MaidDashboard({ onLogout }) {
     earnings: 0,
   });
 
+  // ✅ Background refresh every 30 seconds
   useEffect(() => {
     if (!token || user.role !== "maid") {
       navigate("/login");
       return;
     }
+
+    // Immediate load on mount
     async function loadProfile() {
       try {
         const res = await fetch(`${API_URL}/api/maids/${user.id}`);
@@ -1124,6 +1126,7 @@ export default function MaidDashboard({ onLogout }) {
         if (res.ok && data.maid) setAvailable(data.maid.is_available);
       } catch {}
     }
+
     async function loadStats() {
       try {
         const res = await fetch(`${API_URL}/api/bookings?limit=200`, {
@@ -1141,9 +1144,54 @@ export default function MaidDashboard({ onLogout }) {
         });
       } catch {}
     }
+
     loadProfile();
     loadStats();
-  }, []);
+
+    // ✅ Silent background refresh every 30 seconds
+    // User never sees loading screens — data just updates in the background
+    const refreshInterval = setInterval(async () => {
+      // Refresh user data from /api/auth/me
+      // This keeps avatar and profile in sync across all tabs
+      try {
+        const res = await fetch(`${API_URL}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            updateUser({ ...user, ...data.user });
+          }
+        }
+      } catch {}
+
+      // Refresh profile (availability status)
+      try {
+        const res = await fetch(`${API_URL}/api/maids/${user.id}`);
+        const data = await res.json();
+        if (res.ok && data.maid) setAvailable(data.maid.is_available);
+      } catch {}
+
+      // Refresh stats
+      try {
+        const res = await fetch(`${API_URL}/api/bookings?limit=200`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        const b = data.bookings || [];
+        setStats({
+          total: b.length,
+          pending: b.filter((x) => x.status === "pending").length,
+          completed: b.filter((x) => x.status === "completed").length,
+          earnings: b
+            .filter((x) => x.status === "completed")
+            .reduce((s, x) => s + Number(x.total_amount), 0),
+        });
+      } catch {}
+    }, 15000); // 15 seconds
+
+    return () => clearInterval(refreshInterval);
+  }, [token, user, navigate, updateUser]);
 
   async function toggleAvailability() {
     setSavingAvail(true);
@@ -1161,7 +1209,6 @@ export default function MaidDashboard({ onLogout }) {
     setSavingAvail(false);
   }
 
-  // ✅ Context logout clears user state globally across the whole app
   function handleLogout() {
     logout();
     onLogout?.();
@@ -1169,7 +1216,7 @@ export default function MaidDashboard({ onLogout }) {
 
   return (
     <div className={styles.dashboard}>
-      {/* Header — user.avatar from context so it updates instantly on upload */}
+      {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           {user.avatar ? (
@@ -1275,10 +1322,12 @@ export default function MaidDashboard({ onLogout }) {
 
       <div className={styles.content}>
         {tab === "bookings" && <BookingsTab token={token} />}
-        {/* ✅ No user or onUserUpdate props needed — tabs read from context directly */}
         {tab === "profile" && <ProfileTab token={token} />}
         {tab === "reviews" && <ReviewsTab token={token} />}
       </div>
     </div>
   );
 }
+
+// ─── Bookings Tab ─────────────────────────────────────────────
+// [All previous code for BookingsTab, ProfileTab, ReviewsTab stays the same]
