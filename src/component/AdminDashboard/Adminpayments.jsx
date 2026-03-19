@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import styles from "./AdminDashboard.module.css";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -18,6 +19,7 @@ export default function AdminPayments() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState({});
   const [msg, setMsg] = useState({});
+  const navigate = useNavigate();
 
   const fetchPending = useCallback(async () => {
     setLoading(true);
@@ -94,6 +96,18 @@ export default function AdminPayments() {
           marginBottom: 16,
         }}
       >
+        <p
+          className={styles.sectionTitle || ""}
+          style={{
+            fontSize: 16,
+            fontWeight: "bold",
+            color: "rgb(19,19,103)",
+            margin: 0,
+          }}
+          onClick={() => navigate("/admin")}
+        >
+          &larr; Dashboard
+        </p>
         <p
           className={styles.sectionTitle || ""}
           style={{
