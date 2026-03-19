@@ -80,15 +80,52 @@ function Lightbox({ item, onClose }) {
 }
 
 // ─── Message bubble ──────────────────────────────────────────────────
+// Delete works as follows:
+//   Mobile  — long-press (500ms hold) on your own message → popup appears
+//   Desktop — right-click on your own message → popup appears
+// The popup has "🗑 Delete" and "Cancel".
+// Deletion is only allowed within 5 minutes of sending (enforced by backend too).
 function Bubble({ msg, isMine, onDelete, onMedia }) {
   const [showDel, setShowDel] = useState(false);
+  const pressTimer = useRef(null);
   const ageMin = (Date.now() - new Date(msg.created_at)) / 60000;
   const canDelete = isMine && ageMin <= 5;
+
+  // ── Long-press (mobile touch) ───────────────────────────────────────
+  function onTouchStart(e) {
+    if (!canDelete) return;
+    pressTimer.current = setTimeout(() => {
+      setShowDel(true);
+    }, 500); // 500ms hold
+  }
+  function onTouchEnd() {
+    clearTimeout(pressTimer.current);
+  }
+  function onTouchMove() {
+    // Cancel if finger moves (scrolling)
+    clearTimeout(pressTimer.current);
+  }
+
+  // ── Right-click (desktop) ────────────────────────────────────────────
+  function onContextMenu(e) {
+    if (!canDelete) return;
+    e.preventDefault();
+    setShowDel(true);
+  }
+
+  // ── Close popup on outside click ────────────────────────────────────
+  useEffect(() => {
+    if (!showDel) return;
+    function handler() {
+      setShowDel(false);
+    }
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, [showDel]);
 
   return (
     <div
       className={`${styles.bubbleRow} ${isMine ? styles.bubbleRowMine : styles.bubbleRowTheirs}`}
-      onLongPress={() => canDelete && setShowDel(true)}
     >
       {!isMine && (
         <div className={styles.avatar}>
@@ -104,6 +141,10 @@ function Bubble({ msg, isMine, onDelete, onMedia }) {
 
       <div
         className={`${styles.bubble} ${isMine ? styles.bubbleMine : styles.bubbleTheirs}`}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        onTouchMove={onTouchMove}
+        onContextMenu={onContextMenu}
       >
         {!isMine && (
           <span className={styles.senderName}>{msg.sender_name}</span>
@@ -146,9 +187,12 @@ function Bubble({ msg, isMine, onDelete, onMedia }) {
           )}
         </div>
 
-        {/* Long-press delete */}
+        {/* Delete popup */}
         {showDel && canDelete && (
-          <div className={styles.deletePopup}>
+          <div
+            className={styles.deletePopup}
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               className={styles.deleteBtn}
               onClick={() => {
