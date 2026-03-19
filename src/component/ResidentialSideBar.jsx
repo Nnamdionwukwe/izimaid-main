@@ -65,7 +65,7 @@ export default function ResidentialSideBar() {
           </div>
 
           <div
-            onClick={() => navigate("/Home Cleaning")}
+            onClick={() => navigate("/home-cleaning")}
             className={styles.hoverMainDiv8}
           >
             <i class="fa fa-th-large" aria-hidden="true"></i>
@@ -73,7 +73,7 @@ export default function ResidentialSideBar() {
           </div>
 
           <div
-            onClick={() => navigate("/Special Event Cleaning")}
+            onClick={() => navigate("/special-event-cleaning")}
             className={styles.hoverMainDiv9}
           >
             <i class="fa fa-th-large" aria-hidden="true"></i>
