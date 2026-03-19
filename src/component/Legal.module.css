@@ -1,0 +1,335 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+@media screen and (min-width: 20px) {
+  .page {
+    font-family: "DM Sans", Arial, sans-serif;
+    background: #faf9f6;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* Hero */
+  .hero {
+    background: rgb(32, 32, 65);
+    padding: 50px 20px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(187, 19, 47, 0.15);
+  }
+  .heroEyebrow {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0 0 12px;
+  }
+  .heroTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 10px;
+    line-height: 1.2;
+  }
+  .heroMeta {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0;
+  }
+  .heroDivider {
+    width: 36px;
+    height: 3px;
+    background: rgb(187, 19, 47);
+    margin: 16px auto 0;
+    border-radius: 2px;
+  }
+
+  /* Layout */
+  .layout {
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 0 60px;
+  }
+
+  /* TOC */
+  .toc {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 24px 16px 0;
+  }
+  .tocTitle {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 12px;
+  }
+  .tocList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .tocItem {
+    font-size: 13px;
+    color: rgb(187, 19, 47);
+    cursor: pointer;
+    padding: 4px 0;
+    border-bottom: 1px solid rgb(245, 242, 238);
+  }
+  .tocItem:last-child {
+    border-bottom: none;
+  }
+  .tocItem:hover {
+    color: rgb(32, 32, 65);
+    text-decoration: underline;
+  }
+  .tocNum {
+    color: gray;
+    margin-right: 6px;
+    font-size: 11px;
+  }
+
+  /* Content */
+  .content {
+    padding: 24px 16px 0;
+  }
+  .section {
+    margin-bottom: 36px;
+    scroll-margin-top: 80px;
+  }
+  .sectionNum {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgb(187, 19, 47);
+    margin: 0 0 6px;
+  }
+  .sectionTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgb(235, 232, 225);
+  }
+  .sectionBody {
+    font-size: 13px;
+    color: rgb(70, 68, 68);
+    line-height: 1.8;
+  }
+  .sectionBody p {
+    margin: 0 0 12px;
+  }
+  .sectionBody p:last-child {
+    margin: 0;
+  }
+  .sectionBody ul {
+    margin: 0 0 12px;
+    padding-left: 20px;
+  }
+  .sectionBody ul li {
+    margin-bottom: 6px;
+  }
+  .sectionBody strong {
+    color: rgb(32, 32, 65);
+    font-weight: 700;
+  }
+
+  /* Highlight box */
+  .highlight {
+    background: rgb(240, 240, 255);
+    border-left: 4px solid rgb(32, 32, 65);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    margin: 14px 0;
+    font-size: 13px;
+    color: rgb(50, 50, 80);
+    line-height: 1.7;
+  }
+
+  /* Warning box */
+  .warning {
+    background: rgb(255, 243, 205);
+    border-left: 4px solid rgb(187, 19, 47);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    margin: 14px 0;
+    font-size: 13px;
+    color: rgb(100, 60, 0);
+    line-height: 1.7;
+  }
+
+  /* Contact card */
+  .contactCard {
+    background: rgb(32, 32, 65);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 24px;
+  }
+  .contactTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 8px;
+  }
+  .contactText {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 0 14px;
+    line-height: 1.6;
+  }
+  .contactItems {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .contactItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .contactIcon {
+    font-size: 16px;
+  }
+
+  /* Back button */
+  .backBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: rgb(187, 19, 47);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 16px 16px 0;
+  }
+  .backBtn:hover {
+    color: rgb(32, 32, 65);
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: rgb(235, 232, 225);
+    margin: 0 16px;
+  }
+
+  /* Updated badge */
+  .updatedBadge {
+    display: inline-block;
+    background: rgb(209, 247, 224);
+    color: rgb(10, 107, 46);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+}
+
+@media screen and (min-width: 640px) {
+  .heroTitle {
+    font-size: 34px;
+  }
+  .toc {
+    margin: 28px 32px 0;
+  }
+  .content {
+    padding: 28px 32px 0;
+  }
+  .backBtn {
+    padding: 20px 32px 0;
+  }
+  .divider {
+    margin: 0 32px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 32px;
+    padding: 28px 40px 60px;
+  }
+  .toc {
+    position: sticky;
+    top: 20px;
+    width: 240px;
+    flex-shrink: 0;
+    margin: 0;
+  }
+  .content {
+    flex: 1;
+    padding: 0;
+  }
+  .backBtn {
+    padding: 20px 40px 0;
+  }
+  .divider {
+    margin: 0 40px;
+  }
+  .heroTitle {
+    font-size: 38px;
+  }
+  .contactItems {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .hero {
+    padding: 60px 80px 50px;
+  }
+  .backBtn {
+    padding: 24px 80px 0;
+    max-width: 1060px;
+    margin: 0 auto;
+    display: flex;
+  }
+  .divider {
+    margin: 0 auto;
+    max-width: 1060px;
+  }
+  .layout {
+    max-width: 1060px;
+    padding: 32px 80px 80px;
+  }
+  .toc {
+    width: 220px;
+  }
+}

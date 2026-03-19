@@ -299,8 +299,19 @@ export default function Login({ onSuccess }) {
 
           <p className={styles.terms}>
             By continuing, you agree to our{" "}
-            <span className={styles.termsLink}>Terms of Service</span> and{" "}
-            <span className={styles.termsLink}>Privacy Policy</span>
+            <span
+              onClick={() => navigate("/terms-of-service")}
+              className={styles.termsLink}
+            >
+              Terms of Service
+            </span>{" "}
+            and{" "}
+            <span
+              onClick={() => navigate("/privacy-policy")}
+              className={styles.termsLink}
+            >
+              Privacy Policy
+            </span>
           </p>
         </div>
       </div>

@@ -30,6 +30,8 @@ import OccasionalCleaning from "./component/OccasionalCleaning/OccasionalCleanin
 import MoveOutCleaning from "./component/MoveOutCleaning/MoveOutCleaning.jsx";
 import HomeCleaning from "./component/HomeCleaning/HomeCleaning.jsx";
 import SpecialEventCleaning from "./component/SpecialEventCleaning/SpecialEventCleaning.jsx";
+import TermsOfService from "./component/TermsOfService/TermsOfService.jsx";
+import PrivacyPolicy from "./component/PrivacyPolicy/PrivacyPolicy.jsx";
 
 function App() {
   return (
@@ -138,6 +140,9 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      <Route path="/terms-of-service" element={<TermsOfService />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />
