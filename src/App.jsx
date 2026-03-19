@@ -32,6 +32,9 @@ import HomeCleaning from "./component/HomeCleaning/HomeCleaning.jsx";
 import SpecialEventCleaning from "./component/SpecialEventCleaning/SpecialEventCleaning.jsx";
 import TermsOfService from "./component/TermsOfService/TermsOfService.jsx";
 import PrivacyPolicy from "./component/PrivacyPolicy/PrivacyPolicy.jsx";
+import OurApproach from "./component/OurApproach/OurApproach.jsx";
+import OurResults from "./component/OurResults/OurResults.jsx";
+import OurCommitment from "./component/OurCommitment/OurCommitment.jsx";
 
 function App() {
   return (
@@ -111,6 +114,9 @@ function AppRoutes() {
         path="/special-event-cleaning"
         element={<SpecialEventCleaning />}
       />
+      <Route path="/our-approach" element={<OurApproach />} />
+      <Route path="/our-results" element={<OurResults />} />
+      <Route path="/our-commitment" element={<OurCommitment />} />
 
       {/* Admin Dashboard */}
       <Route
