@@ -1,44 +1,77 @@
-@media screen and (min-width: 20px) {
-  .fixedHeader {
-    position: sticky;
-    top: 0;
-    right: 0;
-    left: 0;
-    background: #ffff;
-    z-index: 100;
-    margin-right: -8px;
-    margin-left: -5px;
-    height: 60px;
-  }
+/* ── Base (all screens) ─────────────────────────────────────────────── */
+.main {
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
-@media screen and (max-width: 992px) {
-  .whyChooseUsFull {
-    display: none;
-  }
+/* ── Mobile header (< 992px) ────────────────────────────────────────── */
+.fixedHeader {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #fff;
+  z-index: 100;
+  display: flex;
+  align-items: center;
 }
 
+/* ── Desktop header (≥ 992px) ───────────────────────────────────────── */
+.fixedHeadr {
+  display: none; /* hidden on mobile, shown on desktop below */
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  z-index: 1000;
+}
+
+/* ── Mobile-only sections (< 992px) ─────────────────────────────────── */
+/* whyChooseUs = mobile variant of WhyChooseUs, Reviews, JoinOurTeam */
+.whyChooseUs {
+  display: block;
+}
+
+/* ── Desktop-only sections (≥ 992px) ────────────────────────────────── */
+/* whyChooseUsFull = full-width desktop variants */
+.whyChooseUsFull {
+  display: none;
+}
+
+/* ── Desktop breakpoint (992px and up) ──────────────────────────────── */
 @media screen and (min-width: 992px) {
+  /* Swap mobile header for desktop header */
   .fixedHeader {
-    position: sticky;
-    top: 0;
-    right: 0;
-    left: 0;
-    background: #ffff;
-    z-index: 100;
     display: none;
   }
 
   .fixedHeadr {
-    position: sticky;
-    top: 0;
-    right: 0;
-    left: 0;
-    background: #ffff;
-    z-index: 1000;
+    display: block;
   }
 
+  /* Swap mobile section variants for desktop variants */
   .whyChooseUs {
     display: none;
+  }
+
+  .whyChooseUsFull {
+    display: block;
+  }
+}
+
+/* ── Small phones (< 360px) ─────────────────────────────────────────── */
+@media screen and (max-width: 360px) {
+  .fixedHeader {
+    height: 54px;
+  }
+}
+
+/* ── Tablets (600px – 991px) ────────────────────────────────────────── */
+@media screen and (min-width: 600px) and (max-width: 991px) {
+  .fixedHeader {
+    height: 64px;
   }
 }

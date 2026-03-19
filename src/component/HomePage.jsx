@@ -30,32 +30,30 @@ export default function HomePage() {
       <div className={styles.main}>
         <FirstHeader />
 
+        {/* Mobile header — visible below 992px */}
         <div className={styles.fixedHeader}>
           <FixedHeader />
         </div>
 
+        {/* Desktop header — visible from 992px up */}
         <div className={styles.fixedHeadr}>
           <SubHeader />
         </div>
 
         <ThirdHeader />
-
         <OurCleaning />
-
         <PerfectGift />
-
         <IziMaidHelp />
-
         <IziMaidHelpFull />
-
         <Customers />
-
         <IziBestCleaningCar />
 
+        {/* Mobile: single-column variant */}
         <div className={styles.whyChooseUs}>
           <WhyChooseUs />
         </div>
 
+        {/* Desktop: full-width variant */}
         <div className={styles.whyChooseUsFull}>
           <WhyChooseUsFull />
         </div>
@@ -68,25 +66,11 @@ export default function HomePage() {
           <ReviewsFull />
         </div>
 
-        <div>
-          <WeProvide />
-        </div>
-
-        <div>
-          <SecondResidential />
-        </div>
-
-        <div>
-          <SecondPractically />
-        </div>
-
-        <div>
-          <Questions />
-        </div>
-
-        <div>
-          <Faq />
-        </div>
+        <WeProvide />
+        <SecondResidential />
+        <SecondPractically />
+        <Questions />
+        <Faq />
 
         <div className={styles.whyChooseUs}>
           <JoinOurTeam />
@@ -96,13 +80,8 @@ export default function HomePage() {
           <JoinOurTeamFull />
         </div>
 
-        <div>
-          <IziBestLogo />
-        </div>
-
-        <div>
-          <Footer />
-        </div>
+        <IziBestLogo />
+        <Footer />
       </div>
 
       {/* Floating support chat — only renders for logged-in customers */}
