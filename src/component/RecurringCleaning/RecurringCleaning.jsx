@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./RecurringCleaning.module.css";
+import FirstHeader from "../FirstHeader";
+import FixedHeader from "../FixedHeader";
+import SubHeader from "../SubHeader";
 
 const FREQUENCIES = [
   {
@@ -110,6 +113,15 @@ export default function RecurringCleaning() {
 
   return (
     <div className={styles.page}>
+      <FirstHeader />
+
+      <div className={styles.fixedHeader}>
+        <FixedHeader />
+      </div>
+
+      <div className={styles.fixedHeadr}>
+        <SubHeader />
+      </div>
       {/* ── Hero ────────────────────────────── */}
       <div className={styles.hero}>
         <p className={styles.heroEyebrow}>Recurring cleaning plans</p>
