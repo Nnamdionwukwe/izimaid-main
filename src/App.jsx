@@ -22,6 +22,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import CustomerSupport from "./component/CustomerSupport/CustomerSupport.jsx";
 import Payment from "./component/Payment/Payment.jsx";
 import RecurringCleaning from "./component/RecurringCleaning/RecurringCleaning.jsx";
+import OneTimeCleaning from "./component/OneTimeCleaning/OneTimeCleaning.jsx";
 
 function App() {
   return (
@@ -90,6 +91,7 @@ function AppRoutes() {
       <Route path="/payment" element={<Payment />} />
       <Route path="/payment/verify" element={<Payment />} />
       <Route path="/recurring-cleaning" element={<RecurringCleaning />} />
+      <Route path="/one-time-cleaning" element={<OneTimeCleaning />} />
 
       {/* Admin Dashboard */}
       <Route

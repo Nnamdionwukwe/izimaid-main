@@ -16,7 +16,10 @@ export default function ResidentialSideBar() {
             <p>Recurring Cleaning</p>
           </div>
 
-          <div className={styles.hoverMainDiv2}>
+          <div
+            onClick={() => navigate("/one-time-cleaning")}
+            className={styles.hoverMainDiv2}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>One Time Cleaning</p>
           </div>
