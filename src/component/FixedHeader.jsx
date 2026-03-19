@@ -6,7 +6,7 @@ export default function FixedHeader() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className={styles.SubHeader1}>
+    <header className={styles.header}>
       <a href="https://deusizisparkle.com">
         <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
       </a>
@@ -22,6 +22,6 @@ export default function FixedHeader() {
           {isOpen && <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />}
         </div>
       </div>
-    </div>
+    </header>
   );
 }

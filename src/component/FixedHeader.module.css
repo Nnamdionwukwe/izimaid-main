@@ -1,11 +1,5 @@
 @media screen and (min-width: 20px) {
   .header {
-    background-color: white;
-    color: black;
-    z-index: 100;
-  }
-
-  .SubHeader1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -13,20 +7,9 @@
     height: 40px;
     padding: 0 20px;
     box-sizing: border-box;
-  }
-
-  .SubHeader2 {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .SubHeader2 div {
-    margin-left: 10px;
-  }
-
-  .thirdHeader2 {
-    display: none;
+    background-color: white;
+    color: black;
+    z-index: 100;
   }
 
   .logo {

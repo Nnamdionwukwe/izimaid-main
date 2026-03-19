@@ -21,6 +21,7 @@ import MaidDetail from "./component/MaidDetail.jsx";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import CustomerSupport from "./component/CustomerSupport/CustomerSupport.jsx";
 import Payment from "./component/Payment/Payment.jsx";
+import RecurringCleaning from "./component/RecurringCleaning/RecurringCleaning.jsx";
 
 function App() {
   return (
@@ -88,6 +89,7 @@ function AppRoutes() {
       <Route path="/bookings/:id" element={<BookingDetail />} />
       <Route path="/payment" element={<Payment />} />
       <Route path="/payment/verify" element={<Payment />} />
+      <Route path="/recurring-cleaning" element={<RecurringCleaning />} />
 
       {/* Admin Dashboard */}
       <Route

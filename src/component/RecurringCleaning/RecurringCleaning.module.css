@@ -1,0 +1,634 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+@media screen and (min-width: 20px) {
+  .page {
+    font-family: "DM Sans", Arial, sans-serif;
+    background: #faf9f6;
+    overflow-x: hidden;
+  }
+
+  /* ── Hero ───────────────────────────────── */
+  .hero {
+    background: rgb(19, 19, 103);
+    padding: 60px 20px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: rgba(187, 19, 47, 0.15);
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    left: -30px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .heroEyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 14px;
+  }
+
+  .heroTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 14px;
+    line-height: 1.2;
+  }
+
+  .heroTitle em {
+    font-style: italic;
+    color: rgb(255, 200, 200);
+  }
+
+  .heroDesc {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 auto;
+    max-width: 400px;
+    line-height: 1.7;
+  }
+
+  .heroDivider {
+    width: 40px;
+    height: 3px;
+    background: rgb(187, 19, 47);
+    margin: 22px auto 0;
+    border-radius: 2px;
+  }
+
+  /* ── Frequency pills ────────────────────── */
+  .freqSection {
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .sectionEyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(187, 19, 47);
+    margin: 0 0 10px;
+  }
+
+  .sectionTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: rgb(19, 19, 103);
+    margin: 0 0 28px;
+    line-height: 1.3;
+  }
+
+  .freqCards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .freqCard {
+    background: white;
+    border: 2px solid rgb(235, 232, 225);
+    border-radius: 14px;
+    padding: 22px 20px;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s,
+      transform 0.2s;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .freqCard:hover {
+    border-color: rgb(19, 19, 103);
+    box-shadow: 0 6px 20px rgba(19, 19, 103, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .freqCard:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+  .freqCard:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  .freqCard:nth-child(3) {
+    animation-delay: 0.15s;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .freqTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .freqLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .freqIcon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgb(240, 240, 255);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .freqName {
+    font-size: 16px;
+    font-weight: 700;
+    color: rgb(19, 19, 103);
+    margin: 0;
+  }
+
+  .freqBadge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgb(187, 19, 47);
+    color: white;
+    white-space: nowrap;
+  }
+
+  .freqDesc {
+    font-size: 13px;
+    color: rgb(100, 98, 98);
+    line-height: 1.6;
+    margin: 0 0 10px;
+  }
+
+  .freqPerks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .freqPerk {
+    font-size: 11px;
+    background: rgb(240, 240, 255);
+    color: rgb(19, 19, 103);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  /* ── What's included ────────────────────── */
+  .included {
+    background: rgb(19, 19, 103);
+    padding: 40px 20px;
+  }
+
+  .includedTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+
+  .includedSub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0 0 24px;
+  }
+
+  .includedGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .includedItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    padding: 14px 12px;
+  }
+
+  .includedCheck {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgb(187, 19, 47);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .includedText {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ── Benefits ───────────────────────────── */
+  .benefits {
+    padding: 40px 20px;
+  }
+
+  .benefitsList {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .benefitCard {
+    display: flex;
+    gap: 16px;
+    background: white;
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid rgb(235, 232, 225);
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .benefitIcon {
+    font-size: 28px;
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 2px;
+  }
+
+  .benefitTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: rgb(19, 19, 103);
+    margin: 0 0 4px;
+  }
+
+  .benefitText {
+    font-size: 13px;
+    color: rgb(100, 98, 98);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── Savings calculator ─────────────────── */
+  .calculator {
+    margin: 0 20px 40px;
+    background: white;
+    border-radius: 16px;
+    border: 2px solid rgb(19, 19, 103);
+    padding: 24px 20px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .calcHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .calcIcon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgb(19, 19, 103);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .calcTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: rgb(19, 19, 103);
+    margin: 0;
+  }
+
+  .calcRow {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .calcField {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .calcLabel {
+    font-size: 11px;
+    font-weight: 700;
+    color: gray;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .calcSelect,
+  .calcInput {
+    height: 42px;
+    border: 1px solid rgb(228, 228, 228);
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-family: inherit;
+    color: rgb(47, 47, 47);
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    background: rgb(250, 249, 246);
+  }
+
+  .calcSelect:focus,
+  .calcInput:focus {
+    border-color: rgb(19, 19, 103);
+  }
+
+  .calcResult {
+    background: rgb(19, 19, 103);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .calcResultLabel {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0;
+  }
+
+  .calcResultAmount {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+  }
+
+  .calcSavings {
+    font-size: 12px;
+    color: rgb(150, 230, 170);
+    margin: 0;
+  }
+
+  /* ── FAQ ────────────────────────────────── */
+  .faq {
+    padding: 0 20px 40px;
+  }
+
+  .faqList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .faqItem {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .faqQuestion {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 16px 18px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(19, 19, 103);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+  }
+
+  .faqChevron {
+    font-size: 18px;
+    transition: transform 0.2s;
+    color: rgb(187, 19, 47);
+    flex-shrink: 0;
+  }
+
+  .faqChevronOpen {
+    transform: rotate(180deg);
+  }
+
+  .faqAnswer {
+    padding: 0 18px 16px;
+    font-size: 13px;
+    color: rgb(100, 98, 98);
+    line-height: 1.7;
+    margin: 0;
+    border-top: 1px solid rgb(245, 242, 238);
+    padding-top: 12px;
+  }
+
+  /* ── CTA ────────────────────────────────── */
+  .cta {
+    background: rgb(187, 19, 47);
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .ctaIcon {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+
+  .ctaTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 10px;
+  }
+
+  .ctaText {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+
+  .ctaButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .ctaPrimary {
+    height: 50px;
+    padding: 0 32px;
+    background: white;
+    color: rgb(187, 19, 47);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .ctaPrimary:hover {
+    background: rgb(245, 245, 245);
+  }
+
+  .ctaSecondary {
+    height: 50px;
+    padding: 0 32px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .ctaSecondary:hover {
+    border-color: white;
+  }
+}
+
+@media screen and (min-width: 576px) {
+  .heroTitle {
+    font-size: 42px;
+  }
+  .freqCards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .freqCard:last-child {
+    grid-column: span 2;
+  }
+  .ctaButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .freqSection,
+  .benefits,
+  .faq {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .calculator {
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+  .included {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .cta {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .benefitsList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .freqCards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .freqCard:last-child {
+    grid-column: span 1;
+  }
+  .includedGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .hero {
+    padding: 90px 80px 80px;
+  }
+  .heroTitle {
+    font-size: 50px;
+  }
+  .freqSection,
+  .benefits,
+  .faq {
+    padding-left: 80px;
+    padding-right: 80px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .calculator {
+    max-width: 840px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .included {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .cta {
+    padding: 60px 80px;
+  }
+}
