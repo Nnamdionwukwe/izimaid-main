@@ -183,7 +183,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
             </div>
           </div>
 
-          <a href="https://izimaid-sage.vercel.app">
+          <a href="https://deusizisparkle.com">
             <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
           </a>
 

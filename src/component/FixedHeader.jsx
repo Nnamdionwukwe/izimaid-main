@@ -6,22 +6,32 @@ export default function FixedHeader() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className={styles.header}>
-      <a href="https://deusizisparkle.com">
-        <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
-      </a>
-
-      <div className={styles.hamburger}>
-        <i
-          onClick={() => setIsOpen((is) => !is)}
-          class="fa fa-bars"
-          aria-hidden="true"
-        ></i>
-
-        <div className={styles.sideBarMain}>
-          {isOpen && <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />}
+    <>
+      <header className={styles.header1}>
+        <div className={styles.header2}>
+          <a className={styles.headerLink} href="http://deusiziinterior.com">
+            Deuseizi Group
+          </a>
         </div>
-      </div>
-    </header>
+
+        <div className={styles.header}>
+          <a href="https://deusizisparkle.com">
+            <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
+          </a>
+
+          <div className={styles.hamburger}>
+            <i
+              onClick={() => setIsOpen((is) => !is)}
+              class="fa fa-bars"
+              aria-hidden="true"
+            ></i>
+
+            <div className={styles.sideBarMain}>
+              {isOpen && <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />}
+            </div>
+          </div>
+        </div>
+      </header>
+    </>
   );
 }

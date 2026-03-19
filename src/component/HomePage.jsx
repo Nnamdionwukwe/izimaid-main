@@ -28,7 +28,7 @@ export default function HomePage() {
   return (
     <>
       <div className={styles.main}>
-        <FirstHeader />
+        {/* <FirstHeader /> */}
 
         {/* Mobile header — visible below 992px */}
         <div className={styles.fixedHeader}>
