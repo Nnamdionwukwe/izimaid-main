@@ -9,7 +9,7 @@
 
   /* ── Hero ───────────────────────────────── */
   .hero {
-    background: rgb(19, 19, 103);
+    background: rgb(32, 32, 65);
     padding: 60px 20px 50px;
     text-align: center;
     position: relative;
@@ -97,7 +97,7 @@
     font-family: "Playfair Display", Georgia, serif;
     font-size: 26px;
     font-weight: 700;
-    color: rgb(19, 19, 103);
+    color: rgb(32, 32, 65);
     margin: 0 0 28px;
     line-height: 1.3;
   }
@@ -123,7 +123,7 @@
   }
 
   .freqCard:hover {
-    border-color: rgb(19, 19, 103);
+    border-color: rgb(32, 32, 65);
     box-shadow: 0 6px 20px rgba(19, 19, 103, 0.1);
     transform: translateY(-2px);
   }
@@ -177,7 +177,7 @@
   .freqName {
     font-size: 16px;
     font-weight: 700;
-    color: rgb(19, 19, 103);
+    color: rgb(32, 32, 65);
     margin: 0;
   }
 
@@ -207,7 +207,7 @@
   .freqPerk {
     font-size: 11px;
     background: rgb(240, 240, 255);
-    color: rgb(19, 19, 103);
+    color: rgb(32, 32, 65);
     padding: 3px 10px;
     border-radius: 20px;
     font-weight: 500;
@@ -215,7 +215,7 @@
 
   /* ── What's included ────────────────────── */
   .included {
-    background: rgb(19, 19, 103);
+    background: rgb(32, 32, 65);
     padding: 40px 20px;
   }
 
@@ -301,7 +301,7 @@
   .benefitTitle {
     font-size: 15px;
     font-weight: 700;
-    color: rgb(19, 19, 103);
+    color: rgb(32, 32, 65);
     margin: 0 0 4px;
   }
 
@@ -317,7 +317,7 @@
     margin: 0 20px 40px;
     background: white;
     border-radius: 16px;
-    border: 2px solid rgb(19, 19, 103);
+    border: 2px solid rgb(32, 32, 65);
     padding: 24px 20px;
     overflow: hidden;
     position: relative;
@@ -334,7 +334,7 @@
     width: 42px;
     height: 42px;
     border-radius: 10px;
-    background: rgb(19, 19, 103);
+    background: rgb(32, 32, 65);
     color: white;
     display: flex;
     align-items: center;
@@ -347,7 +347,7 @@
     font-family: "Playfair Display", Georgia, serif;
     font-size: 18px;
     font-weight: 700;
-    color: rgb(19, 19, 103);
+    color: rgb(32, 32, 65);
     margin: 0;
   }
 
@@ -389,11 +389,11 @@
 
   .calcSelect:focus,
   .calcInput:focus {
-    border-color: rgb(19, 19, 103);
+    border-color: rgb(32, 32, 65);
   }
 
   .calcResult {
-    background: rgb(19, 19, 103);
+    background: rgb(32, 32, 65);
     border-radius: 10px;
     padding: 16px;
     display: flex;
@@ -450,7 +450,7 @@
     text-align: left;
     font-size: 14px;
     font-weight: 700;
-    color: rgb(19, 19, 103);
+    color: rgb(32, 32, 65);
     cursor: pointer;
     display: flex;
     justify-content: space-between;
