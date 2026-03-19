@@ -10,6 +10,8 @@
     background-color: white;
     color: black;
     z-index: 100;
+    /* Reset browser default header margin/padding */
+    margin: 0;
   }
 
   .logo {
@@ -21,6 +23,7 @@
   .hamburger {
     font-size: 20px;
     position: relative;
+    cursor: pointer;
   }
 
   .hamburger i {
