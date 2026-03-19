@@ -1,0 +1,816 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+@media screen and (min-width: 20px) {
+  .page {
+    font-family: "DM Sans", Arial, sans-serif;
+    background: #faf9f6;
+    overflow-x: hidden;
+  }
+
+  /* Hero */
+  .hero {
+    background: rgb(32, 32, 65);
+    padding: 60px 20px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(187, 19, 47, 0.18);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    left: -30px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .heroEyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 14px;
+  }
+  .heroTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 14px;
+    line-height: 1.2;
+  }
+  .heroTitle em {
+    font-style: italic;
+    color: rgb(255, 200, 200);
+  }
+  .heroDesc {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 auto;
+    max-width: 420px;
+    line-height: 1.7;
+  }
+  .heroDivider {
+    width: 40px;
+    height: 3px;
+    background: rgb(187, 19, 47);
+    margin: 22px auto 0;
+    border-radius: 2px;
+  }
+  .heroButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    margin-top: 28px;
+  }
+  .heroPrimary {
+    height: 48px;
+    padding: 0 28px;
+    background: rgb(187, 19, 47);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .heroPrimary:hover {
+    background: rgb(150, 15, 37);
+  }
+  .heroSecondary {
+    height: 48px;
+    padding: 0 28px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .heroSecondary:hover {
+    border-color: white;
+  }
+
+  /* Stats bar */
+  .statsBar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: rgb(187, 19, 47);
+  }
+  .statItem {
+    padding: 18px 16px;
+    text-align: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .statItem:nth-child(even) {
+    border-right: none;
+  }
+  .statItem:nth-child(3),
+  .statItem:nth-child(4) {
+    border-bottom: none;
+  }
+  .statNum {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 3px;
+  }
+  .statLabel {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+  }
+
+  /* Sections */
+  .section {
+    padding: 44px 20px;
+  }
+  .sectionEyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(187, 19, 47);
+    margin: 0 0 10px;
+  }
+  .sectionTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 28px;
+    line-height: 1.3;
+  }
+
+  /* Service cards */
+  .serviceCards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .serviceCard {
+    background: white;
+    border-radius: 14px;
+    border: 2px solid rgb(235, 232, 225);
+    overflow: hidden;
+    transition:
+      box-shadow 0.2s,
+      transform 0.2s;
+    animation: fadeUp 0.5s ease both;
+  }
+  .serviceCard:hover {
+    box-shadow: 0 8px 24px rgba(32, 32, 65, 0.1);
+    transform: translateY(-2px);
+    border-color: rgb(32, 32, 65);
+  }
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .serviceCard:nth-child(1) {
+    animation-delay: 0.04s;
+  }
+  .serviceCard:nth-child(2) {
+    animation-delay: 0.08s;
+  }
+  .serviceCard:nth-child(3) {
+    animation-delay: 0.12s;
+  }
+  .cardBanner {
+    height: 6px;
+    background: rgb(187, 19, 47);
+  }
+  .cardBody {
+    padding: 20px;
+  }
+  .cardTop {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .cardIcon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: rgb(240, 240, 255);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .cardName {
+    font-size: 17px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 3px;
+  }
+  .cardTagline {
+    font-size: 12px;
+    color: gray;
+    margin: 0;
+  }
+  .cardDesc {
+    font-size: 13px;
+    color: rgb(90, 88, 88);
+    line-height: 1.65;
+    margin: 0 0 14px;
+  }
+  .checkList {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .checkItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    color: rgb(60, 58, 58);
+  }
+  .checkDot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgb(32, 32, 65);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .cardFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: rgb(250, 249, 246);
+    border-top: 1px solid rgb(240, 238, 234);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .priceBlock {
+    display: flex;
+    flex-direction: column;
+  }
+  .priceFrom {
+    font-size: 11px;
+    color: gray;
+  }
+  .priceAmount {
+    font-size: 18px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+  }
+  .bookBtn {
+    height: 36px;
+    padding: 0 18px;
+    background: rgb(187, 19, 47);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .bookBtn:hover {
+    background: rgb(150, 15, 37);
+  }
+
+  /* Included section */
+  .included {
+    background: rgb(32, 32, 65);
+    padding: 40px 20px;
+  }
+  .includedTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .includedSub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0 0 24px;
+  }
+  .roomTabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-bottom: 20px;
+  }
+  .roomTabs::-webkit-scrollbar {
+    display: none;
+  }
+  .roomTab {
+    flex-shrink: 0;
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .roomTabActive {
+    background: rgb(187, 19, 47);
+    color: white;
+    border-color: rgb(187, 19, 47);
+  }
+  .roomItems {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .roomItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .roomCheck {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgb(187, 19, 47);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .roomText {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  /* Why us */
+  .benefits {
+    padding: 44px 20px;
+  }
+  .benefitCards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .benefitCard {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition: box-shadow 0.2s;
+  }
+  .benefitCard:hover {
+    box-shadow: 0 6px 18px rgba(32, 32, 65, 0.08);
+  }
+  .benefitIcon {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: rgb(240, 240, 255);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .benefitTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 5px;
+  }
+  .benefitText {
+    font-size: 13px;
+    color: rgb(90, 88, 88);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* House sizes */
+  .houseSizes {
+    padding: 0 20px 44px;
+  }
+  .sizeGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .sizeCard {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .sizeCard:hover {
+    border-color: rgb(32, 32, 65);
+    box-shadow: 0 4px 14px rgba(32, 32, 65, 0.08);
+  }
+  .sizeEmoji {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+  .sizeName {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 3px;
+  }
+  .sizeDuration {
+    font-size: 11px;
+    color: gray;
+    margin: 0 0 6px;
+  }
+  .sizePrice {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(187, 19, 47);
+    margin: 0;
+  }
+
+  /* Testimonials */
+  .testimonials {
+    background: rgb(32, 32, 65);
+    padding: 40px 20px;
+  }
+  .testimonialsTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .testimonialsSub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0 0 24px;
+  }
+  .testimonialList {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .testimonialCard {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 16px 18px;
+    border-left: 4px solid rgb(187, 19, 47);
+  }
+  .testimonialText {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.7;
+    margin: 0 0 12px;
+    font-style: italic;
+  }
+  .testimonialAuthor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .testimonialAvatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgb(187, 19, 47);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .testimonialName {
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 1px;
+  }
+  .testimonialLocation {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0;
+  }
+  .testimonialStars {
+    font-size: 12px;
+    color: rgb(255, 200, 100);
+    margin-left: auto;
+  }
+
+  /* Process */
+  .process {
+    padding: 44px 20px;
+  }
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+  .steps::before {
+    content: "";
+    position: absolute;
+    left: 19px;
+    top: 20px;
+    bottom: 20px;
+    width: 2px;
+    background: linear-gradient(to bottom, rgb(32, 32, 65), rgb(187, 19, 47));
+  }
+  .step {
+    display: flex;
+    gap: 20px;
+    padding: 0 0 28px;
+    position: relative;
+  }
+  .stepNum {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgb(32, 32, 65);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    font-family: "Playfair Display", Georgia, serif;
+  }
+  .stepBody {
+    padding-top: 8px;
+  }
+  .stepTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 4px;
+  }
+  .stepText {
+    font-size: 13px;
+    color: rgb(100, 98, 98);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* FAQ */
+  .faq {
+    padding: 0 20px 44px;
+  }
+  .faqList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .faqItem {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .faqQuestion {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 16px 18px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+  }
+  .faqChevron {
+    font-size: 18px;
+    transition: transform 0.2s;
+    color: rgb(187, 19, 47);
+    flex-shrink: 0;
+  }
+  .faqChevronOpen {
+    transform: rotate(180deg);
+  }
+  .faqAnswer {
+    padding: 0 18px 16px;
+    font-size: 13px;
+    color: rgb(100, 98, 98);
+    line-height: 1.7;
+    margin: 0;
+    border-top: 1px solid rgb(245, 242, 238);
+    padding-top: 12px;
+  }
+
+  /* CTA */
+  .cta {
+    background: rgb(187, 19, 47);
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .ctaTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 10px;
+  }
+  .ctaText {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+  .ctaButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .ctaPrimary {
+    height: 50px;
+    padding: 0 32px;
+    background: white;
+    color: rgb(187, 19, 47);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+  .ctaPrimary:hover {
+    background: rgb(245, 245, 245);
+  }
+  .ctaSecondary {
+    height: 50px;
+    padding: 0 32px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+  .ctaSecondary:hover {
+    border-color: white;
+  }
+}
+
+@media screen and (min-width: 576px) {
+  .heroTitle {
+    font-size: 42px;
+  }
+  .heroButtons,
+  .ctaButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .statsBar {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .statItem {
+    border-bottom: none;
+  }
+  .statItem:nth-child(4) {
+    border-right: none;
+  }
+  .serviceCards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .serviceCards > :last-child {
+    grid-column: span 2;
+  }
+  .sizeGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .roomItems {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .section,
+  .benefits,
+  .houseSizes,
+  .process,
+  .faq {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .included,
+  .testimonials {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .cta {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .serviceCards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .serviceCards > :last-child {
+    grid-column: span 1;
+  }
+  .benefitCards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .testimonialList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .hero {
+    padding: 90px 80px 80px;
+  }
+  .heroTitle {
+    font-size: 50px;
+  }
+  .section,
+  .benefits,
+  .houseSizes,
+  .process,
+  .faq {
+    padding-left: 80px;
+    padding-right: 80px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .included,
+  .testimonials {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .cta {
+    padding: 60px 80px;
+  }
+  .roomItems {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .steps::before {
+    left: 23px;
+  }
+}

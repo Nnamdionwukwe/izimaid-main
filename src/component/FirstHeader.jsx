@@ -4,7 +4,7 @@ export default function FirstHeader() {
   return (
     <div className={styles.header}>
       <a className={styles.headerLink} href="http://deusiziinterior.com">
-        Deuseizi Interior
+        Deuseizi Group
       </a>
     </div>
   );

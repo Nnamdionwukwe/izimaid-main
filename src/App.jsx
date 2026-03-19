@@ -28,6 +28,8 @@ import EcoFriendlyCleaning from "./component/EcoFriendlyCleaning/EcoFriendlyClea
 import ApartmentCleaning from "./component/ApartmentCleaning/ApartmentCleaning.jsx";
 import OccasionalCleaning from "./component/OccasionalCleaning/OccasionalCleaning.jsx";
 import MoveOutCleaning from "./component/MoveOutCleaning/MoveOutCleaning.jsx";
+import HomeCleaning from "./component/HomeCleaning/HomeCleaning.jsx";
+import SpecialEventCleaning from "./component/SpecialEventCleaning/SpecialEventCleaning.jsx";
 
 function App() {
   return (
@@ -102,6 +104,11 @@ function AppRoutes() {
       <Route path="/apartment-cleaning" element={<ApartmentCleaning />} />
       <Route path="/occasional-cleaning" element={<OccasionalCleaning />} />
       <Route path="/move-out-cleaning" element={<MoveOutCleaning />} />
+      <Route path="/home-cleaning" element={<HomeCleaning />} />
+      <Route
+        path="/special-event-cleaning"
+        element={<SpecialEventCleaning />}
+      />
 
       {/* Admin Dashboard */}
       <Route
