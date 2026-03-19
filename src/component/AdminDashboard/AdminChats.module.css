@@ -817,3 +817,27 @@
 .bubbleCustomer .adminDeletedMeta {
   color: rgba(255, 255, 255, 0.9);
 }
+
+/* ── Deleted message banner (admin — shown above content, not instead of it) ── */
+.adminDeletedBanner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.75;
+  margin-bottom: 6px;
+  border-left: 3px solid rgba(0, 0, 0, 0.2);
+}
+.bubbleCustomer .adminDeletedBanner {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Slightly dimmed text for deleted message content */
+.bubbleTextDeleted {
+  opacity: 0.65;
+  font-style: italic;
+}

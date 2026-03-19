@@ -221,47 +221,46 @@ function MessageBubble({ msg, conversation, onMediaClick }) {
       )}
       <div className={`${styles.bubble} ${bubbleClass}`}>
         <span className={styles.senderLabel}>{label}</span>
-        {/* Admin always sees deleted messages with full context */}
-        {msg.deleted_at ? (
-          <div className={styles.adminDeletedMsg}>
-            <span className={styles.adminDeletedIcon}>🗑</span>
-            <div>
-              <p className={styles.adminDeletedLabel}>Message deleted</p>
-              <p className={styles.adminDeletedMeta}>
-                by {msg.deleted_by_name || "sender"} ·{" "}
-                {formatDate(msg.deleted_at)}
-              </p>
-            </div>
+        {/* Admin sees FULL content even for deleted messages, plus a deletion notice */}
+        {msg.deleted_at && (
+          <div className={styles.adminDeletedBanner}>
+            <span>
+              🗑 Deleted by {msg.deleted_by_name || "sender"} ·{" "}
+              {formatDate(msg.deleted_at)}
+            </span>
           </div>
-        ) : (
-          <>
-            {hasMedia && (
-              <button
-                className={styles.mediaBubble}
-                onClick={() => onMediaClick(msg)}
-                type="button"
-              >
-                {msg.message_type === "video" ? (
-                  <div className={styles.videoThumb}>
-                    <span className={styles.playIcon}>▶</span>
-                    <span className={styles.mediaCaption}>Video</span>
-                  </div>
-                ) : (
-                  <img
-                    src={msg.media_url}
-                    alt={msg.content || "image"}
-                    className={styles.mediaImg}
-                  />
-                )}
-              </button>
+        )}
+
+        {/* Always render media and text — admin can read everything */}
+        {hasMedia && (
+          <button
+            className={styles.mediaBubble}
+            onClick={() => onMediaClick(msg)}
+            type="button"
+          >
+            {msg.message_type === "video" ? (
+              <div className={styles.videoThumb}>
+                <span className={styles.playIcon}>▶</span>
+                <span className={styles.mediaCaption}>Video</span>
+              </div>
+            ) : (
+              <img
+                src={msg.media_url}
+                alt={msg.content || "image"}
+                className={styles.mediaImg}
+              />
             )}
-            {msg.content && !hasMedia && (
-              <p className={styles.bubbleText}>{msg.content}</p>
-            )}
-            {msg.content && hasMedia && (
-              <p className={styles.mediaCaption}>{msg.content}</p>
-            )}
-          </>
+          </button>
+        )}
+        {msg.content && !hasMedia && (
+          <p
+            className={`${styles.bubbleText} ${msg.deleted_at ? styles.bubbleTextDeleted : ""}`}
+          >
+            {msg.content}
+          </p>
+        )}
+        {msg.content && hasMedia && (
+          <p className={styles.mediaCaption}>{msg.content}</p>
         )}
         <div className={styles.bubbleMeta}>
           <span className={styles.bubbleTime}>
