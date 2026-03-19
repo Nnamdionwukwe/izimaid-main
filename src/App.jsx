@@ -23,6 +23,9 @@ import CustomerSupport from "./component/CustomerSupport/CustomerSupport.jsx";
 import Payment from "./component/Payment/Payment.jsx";
 import RecurringCleaning from "./component/RecurringCleaning/RecurringCleaning.jsx";
 import OneTimeCleaning from "./component/OneTimeCleaning/OneTimeCleaning.jsx";
+import MoveInCleaning from "./component/MoveInCleaning/MoveInCleaning.jsx";
+import EcoFriendlyCleaning from "./component/EcoFriendlyCleaning/EcoFriendlyCleaning.jsx";
+import ApartmentCleaning from "./component/ApartmentCleaning/ApartmentCleaning.jsx";
 
 function App() {
   return (
@@ -92,6 +95,9 @@ function AppRoutes() {
       <Route path="/payment/verify" element={<Payment />} />
       <Route path="/recurring-cleaning" element={<RecurringCleaning />} />
       <Route path="/one-time-cleaning" element={<OneTimeCleaning />} />
+      <Route path="/move-in-cleaning" element={<MoveInCleaning />} />
+      <Route path="/eco-friendly-cleaning" element={<EcoFriendlyCleaning />} />
+      <Route path="/apartment-cleaning" element={<ApartmentCleaning />} />
 
       {/* Admin Dashboard */}
       <Route
