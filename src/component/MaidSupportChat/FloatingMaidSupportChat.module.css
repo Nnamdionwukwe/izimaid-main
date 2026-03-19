@@ -1,0 +1,152 @@
+/* ── Floating chat window ──────────────────────────────────────────── */
+.chatWindow {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 370px;
+  height: 560px;
+  z-index: 1000;
+  border-radius: 16px;
+  box-shadow:
+    0 24px 64px rgba(19, 19, 103, 0.22),
+    0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── FAB button ────────────────────────────────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px 0 16px;
+  height: 52px;
+  border-radius: 26px;
+  border: none;
+  background: rgb(19, 19, 103);
+  color: white;
+  cursor: pointer;
+  box-shadow:
+    0 8px 24px rgba(19, 19, 103, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.15);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  animation: fabIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fabIn {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fab:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow:
+    0 12px 32px rgba(19, 19, 103, 0.48),
+    0 4px 12px rgba(0, 0, 0, 0.18);
+}
+.fab:active {
+  transform: scale(0.97);
+}
+
+.fabIcon {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.fabLabel {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+/* ── Unread badge ──────────────────────────────────────────────────── */
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: #e53935;
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border: 2px solid white;
+  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePop {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* ── Pulse ring ────────────────────────────────────────────────────── */
+.pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 26px;
+  border: 2px solid rgb(19, 19, 103);
+  opacity: 0;
+  animation: pulseRing 2.5s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulseRing {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+/* ── Mobile ────────────────────────────────────────────────────────── */
+@media (max-width: 420px) {
+  .chatWindow {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+  .fab {
+    bottom: 16px;
+    right: 16px;
+    height: 48px;
+    padding: 0 16px 0 14px;
+  }
+}

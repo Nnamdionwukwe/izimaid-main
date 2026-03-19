@@ -4,6 +4,7 @@ import styles from "./MaidDashboard.module.css";
 import { useAuth } from "../../context/AuthContext";
 import MaidSupportTab from "../MaidsupportTab/Maidsupporttab";
 import MaidChat from "../MaidChat/MaidChat";
+import FloatingMaidSupportChat from "../MaidSupportChat/FloatingMaidSupportChat";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -944,7 +945,6 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
           </button>
         ))}
       </div>
-
       {loading ? (
         <div className={styles.loading}>Loading...</div>
       ) : bookings.length === 0 ? (
@@ -970,7 +970,6 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                     : b.status?.replace("_", " ")}
                 </span>
               </div>
-
               <div className={styles.bookingMeta}>
                 <div className={styles.metaItem}>
                   Duration:{" "}
@@ -986,7 +985,6 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                   Address: <span className={styles.metaValue}>{b.address}</span>
                 </div>
               </div>
-
               {b.status === "declined" && b.declined_reason && (
                 <div
                   style={{
@@ -1004,7 +1002,6 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                   <p style={{ margin: 0 }}>{b.declined_reason}</p>
                 </div>
               )}
-
               <div className={styles.bookingActions}>
                 {b.status === "pending" && (
                   <>
@@ -1043,8 +1040,6 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                     Declined on {formatDate(b.updated_at)}
                   </p>
                 )}
-
-                {/* ── 💬 Chat button ── */}
                 {["pending", "confirmed", "in_progress", "completed"].includes(
                   b.status,
                 ) && (
@@ -1067,8 +1062,6 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                     💬 Chat
                   </button>
                 )}
-
-                {/* ── 🎫 Get Support button ── */}
                 <button
                   className={styles.actionBtn}
                   style={{
@@ -1093,7 +1086,6 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
           ))}
         </div>
       )}
-
       {declineModal && (
         <DeclineConfirmModal
           booking={declineModal}
@@ -1193,11 +1185,8 @@ export default function MaidDashboard({ onLogout }) {
     message: "",
     type: "success",
   });
-  // Prefill booking for support tab
   const [supportPrefill, setSupportPrefill] = useState(null);
-  // Active chat booking
   const [chatBooking, setChatBooking] = useState(null);
-  // Open support ticket count for tab badge
   const [supportOpenCount, setSupportOpenCount] = useState(0);
 
   useEffect(() => {
@@ -1269,7 +1258,6 @@ export default function MaidDashboard({ onLogout }) {
       } catch (err) {
         console.error("Background refresh error:", err);
       }
-      // Refresh support count too
       try {
         const sr = await fetch(`${API_URL}/api/maid-support?limit=50`, {
           headers: { Authorization: `Bearer ${token_val}` },
@@ -1298,13 +1286,9 @@ export default function MaidDashboard({ onLogout }) {
   function handleDeclineMessage({ message, type }) {
     setToast({ visible: true, message, type });
   }
-
-  // Called from BookingsTab "💬 Chat" button
   function handleOpenChat(booking) {
     setChatBooking(booking);
   }
-
-  // Called from BookingsTab "Get Support" button
   function handleGetSupport(booking) {
     setSupportPrefill(booking);
     setTab("support");
@@ -1331,7 +1315,6 @@ export default function MaidDashboard({ onLogout }) {
     onLogout?.();
   }
 
-  // If chat is open render full-screen
   if (chatBooking) {
     return (
       <MaidChat
@@ -1344,151 +1327,156 @@ export default function MaidDashboard({ onLogout }) {
   }
 
   return (
-    <div className={styles.dashboard}>
-      {/* Header */}
-      <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          {user.avatar ? (
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className={styles.headerAvatar}
-              onError={(ev) => {
-                ev.target.style.display = "none";
-              }}
-            />
-          ) : (
-            <div className={styles.headerAvatarPlaceholder}>
-              {initials(user.name)}
+    <>
+      <div className={styles.dashboard}>
+        {/* Header */}
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
+            {user.avatar ? (
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className={styles.headerAvatar}
+                onError={(ev) => {
+                  ev.target.style.display = "none";
+                }}
+              />
+            ) : (
+              <div className={styles.headerAvatarPlaceholder}>
+                {initials(user.name)}
+              </div>
+            )}
+            <div>
+              <p className={styles.headerName}>{user.name}</p>
+              <p className={styles.headerRole}>Maid · Deusizi Sparkle</p>
             </div>
-          )}
+          </div>
+          <button className={styles.logoutBtn} onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+
+        {/* Availability */}
+        <div className={styles.availBar}>
           <div>
-            <p className={styles.headerName}>{user.name}</p>
-            <p className={styles.headerRole}>Maid · Deusizi Sparkle</p>
-          </div>
-        </div>
-        <button className={styles.logoutBtn} onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
-
-      {/* Availability */}
-      <div className={styles.availBar}>
-        <div>
-          <p className={styles.availLabel}>Availability</p>
-          <p className={styles.availStatus}>
-            {available
-              ? "You are visible to customers"
-              : "You are hidden from search"}
-          </p>
-        </div>
-        <button
-          className={`${styles.toggle} ${available ? styles.toggleOn : ""}`}
-          onClick={toggleAvailability}
-          disabled={savingAvail}
-        >
-          <div
-            className={`${styles.toggleKnob} ${available ? styles.toggleKnobOn : ""}`}
-          />
-        </button>
-      </div>
-
-      {/* Stats */}
-      <div className={styles.content}>
-        <div className={styles.statsGrid}>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Total Bookings</p>
-            <p className={styles.statValue}>{stats.total}</p>
-          </div>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Pending</p>
-            <p className={styles.statValue}>{stats.pending}</p>
-          </div>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Completed</p>
-            <p className={styles.statValue}>{stats.completed}</p>
-          </div>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Earnings</p>
-            <p className={styles.statValue} style={{ fontSize: 18 }}>
-              ₦{stats.earnings.toLocaleString()}
+            <p className={styles.availLabel}>Availability</p>
+            <p className={styles.availStatus}>
+              {available
+                ? "You are visible to customers"
+                : "You are hidden from search"}
             </p>
           </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className={styles.tabs}>
-        {[
-          ["bookings", "Bookings"],
-          ["profile", "My Profile"],
-          ["reviews", "Reviews"],
-          ["support", "Support"],
-        ].map(([key, label]) => (
           <button
-            key={key}
-            className={`${styles.tab} ${tab === key ? styles.tabActive : ""}`}
-            onClick={() => {
-              setTab(key);
-              if (key !== "support") setSupportPrefill(null);
-            }}
+            className={`${styles.toggle} ${available ? styles.toggleOn : ""}`}
+            onClick={toggleAvailability}
+            disabled={savingAvail}
           >
-            {label}
-            {key === "bookings" && stats.pending > 0 && (
-              <span
-                style={{
-                  marginLeft: 6,
-                  background: "rgb(187,19,47)",
-                  color: "white",
-                  fontSize: 10,
-                  padding: "1px 6px",
-                  borderRadius: 10,
-                  fontWeight: "bold",
-                }}
-              >
-                {stats.pending}
-              </span>
-            )}
-            {key === "support" && supportOpenCount > 0 && (
-              <span
-                style={{
-                  marginLeft: 6,
-                  background: "rgb(19,19,103)",
-                  color: "white",
-                  fontSize: 10,
-                  padding: "1px 6px",
-                  borderRadius: 10,
-                  fontWeight: "bold",
-                }}
-              >
-                {supportOpenCount > 99 ? "99+" : supportOpenCount}
-              </span>
-            )}
+            <div
+              className={`${styles.toggleKnob} ${available ? styles.toggleKnobOn : ""}`}
+            />
           </button>
-        ))}
+        </div>
+
+        {/* Stats */}
+        <div className={styles.content}>
+          <div className={styles.statsGrid}>
+            <div className={styles.statCard}>
+              <p className={styles.statLabel}>Total Bookings</p>
+              <p className={styles.statValue}>{stats.total}</p>
+            </div>
+            <div className={styles.statCard}>
+              <p className={styles.statLabel}>Pending</p>
+              <p className={styles.statValue}>{stats.pending}</p>
+            </div>
+            <div className={styles.statCard}>
+              <p className={styles.statLabel}>Completed</p>
+              <p className={styles.statValue}>{stats.completed}</p>
+            </div>
+            <div className={styles.statCard}>
+              <p className={styles.statLabel}>Earnings</p>
+              <p className={styles.statValue} style={{ fontSize: 18 }}>
+                ₦{stats.earnings.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className={styles.tabs}>
+          {[
+            ["bookings", "Bookings"],
+            ["profile", "My Profile"],
+            ["reviews", "Reviews"],
+            ["support", "Support"],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              className={`${styles.tab} ${tab === key ? styles.tabActive : ""}`}
+              onClick={() => {
+                setTab(key);
+                if (key !== "support") setSupportPrefill(null);
+              }}
+            >
+              {label}
+              {key === "bookings" && stats.pending > 0 && (
+                <span
+                  style={{
+                    marginLeft: 6,
+                    background: "rgb(187,19,47)",
+                    color: "white",
+                    fontSize: 10,
+                    padding: "1px 6px",
+                    borderRadius: 10,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {stats.pending}
+                </span>
+              )}
+              {key === "support" && supportOpenCount > 0 && (
+                <span
+                  style={{
+                    marginLeft: 6,
+                    background: "rgb(19,19,103)",
+                    color: "white",
+                    fontSize: 10,
+                    padding: "1px 6px",
+                    borderRadius: 10,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {supportOpenCount > 99 ? "99+" : supportOpenCount}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div className={styles.content}>
+          {tab === "bookings" && (
+            <BookingsTab
+              token={token}
+              onDeclineMessage={handleDeclineMessage}
+              onGetSupport={handleGetSupport}
+              onOpenChat={handleOpenChat}
+            />
+          )}
+          {tab === "profile" && <ProfileTab token={token} />}
+          {tab === "reviews" && <ReviewsTab token={token} />}
+          {tab === "support" && (
+            <MaidSupportTab token={token} prefillBooking={supportPrefill} />
+          )}
+        </div>
+
+        <FloatingToast
+          message={toast.message}
+          type={toast.type}
+          visible={toast.visible}
+        />
       </div>
 
-      <div className={styles.content}>
-        {tab === "bookings" && (
-          <BookingsTab
-            token={token}
-            onDeclineMessage={handleDeclineMessage}
-            onGetSupport={handleGetSupport}
-            onOpenChat={handleOpenChat}
-          />
-        )}
-        {tab === "profile" && <ProfileTab token={token} />}
-        {tab === "reviews" && <ReviewsTab token={token} />}
-        {tab === "support" && (
-          <MaidSupportTab token={token} prefillBooking={supportPrefill} />
-        )}
-      </div>
-
-      <FloatingToast
-        message={toast.message}
-        type={toast.type}
-        visible={toast.visible}
-      />
-    </div>
+      {/* Floating maid support chat — only renders for logged-in maids */}
+      <FloatingMaidSupportChat />
+    </>
   );
 }
