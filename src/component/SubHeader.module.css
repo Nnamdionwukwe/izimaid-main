@@ -198,6 +198,12 @@
     font-size: 18px;
   }
 
+  .minsDiv {
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 20px;
+  }
+
   .mins {
     margin-left: 70px;
     margin-top: -1px;
@@ -269,59 +275,12 @@
     display: none;
   }
 
-  .localIzimaidMain {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    inset: 0;
-    background: rgba(35, 33, 33, 0.98);
-    z-index: 200;
-  }
-
   .localIzimaidMainDiv {
-    background: white;
     height: 27em;
     width: 38em;
-    z-index: 300;
-    border-radius: 7px;
-  }
-
-  .localIzimaidMainDivSub {
-    position: relative;
-  }
-
-  .timesHover {
-    position: absolute;
-    right: 0;
-    top: 0;
-    margin-right: 15px;
-    cursor: pointer;
-  }
-
-  .timesHover h4 {
-    border: 2px solid rgb(6, 6, 60);
-    border-radius: 100%;
-    padding: 1px 6.5px 0.5px 6.5px;
-    background: white;
-  }
-
-  .logoDiv {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 50px;
-  }
-
-  .logo2 {
-    width: 100px;
-    object-fit: cover;
   }
 
   .zip {
-    color: rgb(233, 42, 42);
-    margin-top: 8px;
-    margin-left: 15px;
     font-size: 13px;
   }
 

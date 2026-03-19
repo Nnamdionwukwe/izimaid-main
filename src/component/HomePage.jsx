@@ -35,6 +35,11 @@ export default function HomePage() {
           <FixedHeader />
         </div>
 
+        {/* Mobile SubHeader (buttons + find local) — visible below 992px */}
+        <div className={styles.mobileSubHeader}>
+          <SubHeader />
+        </div>
+
         {/* Desktop header — visible from 992px up */}
         <div className={styles.fixedHeadr}>
           <SubHeader />

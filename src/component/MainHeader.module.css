@@ -28,6 +28,11 @@
   z-index: 1000;
 }
 
+/* ── Mobile SubHeader (buttons + find local) — hidden on desktop ─────── */
+.mobileSubHeader {
+  display: block;
+}
+
 /* ── Mobile-only sections (< 992px) ─────────────────────────────────── */
 .whyChooseUs {
   display: block;
@@ -41,6 +46,10 @@
 /* ── Desktop breakpoint (992px and up) ──────────────────────────────── */
 @media screen and (min-width: 992px) {
   .fixedHeader {
+    display: none;
+  }
+
+  .mobileSubHeader {
     display: none;
   }
 

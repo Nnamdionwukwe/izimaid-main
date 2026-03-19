@@ -9,10 +9,8 @@ import Residential from "./Residential";
 import WhyHireUs from "./WhyHireUs";
 import styles from "./SubHeader.module.css";
 
-// ── Extract detailed address from Nominatim response ─────────────────────────
 function extractAddressDetails(data) {
   const address = data.address || {};
-
   return {
     street: address.road || address.house_number || "",
     houseNumber: address.house_number || "",
@@ -24,30 +22,11 @@ function extractAddressDetails(data) {
   };
 }
 
-// ── Format address nicely for saving ────────────────────────────────────────
-function formatAddress(addressDetails) {
-  const parts = [];
-
-  if (addressDetails.street) {
-    parts.push(addressDetails.street);
-  }
-
-  if (addressDetails.city) {
-    parts.push(addressDetails.city);
-  }
-
-  if (addressDetails.state) {
-    parts.push(addressDetails.state);
-  }
-
-  if (addressDetails.country) {
-    parts.push(addressDetails.country);
-  }
-
-  return parts.length > 0 ? parts.join(", ") : addressDetails.displayName;
+function formatAddress({ street, city, state, country, displayName }) {
+  const parts = [street, city, state, country].filter(Boolean);
+  return parts.length > 0 ? parts.join(", ") : displayName;
 }
 
-// ── Location modal (shared between mobile + desktop) ─────────────────────────
 function LocationModal({
   onClose,
   locationInput,
@@ -109,7 +88,6 @@ function LocationModal({
             )}
           </div>
 
-          {/* Display detected address details */}
           {detectedAddress && (
             <div
               style={{
@@ -162,7 +140,6 @@ function LocationModal({
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
 export default function SubHeader() {
   const navigate = useNavigate();
 
@@ -178,8 +155,7 @@ export default function SubHeader() {
   function handleInput(e) {
     const val = e.target.value;
     setLocationInput(val);
-    setDetectedAddress(null); // Clear detected address when user types
-
+    setDetectedAddress(null);
     if (!val.length) {
       setInvalidZip(false);
       setClearInput(false);
@@ -220,46 +196,30 @@ export default function SubHeader() {
     setLocationError("");
     setDetectedAddress(null);
 
-    const geolocationOptions = {
-      enableHighAccuracy: true,
-      timeout: 30000, // 30 seconds for iOS
-      maximumAge: 0,
-    };
-
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        const { latitude, longitude } = position.coords;
         try {
-          const { latitude, longitude } = position.coords;
-
-          // Fetch detailed address from Nominatim
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
             { timeout: 8000 },
           );
-
           if (!res.ok) throw new Error("Address lookup failed");
-
           const data = await res.json();
           const addressDetails = extractAddressDetails(data);
           const formattedAddress = formatAddress(addressDetails);
-
           setDetectedAddress(addressDetails);
           setLocationInput(formattedAddress);
           setLocating(false);
-
-          // Auto-navigate with the formatted address
           setTimeout(() => {
             setFindLocalIzimaid(false);
             navigate(`/maids?location=${encodeURIComponent(formattedAddress)}`);
           }, 1000);
-        } catch (err) {
-          console.error("Reverse geocoding error:", err);
+        } catch {
           setLocating(false);
-
           try {
-            // Fallback: Just get city/postcode if detailed lookup fails
             const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`,
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
             );
             const data = await res.json();
             const city =
@@ -272,8 +232,7 @@ export default function SubHeader() {
             const country = data.address?.country || "";
             const location =
               [city, postcode, country].filter(Boolean).join(", ") ||
-              `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`;
-
+              `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
             setLocationInput(location);
             setDetectedAddress({
               city,
@@ -282,7 +241,6 @@ export default function SubHeader() {
               street: "",
               state: "",
             });
-
             setTimeout(() => {
               setFindLocalIzimaid(false);
               navigate(`/maids?location=${encodeURIComponent(location)}`);
@@ -304,7 +262,7 @@ export default function SubHeader() {
               : "📍 Could not get your location. Try enabling GPS or entering manually.",
         );
       },
-      geolocationOptions,
+      { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 },
     );
   }
 
@@ -358,7 +316,7 @@ export default function SubHeader() {
       <div className={styles.thirdHeaderMain}>
         <div className={styles.secondMain1}>
           <Link
-            to="https://izimaid-sage.vercel.app"
+            to="https://deausizisparkle.com"
             className={styles.secondMainLogo}
           >
             <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
@@ -377,56 +335,31 @@ export default function SubHeader() {
             <div>
               <p className={styles.thirdPara3}>Own a Franchise</p>
             </div>
-
             <div
-              className={styles.thirdHeader3}
               onClick={() => setFindLocalIzimaid(true)}
+              className={styles.thirdHeader3}
             >
               <i className="fa fa-map-marker" aria-hidden="true" />
               <p>Find My Local Deusizi Sparkle Maid</p>
             </div>
-
             {findLocalIzimaid && <LocationModal {...modalProps} />}
           </div>
         </div>
 
         <div className={styles.thirdMain}>
-          <div className={styles.residence}>
-            <p className={styles.thirdMainDiv1}>Residential</p>
-            <div className={styles.hoverMain}>
-              <Residential />
+          {[
+            ["thirdMainDiv1", "Residential", <Residential />],
+            ["thirdMainDiv2", "Light Commercial", <LightCommercial />],
+            ["thirdMainDiv3", "Why Hire Us", <WhyHireUs />],
+            ["thirdMainDiv4", "About Us", <AboutUs />],
+            ["thirdMainDiv5", "Cleaning Tip", <CleaningTips />],
+            ["thirdMainDiv6", "Practically Spotless Blog", <Practically />],
+          ].map(([cls, label, component]) => (
+            <div key={label} className={styles.residence}>
+              <p className={styles[cls]}>{label}</p>
+              <div className={styles.hoverMain}>{component}</div>
             </div>
-          </div>
-          <div className={styles.residence}>
-            <p className={styles.thirdMainDiv2}>Light Commercial</p>
-            <div className={styles.hoverMain}>
-              <LightCommercial />
-            </div>
-          </div>
-          <div className={styles.residence}>
-            <p className={styles.thirdMainDiv3}>Why Hire Us</p>
-            <div className={styles.hoverMain}>
-              <WhyHireUs />
-            </div>
-          </div>
-          <div className={styles.residence}>
-            <p className={styles.thirdMainDiv4}>About Us</p>
-            <div className={styles.hoverMain}>
-              <AboutUs />
-            </div>
-          </div>
-          <div className={styles.residence}>
-            <p className={styles.thirdMainDiv5}>Cleaning Tip</p>
-            <div className={styles.hoverMain}>
-              <CleaningTips />
-            </div>
-          </div>
-          <div className={styles.residence}>
-            <p className={styles.thirdMainDiv6}>Practically Spotless Blog</p>
-            <div className={styles.hoverMain}>
-              <Practically />
-            </div>
-          </div>
+          ))}
 
           <div className={styles.SubMain}>
             <div className={styles.SubHeader3}>
