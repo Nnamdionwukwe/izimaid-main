@@ -1,0 +1,1019 @@
+/* ── Base ──────────────────────────────────────────────────────────── */
+.page {
+  padding: 20px 16px 80px;
+  font-family: Arial, Helvetica, sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ── Header ────────────────────────────────────────────────────────── */
+.listHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.pageTitle {
+  font-size: 22px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 6px 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pageSub {
+  font-size: 13px;
+  color: gray;
+  margin: 0;
+}
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Total unread badge in title */
+.totalUnreadBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 12px;
+  background: rgb(187, 19, 47);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: rgb(19, 19, 103);
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+.backBtn:hover {
+  text-decoration: underline;
+}
+
+.syncBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1.5px solid rgb(220, 220, 235);
+  background: white;
+  font-size: 18px;
+  color: rgb(19, 19, 103);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.syncBtn:hover {
+  background: rgb(240, 240, 255);
+}
+.syncBtnSyncing {
+  animation: spin 1s linear infinite;
+  opacity: 0.6;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.syncStatus {
+  font-size: 11px;
+  color: #aaa;
+  margin: -8px 0 12px;
+  text-align: right;
+}
+
+/* ── Search ────────────────────────────────────────────────────────── */
+.searchRow {
+  position: relative;
+  margin-bottom: 12px;
+}
+.searchInput {
+  width: 100%;
+  padding: 11px 40px 11px 14px;
+  border: 1.5px solid rgb(220, 220, 235);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.searchInput:focus {
+  border-color: rgb(19, 19, 103);
+}
+.clearSearch {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #aaa;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ── Deleted filter ─────────────────────────────────────────────────── */
+.deletedFilterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #ffccbc;
+  background: white;
+  font-size: 12px;
+  font-weight: bold;
+  color: #e65100;
+  cursor: pointer;
+  font-family: inherit;
+  margin-bottom: 10px;
+  transition: all 0.15s;
+}
+.deletedFilterBtn:hover {
+  background: #fff3e0;
+}
+.deletedFilterBtnActive {
+  background: #fff3e0;
+  border-color: #e65100;
+}
+
+.resultCount {
+  font-size: 12px;
+  color: #aaa;
+  margin: 0 0 12px;
+}
+
+/* ── Skeleton ──────────────────────────────────────────────────────── */
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.skeletonRow {
+  height: 80px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eeeef5 25%, #f5f5fc 50%, #eeeef5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+.skeletonDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skeletonHeader {
+  height: 100px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eeeef5 25%, #f5f5fc 50%, #eeeef5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+.skeletonThread {
+  height: 300px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eeeef5 25%, #f5f5fc 50%, #eeeef5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ── Conversation list ─────────────────────────────────────────────── */
+.convList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.convRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: white;
+  border: 1.5px solid rgb(228, 228, 240);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    box-shadow 0.15s,
+    transform 0.1s;
+}
+.convRow:hover {
+  box-shadow: 0 4px 16px rgba(19, 19, 103, 0.1);
+  transform: translateY(-1px);
+}
+.convRowDeleted {
+  border-color: #ffccbc;
+  background: #fffaf8;
+}
+.convRowUnread {
+  border-color: rgb(19, 19, 103);
+  background: rgb(248, 248, 255);
+}
+
+.convRowAvatar {
+  position: relative;
+  flex-shrink: 0;
+}
+.unreadDot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgb(187, 19, 47);
+  border: 2px solid white;
+}
+
+.convRowBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.convRowTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+.convNames {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgb(30, 30, 30);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.convTime {
+  font-size: 11px;
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+.convEmail {
+  font-size: 11px;
+  color: #aaa;
+  margin: 0 0 3px;
+}
+
+.convLastMsg {
+  font-size: 12px;
+  color: gray;
+  margin: 0 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.noMsg {
+  color: #ccc;
+  font-style: italic;
+}
+
+.convRowMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.convMsgCount {
+  font-size: 11px;
+  color: #aaa;
+}
+.unreadCount {
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgb(187, 19, 47);
+  color: white;
+}
+
+.convChevron {
+  font-size: 22px;
+  color: #ccc;
+  flex-shrink: 0;
+}
+
+/* ── Deletion badge ─────────────────────────────────────────────────── */
+.deletionBadge {
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+/* ── Empty state ───────────────────────────────────────────────────── */
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+}
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+.emptyTitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: #444;
+  margin: 0 0 6px;
+}
+.emptySub {
+  font-size: 13px;
+  color: gray;
+  margin: 0;
+}
+
+/* ── Pagination ────────────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+.pageBtn {
+  padding: 8px 18px;
+  border: 1.5px solid rgb(220, 220, 235);
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  cursor: pointer;
+  font-family: inherit;
+}
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.pageBtn:hover:not(:disabled) {
+  background: rgb(240, 240, 255);
+}
+.pageInfo {
+  font-size: 13px;
+  color: gray;
+}
+
+/* ── Detail view ───────────────────────────────────────────────────── */
+.detailWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detailNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.refreshRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lastRefresh {
+  font-size: 11px;
+  color: #bbb;
+}
+.refreshBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1.5px solid rgb(220, 220, 235);
+  background: white;
+  font-size: 16px;
+  color: rgb(19, 19, 103);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.refreshBtn:hover {
+  background: rgb(240, 240, 255);
+}
+
+.errorBox {
+  padding: 14px;
+  background: #fff0f0;
+  border: 1px solid #ffcccc;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #c62828;
+}
+
+.detailCard {
+  background: white;
+  border: 1px solid rgb(228, 228, 240);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* ── Deletion banner ────────────────────────────────────────────────── */
+.deletionBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 2px solid;
+  flex-wrap: wrap;
+}
+.deletionBannerIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.deletionBannerDetail {
+  font-size: 12px;
+  margin: 3px 0 0;
+  opacity: 0.85;
+  line-height: 1.5;
+}
+.deletionBannerNote {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: bold;
+  opacity: 0.7;
+  white-space: nowrap;
+  align-self: center;
+}
+
+/* ── Participants bar ──────────────────────────────────────────────── */
+.participantsBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid rgb(240, 240, 240);
+  flex-wrap: wrap;
+}
+.participant {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
+  min-width: 120px;
+}
+.participantRight {
+  justify-content: flex-end;
+  text-align: right;
+}
+.participantName {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgb(30, 30, 30);
+  margin: 0 0 2px;
+}
+.participantRole {
+  font-size: 11px;
+  color: gray;
+  margin: 0;
+}
+.participantEmail {
+  font-size: 11px;
+  color: #aaa;
+  margin: 2px 0 0;
+}
+.participantDeleted {
+  font-size: 11px;
+  color: #e65100;
+  font-weight: bold;
+  margin: 3px 0 0;
+}
+
+.adminAvatarWrap {
+  flex-shrink: 0;
+}
+.adminAvatarCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgb(19, 19, 103);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.convArrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.arrowLine {
+  width: 1px;
+  height: 20px;
+  background: rgb(220, 220, 230);
+}
+.convMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.msgCount {
+  font-size: 12px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+}
+.supportLabel {
+  font-size: 11px;
+  color: gray;
+}
+.unreadBadge {
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: rgb(187, 19, 47);
+  color: white;
+}
+
+/* ── Thread ────────────────────────────────────────────────────────── */
+.thread {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 200px;
+  max-height: 45vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+.noMessages {
+  text-align: center;
+  color: #aaa;
+  font-size: 13px;
+  padding: 20px 0;
+}
+
+/* ── Message bubbles ───────────────────────────────────────────────── */
+.bubbleWrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+.bubbleWrapRight {
+  flex-direction: row-reverse;
+}
+.bubbleWrapLeft {
+  flex-direction: row;
+}
+.bubbleAvatar {
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.bubble {
+  max-width: 68%;
+  padding: 8px 12px;
+  border-radius: 14px;
+  word-break: break-word;
+}
+.bubbleCustomer {
+  background: rgb(245, 245, 255);
+  color: rgb(30, 30, 30);
+  border-bottom-left-radius: 4px;
+  border: 1px solid rgb(220, 220, 240);
+}
+.bubbleAdmin {
+  background: rgb(19, 19, 103);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.bubbleOther {
+  background: #f0f0f0;
+  color: #333;
+  border-bottom-left-radius: 4px;
+}
+
+.senderLabel {
+  display: block;
+  font-size: 10px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.bubbleAdmin .senderLabel {
+  color: rgba(255, 255, 255, 0.85);
+}
+.bubbleCustomer .senderLabel {
+  color: rgb(19, 19, 103);
+}
+
+.bubbleText {
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0 0 4px;
+  white-space: pre-wrap;
+}
+.bubbleMeta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 2px;
+}
+.bubbleTime {
+  font-size: 10px;
+  opacity: 0.55;
+}
+.readTick {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: bold;
+}
+
+/* ── Media in bubbles ──────────────────────────────────────────────── */
+.mediaBubble {
+  display: block;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 4px;
+  transition: opacity 0.15s;
+}
+.mediaBubble:hover {
+  opacity: 0.88;
+}
+.mediaImg {
+  max-width: 200px;
+  max-height: 180px;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+}
+.videoThumb {
+  width: 180px;
+  height: 110px;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  gap: 6px;
+}
+.playIcon {
+  font-size: 28px;
+  color: white;
+}
+.mediaCaption {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 2px 0 4px;
+}
+
+/* ── Admin deleted banner ──────────────────────────────────────────── */
+.adminDeletedBanner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.75;
+  margin-bottom: 6px;
+  border-left: 3px solid rgba(0, 0, 0, 0.2);
+}
+.bubbleAdmin .adminDeletedBanner {
+  background: rgba(255, 255, 255, 0.15);
+}
+.bubbleTextDeleted {
+  opacity: 0.65;
+  font-style: italic;
+}
+
+/* ── Reply area ────────────────────────────────────────────────────── */
+.replyArea {
+  border-top: 2px solid rgb(19, 19, 103);
+  background: rgb(248, 248, 255);
+  padding: 12px 16px;
+}
+
+.replyRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.attachLabel {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: white;
+  border: 1.5px solid rgb(220, 220, 235);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.attachLabel:hover {
+  background: rgb(240, 240, 255);
+}
+.attachIcon {
+  font-size: 17px;
+}
+.hiddenInput {
+  display: none;
+}
+
+.replyInput {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid rgb(220, 220, 235);
+  border-radius: 22px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  line-height: 1.4;
+  max-height: 120px;
+  overflow-y: auto;
+  transition: border-color 0.15s;
+  background: white;
+  color: #1a1a1a;
+}
+.replyInput:focus {
+  border-color: rgb(19, 19, 103);
+}
+.replyInput::placeholder {
+  color: #bbb;
+}
+
+.sendBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #e0e3ee;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+.sendBtnActive {
+  background: rgb(19, 19, 103);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(19, 19, 103, 0.35);
+}
+.sendBtnActive:hover {
+  background: rgb(14, 14, 80);
+}
+.sendBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.replyHint {
+  font-size: 11px;
+  color: rgb(19, 19, 103);
+  opacity: 0.65;
+  margin: 6px 0 0;
+  text-align: center;
+}
+
+.sendError {
+  font-size: 12px;
+  color: #c62828;
+  background: #fff0f0;
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+}
+
+/* ── Media preview strip ───────────────────────────────────────────── */
+.mediaStrip {
+  display: flex;
+  gap: 8px;
+  padding: 0 0 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.mediaStrip::-webkit-scrollbar {
+  display: none;
+}
+.mediaStripItem {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #eee;
+}
+.stripImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.stripVideo {
+  width: 100%;
+  height: 100%;
+  background: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.stripRemove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  color: white;
+  border: none;
+  font-size: 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ── Upload progress ───────────────────────────────────────────────── */
+.uploadProgress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgb(19, 19, 103);
+  padding: 0 0 8px;
+  font-weight: 600;
+}
+.spinnerDark {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  border-top-color: rgb(19, 19, 103);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ── Spinners ──────────────────────────────────────────────────────── */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+
+/* ── Thread footer ─────────────────────────────────────────────────── */
+.threadFooter {
+  padding: 10px 20px;
+  border-top: 1px solid rgb(240, 240, 240);
+  background: rgb(248, 248, 252);
+}
+.threadFooterNote {
+  font-size: 11px;
+  color: #bbb;
+}
+
+/* ── Avatars ───────────────────────────────────────────────────────── */
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+.avatarFallback {
+  border-radius: 50%;
+  background: rgb(19, 19, 103);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+
+/* ── Lightbox ──────────────────────────────────────────────────────── */
+.lightboxOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.lightboxContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.lightboxMedia {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 10px;
+  object-fit: contain;
+  display: block;
+}
+.lightboxClose {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+  color: #333;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.lightboxName {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin: 0;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .participantsBar {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .convArrow {
+    flex-direction: row;
+  }
+  .participantRight {
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .bubble {
+    max-width: 82%;
+  }
+  .deletionBannerNote {
+    display: none;
+  }
+  .thread {
+    max-height: 38vh;
+  }
+}
