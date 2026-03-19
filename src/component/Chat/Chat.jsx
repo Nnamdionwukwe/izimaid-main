@@ -171,7 +171,7 @@ function Bubble({ msg, isMine, onDelete, onMedia }) {
 
         {/* Deleted message placeholder */}
         {msg.deleted_at ? (
-          <p className={styles.deletedMsg}>🗑 Message deleted</p>
+          <p className={styles.deletedMsg}>Message deleted</p>
         ) : (
           <>
             {/* Text */}

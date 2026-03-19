@@ -12,6 +12,12 @@
   z-index: 200;
 }
 
+.deletedMsg {
+  font-style: italic;
+  color: #888;
+  font-size: 13px;
+}
+
 /* ── Header ────────────────────────────────────────────────────────── */
 .header {
   display: flex;
