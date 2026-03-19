@@ -179,7 +179,7 @@ function Bubble({ msg, isMine, onDelete, onMedia }) {
           <span className={styles.bubbleTime}>{fmtTime(msg.created_at)}</span>
           {isMine && (
             <span
-              className={styles.bubbleRead}
+              className={`${styles.bubbleRead} ${msg.is_read ? styles.bubbleReadSeen : styles.bubbleReadSent}`}
               title={msg.is_read ? "Seen" : "Sent"}
             >
               {msg.is_read ? "✓✓" : "✓"}
