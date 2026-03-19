@@ -4,13 +4,52 @@ import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const CONVERSATIONS_URL = `${API_URL}/api/chat/admin`;
-const POLL_INTERVAL = 30000; // 30s
+const POLL_INTERVAL = 30000;
 
 const BOOKING_STATUS_STYLES = {
   pending: { bg: "#fff8e1", color: "#f59e0b" },
   confirmed: { bg: "#e3f2fd", color: "#1976d2" },
   completed: { bg: "#e8f5e9", color: "#388e3c" },
   cancelled: { bg: "#fce4ec", color: "#c62828" },
+  in_progress: { bg: "#ede7f6", color: "#6a1b9a" },
+  declined: { bg: "#fff3e0", color: "#e65100" },
+};
+
+// Deletion status → human-readable label + colours
+const DELETION_META = {
+  deleted_by_customer: {
+    label: "🗑 Deleted by customer",
+    bg: "#fff3e0",
+    color: "#e65100",
+    detail: (conv) =>
+      `Customer deleted this chat${
+        conv.deleted_at_customer
+          ? " on " + formatDate(conv.deleted_at_customer)
+          : ""
+      }. The maid's view is unaffected.`,
+  },
+  deleted_by_maid: {
+    label: "🗑 Deleted by maid",
+    bg: "#fff3e0",
+    color: "#e65100",
+    detail: (conv) =>
+      `Maid deleted this chat${
+        conv.deleted_at_maid ? " on " + formatDate(conv.deleted_at_maid) : ""
+      }. The customer's view is unaffected.`,
+  },
+  deleted_by_both: {
+    label: "🗑 Deleted by both parties",
+    bg: "#fce4ec",
+    color: "#c62828",
+    detail: (conv) => {
+      const parts = [];
+      if (conv.deleted_at_customer)
+        parts.push(`Customer: ${formatDate(conv.deleted_at_customer)}`);
+      if (conv.deleted_at_maid)
+        parts.push(`Maid: ${formatDate(conv.deleted_at_maid)}`);
+      return `Both parties have deleted this chat. ${parts.join(" · ")}`;
+    },
+  },
 };
 
 function getToken() {
@@ -72,7 +111,47 @@ function Avatar({ name, src, size = 36 }) {
   );
 }
 
-// ─── Lightbox ───────────────────────────────────────────────────────
+// ─── Deletion badge (small, used in list rows) ───────────────────────
+function DeletionBadge({ status }) {
+  const meta = DELETION_META[status];
+  if (!meta) return null;
+  return (
+    <span
+      className={styles.deletionBadge}
+      style={{ background: meta.bg, color: meta.color }}
+      title={status.replace(/_/g, " ")}
+    >
+      {meta.label}
+    </span>
+  );
+}
+
+// ─── Deletion banner (full-width, used in detail view) ───────────────
+function DeletionBanner({ conv }) {
+  const meta = DELETION_META[conv.deletion_status];
+  if (!meta) return null;
+  return (
+    <div
+      className={styles.deletionBanner}
+      style={{
+        background: meta.bg,
+        borderColor: meta.color,
+        color: meta.color,
+      }}
+    >
+      <span className={styles.deletionBannerIcon}>⚠️</span>
+      <div>
+        <strong>{meta.label}</strong>
+        <p className={styles.deletionBannerDetail}>{meta.detail(conv)}</p>
+      </div>
+      <span className={styles.deletionBannerNote}>
+        Admin view is always preserved
+      </span>
+    </div>
+  );
+}
+
+// ─── Lightbox ────────────────────────────────────────────────────────
 function Lightbox({ item, onClose }) {
   if (!item) return null;
   return (
@@ -127,7 +206,9 @@ function MessageBubble({ msg, conversation, onMediaClick }) {
 
   return (
     <div
-      className={`${styles.bubbleWrap} ${isCustomer ? styles.bubbleWrapRight : styles.bubbleWrapLeft}`}
+      className={`${styles.bubbleWrap} ${
+        isCustomer ? styles.bubbleWrapRight : styles.bubbleWrapLeft
+      }`}
     >
       {!isCustomer && (
         <div className={styles.bubbleAvatar}>
@@ -140,31 +221,47 @@ function MessageBubble({ msg, conversation, onMediaClick }) {
       )}
       <div className={`${styles.bubble} ${bubbleClass}`}>
         <span className={styles.senderLabel}>{label}</span>
-        {hasMedia && (
-          <button
-            className={styles.mediaBubble}
-            onClick={() => onMediaClick(msg)}
-            type="button"
-          >
-            {msg.message_type === "video" ? (
-              <div className={styles.videoThumb}>
-                <span className={styles.playIcon}>▶</span>
-                <span className={styles.mediaCaption}>Video</span>
-              </div>
-            ) : (
-              <img
-                src={msg.media_url}
-                alt={msg.content || "image"}
-                className={styles.mediaImg}
-              />
+        {/* Admin always sees deleted messages with full context */}
+        {msg.deleted_at ? (
+          <div className={styles.adminDeletedMsg}>
+            <span className={styles.adminDeletedIcon}>🗑</span>
+            <div>
+              <p className={styles.adminDeletedLabel}>Message deleted</p>
+              <p className={styles.adminDeletedMeta}>
+                by {msg.deleted_by_name || "sender"} ·{" "}
+                {formatDate(msg.deleted_at)}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {hasMedia && (
+              <button
+                className={styles.mediaBubble}
+                onClick={() => onMediaClick(msg)}
+                type="button"
+              >
+                {msg.message_type === "video" ? (
+                  <div className={styles.videoThumb}>
+                    <span className={styles.playIcon}>▶</span>
+                    <span className={styles.mediaCaption}>Video</span>
+                  </div>
+                ) : (
+                  <img
+                    src={msg.media_url}
+                    alt={msg.content || "image"}
+                    className={styles.mediaImg}
+                  />
+                )}
+              </button>
             )}
-          </button>
-        )}
-        {msg.content && !hasMedia && (
-          <p className={styles.bubbleText}>{msg.content}</p>
-        )}
-        {msg.content && hasMedia && (
-          <p className={styles.mediaCaption}>{msg.content}</p>
+            {msg.content && !hasMedia && (
+              <p className={styles.bubbleText}>{msg.content}</p>
+            )}
+            {msg.content && hasMedia && (
+              <p className={styles.mediaCaption}>{msg.content}</p>
+            )}
+          </>
         )}
         <div className={styles.bubbleMeta}>
           <span className={styles.bubbleTime}>
@@ -224,14 +321,12 @@ function ConversationDetail({ conversationId, onBack }) {
     fetchConversation(false);
   }, [conversationId]);
 
-  // Scroll to bottom on new messages
   useEffect(() => {
     if (data && threadRef.current) {
       threadRef.current.scrollTop = threadRef.current.scrollHeight;
     }
   }, [data?.messages?.length]);
 
-  // Auto-refresh
   useEffect(() => {
     const id = setInterval(() => fetchConversation(true), POLL_INTERVAL);
     return () => clearInterval(id);
@@ -275,6 +370,9 @@ function ConversationDetail({ conversationId, onBack }) {
 
       {!loading && conv && (
         <div className={styles.detailCard}>
+          {/* ── Deletion banner — shown prominently if any party deleted ── */}
+          <DeletionBanner conv={conv} />
+
           {/* Participants header */}
           <div className={styles.participantsBar}>
             <div className={styles.participant}>
@@ -289,6 +387,15 @@ function ConversationDetail({ conversationId, onBack }) {
                 {conv.customer_email && (
                   <p className={styles.participantEmail}>
                     {conv.customer_email}
+                  </p>
+                )}
+                {/* Show if customer deleted their view */}
+                {conv.deleted_by_customer && (
+                  <p className={styles.participantDeleted}>
+                    🗑 Deleted{" "}
+                    {conv.deleted_at_customer
+                      ? timeAgo(conv.deleted_at_customer)
+                      : ""}
                   </p>
                 )}
               </div>
@@ -335,6 +442,13 @@ function ConversationDetail({ conversationId, onBack }) {
                 {conv.maid_email && (
                   <p className={styles.participantEmail}>{conv.maid_email}</p>
                 )}
+                {/* Show if maid deleted their view */}
+                {conv.deleted_by_maid && (
+                  <p className={styles.participantDeleted}>
+                    🗑 Deleted{" "}
+                    {conv.deleted_at_maid ? timeAgo(conv.deleted_at_maid) : ""}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -377,11 +491,16 @@ function ConversationDetail({ conversationId, onBack }) {
   );
 }
 
-// ─── Conversation Row (list item) ────────────────────────────────────
+// ─── Conversation Row ────────────────────────────────────────────────
 function ConversationRow({ conv, onClick }) {
   const bkStyle = BOOKING_STATUS_STYLES[conv.booking_status] || {};
+  const isDeleted = conv.deletion_status && conv.deletion_status !== "active";
+
   return (
-    <div className={styles.convRow} onClick={onClick}>
+    <div
+      className={`${styles.convRow} ${isDeleted ? styles.convRowDeleted : ""}`}
+      onClick={onClick}
+    >
       <div className={styles.convRowAvatars}>
         <Avatar
           name={conv.customer_name}
@@ -400,6 +519,7 @@ function ConversationRow({ conv, onClick }) {
             {timeAgo(conv.last_message_at || conv.updated_at)}
           </span>
         </div>
+
         <p className={styles.convLastMsg}>
           {conv.last_message ? (
             conv.last_message.length > 80 ? (
@@ -411,6 +531,7 @@ function ConversationRow({ conv, onClick }) {
             <em className={styles.noMsg}>No messages yet</em>
           )}
         </p>
+
         <div className={styles.convRowMeta}>
           <span className={styles.convMsgCount}>
             💬 {conv.message_count ?? 0}
@@ -432,6 +553,8 @@ function ConversationRow({ conv, onClick }) {
               {conv.booking_status.replace("_", " ")}
             </span>
           )}
+          {/* ── Deletion badge ── */}
+          {isDeleted && <DeletionBadge status={conv.deletion_status} />}
           <span className={styles.convId}>
             #{conv.booking_id?.toString().slice(0, 8)}
           </span>
@@ -454,6 +577,8 @@ export default function AdminChats() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [selectedId, setSelectedId] = useState(null);
+  // Filter to show only deleted conversations
+  const [showDeleted, setShowDeleted] = useState(false);
   const LIMIT = 20;
   const navigate = useNavigate();
 
@@ -485,7 +610,6 @@ export default function AdminChats() {
     fetchConversations(false, page, search);
   }, [page, search]);
 
-  // Background poll (only when on list view)
   useEffect(() => {
     if (selectedId) return;
     const id = setInterval(
@@ -495,7 +619,7 @@ export default function AdminChats() {
     return () => clearInterval(id);
   }, [fetchConversations, selectedId, page, search]);
 
-  // Search with debounce
+  // Debounced search
   useEffect(() => {
     const t = setTimeout(() => {
       setPage(1);
@@ -504,7 +628,17 @@ export default function AdminChats() {
     return () => clearTimeout(t);
   }, [searchInput]);
 
-  // Detail view
+  // Client-side deletion filter
+  const displayed = showDeleted
+    ? conversations.filter(
+        (c) => c.deletion_status && c.deletion_status !== "active",
+      )
+    : conversations;
+
+  const deletedCount = conversations.filter(
+    (c) => c.deletion_status && c.deletion_status !== "active",
+  ).length;
+
   if (selectedId) {
     return (
       <div className={styles.page}>
@@ -540,7 +674,6 @@ export default function AdminChats() {
         </div>
       </div>
 
-      {/* Sync status */}
       {lastSync && (
         <p className={styles.syncStatus}>
           {syncing
@@ -549,7 +682,7 @@ export default function AdminChats() {
         </p>
       )}
 
-      {/* Search */}
+      {/* Search + deleted filter row */}
       <div className={styles.searchRow}>
         <input
           className={styles.searchInput}
@@ -567,15 +700,25 @@ export default function AdminChats() {
         )}
       </div>
 
-      {/* Result count */}
+      {/* Deleted filter toggle */}
+      {deletedCount > 0 && (
+        <button
+          className={`${styles.deletedFilterBtn} ${showDeleted ? styles.deletedFilterBtnActive : ""}`}
+          onClick={() => setShowDeleted((v) => !v)}
+        >
+          🗑 {showDeleted ? "Show all" : `Show deleted (${deletedCount})`}
+        </button>
+      )}
+
       {!loading && (
         <p className={styles.resultCount}>
-          {total} conversation{total !== 1 ? "s" : ""}
+          {showDeleted ? deletedCount : total} conversation
+          {(showDeleted ? deletedCount : total) !== 1 ? "s" : ""}
           {search ? ` matching "${search}"` : ""}
+          {showDeleted ? " · deleted view" : ""}
         </p>
       )}
 
-      {/* List */}
       {loading ? (
         <div className={styles.skeletonList}>
           {[...Array(6)].map((_, i) => (
@@ -586,22 +729,28 @@ export default function AdminChats() {
             />
           ))}
         </div>
-      ) : conversations.length === 0 ? (
+      ) : displayed.length === 0 ? (
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}>💬</div>
           <p className={styles.emptyTitle}>
-            {search ? "No matching conversations" : "No conversations yet"}
+            {showDeleted
+              ? "No deleted conversations"
+              : search
+                ? "No matching conversations"
+                : "No conversations yet"}
           </p>
           <p className={styles.emptySub}>
-            {search
-              ? "Try searching by name or booking ID."
-              : "Conversations between customers and maids will appear here."}
+            {showDeleted
+              ? "No parties have deleted any chats yet."
+              : search
+                ? "Try searching by name or booking ID."
+                : "Conversations between customers and maids will appear here."}
           </p>
         </div>
       ) : (
         <>
           <div className={styles.convList}>
-            {conversations.map((c) => (
+            {displayed.map((c) => (
               <ConversationRow
                 key={c.id}
                 conv={c}
@@ -610,8 +759,7 @@ export default function AdminChats() {
             ))}
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
+          {totalPages > 1 && !showDeleted && (
             <div className={styles.pagination}>
               <button
                 className={styles.pageBtn}

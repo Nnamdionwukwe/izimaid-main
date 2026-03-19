@@ -154,8 +154,9 @@ function Bubble({ msg, isMine, onDelete, onMedia }) {
           <span className={styles.senderName}>{msg.sender_name}</span>
         )}
 
-        {/* Media */}
-        {(msg.message_type === "image" || msg.message_type === "video") &&
+        {/* Media — hidden if deleted */}
+        {!msg.deleted_at &&
+          (msg.message_type === "image" || msg.message_type === "video") &&
           msg.media_url && (
             <button className={styles.mediaThumb} onClick={() => onMedia(msg)}>
               {msg.message_type === "video" ? (
@@ -168,16 +169,23 @@ function Bubble({ msg, isMine, onDelete, onMedia }) {
             </button>
           )}
 
-        {/* Text */}
-        {msg.message_type === "text" && (
-          <p className={styles.bubbleText}>{msg.content}</p>
+        {/* Deleted message placeholder */}
+        {msg.deleted_at ? (
+          <p className={styles.deletedMsg}>🗑 Message deleted</p>
+        ) : (
+          <>
+            {/* Text */}
+            {msg.message_type === "text" && (
+              <p className={styles.bubbleText}>{msg.content}</p>
+            )}
+            {/* Caption under media */}
+            {msg.message_type !== "text" &&
+              msg.content &&
+              msg.content !== msg.media_url && (
+                <p className={styles.bubbleCaption}>{msg.content}</p>
+              )}
+          </>
         )}
-        {/* Caption under media */}
-        {msg.message_type !== "text" &&
-          msg.content &&
-          msg.content !== msg.media_url && (
-            <p className={styles.bubbleCaption}>{msg.content}</p>
-          )}
 
         <div className={styles.bubbleMeta}>
           <span className={styles.bubbleTime}>{fmtTime(msg.created_at)}</span>
