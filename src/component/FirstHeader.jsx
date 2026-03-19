@@ -2,17 +2,10 @@ import styles from "./FirstHeader.module.css";
 
 export default function FirstHeader() {
   return (
-    <div>
-      <div className={styles.header1}>
-        <a className={styles.headerP} href="http://deusiziinterior.com">
-          Deuseizi Interior
-        </a>
-      </div>
-      <div className={styles.header2}>
-        <a className={styles.headerP} href="http://deusiziinterior.com">
-          Deuseizi Interior
-        </a>
-      </div>
+    <div className={styles.header}>
+      <a className={styles.headerLink} href="http://deusiziinterior.com">
+        Deuseizi Interior
+      </a>
     </div>
   );
 }

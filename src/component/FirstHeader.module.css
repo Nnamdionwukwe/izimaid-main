@@ -1,37 +1,16 @@
-@media screen and (min-width: 20px) {
-  .header1 {
-    background-color: rgb(32, 32, 65);
-    padding: 5px 20px;
-    color: white;
-    font-style: italic;
-    font-weight: bold;
-    cursor: pointer;
-    margin: -10px -8px 10px -8px;
-  }
-
-  .header2 {
-    display: none;
-  }
-
-  .headerP {
-    text-decoration: none;
-    color: white;
-  }
+/* ── Base (all screens) ─────────────────────────────────────────────── */
+.header {
+  background-color: rgb(32, 32, 65);
+  padding: 5px 20px;
+  color: white;
+  font-style: italic;
+  font-weight: bold;
+  cursor: pointer;
+  /* Preserve original negative margins */
+  margin: -10px -8px 10px -8px;
 }
 
-@media screen and (min-width: 992px) {
-  .header2 {
-    background-color: rgb(32, 32, 65);
-    padding: 5px 20px;
-    color: white;
-    font-style: italic;
-    font-weight: bold;
-    cursor: pointer;
-    margin: -10px -8px 10px -8px;
-  }
-
-  .headerP {
-    text-decoration: none;
-    color: white;
-  }
+.headerLink {
+  text-decoration: none;
+  color: white;
 }
