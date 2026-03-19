@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./EcoFriendlyCleaning.module.css";
+import FixedHeader from "../FixedHeader";
 
 const PRODUCTS = [
   {
@@ -132,6 +133,7 @@ export default function EcoFriendlyCleaning() {
 
   return (
     <div className={styles.page}>
+      <FixedHeader />
       {/* Hero */}
       <div className={styles.hero}>
         <div className={styles.heroLeaf}>🌿</div>

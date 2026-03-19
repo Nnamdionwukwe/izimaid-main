@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./OneTimeCleaning.module.css";
+import FixedHeader from "../FixedHeader";
 
 const SERVICES = [
   {
@@ -118,6 +119,7 @@ export default function OneTimeCleaning() {
 
   return (
     <div className={styles.page}>
+      <FixedHeader />
       {/* Hero */}
       <div className={styles.hero}>
         <p className={styles.heroEyebrow}>One-time cleaning</p>

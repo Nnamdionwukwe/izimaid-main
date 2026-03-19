@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MoveInCleaning.module.css";
+import FixedHeader from "../FixedHeader";
 
 const SERVICES = [
   {
@@ -158,6 +159,7 @@ export default function MoveInCleaning() {
 
   return (
     <div className={styles.page}>
+      <FixedHeader />
       {/* Hero */}
       <div className={styles.hero}>
         <p className={styles.heroEyebrow}>Move-in / Move-out cleaning</p>

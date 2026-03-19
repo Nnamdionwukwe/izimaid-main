@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MoveOutCleaning.module.css";
+import FixedHeader from "../FixedHeader";
 
 const PACKAGES = [
   {
@@ -173,6 +174,7 @@ export default function MoveOutCleaning() {
 
   return (
     <div className={styles.page}>
+      <FixedHeader />
       {/* Hero */}
       <div className={styles.hero}>
         <p className={styles.heroEyebrow}>Move-out cleaning</p>

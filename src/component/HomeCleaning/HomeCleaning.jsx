@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./HomeCleaning.module.css";
+import FixedHeader from "../FixedHeader";
 
 const SERVICES = [
   {
@@ -219,6 +220,7 @@ export default function HomeCleaning() {
 
   return (
     <div className={styles.page}>
+      <FixedHeader />
       {/* Hero */}
       <div className={styles.hero}>
         <p className={styles.heroEyebrow}>Home cleaning</p>

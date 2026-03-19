@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./OccasionalCleaning.module.css";
+import FixedHeader from "../FixedHeader";
 
 const OCCASIONS = [
   {
@@ -131,6 +132,7 @@ export default function OccasionalCleaning() {
 
   return (
     <div className={styles.page}>
+      <FixedHeader />
       {/* Hero */}
       <div className={styles.hero}>
         <p className={styles.heroEyebrow}>Occasional cleaning</p>

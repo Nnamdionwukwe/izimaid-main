@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./SpecialEventCleaning.module.css";
+import FixedHeader from "../FixedHeader";
 
 const EVENTS = [
   {
@@ -170,6 +171,7 @@ export default function SpecialEventCleaning() {
 
   return (
     <div className={styles.page}>
+      <FixedHeader />
       {/* Hero */}
       <div className={styles.hero}>
         <p className={styles.heroEyebrow}>Special event cleaning</p>

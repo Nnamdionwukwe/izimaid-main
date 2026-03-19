@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ApartmentCleaning.module.css";
+import FixedHeader from "../FixedHeader";
 
 const SIZES = [
   {
@@ -191,6 +192,7 @@ export default function ApartmentCleaning() {
 
   return (
     <div className={styles.page}>
+      <FixedHeader />
       {/* Hero */}
       <div className={styles.hero}>
         <p className={styles.heroEyebrow}>Apartment & condo cleaning</p>
