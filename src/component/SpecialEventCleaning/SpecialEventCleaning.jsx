@@ -170,237 +170,243 @@ export default function SpecialEventCleaning() {
   const [openFaq, setOpenFaq] = useState(null);
 
   return (
-    <div className={styles.page}>
+    <>
       <FixedHeader />
-      {/* Hero */}
-      <div className={styles.hero}>
-        <p className={styles.heroEyebrow}>Special event cleaning</p>
-        <h1 className={styles.heroTitle}>
-          Your event.
-          <br />
-          <em>We handle the rest.</em>
-        </h1>
-        <p className={styles.heroDesc}>
-          Professional before & after cleaning for every special occasion —
-          parties, weddings, corporate events, and more.
-        </p>
-        <div className={styles.heroDivider} />
-        <div className={styles.heroButtons}>
-          <button
-            className={styles.heroPrimary}
-            onClick={() => navigate("/maids")}
-          >
-            Book Event Clean
-          </button>
-          <button
-            className={styles.heroSecondary}
-            onClick={() => navigate("/request-a-free-estimate")}
-          >
-            Get a Free Estimate
-          </button>
-        </div>
-      </div>
-
-      {/* Trust bar */}
-      <div className={styles.trustBar}>
-        {[
-          ["📅", "Before & after packages"],
-          ["⚡", "Fast turnaround"],
-          ["👥", "Teams available"],
-          ["🛡️", "Satisfaction guaranteed"],
-          ["🔒", "Secure payment"],
-        ].map(([emoji, text]) => (
-          <div key={text} className={styles.trustItem}>
-            <span className={styles.trustEmoji}>{emoji}</span>
-            <span className={styles.trustText}>{text}</span>
+      <div className={styles.page}>
+        {/* Hero */}
+        <div className={styles.hero}>
+          <p className={styles.heroEyebrow}>Special event cleaning</p>
+          <h1 className={styles.heroTitle}>
+            Your event.
+            <br />
+            <em>We handle the rest.</em>
+          </h1>
+          <p className={styles.heroDesc}>
+            Professional before & after cleaning for every special occasion —
+            parties, weddings, corporate events, and more.
+          </p>
+          <div className={styles.heroDivider} />
+          <div className={styles.heroButtons}>
+            <button
+              className={styles.heroPrimary}
+              onClick={() => navigate("/maids")}
+            >
+              Book Event Clean
+            </button>
+            <button
+              className={styles.heroSecondary}
+              onClick={() => navigate("/request-a-free-estimate")}
+            >
+              Get a Free Estimate
+            </button>
           </div>
-        ))}
-      </div>
+        </div>
 
-      {/* Event cards */}
-      <div className={styles.section}>
-        <p className={styles.sectionEyebrow}>Pick your event</p>
-        <h2 className={styles.sectionTitle}>
-          We clean for every special occasion
-        </h2>
-        <div className={styles.eventCards}>
-          {EVENTS.map((e) => (
-            <div key={e.name} className={styles.eventCard}>
-              <div className={styles.cardBanner} />
-              <div className={styles.cardBody}>
-                <div className={styles.cardTop}>
-                  <div className={styles.cardIcon}>{e.icon}</div>
-                  <div>
-                    <p className={styles.cardName}>{e.name}</p>
-                    <p className={styles.cardTagline}>{e.tagline}</p>
+        {/* Trust bar */}
+        <div className={styles.trustBar}>
+          {[
+            ["📅", "Before & after packages"],
+            ["⚡", "Fast turnaround"],
+            ["👥", "Teams available"],
+            ["🛡️", "Satisfaction guaranteed"],
+            ["🔒", "Secure payment"],
+          ].map(([emoji, text]) => (
+            <div key={text} className={styles.trustItem}>
+              <span className={styles.trustEmoji}>{emoji}</span>
+              <span className={styles.trustText}>{text}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Event cards */}
+        <div className={styles.section}>
+          <p className={styles.sectionEyebrow}>Pick your event</p>
+          <h2 className={styles.sectionTitle}>
+            We clean for every special occasion
+          </h2>
+          <div className={styles.eventCards}>
+            {EVENTS.map((e) => (
+              <div key={e.name} className={styles.eventCard}>
+                <div className={styles.cardBanner} />
+                <div className={styles.cardBody}>
+                  <div className={styles.cardTop}>
+                    <div className={styles.cardIcon}>{e.icon}</div>
+                    <div>
+                      <p className={styles.cardName}>{e.name}</p>
+                      <p className={styles.cardTagline}>{e.tagline}</p>
+                    </div>
+                  </div>
+                  <p className={styles.cardDesc}>{e.desc}</p>
+                  <div className={styles.cardTags}>
+                    {e.tags.map((t) => (
+                      <span key={t} className={styles.cardTag}>
+                        {t}
+                      </span>
+                    ))}
                   </div>
                 </div>
-                <p className={styles.cardDesc}>{e.desc}</p>
-                <div className={styles.cardTags}>
-                  {e.tags.map((t) => (
-                    <span key={t} className={styles.cardTag}>
-                      {t}
-                    </span>
-                  ))}
+                <div className={styles.cardFooter}>
+                  <div className={styles.cardPrice}>
+                    From <strong>{e.from}</strong>
+                  </div>
+                  <button
+                    className={styles.bookBtn}
+                    onClick={() => navigate("/maids")}
+                  >
+                    Book Now
+                  </button>
                 </div>
               </div>
-              <div className={styles.cardFooter}>
-                <div className={styles.cardPrice}>
-                  From <strong>{e.from}</strong>
-                </div>
-                <button
-                  className={styles.bookBtn}
-                  onClick={() => navigate("/maids")}
-                >
-                  Book Now
-                </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Timeline */}
+        <div className={styles.timeline}>
+          <p
+            className={styles.sectionEyebrow}
+            style={{ color: "rgba(255,255,255,0.6)" }}
+          >
+            How it works
+          </p>
+          <h2 className={styles.timelineTitle}>The event cleaning timeline</h2>
+          <p className={styles.timelineSub}>
+            We fit seamlessly around your schedule — before, during, or after.
+          </p>
+          <div className={styles.timelineGrid}>
+            {TIMELINE_ITEMS.map((t) => (
+              <div key={t.name} className={styles.timelineItem}>
+                <div className={styles.timelineEmoji}>{t.emoji}</div>
+                <p className={styles.timelineName}>{t.name}</p>
+                <p className={styles.timelineDesc}>{t.desc}</p>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Timeline */}
-      <div className={styles.timeline}>
-        <p
-          className={styles.sectionEyebrow}
-          style={{ color: "rgba(255,255,255,0.6)" }}
-        >
-          How it works
-        </p>
-        <h2 className={styles.timelineTitle}>The event cleaning timeline</h2>
-        <p className={styles.timelineSub}>
-          We fit seamlessly around your schedule — before, during, or after.
-        </p>
-        <div className={styles.timelineGrid}>
-          {TIMELINE_ITEMS.map((t) => (
-            <div key={t.name} className={styles.timelineItem}>
-              <div className={styles.timelineEmoji}>{t.emoji}</div>
-              <p className={styles.timelineName}>{t.name}</p>
-              <p className={styles.timelineDesc}>{t.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Included */}
-      <div className={styles.included}>
-        <p className={styles.sectionEyebrow}>Every event clean includes</p>
-        <h2 className={styles.sectionTitle}>What's covered in every booking</h2>
-        <div className={styles.includedGrid}>
-          {INCLUDED.map((item) => (
-            <div key={item} className={styles.includedItem}>
-              <div className={styles.includedCheck}>✓</div>
-              <span className={styles.includedText}>{item}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Benefits */}
-      <div className={styles.benefits}>
-        <p className={styles.sectionEyebrow}>Why it works</p>
-        <h2 className={styles.sectionTitle}>
-          Built for events, not just houses
-        </h2>
-        <div className={styles.benefitCards}>
-          {BENEFITS.map((b, i) => (
-            <div
-              key={b.title}
-              className={styles.benefitCard}
-              style={{ animationDelay: `${i * 0.07}s` }}
-            >
-              <div className={styles.benefitIcon}>{b.icon}</div>
-              <div>
-                <p className={styles.benefitTitle}>{b.title}</p>
-                <p className={styles.benefitText}>{b.text}</p>
+        {/* Included */}
+        <div className={styles.included}>
+          <p className={styles.sectionEyebrow}>Every event clean includes</p>
+          <h2 className={styles.sectionTitle}>
+            What's covered in every booking
+          </h2>
+          <div className={styles.includedGrid}>
+            {INCLUDED.map((item) => (
+              <div key={item} className={styles.includedItem}>
+                <div className={styles.includedCheck}>✓</div>
+                <span className={styles.includedText}>{item}</span>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Steps */}
-      <div className={styles.steps}>
-        <p className={styles.sectionEyebrow}>The process</p>
-        <h2 className={styles.sectionTitle}>
-          From booking to spotless — 4 steps
-        </h2>
-        <div className={styles.stepList}>
-          {STEPS.map((s, i) => (
-            <div key={s.title} className={styles.step}>
-              <div className={styles.stepNum}>{i + 1}</div>
-              <div className={styles.stepBody}>
-                <p className={styles.stepTitle}>{s.title}</p>
-                <p className={styles.stepText}>{s.text}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Commitment */}
-      <div className={styles.commitment}>
-        <div className={styles.commitHeader}>
-          <span className={styles.commitHeaderIcon}>🤝</span>
-          <p className={styles.commitHeaderTitle}>Our event cleaning promise</p>
-        </div>
-        <div className={styles.commitList}>
-          {COMMITMENTS.map((c, i) => (
-            <div key={i} className={styles.commitItem}>
-              <div className={styles.commitDot}>✓</div>
-              <p className={styles.commitText}>{c}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* FAQ */}
-      <div className={styles.faq}>
-        <p className={styles.sectionEyebrow}>Questions?</p>
-        <h2 className={styles.sectionTitle}>Event cleaning — answered</h2>
-        <div className={styles.faqList}>
-          {FAQS.map((f, i) => (
-            <div key={i} className={styles.faqItem}>
-              <button
-                className={styles.faqQuestion}
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+        {/* Benefits */}
+        <div className={styles.benefits}>
+          <p className={styles.sectionEyebrow}>Why it works</p>
+          <h2 className={styles.sectionTitle}>
+            Built for events, not just houses
+          </h2>
+          <div className={styles.benefitCards}>
+            {BENEFITS.map((b, i) => (
+              <div
+                key={b.title}
+                className={styles.benefitCard}
+                style={{ animationDelay: `${i * 0.07}s` }}
               >
-                <span>{f.q}</span>
-                <span
-                  className={`${styles.faqChevron} ${openFaq === i ? styles.faqChevronOpen : ""}`}
-                >
-                  ▾
-                </span>
-              </button>
-              {openFaq === i && <p className={styles.faqAnswer}>{f.a}</p>}
-            </div>
-          ))}
+                <div className={styles.benefitIcon}>{b.icon}</div>
+                <div>
+                  <p className={styles.benefitTitle}>{b.title}</p>
+                  <p className={styles.benefitText}>{b.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* CTA */}
-      <div className={styles.cta}>
-        <h2 className={styles.ctaTitle}>Book your event clean today</h2>
-        <p className={styles.ctaText}>
-          Before, after, or both. Professional event cleaning across Abuja and
-          Lagos — no stress, no mess.
-        </p>
-        <div className={styles.ctaButtons}>
-          <button
-            className={styles.ctaPrimary}
-            onClick={() => navigate("/maids")}
-          >
-            Browse Maids
-          </button>
-          <button
-            className={styles.ctaSecondary}
-            onClick={() => navigate("/request-a-free-estimate")}
-          >
-            Get a Free Estimate
-          </button>
+        {/* Steps */}
+        <div className={styles.steps}>
+          <p className={styles.sectionEyebrow}>The process</p>
+          <h2 className={styles.sectionTitle}>
+            From booking to spotless — 4 steps
+          </h2>
+          <div className={styles.stepList}>
+            {STEPS.map((s, i) => (
+              <div key={s.title} className={styles.step}>
+                <div className={styles.stepNum}>{i + 1}</div>
+                <div className={styles.stepBody}>
+                  <p className={styles.stepTitle}>{s.title}</p>
+                  <p className={styles.stepText}>{s.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Commitment */}
+        <div className={styles.commitment}>
+          <div className={styles.commitHeader}>
+            <span className={styles.commitHeaderIcon}>🤝</span>
+            <p className={styles.commitHeaderTitle}>
+              Our event cleaning promise
+            </p>
+          </div>
+          <div className={styles.commitList}>
+            {COMMITMENTS.map((c, i) => (
+              <div key={i} className={styles.commitItem}>
+                <div className={styles.commitDot}>✓</div>
+                <p className={styles.commitText}>{c}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <div className={styles.faq}>
+          <p className={styles.sectionEyebrow}>Questions?</p>
+          <h2 className={styles.sectionTitle}>Event cleaning — answered</h2>
+          <div className={styles.faqList}>
+            {FAQS.map((f, i) => (
+              <div key={i} className={styles.faqItem}>
+                <button
+                  className={styles.faqQuestion}
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                >
+                  <span>{f.q}</span>
+                  <span
+                    className={`${styles.faqChevron} ${openFaq === i ? styles.faqChevronOpen : ""}`}
+                  >
+                    ▾
+                  </span>
+                </button>
+                {openFaq === i && <p className={styles.faqAnswer}>{f.a}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className={styles.cta}>
+          <h2 className={styles.ctaTitle}>Book your event clean today</h2>
+          <p className={styles.ctaText}>
+            Before, after, or both. Professional event cleaning across Abuja and
+            Lagos — no stress, no mess.
+          </p>
+          <div className={styles.ctaButtons}>
+            <button
+              className={styles.ctaPrimary}
+              onClick={() => navigate("/maids")}
+            >
+              Browse Maids
+            </button>
+            <button
+              className={styles.ctaSecondary}
+              onClick={() => navigate("/request-a-free-estimate")}
+            >
+              Get a Free Estimate
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
