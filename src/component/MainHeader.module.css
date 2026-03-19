@@ -1,7 +1,6 @@
 /* ── Base (all screens) ─────────────────────────────────────────────── */
 .main {
   width: 100%;
-  overflow-x: hidden;
   box-sizing: border-box;
 }
 
@@ -20,7 +19,7 @@
 
 /* ── Desktop header (≥ 992px) ───────────────────────────────────────── */
 .fixedHeadr {
-  display: none; /* hidden on mobile, shown on desktop below */
+  display: none;
   position: sticky;
   top: 0;
   left: 0;
@@ -30,20 +29,17 @@
 }
 
 /* ── Mobile-only sections (< 992px) ─────────────────────────────────── */
-/* whyChooseUs = mobile variant of WhyChooseUs, Reviews, JoinOurTeam */
 .whyChooseUs {
   display: block;
 }
 
 /* ── Desktop-only sections (≥ 992px) ────────────────────────────────── */
-/* whyChooseUsFull = full-width desktop variants */
 .whyChooseUsFull {
   display: none;
 }
 
 /* ── Desktop breakpoint (992px and up) ──────────────────────────────── */
 @media screen and (min-width: 992px) {
-  /* Swap mobile header for desktop header */
   .fixedHeader {
     display: none;
   }
@@ -52,7 +48,6 @@
     display: block;
   }
 
-  /* Swap mobile section variants for desktop variants */
   .whyChooseUs {
     display: none;
   }

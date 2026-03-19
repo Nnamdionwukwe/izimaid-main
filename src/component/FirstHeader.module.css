@@ -1,16 +1,23 @@
-/* ── Base (all screens) ─────────────────────────────────────────────── */
 .header {
   background-color: rgb(32, 32, 65);
-  padding: 5px 20px;
+  padding: 0px 20px;
   color: white;
   font-style: italic;
   font-weight: bold;
-  cursor: pointer;
-  /* Preserve original negative margins */
-  margin: -10px -8px 10px -8px;
+  display: block;
+  width: 100vw;
+  box-sizing: border-box;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  /* margin-top: -10px; */
 }
 
 .headerLink {
   text-decoration: none;
   color: white;
+  font-size: 13px;
+  letter-spacing: 0.3px;
 }
