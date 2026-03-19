@@ -24,7 +24,7 @@ export default function WhyChooseUs() {
           >
             <i class="fa fa-check-square" aria-hidden="true"></i>
 
-            <h3>Backed by the IziBest Done Right Promise</h3>
+            <h3>Backed by the Deusizi Sparkle Done Right Promise</h3>
 
             {isOpen1 ? <h1>&uarr;</h1> : <h1>&darr;</h1>}
           </div>

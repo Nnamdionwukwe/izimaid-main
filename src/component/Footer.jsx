@@ -6,7 +6,7 @@ export default function Footer() {
     <div>
       <div className={styles.footerDiv}>
         <div className={styles.footerDiv2}>
-          <a href="https://izimaid-sage.vercel.app">
+          <a href="https://deusizisparkle.com">
             <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
           </a>
 
@@ -101,13 +101,13 @@ export default function Footer() {
       </div>
 
       <p className={styles.border4}>
-        © 2025 IziBest Company and its affiliates. All rights reserved. IziBest
-        is a registered trademark of IziBest Assetco LLC. IziMaid is a
-        registered trademark of IziMaid SPV LLC. This site and all of its
-        content is protected under applicable law, including laws of the U.S.
-        and other countries. Each location is independently owned and operated.
-        Services may vary by location. Please contact the franchise location for
-        additional information.
+        © 2025 Deusizi sparkle Company and its affiliates. All rights reserved.
+        Deusizi sparkle is a registered trademark of Deusizi sparkle LLC.
+        Deusizi sparkle is a registered trademark of Deusizi sparkle SPV LLC.
+        This site and all of its content is protected under applicable law,
+        including laws of the U.S. and other countries. Each location is
+        independently owned and operated. Services may vary by location. Please
+        contact the franchise location for additional information.
       </p>
     </div>
   );

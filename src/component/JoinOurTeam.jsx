@@ -13,11 +13,11 @@ export default function JoinOurTeam() {
           <h2 className={styles.mainh1}>Join Our Team</h2>
 
           <p>
-            The moment you put on a IziMaid® uniform, you become part of a
-            family, a team of people committed to supporting one another.
-            IziMaid values taking care of our employees and proudly offers the
-            opportunity to grow from a job into a career and a work culture of
-            respect, integrity, and fun.
+            The moment you put on a Deusizi sparkle® uniform, you become part of
+            a family, a team of people committed to supporting one another.
+            Deusizi sparkle values taking care of our employees and proudly
+            offers the opportunity to grow from a job into a career and a work
+            culture of respect, integrity, and fun.
           </p>
 
           <p>

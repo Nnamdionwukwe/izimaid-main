@@ -285,7 +285,7 @@ export default function MyBookings() {
                     className={styles.supportBtn}
                     onClick={(e) => handleGetSupport(e, b)}
                   >
-                    🎫 Support
+                    🎫 Get Support
                   </button>
                 )}
               </div>

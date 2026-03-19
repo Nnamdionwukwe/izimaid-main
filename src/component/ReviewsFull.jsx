@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 
 const steps = [
   "I was extremely pleased with the service that the staff did for me. The office was attentive to my request and was great with communication. They were thorough and were able to tackle a messy situation. I would highly recommend their service.",
-  "The team came to do a deep cleaning at my house this week and they did an amazing job. We were beyond grateful since my husband and I work and study at the same time we have little to no time for cleaning the house and IziMaid's team made our house look incredible. We are beyond happy and grateful with the team and their service.",
-  "Wow I am so impressed with Team #8 Matilda and Cristina! This is the first time I have had my home professionally cleaned and I can definitely say I will not hesitate to book with IziMaid again. My home has never been cleaner and fresher. I would recommend IziMaid to my friends and family in a heartbeat.",
+  "The team came to do a deep cleaning at my house this week and they did an amazing job. We were beyond grateful since my husband and I work and study at the same time we have little to no time for cleaning the house and Deusizi Sparkle's team made our house look incredible. We are beyond happy and grateful with the team and their service.",
+  "Wow I am so impressed with Team #8 Matilda and Cristina! This is the first time I have had my home professionally cleaned and I can definitely say I will not hesitate to book with Deusizi Sparkle again. My home has never been cleaner and fresher. I would recommend Deusizi Sparkle to my friends and family in a heartbeat.",
   "The cleaning team arrived promptly and started cleaning immediately. They were very friendly and took great care to ensure they did a good job. Im very impressed with the company so far! From the initial in-home estimate to the first cleaning! Even having a supervisor stop by to ensure the cleaning was done properly. I look forward to continue to work with the company.",
-  "I have been using  IziMaid for a few months now and I am very happy with the service. The team is always on time, professional, and does a great job cleaning my home. I appreciate the attention to detail and the personalized service they provide. I highly recommend  IziMaid to anyone looking for a reliable and thorough cleaning service.",
+  "I have been using  Deusizi Sparkle for a few months now and I am very happy with the service. The team is always on time, professional, and does a great job cleaning my home. I appreciate the attention to detail and the personalized service they provide. I highly recommend  Deusizi Sparkle to anyone looking for a reliable and thorough cleaning service.",
 ];
 
 export default function ReviewsFull() {
@@ -158,8 +158,8 @@ export default function ReviewsFull() {
 
           <div className={styles.logoDiv2}>
             <h2>
-              The IziMaid Done Right Promise? delivered by IziBest Interior, a
-              proud IziBest company.
+              The Deusizi Sparkle Done Right Promise? delivered by Deusizi
+              Interior, a proud Deusizi Interior Company.
             </h2>
           </div>
 

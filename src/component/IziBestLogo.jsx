@@ -6,19 +6,19 @@ export default function IziBestLogo() {
     <div className={styles.container}>
       <div>
         <div className={styles.containerDiv}>
-          <a href="https://izimaid-sage.vercel.app">
+          <a href="https://deusizisparkle.com">
             <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
           </a>
 
           <p className={styles.text}></p>
-          <a className={styles.headerP} href="http://izibest.com">
+          <a className={styles.headerP} href="http://deusiziinterior.com">
             <img className={styles.logo} alt="Logo" src="izibest.jpg" />
           </a>
         </div>
 
         <h2 className={styles.containerh2}>
-          IziMaid is part of the IziBest group of companies, family of home
-          service providers.
+          Deusizi sparkle is part of the IziBest group of companies, family of
+          home service providers.
         </h2>
 
         <p className={styles.containerp}>
@@ -31,10 +31,10 @@ export default function IziBestLogo() {
         <div className={styles.googleDivMain}>
           <div className={styles.googleDiv}>
             <div className={styles.download1}>
-              <h4>IziMaid is all you need to remember</h4>
+              <h4>Deusizi sparkle is all you need to remember</h4>
 
               <div className={styles.iziMaid}>
-                <h4>Discover IziMaid</h4>
+                <h4>Discover Deusizi sparkle</h4>
 
                 <h2>&rarr;</h2>
               </div>

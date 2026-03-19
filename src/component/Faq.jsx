@@ -122,7 +122,7 @@ export default function Faq() {
       <div className={styles.main1}>
         <div className={styles.mainSub}>
           <div onClick={handleClick1} className={styles.backed}>
-            <h3>What is The IziBest Done Right Promise®?</h3>
+            <h3>What is The Deusizi sparkle Done Right Promise®?</h3>
 
             {isOpen1 ? <h2>&minus;</h2> : <h1>&#43;</h1>}
           </div>
@@ -130,21 +130,23 @@ export default function Faq() {
           {isOpen1 && (
             <div className={styles.residentialDIv}>
               <p className={styles.hoverMainliv1}>
-                IziBest Done Right Promise® delivered by IziMaid® ensures
-                outstanding service. If something isn't right, contact us by the
-                next business day and we'll make it right, at no extra cost.
-                Trusted for 5+ years to get the job done right.
+                Deusizi sparkle Done Right Promise® delivered by Deusizi
+                sparkle® ensures outstanding service. If something isn't right,
+                contact us by the next business day and we'll make it right, at
+                no extra cost. Trusted for 5+ years to get the job done right.
                 <span className={styles.span}>Learn More.</span>
               </p>
 
               <p className={styles.hoverMainliv1}>
-                Molly Maid is proud to be an IziBest Interior company.We're part
+                Molly Maid is proud to be an Deusizi Interior company.We're part
                 of a network of home service professionals who offer trusted,
                 friendly and fast home services for your entire home. From
                 plumbing to electrical, appliance repair to handyman service,
-                IziBest Group of Companies has you covered.
-                <a href="http://izibest.com">
-                  <span className={styles.span}>Learn More About IziBest.</span>
+                Deusizi sparkle Group of Companies has you covered.
+                <a href="http://Deusiziinterior.com">
+                  <span className={styles.span}>
+                    Learn More About Deusizi sparkle.
+                  </span>
                 </a>
               </p>
             </div>
@@ -153,7 +155,7 @@ export default function Faq() {
 
         <div className={styles.mainSub}>
           <div onClick={handleClick2} className={styles.backed}>
-            <h3>Why Choose IziMaid?</h3>
+            <h3>Why Choose Deusizi sparkle?</h3>
 
             {isOpen2 ? <h2>&minus;</h2> : <h1>&#43;</h1>}
           </div>
@@ -162,13 +164,13 @@ export default function Faq() {
             <div className={styles.residentialDIv}>
               <p className={styles.hoverMainliv1}>
                 Life is busy, which means you can’t always complete everything
-                on your to-do list. IziMaid allows you to have a sparkling home,
-                saves you valuable time, and provides the peace of mind that
-                comes with knowing the job was done right. Our residential home
-                cleaning service is dedicated to making your life easier. We've
-                built a reputation for top-notch cleaning that you can trust.
-                Our detailed approach covers every room and corner, leaving no
-                mess behind.
+                on your to-do list. Deusizi sparkle allows you to have a
+                sparkling home, saves you valuable time, and provides the peace
+                of mind that comes with knowing the job was done right. Our
+                residential home cleaning service is dedicated to making your
+                life easier. We've built a reputation for top-notch cleaning
+                that you can trust. Our detailed approach covers every room and
+                corner, leaving no mess behind.
               </p>
 
               <p className={styles.hoverMainliv1}>
@@ -176,10 +178,10 @@ export default function Faq() {
               </p>
 
               <p className={styles.hoverMainliv1}>
-                As part of the IziBest family of home service brands, we uphold
-                high standards and prioritize your satisfaction. Choose IziMaid
-                for a cleaner, healthier home that allows you to focus on what
-                matters most to you.
+                As part of the Deusizi sparkle family of home service brands, we
+                uphold high standards and prioritize your satisfaction. Choose
+                Deusizi sparkle for a cleaner, healthier home that allows you to
+                focus on what matters most to you.
                 <span className={styles.span}>Request a free estimate</span>
                 now!
               </p>
@@ -189,7 +191,7 @@ export default function Faq() {
 
         <div className={styles.mainSub}>
           <div onClick={handleClick3} className={styles.backed}>
-            <h3>How long has IziMaid been in business?</h3>
+            <h3>How long has Deusizi sparkle been in business?</h3>
 
             {isOpen3 ? <h2>&minus;</h2> : <h1>&#43;</h1>}
           </div>
@@ -198,11 +200,11 @@ export default function Faq() {
             <div className={styles.residentialDIv}>
               <p className={styles.hoverMainliv1}>
                 Since 2020, customers have welcomed the trusted cleaning
-                professionals from locally owned and operated IziMaid businesses
-                into their homes. We’ve provided cleaning services to over a
-                million customers, and want you to know that you can continue to
-                rely on us to go above and beyond to provide you with a
-                worry-free, top-notch cleaning service every time.
+                professionals from locally owned and operated Deusizi sparkle
+                businesses into their homes. We’ve provided cleaning services to
+                over a million customers, and want you to know that you can
+                continue to rely on us to go above and beyond to provide you
+                with a worry-free, top-notch cleaning service every time.
               </p>
 
               <p className={styles.hoverMainliv1}>
@@ -223,7 +225,7 @@ export default function Faq() {
           {isOpen4 && (
             <div className={styles.residentialDIv}>
               <p className={styles.hoverMainliv1}>
-                IziMaid takes care of your whole home!{" "}
+                Deusizi sparkle takes care of your whole home!{" "}
                 <span className={styles.span}>Our Services</span> are the
                 definition of comprehensive. We give your kitchen a thorough
                 cleaning, and bathrooms sparkle after we're done. Your living
@@ -238,7 +240,7 @@ export default function Faq() {
                 <span className={styles.span}>
                   local home cleaning services
                 </span>
-                near you, IziMaid is the right choice.
+                near you, Deusizi sparkle is the right choice.
               </p>
             </div>
           )}
@@ -266,13 +268,13 @@ export default function Faq() {
               <p className={styles.hoverMainliv1}>
                 If you’re looking for
                 <span className={styles.span}> cleaning services near me</span>
-                that cover it all, IziMaid is the answer. We ensure that floors
-                are vacuumed and mopped throughout the house, making them clean
-                and fresh. Want your bedrooms to be cozy retreats? Come home to
-                neatly made beds and refreshed rooms. We also tackle additional
-                spaces, like hallways and entryways, to ensure no areas are
-                overlooked. page to determine the services that best suit your
-                needs.
+                that cover it all, Deusizi sparkle is the answer. We ensure that
+                floors are vacuumed and mopped throughout the house, making them
+                clean and fresh. Want your bedrooms to be cozy retreats? Come
+                home to neatly made beds and refreshed rooms. We also tackle
+                additional spaces, like hallways and entryways, to ensure no
+                areas are overlooked. page to determine the services that best
+                suit your needs.
               </p>
 
               <p className={styles.hoverMainliv1}>
@@ -288,7 +290,7 @@ export default function Faq() {
 
         <div className={styles.mainSub}>
           <div onClick={handleClick6} className={styles.backed}>
-            <h3>What Other Services Does IziMaid Provide?</h3>
+            <h3>What Other Services Does Deusizi sparkle Provide?</h3>
 
             {isOpen6 ? <h2>&minus;</h2> : <h1>&#43;</h1>}
           </div>
@@ -315,9 +317,10 @@ export default function Faq() {
           {isOpen7 && (
             <div className={styles.residentialDIv}>
               <p className={styles.hoverMainliv1}>
-                IziMaid doesn’t just promise a thorough clean, we back it up.
+                Deusizi sparkle doesn’t just promise a thorough clean, we back
+                it up.
                 <span className={styles.span}>
-                  The IziBest Done Right Promise®
+                  The Deusizi sparkle Done Right Promise®
                 </span>
                 is our commitment to excellence, ensuring that our cleaning
                 services for residential homes are held to the highest

@@ -36,7 +36,7 @@ export default function PerfectGift() {
             <i class="fa fa-heartbeat" aria-hidden="true"></i>
           </div>
 
-          <h5>IziBest Foundation</h5>
+          <h5>Deusizi Foundation</h5>
           <h4>&rarr;</h4>
         </div>
       </div>
@@ -73,7 +73,7 @@ export default function PerfectGift() {
             <div className={styles.subDiv}>
               <h3>Perfecct Gift</h3>
               <p className={styles.para}>
-                Give the gift of time with a IziMaid gift certificate.
+                Give the gift of time with a Deusizi sparkle gift certificate.
               </p>
               <div className={styles.learnMore}>
                 <p className={styles.p}>Learn More</p>
@@ -114,7 +114,7 @@ export default function PerfectGift() {
             />
 
             <div className={styles.subDiv}>
-              <h3>IziBest Foundation</h3>
+              <h3>Deusizi Foundation</h3>
               <p className={styles.para}>
                 Supporting victims of domestic violence.
               </p>
