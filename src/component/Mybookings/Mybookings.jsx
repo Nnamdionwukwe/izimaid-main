@@ -6,6 +6,7 @@ import Chat from "../Chat/Chat";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const FILTERS = [
   "all",
+  "awaiting_payment",
   "pending",
   "confirmed",
   "in_progress",
@@ -15,6 +16,7 @@ const FILTERS = [
 ];
 
 const STATUS_CLASS = {
+  awaiting_payment: styles.statusPending,
   pending: styles.statusPending,
   confirmed: styles.statusConfirmed,
   in_progress: styles.statusInProgress,
@@ -33,6 +35,13 @@ function formatDate(d) {
   });
 }
 
+function statusLabel(s) {
+  if (s === "in_progress") return "In Progress";
+  if (s === "awaiting_payment") return "⏳ Awaiting Payment";
+  if (s === "declined") return "Declined";
+  return s?.charAt(0).toUpperCase() + s?.slice(1);
+}
+
 // Bookings where chat makes sense
 const CHAT_STATUSES = ["confirmed", "in_progress", "completed", "pending"];
 
@@ -41,7 +50,6 @@ export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
-  // Chat state — which booking is the user chatting in
   const [chatBooking, setChatBooking] = useState(null);
 
   useEffect(() => {
@@ -99,7 +107,6 @@ export default function MyBookings() {
     setChatBooking(booking);
   }
 
-  // If a chat is open, render the Chat component full-screen
   if (chatBooking) {
     const otherName = isMaid
       ? chatBooking.customer_name
@@ -148,9 +155,7 @@ export default function MyBookings() {
             className={`${styles.filterBtn} ${filter === f ? styles.filterBtnActive : ""}`}
             onClick={() => setFilter(f)}
           >
-            {f === "in_progress"
-              ? "In Progress"
-              : f.charAt(0).toUpperCase() + f.slice(1)}
+            {f === "awaiting_payment" ? "Unpaid" : statusLabel(f)}
           </button>
         ))}
       </div>
@@ -159,7 +164,7 @@ export default function MyBookings() {
         <div className={styles.loading}>Loading bookings...</div>
       ) : bookings.length === 0 ? (
         <div className={styles.empty}>
-          No {filter !== "all" ? filter : ""} bookings found.
+          No {filter !== "all" ? filter.replace("_", " ") : ""} bookings found.
           {!isMaid && (
             <>
               <br />
@@ -200,11 +205,7 @@ export default function MyBookings() {
                 <span
                   className={`${styles.statusBadge} ${STATUS_CLASS[b.status] || styles.statusPending}`}
                 >
-                  {b.status === "in_progress"
-                    ? "In Progress"
-                    : b.status === "declined"
-                      ? "Declined"
-                      : b.status?.replace("_", " ")}
+                  {statusLabel(b.status)}
                 </span>
               </div>
 
@@ -240,19 +241,45 @@ export default function MyBookings() {
                 </div>
               </div>
 
+              {/* Pay Now button for awaiting_payment bookings */}
+              {!isMaid && b.status === "awaiting_payment" && (
+                <div
+                  style={{ marginTop: 10 }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate("/payment", { state: { booking: b } });
+                    }}
+                    style={{
+                      width: "100%",
+                      height: 38,
+                      background: "rgb(0,100,0)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 8,
+                      fontSize: 13,
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    🔒 Pay Now — ₦{Number(b.total_amount).toLocaleString()}
+                  </button>
+                </div>
+              )}
+
               {/* Action buttons row */}
               <div className={styles.cardActions}>
-                {/* 💬 Chat button — shown when booking status makes sense */}
                 {CHAT_STATUSES.includes(b.status) && (
                   <button
                     className={styles.chatBtn}
                     onClick={(e) => handleOpenChat(e, b)}
                   >
-                    💬 Chat
+                    💬 Live Chat
                   </button>
                 )}
-
-                {/* 🎫 Support button — only for customers */}
                 {!isMaid && (
                   <button
                     className={styles.supportBtn}

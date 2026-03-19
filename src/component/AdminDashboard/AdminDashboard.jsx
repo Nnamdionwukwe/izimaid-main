@@ -270,19 +270,25 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
             className={styles.logoutBtn}
             onClick={() => onNavigate("chats")}
           >
-            🎫 Customer and Maid Chat
+            🎫 Customer and Maid Live Chat
           </button>
           <button
             className={styles.logoutBtn}
             onClick={() => onNavigate("support-chat")}
           >
-            🛎️ Customer Support Chat
+            🛎️ Customer Live Chat
           </button>
           <button
             className={styles.logoutBtn}
             onClick={() => onNavigate("maid-support-chat")}
           >
-            🧹 Maid Support Chat
+            🧹 Maid Live Chat
+          </button>
+          <button
+            className={styles.logoutBtn}
+            onClick={() => onNavigate("payments")}
+          >
+            💳 Payments
           </button>
           <button className={styles.logoutBtn} onClick={onLogout}>
             Logout

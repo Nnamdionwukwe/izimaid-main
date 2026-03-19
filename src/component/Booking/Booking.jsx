@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import styles from "./Booking.module.css";
 
@@ -15,10 +15,8 @@ function initials(name) {
   );
 }
 
-// ── Extract detailed address from Nominatim response ─────────────────────────
 function extractAddressDetails(data) {
   const address = data.address || {};
-
   return {
     street: address.road || address.house_number || "",
     houseNumber: address.house_number || "",
@@ -30,26 +28,12 @@ function extractAddressDetails(data) {
   };
 }
 
-// ── Format address nicely for saving ────────────────────────────────────────
 function formatAddress(addressDetails) {
   const parts = [];
-
-  if (addressDetails.street) {
-    parts.push(addressDetails.street);
-  }
-
-  if (addressDetails.city) {
-    parts.push(addressDetails.city);
-  }
-
-  if (addressDetails.state) {
-    parts.push(addressDetails.state);
-  }
-
-  if (addressDetails.country) {
-    parts.push(addressDetails.country);
-  }
-
+  if (addressDetails.street) parts.push(addressDetails.street);
+  if (addressDetails.city) parts.push(addressDetails.city);
+  if (addressDetails.state) parts.push(addressDetails.state);
+  if (addressDetails.country) parts.push(addressDetails.country);
   return parts.length > 0 ? parts.join(", ") : addressDetails.displayName;
 }
 
@@ -75,61 +59,47 @@ export default function Booking() {
   const total =
     Number(maid.hourly_rate || 0) * Number(form.duration_hours || 0);
 
+  // ── Redirect to payment page once booking is created ─────────
+  useEffect(() => {
+    if (success) {
+      navigate("/payment", { state: { booking: success } });
+    }
+  }, [success]);
+
   function handleChange(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setError("");
   }
 
-  // Get current location using Geolocation API with iOS-specific handling
   async function getCurrentLocation() {
     setGettingLocation(true);
     setLocationError("");
     setDetectedAddress(null);
 
-    // Check if browser supports geolocation
     if (!navigator.geolocation) {
       setLocationError("Geolocation is not supported by your browser");
       setGettingLocation(false);
       return;
     }
 
-    // Increased timeout for iOS - give it more time to get a fix
-    const geolocationOptions = {
-      enableHighAccuracy: true,
-      timeout: 30000, // 30 seconds
-      maximumAge: 0, // Don't use cached location
-    };
-
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
-          const { latitude, longitude, accuracy } = position.coords;
-
-          // Fetch detailed address from Nominatim
+          const { latitude, longitude } = position.coords;
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
-            { timeout: 8000 },
           );
-
           if (!res.ok) throw new Error("Address lookup failed");
-
           const data = await res.json();
           const addressDetails = extractAddressDetails(data);
-          const formattedAddress = formatAddress(addressDetails);
-
           setDetectedAddress(addressDetails);
           setForm((prev) => ({
             ...prev,
-            address: formattedAddress,
+            address: formatAddress(addressDetails),
           }));
-
           setLocationError("");
-        } catch (err) {
-          console.error("Reverse geocoding error:", err);
-          setGettingLocation(false);
-
+        } catch {
           try {
-            // Fallback: Just get city/postcode if detailed lookup fails
             const res = await fetch(
               `https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`,
             );
@@ -138,19 +108,13 @@ export default function Booking() {
               data.address?.city ||
               data.address?.town ||
               data.address?.village ||
-              data.address?.county ||
               "";
             const postcode = data.address?.postcode || "";
             const country = data.address?.country || "";
             const location =
               [city, postcode, country].filter(Boolean).join(", ") ||
               `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`;
-
-            setForm((prev) => ({
-              ...prev,
-              address: location,
-            }));
-
+            setForm((prev) => ({ ...prev, address: location }));
             setDetectedAddress({
               city,
               postalCode: postcode,
@@ -158,7 +122,6 @@ export default function Booking() {
               street: "",
               state: "",
             });
-
             setLocationError("");
           } catch {
             setLocationError(
@@ -166,7 +129,6 @@ export default function Booking() {
             );
           }
         }
-
         setGettingLocation(false);
       },
       (err) => {
@@ -179,7 +141,7 @@ export default function Booking() {
               : "📍 Could not get your location. Try enabling GPS or entering manually.",
         );
       },
-      geolocationOptions,
+      { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 },
     );
   }
 
@@ -213,32 +175,11 @@ export default function Booking() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Booking failed");
-      setSuccess(data.booking);
+      setSuccess(data.booking); // triggers useEffect → navigate to /payment
     } catch (err) {
       setError(err.message || "Something went wrong");
-    } finally {
       setLoading(false);
     }
-  }
-
-  if (success) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.success}>
-          <p className={styles.successTitle}>✓ Booking Confirmed!</p>
-          <p className={styles.successText}>
-            Your booking with {maid.name} has been submitted. You will receive a
-            confirmation once the maid accepts.
-          </p>
-          <button
-            className={styles.successBtn}
-            onClick={() => navigate("/my-bookings")}
-          >
-            View My Bookings
-          </button>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -297,8 +238,8 @@ export default function Booking() {
               value={`₦${total.toLocaleString()}`}
               readOnly
               style={{
-                background: "rgb(248, 248, 248)",
-                color: "rgb(19, 19, 103)",
+                background: "rgb(248,248,248)",
+                color: "rgb(19,19,103)",
                 fontWeight: "bold",
               }}
             />
@@ -321,17 +262,14 @@ export default function Booking() {
               style={{
                 background: "none",
                 border: "none",
-                color: gettingLocation
-                  ? "rgb(100, 100, 100)"
-                  : "rgb(19, 19, 103)",
-                fontSize: "12px",
+                color: gettingLocation ? "rgb(100,100,100)" : "rgb(19,19,103)",
+                fontSize: 12,
                 fontWeight: "bold",
                 cursor: gettingLocation ? "not-allowed" : "pointer",
                 opacity: gettingLocation ? 0.6 : 1,
                 textDecoration: "underline",
                 fontFamily: "inherit",
               }}
-              title="Use your current GPS location (requires location permission)"
             >
               {gettingLocation
                 ? "📍 Getting location..."
@@ -348,7 +286,6 @@ export default function Booking() {
             placeholder="e.g. 12 Banana Street, Lekki, Lagos"
           />
 
-          {/* Display detected address details */}
           {detectedAddress &&
             (detectedAddress.street ||
               detectedAddress.city ||
@@ -356,16 +293,16 @@ export default function Booking() {
               detectedAddress.country) && (
               <div
                 style={{
-                  fontSize: "11px",
+                  fontSize: 11,
                   color: "gray",
                   marginTop: 8,
-                  padding: "8px",
-                  background: "rgb(245, 245, 248)",
-                  borderRadius: "6px",
-                  lineHeight: "1.6",
+                  padding: 8,
+                  background: "rgb(245,245,248)",
+                  borderRadius: 6,
+                  lineHeight: 1.6,
                 }}
               >
-                <p style={{ margin: "0 0 4px 0", fontWeight: "bold" }}>
+                <p style={{ margin: "0 0 4px", fontWeight: "bold" }}>
                   📍 Address Details:
                 </p>
                 {detectedAddress.street && (
@@ -388,9 +325,7 @@ export default function Booking() {
             )}
 
           {locationError && (
-            <p
-              style={{ color: "rgb(187, 19, 47)", fontSize: 12, marginTop: 4 }}
-            >
+            <p style={{ color: "rgb(187,19,47)", fontSize: 12, marginTop: 4 }}>
               {locationError}
             </p>
           )}
@@ -427,6 +362,22 @@ export default function Booking() {
           </div>
         </div>
 
+        {/* Payment notice */}
+        <div
+          style={{
+            background: "rgb(240,248,255)",
+            border: "1px solid rgb(200,220,255)",
+            borderRadius: 8,
+            padding: "12px 14px",
+            fontSize: 13,
+            color: "rgb(30,60,120)",
+          }}
+        >
+          🔒 After booking, you'll be redirected to pay securely via{" "}
+          <strong>Paystack</strong>. Your booking is only confirmed after
+          payment and admin approval.
+        </div>
+
         {error && <p className={styles.error}>{error}</p>}
 
         <button
@@ -434,7 +385,7 @@ export default function Booking() {
           onClick={handleSubmit}
           disabled={loading}
         >
-          {loading ? "Booking..." : "Confirm Booking"}
+          {loading ? "Creating booking..." : "Continue to Payment →"}
         </button>
       </div>
     </div>

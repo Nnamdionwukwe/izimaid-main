@@ -20,6 +20,7 @@ import MaidDashboard from "./component/MaidDashboard/MaidDashboard.jsx";
 import MaidDetail from "./component/MaidDetail.jsx";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import CustomerSupport from "./component/CustomerSupport/CustomerSupport.jsx";
+import Payment from "./component/Payment/Payment.jsx";
 
 function App() {
   return (
@@ -85,6 +86,8 @@ function AppRoutes() {
       <Route path="/maid/:maidId" element={<MaidDetail />} />
       <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="/bookings/:id" element={<BookingDetail />} />
+      <Route path="/payment" element={<Payment />} />
+      <Route path="/payment/verify" element={<Payment />} />
 
       {/* Admin Dashboard */}
       <Route
