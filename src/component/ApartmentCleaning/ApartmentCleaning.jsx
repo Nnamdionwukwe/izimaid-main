@@ -73,60 +73,48 @@ const SIZES = [
   },
 ];
 
-const ROOMS = [
-  {
-    name: "Bedrooms",
-    checks: [
-      "Dust all furniture & surfaces",
-      "Vacuum carpet / mop floor",
-      "Wipe wardrobe doors inside & out",
-      "Clean mirrors & glass",
-      "Wipe skirting boards",
-      "Clean light switches & sockets",
-      "Vacuum under bed",
-      "Make bed (if linen provided)",
-    ],
-  },
-  {
-    name: "Kitchen",
-    checks: [
-      "Wipe all countertops & surfaces",
-      "Clean sink & taps",
-      "Degrease hob & extractor hood",
-      "Wipe cabinet doors & handles",
-      "Clean inside microwave",
-      "Wipe appliance exteriors",
-      "Clean tiles & backsplash",
-      "Mop kitchen floor",
-    ],
-  },
-  {
-    name: "Bathroom",
-    checks: [
-      "Scrub toilet, cistern & seat",
-      "Clean shower & screen",
-      "Descale taps & showerhead",
-      "Scrub tiles & grout",
-      "Clean mirrors & cabinets",
-      "Wipe vanity & surfaces",
-      "Disinfect floor",
-      "Replace bin liner",
-    ],
-  },
-  {
-    name: "Living Areas",
-    checks: [
-      "Dust all surfaces & furniture",
-      "Vacuum sofa & cushions",
-      "Vacuum / mop floor",
-      "Wipe skirting boards",
-      "Clean light switches",
-      "Wipe door frames & handles",
-      "Tidy & organize surfaces",
-      "Clean balcony door glass",
-    ],
-  },
-];
+const ROOMS = {
+  Bedrooms: [
+    "Dust all furniture & surfaces",
+    "Vacuum carpet / mop floor",
+    "Wipe wardrobe doors inside & out",
+    "Clean mirrors & glass",
+    "Wipe skirting boards",
+    "Clean light switches & sockets",
+    "Vacuum under bed",
+    "Make bed (if linen provided)",
+  ],
+  Kitchen: [
+    "Wipe all countertops & surfaces",
+    "Clean sink & taps",
+    "Degrease hob & extractor hood",
+    "Wipe cabinet doors & handles",
+    "Clean inside microwave",
+    "Wipe appliance exteriors",
+    "Clean tiles & backsplash",
+    "Mop kitchen floor",
+  ],
+  Bathroom: [
+    "Scrub toilet, cistern & seat",
+    "Clean shower & screen",
+    "Descale taps & showerhead",
+    "Scrub tiles & grout",
+    "Clean mirrors & cabinets",
+    "Wipe vanity & surfaces",
+    "Disinfect floor",
+    "Replace bin liner",
+  ],
+  "Living Areas": [
+    "Dust all surfaces & furniture",
+    "Vacuum sofa & cushions",
+    "Vacuum / mop floor",
+    "Wipe skirting boards",
+    "Clean light switches",
+    "Wipe door frames & handles",
+    "Tidy & organize surfaces",
+    "Clean balcony door glass",
+  ],
+};
 
 const BENEFITS = [
   {
@@ -297,7 +285,7 @@ export default function ApartmentCleaning() {
           ))}
         </div>
         <div className={styles.roomItems}>
-          {ROOMS[activeRoom].checks.map((item) => (
+          {ROOMS[activeRoom].map((item) => (
             <div key={item} className={styles.roomItem}>
               <div className={styles.roomCheck}>✓</div>
               <span className={styles.roomText}>{item}</span>

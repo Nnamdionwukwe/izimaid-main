@@ -26,6 +26,7 @@ import OneTimeCleaning from "./component/OneTimeCleaning/OneTimeCleaning.jsx";
 import MoveInCleaning from "./component/MoveInCleaning/MoveInCleaning.jsx";
 import EcoFriendlyCleaning from "./component/EcoFriendlyCleaning/EcoFriendlyCleaning.jsx";
 import ApartmentCleaning from "./component/ApartmentCleaning/ApartmentCleaning.jsx";
+import OccasionalCleaning from "./component/OccasionalCleaning/OccasionalCleaning.jsx";
 
 function App() {
   return (
@@ -98,6 +99,7 @@ function AppRoutes() {
       <Route path="/move-in-cleaning" element={<MoveInCleaning />} />
       <Route path="/eco-friendly-cleaning" element={<EcoFriendlyCleaning />} />
       <Route path="/apartment-cleaning" element={<ApartmentCleaning />} />
+      <Route path="/occasional-cleaning" element={<OccasionalCleaning />} />
 
       {/* Admin Dashboard */}
       <Route
