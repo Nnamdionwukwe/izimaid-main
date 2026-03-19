@@ -22,11 +22,11 @@ import IziMaidHelpFull from "./IziMaidHelpFull";
 import Customers from "./Customers";
 import IziBestLogo from "./IziBestLogo";
 import Footer from "./Footer";
+import FloatingSupportChat from "./SupportChat/FloatingSupportChat";
 
 export default function HomePage() {
   return (
     <>
-    
       <div className={styles.main}>
         <FirstHeader />
 
@@ -104,6 +104,9 @@ export default function HomePage() {
           <Footer />
         </div>
       </div>
+
+      {/* Floating support chat — only renders for logged-in customers */}
+      <FloatingSupportChat />
     </>
   );
 }
