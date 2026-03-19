@@ -87,26 +87,17 @@ function Lightbox({ item, onClose }) {
 // Deletion is only allowed within 5 minutes of sending (enforced by backend too).
 function Bubble({ msg, isMine, onDelete, onMedia }) {
   const [showDel, setShowDel] = useState(false);
-  const pressTimer = useRef(null);
   const ageMin = (Date.now() - new Date(msg.created_at)) / 60000;
   const canDelete = isMine && ageMin <= 5;
 
-  // ── Long-press (mobile touch) ───────────────────────────────────────
-  function onTouchStart(e) {
+  // ── Double-tap / double-click (mobile + desktop) ───────────────────
+  function onDoubleClick(e) {
     if (!canDelete) return;
-    pressTimer.current = setTimeout(() => {
-      setShowDel(true);
-    }, 500); // 500ms hold
-  }
-  function onTouchEnd() {
-    clearTimeout(pressTimer.current);
-  }
-  function onTouchMove() {
-    // Cancel if finger moves (scrolling)
-    clearTimeout(pressTimer.current);
+    e.preventDefault();
+    setShowDel(true);
   }
 
-  // ── Right-click (desktop) ────────────────────────────────────────────
+  // ── Right-click (desktop alternative) ───────────────────────────────
   function onContextMenu(e) {
     if (!canDelete) return;
     e.preventDefault();
@@ -141,9 +132,7 @@ function Bubble({ msg, isMine, onDelete, onMedia }) {
 
       <div
         className={`${styles.bubble} ${isMine ? styles.bubbleMine : styles.bubbleTheirs}`}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-        onTouchMove={onTouchMove}
+        onDoubleClick={onDoubleClick}
         onContextMenu={onContextMenu}
       >
         {!isMine && (
