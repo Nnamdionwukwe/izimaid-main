@@ -402,7 +402,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
             <div className={styles.thirdHeader}>
               <i className="fa fa-map-marker" aria-hidden="true"></i>
 
-              <p>Find My Local IziMaid</p>
+              <p>Find My Local Deusizi Sparkle Maid</p>
             </div>
 
             <button
