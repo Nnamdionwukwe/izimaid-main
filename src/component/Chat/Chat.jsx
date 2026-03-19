@@ -90,14 +90,28 @@ function Bubble({ msg, isMine, onDelete, onMedia }) {
   const ageMin = (Date.now() - new Date(msg.created_at)) / 60000;
   const canDelete = isMine && ageMin <= 5;
 
-  // ── Double-tap / double-click (mobile + desktop) ───────────────────
+  // ── Double-tap (mobile) — manual implementation ─────────────────────
+  // onDoubleClick is unreliable on mobile; we track taps manually instead
+  const lastTap = useRef(0);
+  function onTouchEnd(e) {
+    if (!canDelete) return;
+    const now = Date.now();
+    if (now - lastTap.current < 300) {
+      // Two taps within 300ms = double-tap
+      e.preventDefault();
+      setShowDel(true);
+    }
+    lastTap.current = now;
+  }
+
+  // ── Double-click (desktop) ───────────────────────────────────────────
   function onDoubleClick(e) {
     if (!canDelete) return;
     e.preventDefault();
     setShowDel(true);
   }
 
-  // ── Right-click (desktop alternative) ───────────────────────────────
+  // ── Right-click (desktop context menu) ──────────────────────────────
   function onContextMenu(e) {
     if (!canDelete) return;
     e.preventDefault();
@@ -132,6 +146,7 @@ function Bubble({ msg, isMine, onDelete, onMedia }) {
 
       <div
         className={`${styles.bubble} ${isMine ? styles.bubbleMine : styles.bubbleTheirs}`}
+        onTouchEnd={onTouchEnd}
         onDoubleClick={onDoubleClick}
         onContextMenu={onContextMenu}
       >
