@@ -367,7 +367,9 @@ export default function SideBar({ isOpen, setIsOpen }) {
                                 </div>
 
                                 <div
-                                  onClick={() => navigate("/awards")}
+                                  onClick={() =>
+                                    navigate("/board-of-directors")
+                                  }
                                   className={styles.residentialDI23}
                                 >
                                   <i

@@ -1,0 +1,492 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+@media screen and (min-width: 20px) {
+  .page {
+    font-family: "DM Sans", Arial, sans-serif;
+    background: #faf9f6;
+    overflow-x: hidden;
+    margin-top: 20px;
+  }
+
+  /* ── Hero ───────────────────────────────────────────────────────── */
+  .hero {
+    background: rgb(32, 32, 65);
+    padding: 60px 20px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: rgba(187, 19, 47, 0.15);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    left: -30px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .heroEyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 14px;
+  }
+  .heroTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 14px;
+    line-height: 1.2;
+  }
+  .heroTitle em {
+    font-style: italic;
+    color: rgb(255, 200, 200);
+  }
+  .heroDesc {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 auto;
+    max-width: 440px;
+    line-height: 1.7;
+  }
+  .heroDivider {
+    width: 40px;
+    height: 3px;
+    background: rgb(187, 19, 47);
+    margin: 22px auto 0;
+    border-radius: 2px;
+  }
+
+  /* ── Trust bar ──────────────────────────────────────────────────── */
+  .trustBar {
+    background: rgb(187, 19, 47);
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .trustBar::-webkit-scrollbar {
+    display: none;
+  }
+  .trustItem {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    white-space: nowrap;
+  }
+  .trustEmoji {
+    font-size: 18px;
+  }
+  .trustText {
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+  }
+
+  /* ── Section wrapper ────────────────────────────────────────────── */
+  .section {
+    padding: 44px 20px;
+  }
+  .sectionEyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(187, 19, 47);
+    margin: 0 0 10px;
+  }
+  .sectionTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 28px;
+    line-height: 1.3;
+  }
+
+  /* ── Director grid ──────────────────────────────────────────────── */
+  .directorGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .directorCard {
+    background: white;
+    border: 2px solid rgb(235, 232, 225);
+    border-radius: 14px;
+    padding: 18px;
+    cursor: pointer;
+    transition:
+      box-shadow 0.2s,
+      border-color 0.2s,
+      transform 0.15s;
+    animation: fadeUp 0.5s ease both;
+  }
+  .directorCard:hover {
+    box-shadow: 0 6px 20px rgba(32, 32, 65, 0.1);
+    transform: translateY(-1px);
+    border-color: rgb(32, 32, 65);
+  }
+  .directorCardActive {
+    border-color: rgb(187, 19, 47);
+    box-shadow: 0 6px 20px rgba(187, 19, 47, 0.1);
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .directorCardTop {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .directorAvatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: "Playfair Display", Georgia, serif;
+    letter-spacing: 0.5px;
+  }
+
+  .directorInfo {
+    flex: 1;
+    min-width: 0;
+  }
+  .directorName {
+    font-size: 15px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .directorTitle {
+    font-size: 12px;
+    color: rgb(187, 19, 47);
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .expandChevron {
+    font-size: 20px;
+    color: rgb(187, 19, 47);
+    transition: transform 0.25s;
+    flex-shrink: 0;
+  }
+  .expandChevronOpen {
+    transform: rotate(180deg);
+  }
+
+  /* Expertise tags */
+  .expertiseTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .expertiseTag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgb(240, 240, 250);
+    color: rgb(32, 32, 65);
+    border: 1px solid rgb(220, 218, 240);
+  }
+
+  /* Bio expand */
+  .directorBio {
+    animation: bioReveal 0.25s ease;
+  }
+  @keyframes bioReveal {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .bioDivider {
+    height: 1px;
+    background: rgb(235, 232, 225);
+    margin: 14px 0;
+  }
+  .bioText {
+    font-size: 13px;
+    color: rgb(80, 78, 78);
+    line-height: 1.75;
+    margin: 0;
+  }
+
+  /* ── Values (dark section) ──────────────────────────────────────── */
+  .valuesSection {
+    background: rgb(32, 32, 65);
+    padding: 44px 20px;
+  }
+  .valuesSectionTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 28px;
+    line-height: 1.3;
+  }
+  .valueCards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .valueCard {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .valueIcon {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+  .valueTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .valueText {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ── Committees ─────────────────────────────────────────────────── */
+  .committeeList {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .committeeCard {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 12px;
+    padding: 18px 20px;
+    animation: fadeUp 0.5s ease both;
+    transition: box-shadow 0.2s;
+  }
+  .committeeCard:hover {
+    box-shadow: 0 4px 14px rgba(32, 32, 65, 0.08);
+  }
+  .committeeHeader {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .committeeNum {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgb(32, 32, 65);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: "Playfair Display", Georgia, serif;
+    flex-shrink: 0;
+  }
+  .committeeName {
+    font-size: 15px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 2px;
+  }
+  .committeeChair {
+    font-size: 12px;
+    color: rgb(187, 19, 47);
+    font-weight: 600;
+    margin: 0;
+  }
+  .committeeDesc {
+    font-size: 13px;
+    color: rgb(90, 88, 88);
+    line-height: 1.65;
+    margin: 0 0 10px;
+  }
+  .committeeMembers {
+    font-size: 11px;
+    color: rgb(140, 138, 138);
+  }
+  .committeeMembersLabel {
+    font-weight: 700;
+    color: rgb(90, 88, 88);
+  }
+
+  /* ── CTA ────────────────────────────────────────────────────────── */
+  .cta {
+    background: rgb(187, 19, 47);
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .ctaTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 10px;
+  }
+  .ctaText {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 24px;
+    line-height: 1.6;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .ctaButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .ctaPrimary {
+    height: 50px;
+    padding: 0 32px;
+    background: white;
+    color: rgb(187, 19, 47);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+  .ctaPrimary:hover {
+    background: rgb(245, 245, 245);
+  }
+  .ctaSecondary {
+    height: 50px;
+    padding: 0 32px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+  .ctaSecondary:hover {
+    border-color: white;
+  }
+}
+
+/* ── Tablet ─────────────────────────────────────────────────────── */
+@media screen and (min-width: 576px) {
+  .heroTitle {
+    font-size: 44px;
+  }
+  .ctaButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .directorGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .valueCards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .committeeList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── Desktop ─────────────────────────────────────────────────────── */
+@media screen and (min-width: 768px) {
+  .section,
+  .valuesSection {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .cta {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .hero {
+    padding: 90px 80px 80px;
+  }
+  .heroTitle {
+    font-size: 52px;
+  }
+  .section {
+    padding-left: 80px;
+    padding-right: 80px;
+    max-width: 1060px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .valuesSection {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .cta {
+    padding: 60px 80px;
+  }
+  .directorGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .valueCards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

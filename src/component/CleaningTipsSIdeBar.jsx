@@ -1,11 +1,17 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./ResidentialSideBar.module.css";
 
 export default function CleaningTipsSideBar() {
+  const navigate = useNavigate();
+
   return (
     <>
       <div className={styles.residentialMain}>
         <div className={styles.residentialDI}>
-          <div className={styles.hoverMainDiv1}>
+          <div
+            onClick={() => navigate("/general-household")}
+            className={styles.hoverMainDiv1}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>General Household</p>
           </div>

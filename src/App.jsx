@@ -49,6 +49,8 @@ import DeausiziFoundation from "./component/DeausiziFoundation/DeausiziFoundatio
 import DeausiziAwards from "./component/DeausiziAwards/DeausiziAwards.jsx";
 import LocalShelterSupport from "./component/LocalShelterSupport/LocalShelterSupport.jsx";
 import FloatingSupportChat from "./component/SupportChat/FloatingSupportChat.jsx";
+import BoardOfDirectors from "./component/BoardOfDirectors/BoardOfDirectors.jsx";
+import GeneralHousehold from "./component/GeneralHousehold/GeneralHousehold.jsx";
 
 function App() {
   return (
@@ -122,7 +124,7 @@ function AppRoutes() {
       <Route path="/one-time-cleaning" element={<OneTimeCleaning />} />
       <Route path="/move-in-cleaning" element={<MoveInCleaning />} />
       <Route path="/eco-friendly-cleaning" element={<EcoFriendlyCleaning />} />
-      <Route path="/ " element={<ApartmentCleaning />} />
+      <Route path="/apartment-cleaning" element={<ApartmentCleaning />} />
       <Route path="/occasional-cleaning" element={<OccasionalCleaning />} />
       <Route path="/move-out-cleaning" element={<MoveOutCleaning />} />
       <Route path="/home-cleaning" element={<HomeCleaning />} />
@@ -146,6 +148,8 @@ function AppRoutes() {
       <Route path="/foundation" element={<DeausiziFoundation />} />
       <Route path="/awards" element={<DeausiziAwards />} />
       <Route path="/local-shelter-support" element={<LocalShelterSupport />} />
+      <Route path="/board-of-directors" element={<BoardOfDirectors />} />
+      <Route path="/general-household" element={<GeneralHousehold />} />
 
       {/* Admin Dashboard */}
       <Route
