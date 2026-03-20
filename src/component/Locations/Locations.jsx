@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Locations.module.css";
+import FixedHeader from "../FixedHeader";
 
 const CITIES = {
   Abuja: {
@@ -138,6 +139,7 @@ export default function Locations() {
 
   return (
     <div className={styles.page}>
+      <FixedHeader />
       {/* Hero */}
       <div className={styles.hero}>
         <p className={styles.heroEyebrow}>Service locations</p>

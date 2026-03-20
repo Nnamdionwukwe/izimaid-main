@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./GiftCertificates.module.css";
+import FixedHeader from "../FixedHeader";
 
 const PACKAGES = [
   {
@@ -126,6 +127,7 @@ export default function GiftCertificates() {
 
   return (
     <div className={styles.page}>
+      <FixedHeader />
       {/* Hero */}
       <div className={styles.hero}>
         <span className={styles.heroEmoji}>🎁</span>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DeusiziApp.module.css";
+import FixedHeader from "../FixedHeader";
 
 const FEATURES = [
   {
@@ -122,6 +123,7 @@ export default function DeusiziApp() {
 
   return (
     <div className={styles.page}>
+      <FixedHeader />
       {/* Hero */}
       <div className={styles.hero}>
         <p className={styles.heroEyebrow}>The Deusizi Sparkle App</p>

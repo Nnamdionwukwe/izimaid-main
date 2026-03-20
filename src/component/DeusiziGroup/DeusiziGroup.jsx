@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./DeusiziGroup.module.css";
+import FixedHeader from "../FixedHeader";
 
 const FURNITURE_FEATURES = [
   "Authentic Italian furniture sourced directly from manufacturers in Milan, Florence & Veneto",
@@ -69,6 +70,7 @@ export default function DeusiziGroup() {
 
   return (
     <div className={styles.page}>
+      <FixedHeader />
       {/* Hero */}
       <div className={styles.hero}>
         <span className={styles.heroEyebrow}>A Deusizi Group of Companies</span>
