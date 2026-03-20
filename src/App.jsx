@@ -48,12 +48,15 @@ import BeforeAfter from "./component/BeforeAfter/BeforeAfter.jsx";
 import DeausiziFoundation from "./component/DeausiziFoundation/DeausiziFoundation,.jsx";
 import DeausiziAwards from "./component/DeausiziAwards/DeausiziAwards.jsx";
 import LocalShelterSupport from "./component/LocalShelterSupport/LocalShelterSupport.jsx";
+import FloatingSupportChat from "./component/SupportChat/FloatingSupportChat.jsx";
 
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthProvider>
         <BrowserRouter>
+          {/* Floating support chat — only renders for logged-in customers */}
+          <FloatingSupportChat />
           <AppRoutes />
         </BrowserRouter>
       </AuthProvider>

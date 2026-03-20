@@ -88,9 +88,6 @@ export default function HomePage() {
         <IziBestLogo />
         <Footer />
       </div>
-
-      {/* Floating support chat — only renders for logged-in customers */}
-      <FloatingSupportChat />
     </>
   );
 }
