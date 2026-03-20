@@ -51,6 +51,7 @@ import LocalShelterSupport from "./component/LocalShelterSupport/LocalShelterSup
 import FloatingSupportChat from "./component/SupportChat/FloatingSupportChat.jsx";
 import BoardOfDirectors from "./component/BoardOfDirectors/BoardOfDirectors.jsx";
 import GeneralHousehold from "./component/GeneralHousehold/GeneralHousehold.jsx";
+import Kitchens from "./component/CleaningTips/Kitchens.jsx";
 
 function App() {
   return (
@@ -150,6 +151,7 @@ function AppRoutes() {
       <Route path="/local-shelter-support" element={<LocalShelterSupport />} />
       <Route path="/board-of-directors" element={<BoardOfDirectors />} />
       <Route path="/general-household" element={<GeneralHousehold />} />
+      <Route path="/kitchens" element={<Kitchens />} />
 
       {/* Admin Dashboard */}
       <Route
