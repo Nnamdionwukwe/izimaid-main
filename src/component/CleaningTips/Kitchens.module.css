@@ -734,3 +734,228 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+/* ── Category tabs ──────────────────────────────────────────────── */
+.catTabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-bottom: 18px;
+  padding-bottom: 2px;
+}
+.catTabs::-webkit-scrollbar {
+  display: none;
+}
+.catTab {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 24px;
+  border: 2px solid rgb(235, 232, 225);
+  background: white;
+  color: rgb(90, 88, 88);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.catTab:hover {
+  border-color: rgb(32, 32, 65);
+  color: rgb(32, 32, 65);
+}
+.catTabActive {
+  background: rgb(32, 32, 65);
+  color: white;
+  border-color: rgb(32, 32, 65);
+}
+.catTabIcon {
+  font-size: 16px;
+}
+
+/* Category label */
+.catLabel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid rgb(235, 232, 225);
+  border-left: 5px solid rgb(187, 19, 47);
+  margin-bottom: 16px;
+}
+.catLabelIcon {
+  font-size: 28px;
+}
+.catLabelName {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgb(32, 32, 65);
+  margin: 0 0 2px;
+}
+.catLabelTagline {
+  font-size: 12px;
+  color: gray;
+  margin: 0;
+}
+
+/* Tips accordion */
+.tipCard {
+  background: white;
+  border: 1px solid rgb(235, 232, 225);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+  animation: fadeUp 0.4s ease both;
+  margin-bottom: 10px;
+}
+.tipCard:hover {
+  box-shadow: 0 4px 14px rgba(32, 32, 65, 0.08);
+}
+.tipCardOpen {
+  border-color: rgb(32, 32, 65);
+}
+.tipQuestion {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+.tipQuestionLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+.tipNum {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgb(187, 19, 47);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tipTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgb(32, 32, 65);
+  line-height: 1.3;
+}
+.tipChevron {
+  font-size: 18px;
+  color: rgb(187, 19, 47);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.tipChevronOpen {
+  transform: rotate(180deg);
+}
+.tipAnswer {
+  font-size: 13px;
+  color: rgb(80, 78, 78);
+  line-height: 1.75;
+  margin: 0;
+  padding: 12px 16px 16px 54px;
+  border-top: 1px solid rgb(245, 242, 238);
+}
+
+/* Quick wins dark section */
+.quickWins {
+  background: rgb(32, 32, 65);
+  padding: 44px 20px;
+}
+.quickWinsTitle {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 8px;
+}
+.quickWinsSub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+.quickWinsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.quickWinCard {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
+  animation: fadeUp 0.4s ease both;
+}
+.quickWinTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.quickWinIcon {
+  font-size: 22px;
+}
+.quickWinTime {
+  font-size: 11px;
+  font-weight: 700;
+  background: rgb(187, 19, 47);
+  color: white;
+  padding: 3px 9px;
+  border-radius: 12px;
+}
+.quickWinText {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Tips banner list override */
+.tipsList2 {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media screen and (min-width: 576px) {
+  .quickWinsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media screen and (min-width: 768px) {
+  .quickWins {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+@media screen and (min-width: 992px) {
+  .quickWins {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .quickWinsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
