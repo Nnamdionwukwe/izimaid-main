@@ -1,0 +1,741 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+@media screen and (min-width: 20px) {
+  .page {
+    font-family: "DM Sans", Arial, sans-serif;
+    background: #faf9f6;
+    overflow-x: hidden;
+    margin-top: 20px;
+  }
+
+  /* ── Hero ─────────────────────────────────────────────────────────── */
+  .hero {
+    background: rgb(22, 20, 40);
+    padding: 50px 20px 54px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.12);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -50px;
+    left: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.07);
+  }
+  .heroTrophy {
+    font-size: 52px;
+    margin-bottom: 16px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+  .heroEyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(212, 175, 55, 0.75);
+    margin: 0 0 14px;
+  }
+  .heroTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 14px;
+    line-height: 1.2;
+  }
+  .heroTitle em {
+    font-style: italic;
+    color: rgb(212, 175, 55);
+  }
+  .heroDesc {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.68);
+    margin: 0 auto;
+    max-width: 440px;
+    line-height: 1.7;
+  }
+  .heroDivider {
+    width: 40px;
+    height: 3px;
+    background: rgb(212, 175, 55);
+    margin: 22px auto 0;
+    border-radius: 2px;
+  }
+  .heroButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    margin-top: 28px;
+  }
+  .heroPrimary {
+    height: 48px;
+    padding: 0 28px;
+    background: rgb(212, 175, 55);
+    color: rgb(22, 20, 40);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+    transition: background 0.15s;
+  }
+  .heroPrimary:hover {
+    background: rgb(190, 155, 40);
+  }
+  .heroSecondary {
+    height: 48px;
+    padding: 0 28px;
+    background: transparent;
+    color: rgb(212, 175, 55);
+    border: 2px solid rgba(212, 175, 55, 0.45);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .heroSecondary:hover {
+    border-color: rgb(212, 175, 55);
+  }
+
+  /* ── Stats bar ───────────────────────────────────────────────────── */
+  .statsBar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: rgb(212, 175, 55);
+  }
+  .statItem {
+    padding: 18px 16px;
+    text-align: center;
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+  .statItem:nth-child(even) {
+    border-right: none;
+  }
+  .statItem:nth-child(3),
+  .statItem:nth-child(4) {
+    border-bottom: none;
+  }
+  .statNum {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: rgb(22, 20, 40);
+    margin: 0 0 3px;
+  }
+  .statLabel {
+    font-size: 11px;
+    color: rgba(22, 20, 40, 0.72);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  /* ── Shared ──────────────────────────────────────────────────────── */
+  .section {
+    padding: 44px 20px;
+  }
+  .faq {
+    padding: 0 20px 44px;
+  }
+  .sectionEyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(180, 145, 30);
+    margin: 0 0 10px;
+  }
+  .sectionTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 10px;
+    line-height: 1.3;
+  }
+  .sectionSub {
+    font-size: 14px;
+    color: gray;
+    line-height: 1.6;
+    margin: 0 0 24px;
+  }
+
+  /* ── Category cards ──────────────────────────────────────────────── */
+  .categoryGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .categoryCard {
+    background: white;
+    border: 2px solid rgb(235, 232, 225);
+    border-radius: 14px;
+    padding: 20px;
+    transition:
+      box-shadow 0.2s,
+      border-color 0.2s,
+      transform 0.2s;
+  }
+  .categoryCard:hover {
+    box-shadow: 0 8px 24px rgba(32, 32, 65, 0.1);
+    border-color: rgb(212, 175, 55);
+    transform: translateY(-2px);
+  }
+  .categoryIcon {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  .categoryTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 8px;
+  }
+  .categoryDesc {
+    font-size: 13px;
+    color: rgb(90, 88, 88);
+    line-height: 1.65;
+    margin: 0 0 14px;
+  }
+  .categoryPrize {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgb(255, 252, 235);
+    border: 1px solid rgb(212, 175, 55);
+    border-radius: 8px;
+  }
+  .prizeLabel {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgb(140, 110, 20);
+  }
+  .prizeValue {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(100, 75, 10);
+  }
+
+  /* ── Nominees ────────────────────────────────────────────────────── */
+  .nominees {
+    background: rgb(22, 20, 40);
+    padding: 40px 20px;
+  }
+  .nomineesTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .nomineesSub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 24px;
+  }
+  .nomineeGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .nomineeCard {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 14px 16px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    transition: background 0.15s;
+  }
+  .nomineeCard:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .nomineeAvatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgb(212, 175, 55);
+    color: rgb(22, 20, 40);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .nomineeInfo {
+    flex: 1;
+    min-width: 0;
+  }
+  .nomineeName {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 2px;
+  }
+  .nomineeLocation {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 2px;
+  }
+  .nomineeAward {
+    font-size: 11px;
+    color: rgb(212, 175, 55);
+    font-weight: 600;
+    margin: 0;
+  }
+  .nomineeMeta {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .nomineeRating {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(212, 175, 55);
+    margin: 0 0 2px;
+  }
+  .nomineeBookings {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+  }
+
+  /* ── Criteria ────────────────────────────────────────────────────── */
+  .criteriaList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .criteriaItem {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .criteriaLeft {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .criteriaIcon {
+    font-size: 18px;
+  }
+  .criteriaTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+  }
+  .criteriaBarWrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .criteriaBar {
+    flex: 1;
+    height: 8px;
+    background: rgb(240, 238, 234);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .criteriaFill {
+    height: 100%;
+    background: rgb(212, 175, 55);
+    border-radius: 4px;
+  }
+  .criteriaWeight {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(180, 145, 30);
+    flex-shrink: 0;
+  }
+  .criteriaText {
+    font-size: 13px;
+    color: gray;
+    margin: 0;
+    line-height: 1.5;
+  }
+  .criteriaNote {
+    font-size: 12px;
+    color: gray;
+    margin-top: 16px;
+    font-style: italic;
+  }
+
+  /* ── Past winners ────────────────────────────────────────────────── */
+  .winners {
+    background: rgb(22, 20, 40);
+    padding: 40px 20px;
+  }
+  .winnersTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 20px;
+  }
+  .yearTabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .yearTab {
+    padding: 7px 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .yearTab:hover {
+    border-color: rgb(212, 175, 55);
+    color: rgb(212, 175, 55);
+  }
+  .yearTabActive {
+    background: rgb(212, 175, 55);
+    color: rgb(22, 20, 40);
+    border-color: rgb(212, 175, 55);
+  }
+  .winnerGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .winnerCard {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    text-align: center;
+  }
+  .winnerAwardBadge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgb(212, 175, 55);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 20px;
+    padding: 3px 12px;
+    margin-bottom: 14px;
+  }
+  .winnerAvatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgb(212, 175, 55);
+    color: rgb(22, 20, 40);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 auto 10px;
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+  }
+  .winnerName {
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 3px;
+  }
+  .winnerLocation {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 12px;
+  }
+  .winnerQuote {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.75);
+    font-style: italic;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── Timeline ────────────────────────────────────────────────────── */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 9px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      rgb(212, 175, 55),
+      rgba(212, 175, 55, 0.2)
+    );
+  }
+  .timelineItem {
+    display: flex;
+    gap: 20px;
+    padding: 0 0 22px;
+    position: relative;
+  }
+  .timelineDot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgb(212, 175, 55);
+    border: 3px solid #faf9f6;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    margin-top: 2px;
+  }
+  .timelineDate {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgb(180, 145, 30);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 3px;
+  }
+  .timelineEvent {
+    font-size: 14px;
+    color: rgb(60, 58, 58);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ── FAQ ─────────────────────────────────────────────────────────── */
+  .faqList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .faqItem {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .faqQuestion {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 16px 18px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+  }
+  .faqChevron {
+    font-size: 18px;
+    transition: transform 0.2s;
+    color: rgb(180, 145, 30);
+    flex-shrink: 0;
+  }
+  .faqChevronOpen {
+    transform: rotate(180deg);
+  }
+  .faqAnswer {
+    padding: 12px 18px 16px;
+    font-size: 13px;
+    color: rgb(100, 98, 98);
+    line-height: 1.7;
+    margin: 0;
+    border-top: 1px solid rgb(245, 242, 238);
+  }
+
+  /* ── CTA ─────────────────────────────────────────────────────────── */
+  .cta {
+    background: rgb(22, 20, 40);
+    padding: 50px 20px;
+    text-align: center;
+  }
+  .ctaTrophy {
+    font-size: 44px;
+    margin-bottom: 16px;
+  }
+  .ctaTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 10px;
+  }
+  .ctaText {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.68);
+    margin: 0 0 28px;
+    line-height: 1.6;
+  }
+  .ctaButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .ctaPrimary {
+    height: 50px;
+    padding: 0 32px;
+    background: rgb(212, 175, 55);
+    color: rgb(22, 20, 40);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+  .ctaPrimary:hover {
+    background: rgb(190, 155, 40);
+  }
+  .ctaSecondary {
+    height: 50px;
+    padding: 0 32px;
+    background: transparent;
+    color: rgb(212, 175, 55);
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+  .ctaSecondary:hover {
+    border-color: rgb(212, 175, 55);
+  }
+}
+
+/* ── Tablet (576px+) ─────────────────────────────────────────────────── */
+@media screen and (min-width: 576px) {
+  .heroTitle {
+    font-size: 42px;
+  }
+  .heroButtons,
+  .ctaButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .statsBar {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .statItem {
+    border-bottom: none;
+  }
+  .statItem:nth-child(4) {
+    border-right: none;
+  }
+  .categoryGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .nomineeGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .winnerGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── Tablet large (768px+) ───────────────────────────────────────────── */
+@media screen and (min-width: 768px) {
+  .section,
+  .faq {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .nominees,
+  .winners {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .cta {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+/* ── Desktop (992px+) ────────────────────────────────────────────────── */
+@media screen and (min-width: 992px) {
+  .hero {
+    padding: 80px 80px 70px;
+  }
+  .heroTitle {
+    font-size: 50px;
+  }
+  .section,
+  .faq {
+    padding-left: 80px;
+    padding-right: 80px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .nominees,
+  .winners {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .cta {
+    padding: 60px 80px;
+  }
+  .categoryGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .nomineeGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .winnerGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

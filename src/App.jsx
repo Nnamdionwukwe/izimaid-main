@@ -46,6 +46,7 @@ import ApplyLocally from "./component/AplicarLocalmente/ApplyLocally.jsx";
 import WhatsIncluded from "./component/WhatsIncluded/WhatsIncluded.jsx";
 import BeforeAfter from "./component/BeforeAfter/BeforeAfter.jsx";
 import DeausiziFoundation from "./component/DeausiziFoundation/DeausiziFoundation,.jsx";
+import DeausiziAwards from "./component/DeausiziAwards/DeausiziAwards.jsx";
 
 function App() {
   return (
@@ -139,6 +140,7 @@ function AppRoutes() {
       <Route path="/whats-included" element={<WhatsIncluded />} />
       <Route path="/before-after-cleaning" element={<BeforeAfter />} />
       <Route path="/foundation" element={<DeausiziFoundation />} />
+      <Route path="/awards" element={<DeausiziAwards />} />
 
       {/* Admin Dashboard */}
       <Route
