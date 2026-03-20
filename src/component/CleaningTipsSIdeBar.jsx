@@ -24,12 +24,18 @@ export default function CleaningTipsSideBar() {
             <p>Kitchens</p>
           </div>
 
-          <div className={styles.hoverMainDiv3}>
+          <div
+            onClick={() => navigate("/move-cleaning-tips")}
+            className={styles.hoverMainDiv3}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Move-In Cleaning</p>
           </div>
 
-          <div className={styles.hoverMainDiv4}>
+          <div
+            onClick={() => navigate("/office-cleaning-tips")}
+            className={styles.hoverMainDiv4}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Office </p>
           </div>

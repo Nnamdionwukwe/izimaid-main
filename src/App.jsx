@@ -52,6 +52,8 @@ import FloatingSupportChat from "./component/SupportChat/FloatingSupportChat.jsx
 import BoardOfDirectors from "./component/BoardOfDirectors/BoardOfDirectors.jsx";
 import GeneralHousehold from "./component/GeneralHousehold/GeneralHousehold.jsx";
 import Kitchens from "./component/CleaningTips/Kitchens.jsx";
+import MoveCleaningTips from "./component/CleaningTips/MoveCleaningTips.jsx";
+import OfficeCleaningTips from "./component/CleaningTips/OfficeCleaningTips.jsx";
 
 function App() {
   return (
@@ -152,6 +154,8 @@ function AppRoutes() {
       <Route path="/board-of-directors" element={<BoardOfDirectors />} />
       <Route path="/general-household" element={<GeneralHousehold />} />
       <Route path="/kitchens" element={<Kitchens />} />
+      <Route path="/move-cleaning-tips" element={<MoveCleaningTips />} />
+      <Route path="/office-cleaning-tips" element={<OfficeCleaningTips />} />
 
       {/* Admin Dashboard */}
       <Route
