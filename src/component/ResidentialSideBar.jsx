@@ -33,6 +33,14 @@ export default function ResidentialSideBar() {
           </div>
 
           <div
+            onClick={() => navigate("/kitchens")}
+            className={styles.hoverMainDiv3}
+          >
+            <i class="fa fa-th-large" aria-hidden="true"></i>
+            <p>Kitchens</p>
+          </div>
+
+          <div
             onClick={() => navigate("/eco-friendly-cleaning")}
             className={styles.hoverMainDiv4}
           >
