@@ -355,7 +355,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
 
                                 <div
                                   onClick={() =>
-                                    navigate("/before-after-cleaning")
+                                    navigate("/local-shelter-support")
                                   }
                                   className={styles.residentialDI23}
                                 >
