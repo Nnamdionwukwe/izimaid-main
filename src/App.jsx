@@ -122,7 +122,7 @@ function AppRoutes() {
       <Route path="/one-time-cleaning" element={<OneTimeCleaning />} />
       <Route path="/move-in-cleaning" element={<MoveInCleaning />} />
       <Route path="/eco-friendly-cleaning" element={<EcoFriendlyCleaning />} />
-      <Route path="/apartment-cleaning" element={<ApartmentCleaning />} />
+      <Route path="/ " element={<ApartmentCleaning />} />
       <Route path="/occasional-cleaning" element={<OccasionalCleaning />} />
       <Route path="/move-out-cleaning" element={<MoveOutCleaning />} />
       <Route path="/home-cleaning" element={<HomeCleaning />} />
