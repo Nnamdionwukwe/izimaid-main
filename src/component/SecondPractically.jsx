@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./SecondPractically.module.css";
 
 export default function SecondPractically() {
+  const navigate = useNavigate();
+
   return (
     <div className={styles.mainMain}>
       <div className={styles.main}>
@@ -8,7 +11,7 @@ export default function SecondPractically() {
           <h1>Practically Spotless Blog</h1>
 
           <div className={styles.mainh2}>
-            <h4>View All Blog Posts</h4>
+            <h4 onClick={() => navigate("/blog")}>View All Blog Posts</h4>
             <h5>&rarr;</h5>
           </div>
         </div>

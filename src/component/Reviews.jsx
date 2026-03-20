@@ -32,7 +32,6 @@ export default function Reviews() {
       <div className={styles.hearMain}>
         <div className={styles.hearMainSub}>
           <h1>Hear From Our Clients</h1>
-          <h4>Read More Reviews</h4>
         </div>
       </div>
 

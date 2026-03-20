@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./WeProvide.module.css";
 
 export default function WeProvide() {
+  const navigate = useNavigate();
+
   return (
     <div className={styles.main}>
       <div className={styles.mainDiv}>
@@ -24,7 +27,9 @@ export default function WeProvide() {
           one-time specific...
         </p>
 
-        <p className={styles.p3}>...Read More</p>
+        <p onClick={() => navigate("/home-cleaning")} className={styles.p3}>
+          ...Read More
+        </p>
       </div>
     </div>
   );
