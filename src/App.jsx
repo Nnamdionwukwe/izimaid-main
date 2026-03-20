@@ -65,6 +65,7 @@ import LaundryRooms from "./component/CleaningTips/LaundryRooms.jsx";
 import KitchenTips from "./component/CleaningTips/KitchenTips.jsx";
 import Blog from "./component/Blog/Blog.jsx";
 import Seasonal from "./component/Blog/Seasonal.jsx";
+import TipsAndTricks from "./component/Blog/TipsAndTricks.jsx";
 
 function App() {
   return (
@@ -181,6 +182,7 @@ function AppRoutes() {
       <Route path="/kitchens-tips" element={<KitchenTips />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/seasonal" element={<Seasonal />} />
+      <Route path="/blog/tips-and-tricks" element={<TipsAndTricks />} />
 
       {/* Admin Dashboard */}
       <Route

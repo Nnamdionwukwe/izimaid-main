@@ -23,7 +23,10 @@ export default function PracticalSideBar() {
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Seasonal</p>
           </div>
-          <div className={styles.hoverMainDiv12}>
+          <div
+            onClick={() => navigate("/blog/tips-and-tricks")}
+            className={styles.hoverMainDiv12}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p className={styles.para6}>Tips and Tricks</p>
           </div>
