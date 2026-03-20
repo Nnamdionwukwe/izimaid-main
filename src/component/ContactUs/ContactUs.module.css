@@ -1,0 +1,514 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+@media screen and (min-width: 20px) {
+  .page {
+    font-family: "DM Sans", Arial, sans-serif;
+    background: #faf9f6;
+    overflow-x: hidden;
+    margin-top: 20px;
+  }
+
+  /* ── Hero ─────────────────────────────────────────────────────────── */
+  .hero {
+    background: rgb(32, 32, 65);
+    padding: 60px 20px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(187, 19, 47, 0.18);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    left: -30px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .heroEyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 14px;
+  }
+  .heroTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 14px;
+    line-height: 1.2;
+  }
+  .heroTitle em {
+    font-style: italic;
+    color: rgb(255, 200, 200);
+  }
+  .heroDesc {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 auto;
+    max-width: 420px;
+    line-height: 1.7;
+  }
+  .heroDivider {
+    width: 40px;
+    height: 3px;
+    background: rgb(187, 19, 47);
+    margin: 22px auto 0;
+    border-radius: 2px;
+  }
+
+  /* ── Section wrapper ─────────────────────────────────────────────── */
+  .section {
+    padding: 44px 20px;
+  }
+  .sectionEyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(187, 19, 47);
+    margin: 0 0 10px;
+  }
+  .sectionTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 28px;
+    line-height: 1.3;
+  }
+
+  /* ── Contact method cards ────────────────────────────────────────── */
+  .methodGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .methodCard {
+    background: white;
+    border: 2px solid rgb(235, 232, 225);
+    border-radius: 14px;
+    padding: 20px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    text-decoration: none;
+    transition:
+      box-shadow 0.2s,
+      border-color 0.2s,
+      transform 0.2s;
+    cursor: pointer;
+  }
+  .methodCard:hover {
+    box-shadow: 0 8px 24px rgba(32, 32, 65, 0.1);
+    border-color: rgb(32, 32, 65);
+    transform: translateY(-2px);
+  }
+  .methodIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgb(240, 240, 255);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .methodTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 3px;
+  }
+  .methodDetail {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgb(187, 19, 47);
+    margin: 0 0 2px;
+  }
+  .methodSub {
+    font-size: 11px;
+    color: gray;
+    margin: 0;
+  }
+
+  /* ── Contact form section ────────────────────────────────────────── */
+  .formSection {
+    background: rgb(32, 32, 65);
+    padding: 44px 20px;
+  }
+  .formInner {
+    background: white;
+    border-radius: 16px;
+    padding: 28px 20px;
+  }
+  .formInner .sectionEyebrow {
+    color: rgb(187, 19, 47);
+  }
+  .formInner .sectionTitle {
+    color: rgb(32, 32, 65);
+    margin-bottom: 22px;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .row {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .label {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(50, 50, 70);
+  }
+  .req {
+    color: rgb(187, 19, 47);
+    margin-left: 2px;
+  }
+  .optional {
+    font-size: 11px;
+    color: gray;
+    font-weight: 400;
+    margin-left: 4px;
+  }
+  .input {
+    height: 46px;
+    padding: 0 14px;
+    border: 1.5px solid rgb(220, 218, 212);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background: white;
+    color: rgb(32, 32, 65);
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  .input:focus {
+    border-color: rgb(32, 32, 65);
+  }
+  .select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+  .textarea {
+    padding: 12px 14px;
+    border: 1.5px solid rgb(220, 218, 212);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    resize: vertical;
+    min-height: 130px;
+    color: rgb(32, 32, 65);
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+    width: 100%;
+    line-height: 1.6;
+  }
+  .textarea:focus {
+    border-color: rgb(32, 32, 65);
+  }
+  .inputError {
+    border-color: rgb(187, 19, 47);
+  }
+  .error {
+    font-size: 11px;
+    color: rgb(187, 19, 47);
+    margin: 0;
+  }
+
+  .submitBtn {
+    height: 50px;
+    background: rgb(187, 19, 47);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .submitBtn:hover:not(:disabled) {
+    background: rgb(150, 15, 37);
+  }
+  .submitBtn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+  .spinnerRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2.5px solid rgba(255, 255, 255, 0.35);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ── Success state ───────────────────────────────────────────────── */
+  .successBox {
+    text-align: center;
+    padding: 30px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .successIcon {
+    font-size: 48px;
+  }
+  .successTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0;
+  }
+  .successText {
+    font-size: 14px;
+    color: gray;
+    margin: 0;
+    max-width: 300px;
+    line-height: 1.6;
+  }
+  .heroPrimary {
+    height: 48px;
+    padding: 0 28px;
+    background: rgb(187, 19, 47);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 6px;
+  }
+  .heroPrimary:hover {
+    background: rgb(150, 15, 37);
+  }
+
+  /* ── FAQ ─────────────────────────────────────────────────────────── */
+  .faq {
+    padding: 0 20px 44px;
+  }
+  .faqList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .faqItem {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .faqQuestion {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 16px 18px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+  }
+  .faqChevron {
+    font-size: 18px;
+    transition: transform 0.2s;
+    color: rgb(187, 19, 47);
+    flex-shrink: 0;
+  }
+  .faqChevronOpen {
+    transform: rotate(180deg);
+  }
+  .faqAnswer {
+    padding: 12px 18px 16px;
+    font-size: 13px;
+    color: rgb(100, 98, 98);
+    line-height: 1.7;
+    margin: 0;
+    border-top: 1px solid rgb(245, 242, 238);
+  }
+
+  /* ── CTA ─────────────────────────────────────────────────────────── */
+  .cta {
+    background: rgb(187, 19, 47);
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .ctaTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 10px;
+  }
+  .ctaText {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+  .ctaButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .ctaPrimary {
+    height: 50px;
+    padding: 0 32px;
+    background: white;
+    color: rgb(187, 19, 47);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+  .ctaPrimary:hover {
+    background: rgb(245, 245, 245);
+  }
+  .ctaSecondary {
+    height: 50px;
+    padding: 0 32px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+  .ctaSecondary:hover {
+    border-color: white;
+  }
+}
+
+/* ── Tablet (576px+) ─────────────────────────────────────────────────── */
+@media screen and (min-width: 576px) {
+  .heroTitle {
+    font-size: 42px;
+  }
+  .methodGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .row {
+    flex-direction: row;
+  }
+  .row .field {
+    flex: 1;
+  }
+  .ctaButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+/* ── Tablet large (768px+) ───────────────────────────────────────────── */
+@media screen and (min-width: 768px) {
+  .section,
+  .faq {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .formSection {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .formInner {
+    padding: 36px 32px;
+  }
+  .cta {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+/* ── Desktop (992px+) ────────────────────────────────────────────────── */
+@media screen and (min-width: 992px) {
+  .hero {
+    padding: 90px 80px 80px;
+  }
+  .heroTitle {
+    font-size: 50px;
+  }
+
+  .section,
+  .faq {
+    padding-left: 80px;
+    padding-right: 80px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .formSection {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .formInner {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 44px 44px;
+  }
+  .cta {
+    padding: 60px 80px;
+  }
+}

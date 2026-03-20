@@ -1,0 +1,748 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+@media screen and (min-width: 20px) {
+  .page {
+    font-family: "DM Sans", Arial, sans-serif;
+    background: #faf9f6;
+    overflow-x: hidden;
+  }
+
+  /* Hero */
+  .hero {
+    background: rgb(32, 32, 65);
+    padding: 60px 20px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: rgba(187, 19, 47, 0.12);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    left: -30px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .heroEyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 14px;
+  }
+  .heroTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 14px;
+    line-height: 1.2;
+  }
+  .heroTitle em {
+    font-style: italic;
+    color: rgb(255, 200, 200);
+  }
+  .heroDesc {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 auto 24px;
+    max-width: 400px;
+    line-height: 1.7;
+  }
+
+  /* App mockup */
+  .appMockup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 1;
+  }
+  .phone {
+    width: 140px;
+    background: rgb(14, 14, 30);
+    border-radius: 28px;
+    padding: 10px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+  .phone.phoneLarge {
+    width: 160px;
+    transform: scale(1.05);
+  }
+  .phoneScreen {
+    background: rgb(250, 249, 246);
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 9/19;
+    display: flex;
+    flex-direction: column;
+  }
+  .phoneStatusBar {
+    height: 14px;
+    background: rgb(32, 32, 65);
+  }
+  .phoneHeader {
+    background: rgb(32, 32, 65);
+    padding: 10px 10px 8px;
+  }
+  .phoneHeaderText {
+    font-size: 8px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+  }
+  .phoneHeaderSub {
+    font-size: 6px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+  }
+  .phoneBody {
+    flex: 1;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .phoneMaidCard {
+    background: white;
+    border-radius: 8px;
+    padding: 7px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+  .phoneMaidAvatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgb(32, 32, 65);
+    flex-shrink: 0;
+  }
+  .phoneMaidInfo {
+    flex: 1;
+  }
+  .phoneMaidName {
+    font-size: 6px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0;
+  }
+  .phoneMaidRate {
+    font-size: 5px;
+    color: gray;
+    margin: 0;
+  }
+  .phoneMaidStars {
+    font-size: 5px;
+    color: rgb(150, 107, 7);
+  }
+  .phoneBookBtn {
+    background: rgb(187, 19, 47);
+    color: white;
+    font-size: 4px;
+    font-weight: 700;
+    padding: 3px 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .phoneSearch {
+    background: white;
+    border-radius: 6px;
+    padding: 5px 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 2px;
+  }
+  .phoneSearchIcon {
+    font-size: 7px;
+  }
+  .phoneSearchText {
+    font-size: 5px;
+    color: gray;
+  }
+  .phoneSectionLabel {
+    font-size: 6px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0;
+  }
+
+  /* Download buttons */
+  .downloadButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+  .dlBtn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 52px;
+    padding: 0 20px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 220px;
+    transition:
+      transform 0.15s,
+      box-shadow 0.15s;
+  }
+  .dlBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+  .dlBtnDark {
+    background: white;
+  }
+  .dlBtnIcon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .dlBtnText {
+    text-align: left;
+  }
+  .dlBtnSub {
+    font-size: 10px;
+    color: rgb(80, 80, 80);
+    display: block;
+    margin-bottom: 1px;
+  }
+  .dlBtnMain {
+    font-size: 16px;
+    font-weight: 700;
+    color: rgb(20, 20, 20);
+    display: block;
+  }
+  .comingSoonPill {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    margin-top: 6px;
+  }
+
+  /* Features */
+  .features {
+    padding: 44px 20px;
+  }
+  .sectionEyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(187, 19, 47);
+    margin: 0 0 8px;
+  }
+  .sectionTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 28px;
+    line-height: 1.3;
+  }
+  .featureCards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .featureCard {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition:
+      box-shadow 0.2s,
+      transform 0.15s;
+    animation: fadeUp 0.5s ease both;
+  }
+  .featureCard:hover {
+    box-shadow: 0 6px 20px rgba(32, 32, 65, 0.08);
+    transform: translateY(-2px);
+  }
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .featureCard:nth-child(1) {
+    animation-delay: 0.04s;
+  }
+  .featureCard:nth-child(2) {
+    animation-delay: 0.08s;
+  }
+  .featureCard:nth-child(3) {
+    animation-delay: 0.12s;
+  }
+  .featureCard:nth-child(4) {
+    animation-delay: 0.16s;
+  }
+  .featureCard:nth-child(5) {
+    animation-delay: 0.2s;
+  }
+  .featureCard:nth-child(6) {
+    animation-delay: 0.24s;
+  }
+  .featureIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgb(240, 240, 255);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .featureTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 4px;
+  }
+  .featureText {
+    font-size: 12px;
+    color: rgb(90, 88, 88);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* How it works */
+  .howItWorks {
+    background: rgb(32, 32, 65);
+    padding: 44px 20px;
+  }
+  .howTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .howSub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0 0 24px;
+  }
+  .howSteps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .howStep {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .howStepNum {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgb(187, 19, 47);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-family: "Playfair Display", Georgia, serif;
+  }
+  .howStepIcon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .howStepTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 3px;
+  }
+  .howStepText {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* For maids section */
+  .forMaids {
+    background: rgb(187, 19, 47);
+    padding: 44px 20px;
+  }
+  .forMaidsTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .forMaidsSub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 20px;
+    line-height: 1.6;
+  }
+  .maidBenefits {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .maidBenefit {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .maidBenefitDot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .maidBenefitText {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin: 0;
+  }
+  .maidApplyBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 46px;
+    padding: 0 28px;
+    background: white;
+    color: rgb(187, 19, 47);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 20px;
+  }
+  .maidApplyBtn:hover {
+    background: rgb(245, 245, 245);
+  }
+
+  /* Notify form */
+  .notify {
+    padding: 44px 20px;
+  }
+  .notifyInner {
+    background: white;
+    border: 2px solid rgb(32, 32, 65);
+    border-radius: 16px;
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .notifyIcon {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  .notifyTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 8px;
+  }
+  .notifyText {
+    font-size: 13px;
+    color: rgb(90, 88, 88);
+    margin: 0 0 20px;
+    line-height: 1.6;
+  }
+  .notifyForm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .notifyInput {
+    height: 46px;
+    border: 1px solid rgb(228, 228, 228);
+    border-radius: 8px;
+    padding: 0 14px;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+    width: 100%;
+  }
+  .notifyInput:focus {
+    border-color: rgb(32, 32, 65);
+  }
+  .notifyBtn {
+    height: 46px;
+    background: rgb(32, 32, 65);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .notifyBtn:hover {
+    background: rgb(20, 20, 45);
+  }
+  .notifySuccess {
+    background: rgb(209, 247, 224);
+    color: rgb(10, 107, 46);
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* Web fallback */
+  .webFallback {
+    padding: 0 20px 44px;
+  }
+  .webFallbackInner {
+    background: rgb(245, 245, 248);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .webFallbackIcon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .webFallbackTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 4px;
+  }
+  .webFallbackText {
+    font-size: 12px;
+    color: rgb(90, 88, 88);
+    line-height: 1.6;
+    margin: 0 0 10px;
+  }
+  .webFallbackBtn {
+    height: 38px;
+    padding: 0 18px;
+    background: rgb(187, 19, 47);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .webFallbackBtn:hover {
+    background: rgb(150, 15, 37);
+  }
+
+  /* CTA */
+  .cta {
+    background: rgb(187, 19, 47);
+    padding: 44px 20px;
+    text-align: center;
+  }
+  .ctaTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 10px;
+  }
+  .ctaText {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+  .ctaButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .ctaPrimary {
+    height: 50px;
+    padding: 0 32px;
+    background: white;
+    color: rgb(187, 19, 47);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .ctaPrimary:hover {
+    background: rgb(245, 245, 245);
+  }
+  .ctaSecondary {
+    height: 50px;
+    padding: 0 32px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .ctaSecondary:hover {
+    border-color: white;
+  }
+}
+
+@media screen and (min-width: 480px) {
+  .downloadButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .howSteps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .notifyForm {
+    flex-direction: row;
+  }
+  .notifyInput {
+    flex: 1;
+  }
+  .notifyBtn {
+    padding: 0 20px;
+    white-space: nowrap;
+  }
+}
+
+@media screen and (min-width: 576px) {
+  .heroTitle {
+    font-size: 40px;
+  }
+  .ctaButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .featureCards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .maidBenefits {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .features,
+  .notify,
+  .webFallback {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .howItWorks,
+  .forMaids,
+  .cta {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .heroTitle {
+    font-size: 46px;
+  }
+  .phone {
+    width: 160px;
+  }
+  .phone.phoneLarge {
+    width: 180px;
+  }
+  .howSteps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .notifyInner {
+    padding: 32px;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .hero {
+    padding: 80px 80px 70px;
+  }
+  .heroTitle {
+    font-size: 52px;
+  }
+  .features,
+  .notify,
+  .webFallback {
+    padding-left: 80px;
+    padding-right: 80px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .howItWorks,
+  .forMaids,
+  .cta {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .featureCards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .howSteps {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

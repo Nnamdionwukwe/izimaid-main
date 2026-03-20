@@ -1,0 +1,739 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+@media screen and (min-width: 20px) {
+  .page {
+    font-family: "DM Sans", Arial, sans-serif;
+    background: #faf9f6;
+    overflow-x: hidden;
+  }
+
+  /* Hero */
+  .hero {
+    background: rgb(32, 32, 65);
+    padding: 60px 20px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(187, 19, 47, 0.15);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    left: -30px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .heroEmoji {
+    font-size: 48px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .heroEyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 14px;
+  }
+  .heroTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 14px;
+    line-height: 1.2;
+  }
+  .heroTitle em {
+    font-style: italic;
+    color: rgb(255, 200, 200);
+  }
+  .heroDesc {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 auto 24px;
+    max-width: 400px;
+    line-height: 1.7;
+  }
+  .heroButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+  .heroPrimary {
+    height: 48px;
+    padding: 0 28px;
+    background: rgb(187, 19, 47);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 240px;
+  }
+  .heroPrimary:hover {
+    background: rgb(150, 15, 37);
+  }
+  .heroSecondary {
+    height: 48px;
+    padding: 0 28px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 240px;
+  }
+  .heroSecondary:hover {
+    border-color: white;
+  }
+
+  /* Gift card visual */
+  .giftCardVisual {
+    background: rgb(187, 19, 47);
+    padding: 32px 20px;
+  }
+  .giftCard {
+    max-width: 380px;
+    margin: 0 auto;
+    background: linear-gradient(
+      135deg,
+      rgb(32, 32, 65) 0%,
+      rgb(50, 30, 50) 100%
+    );
+    border-radius: 18px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+  .giftCard::before {
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .giftCard::after {
+    content: "";
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(187, 19, 47, 0.2);
+  }
+  .giftCardTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .giftCardBrand {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+  }
+  .giftCardType {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .giftCardAmount {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 4px;
+    line-height: 1;
+  }
+  .giftCardLabel {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 16px;
+  }
+  .giftCardBar {
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 16px 0;
+  }
+  .giftCardBottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .giftCardCode {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: monospace;
+  }
+  .giftCardLogo {
+    font-size: 20px;
+  }
+  .giftCardTo {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 3px;
+  }
+  .giftCardRecipient {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+  }
+
+  /* Sections */
+  .section {
+    padding: 44px 20px;
+  }
+  .sectionEyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(187, 19, 47);
+    margin: 0 0 8px;
+  }
+  .sectionTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 24px;
+    line-height: 1.3;
+  }
+
+  /* Package cards */
+  .packages {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .packageCard {
+    background: white;
+    border-radius: 14px;
+    border: 2px solid rgb(235, 232, 225);
+    overflow: hidden;
+    cursor: pointer;
+    transition:
+      box-shadow 0.2s,
+      transform 0.2s,
+      border-color 0.2s;
+  }
+  .packageCard:hover {
+    box-shadow: 0 8px 24px rgba(32, 32, 65, 0.1);
+    transform: translateY(-2px);
+  }
+  .packageCardSelected {
+    border-color: rgb(187, 19, 47);
+    box-shadow: 0 8px 24px rgba(187, 19, 47, 0.15);
+  }
+  .packageBanner {
+    height: 5px;
+    background: rgb(187, 19, 47);
+  }
+  .packageBody {
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .packageLeft {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .packageEmoji {
+    font-size: 28px;
+  }
+  .packageName {
+    font-size: 15px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 3px;
+  }
+  .packageDesc {
+    font-size: 12px;
+    color: gray;
+    margin: 0;
+  }
+  .packageRight {
+    text-align: right;
+  }
+  .packagePrice {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 2px;
+  }
+  .packageSub {
+    font-size: 11px;
+    color: gray;
+    margin: 0;
+  }
+  .packageRadio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgb(228, 228, 228);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .packageRadioSelected {
+    border-color: rgb(187, 19, 47);
+    background: rgb(187, 19, 47);
+  }
+  .packageRadioDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+  }
+
+  /* Custom amount */
+  .customCard {
+    background: white;
+    border-radius: 14px;
+    border: 2px dashed rgb(228, 228, 228);
+    padding: 18px 20px;
+  }
+  .customLabel {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 8px;
+  }
+  .customInput {
+    width: 100%;
+    height: 46px;
+    border: 1px solid rgb(228, 228, 228);
+    border-radius: 8px;
+    padding: 0 14px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: "Playfair Display", Georgia, serif;
+    color: rgb(32, 32, 65);
+    outline: none;
+  }
+  .customInput:focus {
+    border-color: rgb(187, 19, 47);
+  }
+
+  /* Personalise form */
+  .personalise {
+    background: rgb(32, 32, 65);
+    padding: 44px 20px;
+  }
+  .personaliseTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .personaliseSub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0 0 24px;
+  }
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .label {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .input {
+    height: 46px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 0 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: white;
+    background: rgba(255, 255, 255, 0.07);
+    outline: none;
+  }
+  .input:focus {
+    border-color: rgb(187, 19, 47);
+  }
+  .input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+  .textarea {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-family: inherit;
+    color: white;
+    background: rgba(255, 255, 255, 0.07);
+    outline: none;
+    min-height: 90px;
+    resize: vertical;
+    width: 100%;
+  }
+  .textarea:focus {
+    border-color: rgb(187, 19, 47);
+  }
+  .textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .submitBtn {
+    height: 50px;
+    background: rgb(187, 19, 47);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .submitBtn:hover {
+    background: rgb(150, 15, 37);
+  }
+  .submitBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .successCard {
+    background: rgba(209, 247, 224, 0.15);
+    border: 1px solid rgba(144, 238, 144, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .successIcon {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  .successTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .successText {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Occasions */
+  .occasions {
+    padding: 44px 20px;
+  }
+  .occasionGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .occasionCard {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .occasionCard:hover {
+    border-color: rgb(32, 32, 65);
+    box-shadow: 0 4px 14px rgba(32, 32, 65, 0.08);
+  }
+  .occasionEmoji {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+  .occasionName {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 3px;
+  }
+  .occasionDesc {
+    font-size: 11px;
+    color: gray;
+    margin: 0;
+  }
+
+  /* How it works */
+  .howSection {
+    background: rgb(245, 245, 248);
+    padding: 44px 20px;
+  }
+  .howCards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .howCard {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid rgb(235, 232, 225);
+  }
+  .howNum {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgb(32, 32, 65);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-family: "Playfair Display", Georgia, serif;
+  }
+  .howTitle {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 3px;
+  }
+  .howText {
+    font-size: 12px;
+    color: rgb(90, 88, 88);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Terms */
+  .terms {
+    padding: 0 20px 44px;
+  }
+  .termsList {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .termItem {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 12px;
+    color: rgb(80, 78, 78);
+  }
+  .termDot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgb(240, 240, 255);
+    color: rgb(32, 32, 65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* CTA */
+  .cta {
+    background: rgb(187, 19, 47);
+    padding: 44px 20px;
+    text-align: center;
+  }
+  .ctaTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 10px;
+  }
+  .ctaText {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+  .ctaButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .ctaPrimary {
+    height: 50px;
+    padding: 0 32px;
+    background: white;
+    color: rgb(187, 19, 47);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .ctaPrimary:hover {
+    background: rgb(245, 245, 245);
+  }
+  .ctaSecondary {
+    height: 50px;
+    padding: 0 32px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .ctaSecondary:hover {
+    border-color: white;
+  }
+}
+
+@media screen and (min-width: 480px) {
+  .heroButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .ctaButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+@media screen and (min-width: 576px) {
+  .heroTitle {
+    font-size: 40px;
+  }
+  .packages {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .occasionGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .howCards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .section,
+  .occasions,
+  .howSection,
+  .terms {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .personalise,
+  .giftCardVisual,
+  .cta {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .heroTitle {
+    font-size: 46px;
+  }
+  .packages {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .howCards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .hero {
+    padding: 80px 80px 70px;
+  }
+  .heroTitle {
+    font-size: 52px;
+  }
+  .section,
+  .occasions,
+  .howSection,
+  .terms {
+    padding-left: 80px;
+    padding-right: 80px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .personalise,
+  .giftCardVisual,
+  .cta {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .occasionGrid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}

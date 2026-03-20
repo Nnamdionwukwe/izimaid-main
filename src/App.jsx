@@ -35,6 +35,14 @@ import PrivacyPolicy from "./component/PrivacyPolicy/PrivacyPolicy.jsx";
 import OurApproach from "./component/OurApproach/OurApproach.jsx";
 import OurResults from "./component/OurResults/OurResults.jsx";
 import OurCommitment from "./component/OurCommitment/OurCommitment.jsx";
+import DeusiziGroup from "./component/DeusiziGroup/DeusiziGroup.jsx";
+import ContactUs from "./component/ContactUs/ContactUs.jsx";
+import Locations from "./component/Locations/Locations.jsx";
+import DeusiziApp from "./component/DeusiziApp/DeusiziApp.jsx";
+import OwnAFranchise from "./component/OwnAFranchise/OwnAFranchise.jsx";
+import GiftCertificates from "./component/GiftCertificates/GiftCertificates.jsx";
+import AplicarLocalmente from "./component/AplicarLocalmente/AplicarLocalmente.jsx";
+import ApplyLocally from "./component/AplicarLocalmente/ApplyLocally.jsx";
 
 function App() {
   return (
@@ -117,6 +125,14 @@ function AppRoutes() {
       <Route path="/our-approach" element={<OurApproach />} />
       <Route path="/our-results" element={<OurResults />} />
       <Route path="/our-commitment" element={<OurCommitment />} />
+      <Route path="/deusizi-group" element={<DeusiziGroup />} />
+      <Route path="/contact" element={<ContactUs />} />
+      <Route path="/locations" element={<Locations />} />
+      <Route path="/app" element={<DeusiziApp />} />
+      <Route path="/franchise" element={<OwnAFranchise />} />
+      <Route path="/gift-certificates" element={<GiftCertificates />} />
+      <Route path="/aplicar-localmente" element={<AplicarLocalmente />} />
+      <Route path="/apply-locally" element={<ApplyLocally />} />
 
       {/* Admin Dashboard */}
       <Route

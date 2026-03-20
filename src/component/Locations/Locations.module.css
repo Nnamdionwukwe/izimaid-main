@@ -1,0 +1,643 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+@media screen and (min-width: 20px) {
+  .page {
+    font-family: "DM Sans", Arial, sans-serif;
+    background: #faf9f6;
+    overflow-x: hidden;
+  }
+
+  /* Hero */
+  .hero {
+    background: rgb(32, 32, 65);
+    padding: 60px 20px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(187, 19, 47, 0.15);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    left: -30px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .heroEyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 14px;
+  }
+  .heroTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 14px;
+    line-height: 1.2;
+  }
+  .heroTitle em {
+    font-style: italic;
+    color: rgb(255, 200, 200);
+  }
+  .heroDesc {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 auto;
+    max-width: 420px;
+    line-height: 1.7;
+  }
+  .heroDivider {
+    width: 40px;
+    height: 3px;
+    background: rgb(187, 19, 47);
+    margin: 20px auto 0;
+    border-radius: 2px;
+  }
+
+  /* City tabs */
+  .cityTabs {
+    background: white;
+    border-bottom: 2px solid rgb(235, 232, 225);
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .cityTabs::-webkit-scrollbar {
+    display: none;
+  }
+  .cityTab {
+    flex-shrink: 0;
+    padding: 16px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    color: gray;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: inherit;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.15s;
+  }
+  .cityTab:hover {
+    color: rgb(32, 32, 65);
+  }
+  .cityTabActive {
+    color: rgb(32, 32, 65);
+    border-bottom-color: rgb(187, 19, 47);
+  }
+  .cityTabEmoji {
+    font-size: 18px;
+  }
+
+  /* City panel */
+  .cityPanel {
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* City hero */
+  .cityHero {
+    background: rgb(32, 32, 65);
+    padding: 32px 20px;
+  }
+  .cityHeroInner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .cityName {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 4px;
+  }
+  .cityTagline {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0 0 14px;
+  }
+  .cityStats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .cityStat {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  .cityStatNum {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 2px;
+  }
+  .cityStatLabel {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+  }
+  .cityMapBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    background: rgb(187, 19, 47);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+  }
+  .cityMapBtn:hover {
+    background: rgb(150, 15, 37);
+  }
+
+  /* Areas section */
+  .areasSection {
+    padding: 32px 20px;
+  }
+  .sectionEyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(187, 19, 47);
+    margin: 0 0 8px;
+  }
+  .sectionTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 20px;
+    line-height: 1.3;
+  }
+  .areasGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .areaCard {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 10px;
+    padding: 14px;
+    transition:
+      box-shadow 0.15s,
+      border-color 0.15s;
+    cursor: pointer;
+  }
+  .areaCard:hover {
+    box-shadow: 0 4px 14px rgba(32, 32, 65, 0.08);
+    border-color: rgb(32, 32, 65);
+  }
+  .areaName {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 3px;
+  }
+  .areaDesc {
+    font-size: 11px;
+    color: gray;
+    margin: 0;
+  }
+  .areaBadge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: rgb(240, 240, 255);
+    color: rgb(32, 32, 65);
+    margin-top: 6px;
+  }
+
+  /* Services */
+  .servicesSection {
+    background: rgb(187, 19, 47);
+    padding: 32px 20px;
+  }
+  .servicesTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .servicesSub {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0 0 20px;
+  }
+  .servicesList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .serviceItem {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .serviceEmoji {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .serviceItemText {
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+  }
+
+  /* Showroom card (Abuja only) */
+  .showroomCard {
+    margin: 20px;
+    background: rgb(32, 32, 65);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .showroomBadge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(180, 140, 80, 0.2);
+    color: rgb(180, 140, 80);
+    border: 1px solid rgba(180, 140, 80, 0.3);
+    margin-bottom: 10px;
+  }
+  .showroomTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .showroomDesc {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.65;
+    margin: 0 0 14px;
+  }
+  .showroomDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .showroomDetail {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .showroomDetailIcon {
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .showroomBtn {
+    height: 40px;
+    padding: 0 20px;
+    background: rgb(180, 140, 80);
+    color: rgb(20, 18, 18);
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .showroomBtn:hover {
+    background: rgb(160, 120, 60);
+  }
+
+  /* How to book */
+  .howToBook {
+    padding: 32px 20px;
+    background: white;
+    border-top: 1px solid rgb(235, 232, 225);
+  }
+  .bookSteps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+  .bookSteps::before {
+    content: "";
+    position: absolute;
+    left: 19px;
+    top: 20px;
+    bottom: 20px;
+    width: 2px;
+    background: linear-gradient(to bottom, rgb(32, 32, 65), rgb(187, 19, 47));
+  }
+  .bookStep {
+    display: flex;
+    gap: 16px;
+    padding: 0 0 22px;
+    position: relative;
+  }
+  .bookStepNum {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgb(32, 32, 65);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    font-family: "Playfair Display", Georgia, serif;
+  }
+  .bookStepBody {
+    padding-top: 8px;
+  }
+  .bookStepTitle {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 3px;
+  }
+  .bookStepText {
+    font-size: 12px;
+    color: rgb(100, 98, 98);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Coming soon */
+  .comingSoon {
+    background: rgb(245, 245, 248);
+    padding: 32px 20px;
+  }
+  .comingSoonTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 6px;
+  }
+  .comingSoonSub {
+    font-size: 13px;
+    color: gray;
+    margin: 0 0 20px;
+  }
+  .comingSoonGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .comingSoonCity {
+    background: white;
+    border: 1px dashed rgb(200, 200, 220);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+    opacity: 0.7;
+  }
+  .comingSoonCityEmoji {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+  .comingSoonCityName {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 2px;
+  }
+  .comingSoonCityTag {
+    font-size: 10px;
+    color: gray;
+    margin: 0;
+  }
+
+  /* CTA */
+  .cta {
+    background: rgb(187, 19, 47);
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .ctaTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 10px;
+  }
+  .ctaText {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+  .ctaButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .ctaPrimary {
+    height: 50px;
+    padding: 0 32px;
+    background: white;
+    color: rgb(187, 19, 47);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .ctaPrimary:hover {
+    background: rgb(245, 245, 245);
+  }
+  .ctaSecondary {
+    height: 50px;
+    padding: 0 32px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .ctaSecondary:hover {
+    border-color: white;
+  }
+}
+
+@media screen and (min-width: 576px) {
+  .heroTitle {
+    font-size: 40px;
+  }
+  .ctaButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .areasGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .servicesList {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .comingSoonGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .cityHeroInner {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .cityStats {
+    flex: 1;
+  }
+  .cityMapBtn {
+    width: auto;
+    padding: 0 20px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .areasSection,
+  .howToBook,
+  .comingSoon {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .servicesSection {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .cityHero {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .showroomCard {
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+  .cta {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .areasGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .bookSteps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .bookSteps::before {
+    display: none;
+  }
+  .heroTitle {
+    font-size: 46px;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .hero {
+    padding: 80px 80px 70px;
+  }
+  .heroTitle {
+    font-size: 52px;
+  }
+  .areasSection,
+  .howToBook,
+  .comingSoon {
+    padding-left: 80px;
+    padding-right: 80px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .servicesSection {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .cityHero {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .showroomCard {
+    max-width: 840px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cta {
+    padding: 60px 80px;
+  }
+  .servicesList {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .areasGrid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
