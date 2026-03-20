@@ -96,7 +96,10 @@ export default function CleaningTipsSideBar() {
             <p>How to Save Time</p>
           </div>
 
-          <div className={styles.hoverMainDiv9}>
+          <div
+            onClick={() => navigate("/laundry-rooms")}
+            className={styles.hoverMainDiv9}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Laundry Rooms</p>
           </div>

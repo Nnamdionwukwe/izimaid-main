@@ -61,6 +61,7 @@ import KidsRooms from "./component/CleaningTips/KidsRooms.jsx";
 import Bedrooms from "./component/CleaningTips/Bedrooms.jsx";
 import SpringCleaning from "./component/CleaningTips/SpringCleaning.jsx";
 import HowToSaveTime from "./component/CleaningTips/HowToSaveTime.jsx";
+import LaundryRooms from "./component/CleaningTips/LaundryRooms.jsx";
 
 function App() {
   return (
@@ -173,6 +174,7 @@ function AppRoutes() {
       <Route path="/bedrooms" element={<Bedrooms />} />
       <Route path="/spring-cleaning" element={<SpringCleaning />} />
       <Route path="/how-to-save-time" element={<HowToSaveTime />} />
+      <Route path="/laundry-rooms" element={<LaundryRooms />} />
 
       {/* Admin Dashboard */}
       <Route
