@@ -1,10 +1,16 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./OurCleaning.module.css";
 
 export default function PerfectGift() {
+  const navigate = useNavigate();
+
   return (
     <div>
       <div className={styles.services}>
-        <div className={styles.mainDiv2}>
+        <div
+          onClick={() => navigate("/recurring-cleaning")}
+          className={styles.mainDiv2}
+        >
           <div className={styles.home}>
             <i class="fa-solid fa-house"></i>
           </div>
@@ -13,7 +19,10 @@ export default function PerfectGift() {
           <h4>&rarr;</h4>
         </div>
 
-        <div className={styles.mainDiv2}>
+        <div
+          onClick={() => navigate("/gift-certificates")}
+          className={styles.mainDiv2}
+        >
           <div className={styles.home}>
             <i class="fa fa-gift" aria-hidden="true"></i>
           </div>
@@ -22,7 +31,10 @@ export default function PerfectGift() {
           <h4>&rarr;</h4>
         </div>
 
-        <div className={styles.mainDiv2}>
+        <div
+          onClick={() => navigate("/guild-and-graphics")}
+          className={styles.mainDiv2}
+        >
           <div className={styles.home}>
             <i class="fa-solid fa-spray-can"></i>
           </div>
@@ -31,7 +43,10 @@ export default function PerfectGift() {
           <h4>&rarr;</h4>
         </div>
 
-        <div className={styles.mainDiv3}>
+        <div
+          onClick={() => navigate("/foundation")}
+          className={styles.mainDiv3}
+        >
           <div className={styles.home}>
             <i class="fa fa-heartbeat" aria-hidden="true"></i>
           </div>
@@ -54,7 +69,10 @@ export default function PerfectGift() {
               <p className={styles.para}>
                 Choose a plan to fit your needs—no contracts, no hassle.
               </p>
-              <div className={styles.learnMore}>
+              <div
+                onClick={() => navigate("/recurring-cleaning")}
+                className={styles.learnMore}
+              >
                 <p className={styles.p}>Learn More</p>
                 <p>&rarr;</p>
               </div>
@@ -76,7 +94,12 @@ export default function PerfectGift() {
                 Give the gift of time with a Deusizi sparkle gift certificate.
               </p>
               <div className={styles.learnMore}>
-                <p className={styles.p}>Learn More</p>
+                <p
+                  className={styles.p}
+                  onClick={() => navigate("/gift-certificates")}
+                >
+                  Learn More
+                </p>
                 <p>&rarr;</p>
               </div>
             </div>
@@ -96,7 +119,10 @@ export default function PerfectGift() {
               <p className={styles.para}>
                 Get expert advice from our team of cleaning specialists.
               </p>
-              <div className={styles.learnMore}>
+              <div
+                onClick={() => navigate("/gruild-and-graphics")}
+                className={styles.learnMore}
+              >
                 <p className={styles.p}>Learn More</p>
                 <p>&rarr;</p>
               </div>
@@ -119,7 +145,9 @@ export default function PerfectGift() {
                 Supporting victims of domestic violence.
               </p>
               <div className={styles.learnMore}>
-                <p className={styles.p}>Learn More</p>
+                <p onClick={() => navigate("/foundation")} className={styles.p}>
+                  Learn More
+                </p>
                 <p>&rarr;</p>
               </div>
             </div>

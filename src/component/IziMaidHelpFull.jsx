@@ -1,10 +1,16 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./IziMaidHelp.module.css";
 
 export default function IziMaidHelpFull() {
+  const navigate = useNavigate();
+
   return (
     <div>
       <div className={styles.services}>
-        <div className={styles.mainDiv2}>
+        <div
+          onClick={() => navigate("/one-time-cleaning")}
+          className={styles.mainDiv2}
+        >
           <div className={styles.home}>
             <i class="fa-solid fa-plate-wheat"></i>
           </div>
@@ -13,7 +19,10 @@ export default function IziMaidHelpFull() {
           <h4>&rarr;</h4>
         </div>
 
-        <div className={styles.mainDiv2}>
+        <div
+          onClick={() => navigate("/recurring-cleaning")}
+          className={styles.mainDiv2}
+        >
           <div className={styles.home4}>
             <i class="fa-solid fa-calendar-days"></i>
           </div>
@@ -22,7 +31,10 @@ export default function IziMaidHelpFull() {
           <h4>&rarr;</h4>
         </div>
 
-        <div className={styles.mainDiv2}>
+        <div
+          onClick={() => navigate("/home-cleaning")}
+          className={styles.mainDiv2}
+        >
           <div className={styles.home}>
             <i class="fa-solid fa-house"></i>
           </div>
@@ -31,7 +43,10 @@ export default function IziMaidHelpFull() {
           <h4>&rarr;</h4>
         </div>
 
-        <div className={styles.mainDiv3}>
+        <div
+          onClick={() => navigate("/apartment-cleaning")}
+          className={styles.mainDiv3}
+        >
           <div className={styles.home5}>
             <i class="fa-solid fa-building"></i>
           </div>
@@ -54,12 +69,15 @@ export default function IziMaidHelpFull() {
               <p className={styles.para}>
                 If you are preparing to host a big event, cleaning the house for
                 spring, or simply trying to get ahead on cleaning chores, you
-                can count on your local IziMaid for a one-time professional
-                house cleaning that refreshes your home and makes it easier to
-                maintain. That way, you can spend less time cleaning and more
-                time enjoying the things you love.
+                can count on your local Deusizi Sparkle Maid for a one-time
+                professional house cleaning that refreshes your home and makes
+                it easier to maintain. That way, you can spend less time
+                cleaning and more time enjoying the things you love.
               </p>
-              <div className={styles.learnMore}>
+              <div
+                onClick={() => navigate("/one-time-cleaning")}
+                className={styles.learnMore}
+              >
                 <p className={styles.p}>Learn More</p>
                 <p>&rarr;</p>
               </div>
@@ -79,11 +97,14 @@ export default function IziMaidHelpFull() {
               <h3>Recurring Cleans</h3>
               <p className={styles.para}>
                 We could all use some help around our homes, and when you choose
-                IziMaid, you can get that help as often as you need it. Our
-                regular maid services are available weekly, bi-weekly, or at a
-                frequency that fits your schedule and cleaning needs.
+                Deusizi Sparkle, you can get that help as often as you need it.
+                Our regular maid services are available weekly, bi-weekly, or at
+                a frequency that fits your schedule and cleaning needs.
               </p>
-              <div className={styles.learnMore}>
+              <div
+                onClick={() => navigate("/recurring-cleaning")}
+                className={styles.learnMore}
+              >
                 <p className={styles.p}>Learn More</p>
                 <p>&rarr;</p>
               </div>
@@ -103,12 +124,16 @@ export default function IziMaidHelpFull() {
               <h3>Home Cleaning</h3>
               <p className={styles.para}>
                 Life is busy, which means you can’t always complete everything
-                on your to-do list. IziMaid allows you to have a sparkling home,
-                saves you valuable time, and provides the peace of mind that
-                comes with knowing the job was done right. Our residential home
-                cleaning service is dedicated to making your life easier.
+                on your to-do list. Deusizi Sparkle allows you to have a
+                sparkling home, saves you valuable time, and provides the peace
+                of mind that comes with knowing the job was done right. Our
+                residential home cleaning service is dedicated to making your
+                life easier.
               </p>
-              <div className={styles.learnMore}>
+              <div
+                onClick={() => navigate("/home-cleaning")}
+                className={styles.learnMore}
+              >
                 <p className={styles.p}>Learn More</p>
                 <p>&rarr;</p>
               </div>
@@ -134,7 +159,10 @@ export default function IziMaidHelpFull() {
                 convenient with regular apartment cleaning services? Imagine
                 what you could do with your newfound free time
               </p>
-              <div className={styles.learnMore}>
+              <div
+                onClick={() => navigate("/apartment-cleaning")}
+                className={styles.learnMore}
+              >
                 <p className={styles.p}>Learn More</p>
                 <p>&rarr;</p>
               </div>

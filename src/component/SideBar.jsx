@@ -208,6 +208,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 </p>
               </div>
             )}
+
             {isOpen2 && (
               <div>
                 <div onClick={handleIsOpen2} className={styles.resident123}>
@@ -224,6 +225,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 </div>
               </div>
             )}
+
             {isOpen3 && (
               <div>
                 <div onClick={handleIsOpen3} className={styles.resident123}>
@@ -240,6 +242,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 </div>
               </div>
             )}
+
             {isOpen4 && (
               <div>
                 <div onClick={handleIsOpen4} className={styles.resident123}>
@@ -256,6 +259,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 </div>
               </div>
             )}
+
             {isOpen5 && (
               <div>
                 <div onClick={handleIsOpen5} className={styles.resident123}>
@@ -382,6 +386,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 </div>
               </div>
             )}
+
             {isOpen6 && (
               <div>
                 <div onClick={handleIsOpen6} className={styles.resident123}>
@@ -398,6 +403,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 </div>
               </div>
             )}
+
             {isOpen7 && (
               <div>
                 <div onClick={handleIsOpen7} className={styles.resident123}>
@@ -414,12 +420,13 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 </div>
               </div>
             )}
-            <dhiv className={styles.thirdHeader}>
+
+            <div className={styles.thirdHeader}>
               <i className="fa fa-map-marker" aria-hidden="true"></i>
+
               <p>Find My Local Deusizi Sparkle Maid</p>
-              70
-            </dhiv>
-            1hnm`gift-certificateszgf[]`
+            </div>
+
             <button
               className={styles.authBtn}
               onClick={handleBookingNavigation}
@@ -432,6 +439,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                     ? "My Bookings"
                     : "My Bookings"}
             </button>
+
             {isOpenFotter && (
               <div className={styles.icons}>
                 <i className="fa-brands fa-facebook"></i>
@@ -441,6 +449,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 <i className="fa-brands fa-linkedin"></i>
               </div>
             )}
+
             {isOpenFotter && (
               <div className={styles.giftsDiv}>
                 <p onClick={() => navigate("/gift-certificates")}>
@@ -451,7 +460,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                   Applicar Localmente
                 </p>
                 <p onClick={() => navigate("/franchise")}>Own a Franchise</p>
-                <video src=""></video>{" "}
+
                 <button className={styles.authBtn} onClick={handleAuthBtn}>
                   {token ? `Logout (${user.name?.split(" ")[0]})` : "Login"}
                 </button>
