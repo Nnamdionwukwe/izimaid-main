@@ -1,0 +1,790 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+@media screen and (min-width: 20px) {
+  .page {
+    font-family: "DM Sans", Arial, sans-serif;
+    background: #faf9f6;
+    overflow-x: hidden;
+    margin-top: 20px;
+  }
+
+  /* ── Hero ─────────────────────────────────────────────────────────── */
+  .hero {
+    background: rgb(32, 32, 65);
+    padding: 60px 20px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(73, 221, 73, 0.12);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    left: -30px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(187, 19, 47, 0.1);
+  }
+  .heroEyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 14px;
+  }
+  .heroTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 14px;
+    line-height: 1.2;
+  }
+  .heroTitle em {
+    font-style: italic;
+    color: rgb(180, 255, 180);
+  }
+  .heroDesc {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 auto;
+    max-width: 460px;
+    line-height: 1.7;
+  }
+  .heroDivider {
+    width: 40px;
+    height: 3px;
+    background: rgb(73, 221, 73);
+    margin: 22px auto 0;
+    border-radius: 2px;
+  }
+  .heroButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    margin-top: 28px;
+  }
+  .heroPrimary {
+    height: 48px;
+    padding: 0 28px;
+    background: rgb(73, 221, 73);
+    color: rgb(20, 60, 20);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+    transition: background 0.15s;
+  }
+  .heroPrimary:hover {
+    background: rgb(56, 190, 56);
+  }
+  .heroSecondary {
+    height: 48px;
+    padding: 0 28px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .heroSecondary:hover {
+    border-color: white;
+  }
+
+  /* ── Stats bar ───────────────────────────────────────────────────── */
+  .statsBar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: rgb(73, 221, 73);
+  }
+  .statItem {
+    padding: 18px 16px;
+    text-align: center;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  .statItem:nth-child(even) {
+    border-right: none;
+  }
+  .statItem:nth-child(3),
+  .statItem:nth-child(4) {
+    border-bottom: none;
+  }
+  .statNum {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: rgb(20, 60, 20);
+    margin: 0 0 3px;
+  }
+  .statLabel {
+    font-size: 11px;
+    color: rgb(30, 80, 30);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  /* ── Shared ──────────────────────────────────────────────────────── */
+  .section {
+    padding: 44px 20px;
+  }
+  .faq {
+    padding: 0 20px 44px;
+  }
+  .sectionEyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(73, 180, 73);
+    margin: 0 0 10px;
+  }
+  .sectionTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 10px;
+    line-height: 1.3;
+  }
+  .sectionSub {
+    font-size: 14px;
+    color: gray;
+    line-height: 1.6;
+    margin: 0 0 24px;
+  }
+
+  /* ── Mission text ────────────────────────────────────────────────── */
+  .missionText {
+    font-size: 15px;
+    color: rgb(70, 68, 68);
+    line-height: 1.8;
+    margin: 0;
+    border-left: 4px solid rgb(73, 221, 73);
+    padding-left: 20px;
+  }
+
+  /* ── Pillars ─────────────────────────────────────────────────────── */
+  .pillars {
+    background: rgb(32, 32, 65);
+    padding: 40px 20px;
+  }
+  .pillarsTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 28px;
+  }
+  .pillarGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .pillarCard {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background 0.15s;
+  }
+  .pillarCard:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .pillarIcon {
+    font-size: 30px;
+    margin-bottom: 10px;
+  }
+  .pillarTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .pillarText {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* ── Allocation ──────────────────────────────────────────────────── */
+  .allocationGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .allocationCard {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .allocationBar {
+    height: 8px;
+    background: rgb(240, 238, 234);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .allocationFill {
+    height: 100%;
+    border-radius: 4px;
+  }
+  .allocationMeta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .allocationPercent {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: "Playfair Display", Georgia, serif;
+  }
+  .allocationTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+  }
+  .allocationText {
+    font-size: 13px;
+    color: gray;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* ── Stories ─────────────────────────────────────────────────────── */
+  .stories {
+    background: rgb(32, 32, 65);
+    padding: 40px 20px;
+  }
+  .storiesTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .storiesSub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 24px;
+  }
+  .storyList {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .storyCard {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 18px 20px;
+    border-left: 4px solid rgb(73, 221, 73);
+  }
+  .storyText {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.75;
+    font-style: italic;
+    margin: 0 0 14px;
+  }
+  .storyAuthor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .storyAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgb(73, 221, 73);
+    color: rgb(20, 60, 20);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .storyName {
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 1px;
+  }
+  .storyLocation {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+  }
+
+  /* ── Donation form ───────────────────────────────────────────────── */
+  .donateSection {
+    background: rgb(32, 32, 65);
+    padding: 44px 20px;
+  }
+  .donateInner {
+    background: white;
+    border-radius: 16px;
+    padding: 28px 20px;
+  }
+  .donateInner .sectionEyebrow {
+    color: rgb(73, 180, 73);
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .row {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .label {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(50, 50, 70);
+  }
+  .req {
+    color: rgb(73, 180, 73);
+    margin-left: 2px;
+  }
+  .optional {
+    font-size: 11px;
+    color: gray;
+    font-weight: 400;
+    margin-left: 4px;
+  }
+
+  /* Frequency toggle */
+  .freqRow {
+    display: flex;
+    gap: 10px;
+  }
+  .freqBtn {
+    flex: 1;
+    height: 42px;
+    border: 2px solid rgb(220, 218, 212);
+    background: white;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: gray;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .freqBtnActive {
+    border-color: rgb(73, 180, 73);
+    color: rgb(30, 100, 30);
+    background: rgb(230, 255, 230);
+  }
+
+  /* Amount grid */
+  .amountGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .amountBtn {
+    height: 42px;
+    border: 2px solid rgb(220, 218, 212);
+    background: white;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(60, 60, 80);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .amountBtn:hover {
+    border-color: rgb(73, 180, 73);
+  }
+  .amountBtnActive {
+    border-color: rgb(73, 180, 73);
+    background: rgb(230, 255, 230);
+    color: rgb(30, 100, 30);
+  }
+
+  .input {
+    height: 46px;
+    padding: 0 14px;
+    border: 1.5px solid rgb(220, 218, 212);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background: white;
+    color: rgb(32, 32, 65);
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  .input:focus {
+    border-color: rgb(73, 180, 73);
+  }
+  .textarea {
+    padding: 12px 14px;
+    border: 1.5px solid rgb(220, 218, 212);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    resize: vertical;
+    min-height: 90px;
+    color: rgb(32, 32, 65);
+    line-height: 1.6;
+    box-sizing: border-box;
+    width: 100%;
+    transition: border-color 0.15s;
+  }
+  .textarea:focus {
+    border-color: rgb(73, 180, 73);
+  }
+  .inputError {
+    border-color: rgb(187, 19, 47);
+  }
+  .error {
+    font-size: 11px;
+    color: rgb(187, 19, 47);
+    margin: 0;
+  }
+
+  /* Donation summary */
+  .summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: rgb(230, 255, 230);
+    border: 1.5px solid rgb(73, 180, 73);
+    border-radius: 10px;
+  }
+  .summaryLabel {
+    font-size: 13px;
+    color: rgb(30, 80, 30);
+    font-weight: 600;
+  }
+  .summaryAmount {
+    font-size: 20px;
+    font-weight: 700;
+    color: rgb(30, 80, 30);
+    font-family: "Playfair Display", Georgia, serif;
+  }
+
+  .donateBtn {
+    height: 54px;
+    background: rgb(73, 221, 73);
+    color: rgb(20, 60, 20);
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .donateBtn:hover:not(:disabled) {
+    background: rgb(56, 190, 56);
+  }
+  .donateBtn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+  .spinnerRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2.5px solid rgba(20, 60, 20, 0.25);
+    border-top-color: rgb(20, 60, 20);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .secureNote {
+    font-size: 12px;
+    color: gray;
+    text-align: center;
+    margin: 0;
+  }
+
+  /* Success */
+  .successBox {
+    text-align: center;
+    padding: 30px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .successIcon {
+    font-size: 52px;
+  }
+  .successTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0;
+  }
+  .successText {
+    font-size: 14px;
+    color: gray;
+    margin: 0;
+    max-width: 340px;
+    line-height: 1.6;
+  }
+
+  /* ── FAQ ─────────────────────────────────────────────────────────── */
+  .faqList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .faqItem {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .faqQuestion {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 16px 18px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+  }
+  .faqChevron {
+    font-size: 18px;
+    transition: transform 0.2s;
+    color: rgb(73, 180, 73);
+    flex-shrink: 0;
+  }
+  .faqChevronOpen {
+    transform: rotate(180deg);
+  }
+  .faqAnswer {
+    padding: 12px 18px 16px;
+    font-size: 13px;
+    color: rgb(100, 98, 98);
+    line-height: 1.7;
+    margin: 0;
+    border-top: 1px solid rgb(245, 242, 238);
+  }
+
+  /* ── CTA ─────────────────────────────────────────────────────────── */
+  .cta {
+    background: rgb(73, 221, 73);
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .ctaTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: rgb(20, 60, 20);
+    margin: 0 0 10px;
+  }
+  .ctaText {
+    font-size: 14px;
+    color: rgb(30, 80, 30);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+  .ctaButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .ctaPrimary {
+    height: 50px;
+    padding: 0 32px;
+    background: rgb(32, 32, 65);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+  .ctaPrimary:hover {
+    background: rgb(20, 20, 50);
+  }
+  .ctaSecondary {
+    height: 50px;
+    padding: 0 32px;
+    background: transparent;
+    color: rgb(20, 60, 20);
+    border: 2px solid rgba(20, 60, 20, 0.4);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+  .ctaSecondary:hover {
+    border-color: rgb(20, 60, 20);
+  }
+}
+
+/* ── Tablet (576px+) ─────────────────────────────────────────────────── */
+@media screen and (min-width: 576px) {
+  .heroTitle {
+    font-size: 42px;
+  }
+  .heroButtons,
+  .ctaButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .statsBar {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .statItem {
+    border-bottom: none;
+  }
+  .statItem:nth-child(4) {
+    border-right: none;
+  }
+  .pillarGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .allocationGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .storyList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .amountGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .row {
+    flex-direction: row;
+  }
+  .row .field {
+    flex: 1;
+  }
+}
+
+/* ── Tablet large (768px+) ───────────────────────────────────────────── */
+@media screen and (min-width: 768px) {
+  .section,
+  .faq {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .pillars,
+  .stories,
+  .donateSection {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .cta {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .donateInner {
+    padding: 36px 32px;
+  }
+}
+
+/* ── Desktop (992px+) ────────────────────────────────────────────────── */
+@media screen and (min-width: 992px) {
+  .hero {
+    padding: 90px 80px 80px;
+  }
+  .heroTitle {
+    font-size: 50px;
+  }
+  .section,
+  .faq {
+    padding-left: 80px;
+    padding-right: 80px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .pillars,
+  .stories,
+  .donateSection {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .donateInner {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 44px;
+  }
+  .cta {
+    padding: 60px 80px;
+  }
+  .storyList {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .amountGrid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}

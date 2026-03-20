@@ -43,6 +43,9 @@ import OwnAFranchise from "./component/OwnAFranchise/OwnAFranchise.jsx";
 import GiftCertificates from "./component/GiftCertificates/GiftCertificates.jsx";
 import AplicarLocalmente from "./component/AplicarLocalmente/AplicarLocalmente.jsx";
 import ApplyLocally from "./component/AplicarLocalmente/ApplyLocally.jsx";
+import WhatsIncluded from "./component/WhatsIncluded/WhatsIncluded.jsx";
+import BeforeAfter from "./component/BeforeAfter/BeforeAfter.jsx";
+import DeausiziFoundation from "./component/DeausiziFoundation/DeausiziFoundation,.jsx";
 
 function App() {
   return (
@@ -133,6 +136,9 @@ function AppRoutes() {
       <Route path="/gift-certificates" element={<GiftCertificates />} />
       <Route path="/aplicar-localmente" element={<AplicarLocalmente />} />
       <Route path="/apply-locally" element={<ApplyLocally />} />
+      <Route path="/whats-included" element={<WhatsIncluded />} />
+      <Route path="/before-after-cleaning" element={<BeforeAfter />} />
+      <Route path="/foundation" element={<DeausiziFoundation />} />
 
       {/* Admin Dashboard */}
       <Route

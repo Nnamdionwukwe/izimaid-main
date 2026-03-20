@@ -289,7 +289,10 @@ export default function SideBar({ isOpen, setIsOpen }) {
                           <div>
                             {openFAQ && (
                               <div className={styles.residentialDI}>
-                                <div className={styles.residentialDI23}>
+                                <div
+                                  onClick={() => navigate("/whats-included")}
+                                  className={styles.residentialDI23}
+                                >
                                   <i
                                     className="fa fa-th-large"
                                     aria-hidden="true"
@@ -297,7 +300,12 @@ export default function SideBar({ isOpen, setIsOpen }) {
                                   <p>What's Included</p>
                                 </div>
 
-                                <div className={styles.residentialDI23}>
+                                <div
+                                  onClick={() =>
+                                    navigate("/before-after-cleaning")
+                                  }
+                                  className={styles.residentialDI23}
+                                >
                                   <i
                                     className="fa fa-th-large"
                                     aria-hidden="true"
@@ -323,7 +331,11 @@ export default function SideBar({ isOpen, setIsOpen }) {
 
                             {iziBest2 && (
                               <div className={styles.residentialDI}>
-                                <div className={styles.residentialDI23}>
+                                <div
+                                  onClick={() => navigate("/foundation")}
+                                  cl
+                                  className={styles.residentialDI23}
+                                >
                                   <i
                                     className="fa fa-th-large"
                                     aria-hidden="true"
@@ -331,7 +343,13 @@ export default function SideBar({ isOpen, setIsOpen }) {
                                   <p>Donate</p>
                                 </div>
 
-                                <div className={styles.residentialDI23}>
+                                <div
+                                  onClick={() =>
+                                    navigate("/before-after-cleaning")
+                                  }
+                                  cl
+                                  className={styles.residentialDI23}
+                                >
                                   <i
                                     className="fa fa-th-large"
                                     aria-hidden="true"
