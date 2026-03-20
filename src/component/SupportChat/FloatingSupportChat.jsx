@@ -65,7 +65,7 @@ export default function FloatingSupportChat() {
           aria-label="Open support chat"
         >
           <span className={styles.fabIcon}>💬</span>
-          <span className={styles.fabLabel}>Support</span>
+          <span className={styles.fabLabel}>Live Chat</span>
           {unread > 0 && (
             <span className={styles.badge}>{unread > 99 ? "99+" : unread}</span>
           )}
