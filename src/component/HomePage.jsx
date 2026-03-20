@@ -22,7 +22,6 @@ import IziMaidHelpFull from "./IziMaidHelpFull";
 import Customers from "./Customers";
 import IziBestLogo from "./IziBestLogo";
 import Footer from "./Footer";
-import FloatingSupportChat from "./SupportChat/FloatingSupportChat";
 
 export default function HomePage() {
   return (
