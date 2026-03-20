@@ -64,6 +64,7 @@ import HowToSaveTime from "./component/CleaningTips/HowToSaveTime.jsx";
 import LaundryRooms from "./component/CleaningTips/LaundryRooms.jsx";
 import KitchenTips from "./component/CleaningTips/KitchenTips.jsx";
 import Blog from "./component/Blog/Blog.jsx";
+import Seasonal from "./component/Blog/Seasonal.jsx";
 
 function App() {
   return (
@@ -179,6 +180,7 @@ function AppRoutes() {
       <Route path="/laundry-rooms" element={<LaundryRooms />} />
       <Route path="/kitchens-tips" element={<KitchenTips />} />
       <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/seasonal" element={<Seasonal />} />
 
       {/* Admin Dashboard */}
       <Route

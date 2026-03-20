@@ -16,11 +16,13 @@ export default function PracticalSideBar() {
             <p>Guilds and Graphics</p>
           </div>
 
-          <div className={styles.hoverMainDiv11}>
+          <div
+            onClick={() => navigate("/blog/seasonal")}
+            className={styles.hoverMainDiv11}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Seasonal</p>
           </div>
-
           <div className={styles.hoverMainDiv12}>
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p className={styles.para6}>Tips and Tricks</p>
