@@ -317,7 +317,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                               className={styles.resident1234}
                               onClick={handleIzibest}
                             >
-                              <p>IziBest Foundation</p>
+                              <p>Deausizi Foundation</p>
                               <p className={styles.greater}>&darr;</p>
                             </div>
 
@@ -336,7 +336,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
                                     className="fa fa-th-large"
                                     aria-hidden="true"
                                   ></i>
-                                  <p>IziBest Awards</p>
+                                  <p>Deusizi Sparkle Awards</p>
                                 </div>
 
                                 <div className={styles.residentialDI23}>
