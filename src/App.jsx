@@ -56,6 +56,11 @@ import MoveCleaningTips from "./component/CleaningTips/MoveCleaningTips.jsx";
 import OfficeCleaningTips from "./component/CleaningTips/OfficeCleaningTips.jsx";
 import LivingRooms from "./component/CleaningTips/LivingRooms.jsx";
 import Bathrooms from "./component/CleaningTips/Bathrooms.jsx";
+import SchedulesChartsChecklists from "./component/CleaningTips/SchedulesChartsChecklists.jsx";
+import KidsRooms from "./component/CleaningTips/KidsRooms.jsx";
+import Bedrooms from "./component/CleaningTips/Bedrooms.jsx";
+import SpringCleaning from "./component/CleaningTips/SpringCleaning.jsx";
+import HowToSaveTime from "./component/CleaningTips/HowToSaveTime.jsx";
 
 function App() {
   return (
@@ -160,6 +165,14 @@ function AppRoutes() {
       <Route path="/office-cleaning-tips" element={<OfficeCleaningTips />} />
       <Route path="/living-rooms" element={<LivingRooms />} />
       <Route path="/bathrooms" element={<Bathrooms />} />
+      <Route
+        path="/schedules-charts-checklists"
+        element={<SchedulesChartsChecklists />}
+      />
+      <Route path="/kids-rooms" element={<KidsRooms />} />
+      <Route path="/bedrooms" element={<Bedrooms />} />
+      <Route path="/spring-cleaning" element={<SpringCleaning />} />
+      <Route path="/how-to-save-time" element={<HowToSaveTime />} />
 
       {/* Admin Dashboard */}
       <Route

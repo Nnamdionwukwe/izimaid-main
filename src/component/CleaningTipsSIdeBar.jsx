@@ -52,32 +52,46 @@ export default function CleaningTipsSideBar() {
             onClick={() => navigate("/bathrooms")}
             className={styles.hoverMainDiv6}
           >
-            className={styles.hoverMainDiv6}
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Bathrooms</p>
           </div>
 
-          <div className={styles.hoverMainDiv7}>
+          <div
+            onClick={() => navigate("/kids-rooms")}
+            className={styles.hoverMainDiv7}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Kid's Rooms</p>
           </div>
 
-          <div className={styles.hoverMainDiv8}>
+          <div
+            onClick={() => navigate("/bedrooms")}
+            className={styles.hoverMainDiv8}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Bedrooms</p>
           </div>
 
-          <div className={styles.hoverMainDiv9}>
+          <div
+            onClick={() => navigate("/schedules-charts-checklists")}
+            className={styles.hoverMainDiv9}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Schedules, Charts and Checklists</p>
           </div>
 
-          <div className={styles.hoverMainDiv9}>
+          <div
+            onClick={() => navigate("/spring-cleaning")}
+            className={styles.hoverMainDiv9}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Spring Cleaning</p>
           </div>
 
-          <div className={styles.hoverMainDiv9}>
+          <div
+            onClick={() => navigate("/how-to-save-time")}
+            className={styles.hoverMainDiv9}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>How to Save Time</p>
           </div>
