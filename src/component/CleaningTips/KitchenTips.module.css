@@ -1,0 +1,961 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+@media screen and (min-width: 20px) {
+  .page {
+    font-family: "DM Sans", Arial, sans-serif;
+    background: #faf9f6;
+    overflow-x: hidden;
+    margin-top: 20px;
+  }
+
+  /* ── Hero ───────────────────────────────────────────────────────── */
+  .hero {
+    background: rgb(32, 32, 65);
+    padding: 60px 20px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: rgba(187, 19, 47, 0.15);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    left: -30px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .heroEyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 14px;
+  }
+  .heroTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 14px;
+    line-height: 1.2;
+  }
+  .heroTitle em {
+    font-style: italic;
+    color: rgb(255, 200, 200);
+  }
+  .heroDesc {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 auto;
+    max-width: 420px;
+    line-height: 1.7;
+  }
+  .heroDivider {
+    width: 40px;
+    height: 3px;
+    background: rgb(187, 19, 47);
+    margin: 22px auto 0;
+    border-radius: 2px;
+  }
+  .heroButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    margin-top: 28px;
+  }
+  .heroPrimary {
+    height: 48px;
+    padding: 0 28px;
+    background: rgb(187, 19, 47);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .heroPrimary:hover {
+    background: rgb(150, 15, 37);
+  }
+  .heroSecondary {
+    height: 48px;
+    padding: 0 28px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .heroSecondary:hover {
+    border-color: white;
+  }
+
+  /* ── Trust bar ──────────────────────────────────────────────────── */
+  .trustBar {
+    background: rgb(187, 19, 47);
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .trustBar::-webkit-scrollbar {
+    display: none;
+  }
+  .trustItem {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    white-space: nowrap;
+  }
+  .trustEmoji {
+    font-size: 18px;
+  }
+  .trustText {
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+  }
+
+  /* ── Section shared ─────────────────────────────────────────────── */
+  .section {
+    padding: 44px 20px;
+  }
+  .sectionEyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(187, 19, 47);
+    margin: 0 0 10px;
+  }
+  .sectionTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 28px;
+    line-height: 1.3;
+  }
+
+  /* ── Service cards ──────────────────────────────────────────────── */
+  .serviceCards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .serviceCard {
+    background: white;
+    border-radius: 14px;
+    border: 2px solid rgb(235, 232, 225);
+    overflow: hidden;
+    transition:
+      box-shadow 0.2s,
+      transform 0.2s;
+    animation: fadeUp 0.5s ease both;
+  }
+  .serviceCard:hover {
+    box-shadow: 0 8px 24px rgba(32, 32, 65, 0.1);
+    transform: translateY(-2px);
+    border-color: rgb(32, 32, 65);
+  }
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .serviceCardBanner {
+    height: 6px;
+    background: rgb(187, 19, 47);
+  }
+  .serviceCardBody {
+    padding: 20px;
+  }
+  .serviceCardTop {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .serviceCardIcon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: rgb(240, 240, 255);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .serviceCardName {
+    font-size: 17px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 3px;
+  }
+  .serviceCardTagline {
+    font-size: 12px;
+    color: gray;
+    margin: 0;
+  }
+  .serviceCardDesc {
+    font-size: 13px;
+    color: rgb(90, 88, 88);
+    line-height: 1.65;
+    margin: 0 0 14px;
+  }
+  .checkList {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .checkItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    color: rgb(60, 58, 58);
+  }
+  .checkDot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgb(32, 32, 65);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .serviceCardFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: rgb(250, 249, 246);
+    border-top: 1px solid rgb(240, 238, 234);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .priceBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .priceFrom {
+    font-size: 11px;
+    color: gray;
+  }
+  .priceAmount {
+    font-size: 18px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+  }
+  .bookBtn {
+    height: 36px;
+    padding: 0 18px;
+    background: rgb(187, 19, 47);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .bookBtn:hover {
+    background: rgb(150, 15, 37);
+  }
+
+  /* ── Area checklist (dark) ──────────────────────────────────────── */
+  .checklist {
+    background: rgb(32, 32, 65);
+    padding: 40px 20px;
+  }
+  .checklistTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+  }
+  .checklistSub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0 0 24px;
+  }
+  .areaTabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-bottom: 20px;
+  }
+  .areaTabs::-webkit-scrollbar {
+    display: none;
+  }
+  .areaTab {
+    flex-shrink: 0;
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .areaTabActive {
+    background: rgb(187, 19, 47);
+    color: white;
+    border-color: rgb(187, 19, 47);
+  }
+  .areaItems {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .areaItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .areaCheck {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgb(187, 19, 47);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .areaText {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  /* ── Why it matters ─────────────────────────────────────────────── */
+  .reasons {
+    padding: 44px 20px;
+  }
+  .reasonCards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .reasonCard {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    animation: fadeUp 0.5s ease both;
+  }
+  .reasonCard:hover {
+    box-shadow: 0 4px 14px rgba(32, 32, 65, 0.07);
+  }
+  .reasonIcon {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: rgb(240, 240, 255);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .reasonTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 5px;
+  }
+  .reasonText {
+    font-size: 13px;
+    color: rgb(90, 88, 88);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── Timeline / steps ───────────────────────────────────────────── */
+  .timeline {
+    padding: 0 20px 44px;
+  }
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+  .steps::before {
+    content: "";
+    position: absolute;
+    left: 19px;
+    top: 20px;
+    bottom: 20px;
+    width: 2px;
+    background: linear-gradient(to bottom, rgb(32, 32, 65), rgb(187, 19, 47));
+  }
+  .step {
+    display: flex;
+    gap: 20px;
+    padding: 0 0 28px;
+    position: relative;
+  }
+  .stepNum {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgb(32, 32, 65);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    font-family: "Playfair Display", Georgia, serif;
+  }
+  .stepBody {
+    padding-top: 8px;
+  }
+  .stepTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 4px;
+  }
+  .stepText {
+    font-size: 13px;
+    color: rgb(100, 98, 98);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── Tips banner ────────────────────────────────────────────────── */
+  .tipsBanner {
+    margin: 0 20px 44px;
+    background: white;
+    border: 2px solid rgb(32, 32, 65);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .tipsBannerHeader {
+    background: rgb(32, 32, 65);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tipsHeaderIcon {
+    font-size: 20px;
+  }
+  .tipsHeaderTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+  }
+  .tipsList {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tipItem {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .tipDot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgb(187, 19, 47);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .tipText {
+    font-size: 13px;
+    color: rgb(60, 58, 58);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── FAQ ────────────────────────────────────────────────────────── */
+  .faq {
+    padding: 0 20px 44px;
+  }
+  .faqList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .faqItem {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .faqQuestion {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 16px 18px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+    gap: 12px;
+  }
+  .faqChevron {
+    font-size: 18px;
+    transition: transform 0.2s;
+    color: rgb(187, 19, 47);
+    flex-shrink: 0;
+  }
+  .faqChevronOpen {
+    transform: rotate(180deg);
+  }
+  .faqAnswer {
+    padding: 12px 18px 16px;
+    font-size: 13px;
+    color: rgb(100, 98, 98);
+    line-height: 1.7;
+    margin: 0;
+    border-top: 1px solid rgb(245, 242, 238);
+  }
+
+  /* ── CTA ────────────────────────────────────────────────────────── */
+  .cta {
+    background: rgb(187, 19, 47);
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .ctaTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 10px;
+  }
+  .ctaText {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 auto 24px;
+    line-height: 1.6;
+    max-width: 420px;
+  }
+  .ctaButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .ctaPrimary {
+    height: 50px;
+    padding: 0 32px;
+    background: white;
+    color: rgb(187, 19, 47);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+  .ctaPrimary:hover {
+    background: rgb(245, 245, 245);
+  }
+  .ctaSecondary {
+    height: 50px;
+    padding: 0 32px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 280px;
+  }
+  .ctaSecondary:hover {
+    border-color: white;
+  }
+}
+
+/* ── Tablet ─────────────────────────────────────────────────────── */
+@media screen and (min-width: 576px) {
+  .heroTitle {
+    font-size: 42px;
+  }
+  .heroButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .ctaButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .serviceCards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .areaItems {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .reasonCards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── Desktop ─────────────────────────────────────────────────────── */
+@media screen and (min-width: 768px) {
+  .section,
+  .reasons,
+  .timeline,
+  .faq {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .checklist {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .tipsBanner {
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+  .cta {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .hero {
+    padding: 90px 80px 80px;
+  }
+  .heroTitle {
+    font-size: 50px;
+  }
+  .section,
+  .reasons,
+  .timeline,
+  .faq {
+    padding-left: 80px;
+    padding-right: 80px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .checklist {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .tipsBanner {
+    max-width: 840px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cta {
+    padding: 60px 80px;
+  }
+  .steps::before {
+    left: 23px;
+  }
+  .areaItems {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .serviceCards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Category tabs ──────────────────────────────────────────────── */
+.catTabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-bottom: 18px;
+  padding-bottom: 2px;
+}
+.catTabs::-webkit-scrollbar {
+  display: none;
+}
+.catTab {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 24px;
+  border: 2px solid rgb(235, 232, 225);
+  background: white;
+  color: rgb(90, 88, 88);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.catTab:hover {
+  border-color: rgb(32, 32, 65);
+  color: rgb(32, 32, 65);
+}
+.catTabActive {
+  background: rgb(32, 32, 65);
+  color: white;
+  border-color: rgb(32, 32, 65);
+}
+.catTabIcon {
+  font-size: 16px;
+}
+
+/* Category label */
+.catLabel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid rgb(235, 232, 225);
+  border-left: 5px solid rgb(187, 19, 47);
+  margin-bottom: 16px;
+}
+.catLabelIcon {
+  font-size: 28px;
+}
+.catLabelName {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgb(32, 32, 65);
+  margin: 0 0 2px;
+}
+.catLabelTagline {
+  font-size: 12px;
+  color: gray;
+  margin: 0;
+}
+
+/* Tips accordion */
+.tipCard {
+  background: white;
+  border: 1px solid rgb(235, 232, 225);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+  animation: fadeUp 0.4s ease both;
+  margin-bottom: 10px;
+}
+.tipCard:hover {
+  box-shadow: 0 4px 14px rgba(32, 32, 65, 0.08);
+}
+.tipCardOpen {
+  border-color: rgb(32, 32, 65);
+}
+.tipQuestion {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+.tipQuestionLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+.tipNum {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgb(187, 19, 47);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tipTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgb(32, 32, 65);
+  line-height: 1.3;
+}
+.tipChevron {
+  font-size: 18px;
+  color: rgb(187, 19, 47);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.tipChevronOpen {
+  transform: rotate(180deg);
+}
+.tipAnswer {
+  font-size: 13px;
+  color: rgb(80, 78, 78);
+  line-height: 1.75;
+  margin: 0;
+  padding: 12px 16px 16px 54px;
+  border-top: 1px solid rgb(245, 242, 238);
+}
+
+/* Quick wins dark section */
+.quickWins {
+  background: rgb(32, 32, 65);
+  padding: 44px 20px;
+}
+.quickWinsTitle {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 8px;
+}
+.quickWinsSub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+.quickWinsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.quickWinCard {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
+  animation: fadeUp 0.4s ease both;
+}
+.quickWinTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.quickWinIcon {
+  font-size: 22px;
+}
+.quickWinTime {
+  font-size: 11px;
+  font-weight: 700;
+  background: rgb(187, 19, 47);
+  color: white;
+  padding: 3px 9px;
+  border-radius: 12px;
+}
+.quickWinText {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Tips banner list override */
+.tipsList2 {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media screen and (min-width: 576px) {
+  .quickWinsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media screen and (min-width: 768px) {
+  .quickWins {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+@media screen and (min-width: 992px) {
+  .quickWins {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .quickWinsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

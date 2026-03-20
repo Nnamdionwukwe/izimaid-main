@@ -1,11 +1,17 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./ResidentialSideBar.module.css";
 
 export default function PracticalSideBar() {
+  const navigate = useNavigate();
+
   return (
     <>
       <div className={styles.de}>
         <div className={styles.residentialDI}>
-          <div className={styles.hoverMainDiv10}>
+          <div
+            onClick={() => navigate("/blog")}
+            className={styles.hoverMainDiv10}
+          >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Guilds and Graphics</p>
           </div>

@@ -17,7 +17,7 @@ export default function CleaningTipsSideBar() {
           </div>
 
           <div
-            onClick={() => navigate("/kitchens")}
+            onClick={() => navigate("/kitchens-tips")}
             className={styles.hoverMainDiv2}
           >
             <i class="fa fa-th-large" aria-hidden="true"></i>
