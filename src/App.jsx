@@ -54,6 +54,8 @@ import GeneralHousehold from "./component/GeneralHousehold/GeneralHousehold.jsx"
 import Kitchens from "./component/CleaningTips/Kitchens.jsx";
 import MoveCleaningTips from "./component/CleaningTips/MoveCleaningTips.jsx";
 import OfficeCleaningTips from "./component/CleaningTips/OfficeCleaningTips.jsx";
+import LivingRooms from "./component/CleaningTips/LivingRooms.jsx";
+import Bathrooms from "./component/CleaningTips/Bathrooms.jsx";
 
 function App() {
   return (
@@ -156,6 +158,8 @@ function AppRoutes() {
       <Route path="/kitchens" element={<Kitchens />} />
       <Route path="/move-cleaning-tips" element={<MoveCleaningTips />} />
       <Route path="/office-cleaning-tips" element={<OfficeCleaningTips />} />
+      <Route path="/living-rooms" element={<LivingRooms />} />
+      <Route path="/bathrooms" element={<Bathrooms />} />
 
       {/* Admin Dashboard */}
       <Route
