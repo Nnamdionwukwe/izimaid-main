@@ -237,10 +237,15 @@ export default function Faq() {
             <div className={styles.residentialDIv}>
               <p className={styles.hoverMainliv1}>
                 Deusizi Sparkle takes care of your whole home!{" "}
-                <span className={styles.span}>Our Services</span> are the
-                definition of comprehensive. We give your kitchen a thorough
-                cleaning, and bathrooms Sparkle after we're done. Your living
-                room is cozy and inviting after we clean.
+                <span
+                  onClick={() => navigate("/home-cleaning")}
+                  className={styles.span}
+                >
+                  Our Services
+                </span>{" "}
+                are the definition of comprehensive. We give your kitchen a
+                thorough cleaning, and bathrooms Sparkle after we're done. Your
+                living room is cozy and inviting after we clean.
               </p>
 
               <p className={styles.hoverMainliv1}>
@@ -248,7 +253,10 @@ export default function Faq() {
                 Our professional home cleaners ensure every room you want
                 cleaned is a delight for you to come back to. If you’ve been
                 looking for the best
-                <span className={styles.span}>
+                <span
+                  onClick={() => navigate("/maids")}
+                  className={styles.span}
+                >
                   local home cleaning services
                 </span>
                 near you, Deusizi Sparkle is the right choice.
@@ -278,7 +286,13 @@ export default function Faq() {
 
               <p className={styles.hoverMainliv1}>
                 If you’re looking for
-                <span className={styles.span}> cleaning services near me</span>
+                <span
+                  onClick={() => navigate("/maids")}
+                  className={styles.span}
+                >
+                  {" "}
+                  cleaning services near me
+                </span>
                 that cover it all, Deusizi Sparkle is the answer. We ensure that
                 floors are vacuumed and mopped throughout the house, making them
                 clean and fresh. Want your bedrooms to be cozy retreats? Come
@@ -311,7 +325,13 @@ export default function Faq() {
               <p className={styles.hoverMainliv1}>
                 We offer cleaning services for any occasion. For a list of all
                 the cleaning services our teams provide, visit
-                <span className={styles.span}> our services</span>
+                <span
+                  onClick={() => navigate("/home-cleaning")}
+                  className={styles.span}
+                >
+                  {" "}
+                  our services
+                </span>
                 page to determine the services that best suit your needs.
               </p>
             </div>
@@ -329,10 +349,9 @@ export default function Faq() {
             <div className={styles.residentialDIv}>
               <p className={styles.hoverMainliv1}>
                 Deusizi Sparkle doesn’t just promise a thorough clean, we back
-                it up.
-                <span className={styles.span}>
-                  The Deusizi Sparkle Done Right Promise®
-                </span>
+                it up. The Deusizi Sparkle Done Right Promise®
+                {/* <span className={styles.span}>
+                </span> */}
                 is our commitment to excellence, ensuring that our cleaning
                 services for residential homes are held to the highest
                 standards. We prioritize your satisfaction and the quality of
@@ -411,9 +430,9 @@ export default function Faq() {
         </div>
       </div>
 
-      <div className={styles.see}>
+      {/* <div className={styles.see}>
         <h3>See All FAQs</h3>
-      </div>
+      </div> */}
     </div>
   );
 }
