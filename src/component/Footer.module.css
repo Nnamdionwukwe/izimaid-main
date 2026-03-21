@@ -163,6 +163,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
+  margin-bottom: 10px;
 }
 
 .brand {
@@ -170,7 +171,7 @@
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.14em;
-  color: rgba(0, 200, 255, 0.6);
+  color: rgba(7, 51, 63, 0.6);
   text-transform: uppercase;
 }
 
