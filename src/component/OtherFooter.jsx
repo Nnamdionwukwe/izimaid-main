@@ -24,7 +24,6 @@ export default function OtherFooter() {
 
       <p className={styles.border4}>
         © 2025 Deusizi Sparkle Company and its affiliates. All rights reserved.
-        Deusizi Sparkle is a registered trademark of Deusizi Sparkle LLC.
         Deusizi Sparkle is a registered trademark of Deusizi Sparkle SPV LLC.
         This site and all of its content is protected under applicable law,
         including laws of the U.S. and other countries. Each location is

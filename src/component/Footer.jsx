@@ -283,7 +283,7 @@ export default function Footer() {
         <p className={styles.border3}>A clean you can count on.®</p>
       </div>
 
-      <div className={styles.h4Div}>
+      {/* <div className={styles.h4Div}>
         <h4
           className={styles.h4}
           style={{ cursor: "pointer" }}
@@ -298,20 +298,16 @@ export default function Footer() {
         >
           Privacy Policy
         </h4>
-        {/* <h4 className={styles.h4}>Accessibility</h4>
-        <h4 className={styles.h4}>Do Not Sell My Info</h4>
-        <h4 className={styles.h4}>Your Privacy Rights</h4> */}
-      </div>
+      </div> */}
 
-      <p className={styles.border4}>
+      {/* <p className={styles.border4}>
         © 2025 Deusizi Sparkle Company and its affiliates. All rights reserved.
-        Deusizi Sparkle is a registered trademark of Deusizi Sparkle LLC.
         Deusizi Sparkle is a registered trademark of Deusizi Sparkle SPV LLC.
         This site and all of its content is protected under applicable law,
         including laws of the U.S. and other countries. Each location is
         independently owned and operated. Services may vary by location. Please
         contact the franchise location for additional information.
-      </p>
+      </p> */}
     </div>
   );
 }
