@@ -23,19 +23,21 @@ export default function SecondPractically() {
 
         <div className={styles.mainSub}>
           <h3 className={styles.how}>
-            How Often Should I Have My House Cleaned?
+            The Weekly Cleaning Schedule [Printable Planner]
           </h3>
 
           <p className={styles.there}>
-            There’s no hard-and-fast answer to the question of how often to have
-            your house cleaned. However, anyone thinking about hiring a cleaning
-            service must pin down a schedule that works for them. Here are some
-            factors to consider when deciding the frequency of professional
-            cleanings.
+            A visual 7-day cleaning schedule showing which room to focus on each
+            day, time estimates per session, and a blank version you can fill in
+            yourself.
           </p>
 
           <div className={styles.mainh1}>
-            <h4>Learn More</h4>
+            <h4
+              onClick={() => navigate("/blog/weekly-cleaning-schedule-graphic")}
+            >
+              Learn More
+            </h4>
             <h5 className={styles.arrow}>&rarr;</h5>
           </div>
         </div>
@@ -47,20 +49,19 @@ export default function SecondPractically() {
 
         <div className={styles.mainSub}>
           <h3 className={styles.how}>
-            Cleaning Schedule For Working Moms and Dads
+            The Complete Spring Cleaning Guide for Nigerian Homes
           </h3>
 
           <p className={styles.there}>
-            So how do you keep the house clean with a busy schedule? We have
-            compiled a list of the 10 best cleaning tips for moms and dads that
-            will help you manage cleaning and your busy schedule. This includes
-            ideas for creating a cleaning schedule and task list to keep the
-            house tidy without dedicating your entire night or weekend to
-            getting it done.
+            A room-by-room spring cleaning guide covering every phase — from
+            decluttering to deep cleaning every surface, fixture, and corner of
+            your home.
           </p>
 
           <div className={styles.mainh1}>
-            <h4>Learn More</h4>
+            <h4 onClick={() => navigate("/blog/spring-cleaning-guide")}>
+              Learn More
+            </h4>
             <h5 className={styles.arrow}>&rarr;</h5>
           </div>
         </div>
@@ -72,19 +73,19 @@ export default function SecondPractically() {
 
         <div className={styles.mainSub}>
           <h3 className={styles.how}>
-            House Cleaning Tips for Seniors and Loved Ones
+            Move-In & Move-Out Cleaning: What You Need to Know
           </h3>
 
           <p className={styles.there}>
-            If you’ve been spending time cleaning for an elderly family member,
-            friend or loved one in your life, and are looking for ways to help
-            them stay self-sufficient, we have some advice to help you be more
-            efficient and, at the same time, reduce some of the unique risks
-            that seniors face.
+            Everything you need before handing over keys or unpacking boxes —
+            tips, checklists, and the difference between a move-in and move-out
+            clean.
           </p>
 
           <div className={styles.mainh1}>
-            <h4>Learn More</h4>
+            <h4 onClick={() => navigate("/blog/move-in-move-out-cleaning")}>
+              Learn More
+            </h4>
             <h5 className={styles.arrow}>&rarr;</h5>
           </div>
         </div>
@@ -95,7 +96,9 @@ export default function SecondPractically() {
           <h1>Cleaning Tips</h1>
 
           <div className={styles.mainh2}>
-            <h4>View All Cleaning Tips </h4>
+            <h4 onClick={() => navigate("/general-household")}>
+              View All Cleaning Tips{" "}
+            </h4>
             <h5>&rarr;</h5>
           </div>
         </div>
@@ -107,18 +110,17 @@ export default function SecondPractically() {
 
         <div className={styles.mainSub}>
           <h3 className={styles.how}>
-            Cleaning Tips on How to Remove Allergens from Your Home
+            Kitchen cleaning tips that actually work.
           </h3>
 
           <p className={styles.there}>
-            While reducing allergens in your home is the goal, consistency is
-            the key to getting it done. Applying these cleaning tips
-            consistently will keep your home looking good, smelling fresh, and
-            reduce allergens in your home.
+            Practical, professional-grade kitchen cleaning advice — from daily
+            habits that prevent build-up to the deep-clean methods that restore
+            any kitchen to its best.
           </p>
 
           <div className={styles.mainh1}>
-            <h4>Learn More</h4>
+            <h4 onClick={() => navigate("/kitchens-tips")}>Learn More</h4>
             <h5 className={styles.arrow}>&rarr;</h5>
           </div>
         </div>
@@ -130,18 +132,17 @@ export default function SecondPractically() {
 
         <div className={styles.mainSub}>
           <h3 className={styles.how}>
-            Stain Removal Techniques: Tips & Guidelines
+            Spring cleaning tips that actually work.
           </h3>
 
           <p className={styles.there}>
-            Stains can ruin furniture, carpet, tile, and many other items. But
-            that doesn’t have to be the case. Our stain removal guide will help
-            you remove even the most stubborn stains, regardless of the type of
-            stain and where it is found.
+            A complete room-by-room spring cleaning guide for Nigerian homes —
+            from decluttering to deep cleaning every surface, fixture, and
+            corner of your home.
           </p>
 
           <div className={styles.mainh1}>
-            <h4>Learn More</h4>
+            <h4 onClick={() => navigate("/spring-cleaning")}>Learn More</h4>
             <h5 className={styles.arrow}>&rarr;</h5>
           </div>
         </div>
@@ -152,17 +153,18 @@ export default function SecondPractically() {
         />
 
         <div className={styles.mainSub}>
-          <h3 className={styles.how}>Free Printable Kids Chore Charts</h3>
+          <h3 className={styles.how}>Schedules, charts & checklists.</h3>
 
           <p className={styles.there}>
-            Not sure which chores are appropriate for your young kids? Use
-            IziMaid's Age-Appropriate Chores List to help you as they grow! For
-            toddlers, chores like putting away toys, and putting books and
-            magazines into a pile are a great start.
+            Everything you need to organise your home cleaning — weekly
+            schedules, room-by-room checklists, and frequency charts for every
+            task in your home.
           </p>
 
           <div className={styles.mainh1}>
-            <h4>Learn More</h4>
+            <h4 onClick={() => navigate("/schedules-charts-checklists")}>
+              Learn More
+            </h4>
             <h5 className={styles.arrow}>&rarr;</h5>
           </div>
         </div>
