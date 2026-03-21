@@ -58,6 +58,9 @@ export default function Maids() {
 
   return (
     <div className={styles.page}>
+      <button className={styles.backLink} onClick={() => navigate("/")}>
+        ← Back to Home
+      </button>
       <h1 className={styles.pageTitle}>Find a Maid</h1>
       <p className={styles.pageSubtitle}>
         Browse verified cleaning professionals near you
