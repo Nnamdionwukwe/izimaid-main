@@ -1,8 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
 import styles from "./Main.module.css";
+import Modal from "./Modal/Modal.jsx";
 
-export default function Main() {
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
+export default function MainFull() {
   //SENDING TO BACKEND
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -51,6 +54,10 @@ export default function Main() {
   const [isOpen12, setIsOpen12] = useState(false);
   const [toggleRadio, setToggleRadio] = useState(false);
   const [formSubmit, setFormSubmit] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  // const [loading, setLoading] = useState(false);
+  // const [submitError, setSubmitError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [selectBedRooms, setSelectBedRooms] = useState(false);
   const [selectBathRooms, setSelectBathRooms] = useState(false);
@@ -77,7 +84,6 @@ export default function Main() {
     setOneTime(false);
     setSelectBedRooms(false);
     setSelectBathRooms(false);
-    // setRecurring(false);
     setLightCommercial(true);
   }
 
@@ -91,16 +97,6 @@ export default function Main() {
     setRecurring(true);
   }
 
-  // function handleClickOneTime2() {
-  //   // setOneTime(true);
-  //   // setRecurring(false);
-  // }
-
-  // function handleRecurring2() {
-  //   // setOneTime(false);
-  //   // setRecurring(true);
-  // }
-
   function handleOneWeek() {
     setOneWeek(true);
     setOneTimeClean(false);
@@ -112,11 +108,6 @@ export default function Main() {
   }
 
   //BEDROOM
-  //BEDROOM
-  //BEDROOM
-  //BEDROOM
-  //BEDROOM
-
   function handleSelectBedRooms() {
     setSelectBedRooms((is) => !is);
     setSelectBathRooms(false);
@@ -125,76 +116,46 @@ export default function Main() {
   function handleSelectedBedRoomsValueNone() {
     setSelectBedRoomsValue(0);
     setSelectBedRooms(false);
-
-    //SETS THE WARNING BACK TO FALSE
     setIsOpen9(false);
-
-    //CALL THE SELECTED BEDROOMS FUNCTION
     handleResidentialBedRooms();
   }
 
   function handleSelectedBedRoomsValue1() {
     setSelectBedRoomsValue(1);
     setSelectBedRooms(false);
-
-    //SETS THE WARNING BACK TO FALSE
     setIsOpen9(false);
-
-    //CALL THE SELECTED BEDROOMS FUNCTION
     handleResidentialBedRooms();
   }
 
   function handleSelectedBedRoomsValue2() {
     setSelectBedRoomsValue(2);
     setSelectBedRooms(false);
-
-    //SETS THE WARNING BACK TO FALSE
     setIsOpen9(false);
-
-    //CALL THE SELECTED BEDROOMS FUNCTION
     handleResidentialBedRooms();
   }
 
   function handleSelectedBedRoomsValue3() {
     setSelectBedRoomsValue(3);
     setSelectBedRooms(false);
-
-    //SETS THE WARNING BACK TO FALSE
     setIsOpen9(false);
-
-    //CALL THE SELECTED BEDROOMS FUNCTION
     handleResidentialBedRooms();
   }
 
   function handleSelectedBedRoomsValue4() {
     setSelectBedRoomsValue(4);
     setSelectBedRooms(false);
-
-    //SETS THE WARNING BACK TO FALSE
     setIsOpen9(false);
-
-    //CALL THE SELECTED BEDROOMS FUNCTION
     handleResidentialBedRooms();
   }
 
   function handleSelectedBedRoomsValue5() {
     setSelectBedRoomsValue(5);
     setSelectBedRooms(false);
-
-    //SETS THE WARNING BACK TO FALSE
     setIsOpen9(false);
-
-    //CALL THE SELECTED BEDROOMS FUNCTION
     handleResidentialBedRooms();
   }
 
   //BATHROOM
-  //BATHROOM
-  //BATHROOM
-  //BATHROOM
-  //BATHROOM
-  //BATHROOM
-
   function handleSelectBathRooms() {
     setSelectBathRooms((is) => !is);
     setSelectBedRooms(false);
@@ -203,69 +164,46 @@ export default function Main() {
   function handleSelectedBathRoomsValueNone() {
     setSelectBathRoomsValue(0);
     setSelectBathRooms(false);
-
     setIsOpen10(false);
-
-    //CALL THE SELECTED BATHROOMS FUNCTION
     handleResidentialBathRoom();
   }
 
   function handleSelectedBathRoomsValue1() {
     setSelectBathRoomsValue(1);
     setSelectBathRooms(false);
-
     setIsOpen10(false);
-
-    //CALL THE SELECTED BATHROOMS FUNCTION
     handleResidentialBathRoom();
   }
 
   function handleSelectedBathRoomsValue2() {
     setSelectBathRoomsValue(2);
     setSelectBathRooms(false);
-
     setIsOpen10(false);
-
-    //CALL THE SELECTED BATHROOMS FUNCTION
     handleResidentialBathRoom();
   }
 
   function handleSelectedBathRoomsValue3() {
     setSelectBathRoomsValue(3);
     setSelectBathRooms(false);
-
     setIsOpen10(false);
-
-    //CALL THE SELECTED BATHROOMS FUNCTION
     handleResidentialBathRoom();
   }
 
   function handleSelectedBathRoomsValue4() {
     setSelectBathRoomsValue(4);
     setSelectBathRooms(false);
-
     setIsOpen10(false);
-
-    //CALL THE SELECTED BATHROOMS FUNCTION
     handleResidentialBathRoom();
   }
 
   function handleSelectedBathRoomsValue5() {
     setSelectBathRoomsValue(5);
     setSelectBathRooms(false);
-
     setIsOpen10(false);
-
-    //CALL THE SELECTED BATHROOMS FUNCTION
     handleResidentialBathRoom();
   }
 
   //LIGHT COMMERCIAL OFFICES
-  //LIGHT COMMERCIAL OFFICES
-  //LIGHT COMMERCIAL OFFICES
-  //LIGHT COMMERCIAL OFFICES
-  //LIGHT COMMERCIAL OFFICES
-
   function handleLightCommercialSelectedOffice() {
     setSelectedOffice((is) => !is);
     setSelectedOfficeBathRooms(false);
@@ -274,70 +212,46 @@ export default function Main() {
   function lightCommercialSelectedOfficeValueNone() {
     setLightCommercialSelectedOfficeValue(0);
     setSelectedOffice(false);
-
     setIsOpen11(false);
-
-    //CALL THE SELECTED LIGHT COMMERCIAL OFFICE FUNCTION
     handleLightCommercialOffices();
   }
 
   function lightCommercialSelectedOfficeValue1() {
     setLightCommercialSelectedOfficeValue(1);
     setSelectedOffice(false);
-
     setIsOpen11(false);
-
-    //CALL THE SELECTED LIGHT COMMERCIAL OFFICE FUNCTION
     handleLightCommercialOffices();
   }
 
   function lightCommercialSelectedOfficeValue2() {
     setLightCommercialSelectedOfficeValue(2);
     setSelectedOffice(false);
-
     setIsOpen11(false);
-
-    //CALL THE SELECTED LIGHT COMMERCIAL OFFICE FUNCTION
     handleLightCommercialOffices();
   }
 
   function lightCommercialSelectedOfficeValue3() {
     setLightCommercialSelectedOfficeValue(3);
     setSelectedOffice(false);
-
     setIsOpen11(false);
-
-    //CALL THE SELECTED LIGHT COMMERCIAL OFFICE FUNCTION
     handleLightCommercialOffices();
   }
 
   function lightCommercialSelectedOfficeValue4() {
     setLightCommercialSelectedOfficeValue(4);
     setSelectedOffice(false);
-
     setIsOpen11(false);
-
-    //CALL THE SELECTED LIGHT COMMERCIAL OFFICE FUNCTION
     handleLightCommercialOffices();
   }
 
   function lightCommercialSelectedOfficeValue5() {
     setLightCommercialSelectedOfficeValue(5);
     setSelectedOffice(false);
-
     setIsOpen11(false);
-
-    //CALL THE SELECTED LIGHT COMMERCIAL OFFICE FUNCTION
     handleLightCommercialOffices();
   }
 
-  ///LIGHT COMMERCIAL OFFICES BATHROOM
-  //LIGHT COMMERCIAL OFFICES ATHROOM
-  ///LIGHT COMMERCIAL OFFICES BATHROOM
-  ///LIGHT COMMERCIAL OFFICES BATHROOM
-  ///LIGHT COMMERCIAL OFFICES BATHROOM
-  ///LIGHT COMMERCIAL OFFICES BATHROOM
-
+  //LIGHT COMMERCIAL OFFICES BATHROOM
   function handleLightCommercialSelectedOfficeBathRooms() {
     setSelectedOfficeBathRooms((is) => !is);
     setSelectedOffice(false);
@@ -346,99 +260,69 @@ export default function Main() {
   function handlelightCommercialSelectedOfficeBathRoomsValueNone() {
     setLightCommercialSelectedOfficeBathRoomsValue(0);
     setSelectedOfficeBathRooms(false);
-
     setIsOpen12(false);
-
-    //CALL THE SELECTED LIGHT COMMERCIAL OFFICE BATHROOM FUNCTION
     handleLightCommercialBathRooms();
   }
 
   function handlelightCommercialSelectedOfficeBathRoomsValue1() {
     setLightCommercialSelectedOfficeBathRoomsValue(1);
     setSelectedOfficeBathRooms(false);
-
     setIsOpen12(false);
-
-    //CALL THE SELECTED LIGHT COMMERCIAL OFFICE BATHROOM FUNCTION
     handleLightCommercialBathRooms();
   }
 
   function handlelightCommercialSelectedOfficeBathRoomsValue2() {
     setLightCommercialSelectedOfficeBathRoomsValue(2);
     setSelectedOfficeBathRooms(false);
-
     setIsOpen12(false);
-
-    //CALL THE SELECTED LIGHT COMMERCIAL OFFICE BATHROOM FUNCTION
     handleLightCommercialBathRooms();
   }
 
   function handlelightCommercialSelectedOfficeBathRoomsValue3() {
     setLightCommercialSelectedOfficeBathRoomsValue(3);
     setSelectedOfficeBathRooms(false);
-
     setIsOpen12(false);
-
-    //CALL THE SELECTED LIGHT COMMERCIAL OFFICE BATHROOM FUNCTION
     handleLightCommercialBathRooms();
   }
 
   function handlelightCommercialSelectedOfficeBathRoomsValue4() {
     setLightCommercialSelectedOfficeBathRoomsValue(4);
     setSelectedOfficeBathRooms(false);
-
     setIsOpen12(false);
-
-    //CALL THE SELECTED LIGHT COMMERCIAL OFFICE BATHROOM FUNCTION
     handleLightCommercialBathRooms();
   }
 
   function handlelightCommercialSelectedOfficeBathRoomsValue5() {
     setLightCommercialSelectedOfficeBathRoomsValue(5);
     setSelectedOfficeBathRooms(false);
-
     setIsOpen12(false);
-
-    //CALL THE SELECTED LIGHT COMMERCIAL OFFICE BATHROOM FUNCTION
     handleLightCommercialBathRooms();
   }
 
   //LIGHT COMMERCIAL RECURRING
-  //LIGHT COMMERCIAL RECURRING
-  //LIGHT COMMERCIAL RECURRING
-  //LIGHT COMMERCIAL RECURRING
-  //LIGHT COMMERCIAL RECURRING
-  //LIGHT COMMERCIAL RECURRING
   function handleWeekly() {
     setLightCommercialRecurring("weekly");
-    setLightCommercialOneTimeClean("");
     setLightCommercialOneTimeClean("");
   }
 
   function handleOtherWeek() {
     setLightCommercialRecurring("every Other Week");
     setLightCommercialOneTimeClean("");
-    setLightCommercialOneTimeClean("");
   }
+
   function handle4Weeks() {
     setLightCommercialRecurring("once In 4 Weeks");
-    setLightCommercialOneTimeClean("");
     setLightCommercialOneTimeClean("");
   }
 
   //ONE TIME CLEAN
-  //ONE TIME CLEAN
-  //ONE TIME CLEAN
   function handleYes() {
     setLightCommercialOneTimeClean("yes");
     setLightCommercialRecurring("");
-    setLightCommercialRecurring("");
-    setLightCommercialRecurring("");
   }
+
   function handleNo() {
     setLightCommercialOneTimeClean("no");
-    setLightCommercialRecurring("");
-    setLightCommercialRecurring("");
     setLightCommercialRecurring("");
   }
 
@@ -449,40 +333,39 @@ export default function Main() {
     !firstName.length && setIsOpenCheck(false);
   }
 
-  //LAST NAME  INPUT FORMS
+  //LAST NAME INPUT FORMS
   function handleLastName(e) {
     setLastName(e.target.value);
     lastName.length >= 0 && setIsOpen2(false);
     !lastName.length && setIsOpenCheck(false);
   }
 
-  //EMAIL ADRESS  INPUT FORMS
+  //EMAIL ADDRESS INPUT FORMS
   function handleEmailAddress(e) {
     setEmail(e.target.value);
     email.length >= 0 && setIsOpen3(false);
     !email.length && setIsOpenCheck(false);
   }
 
-  //PHONE NUMBER  INPUT FORMS
+  //PHONE NUMBER INPUT FORMS
   function handlePhoneNumber(e) {
     setPhoneNumber(e.target.value);
     phoneNumber.length >= 0 && setIsOpen4(false);
     !phoneNumber.length && setIsOpenCheck(false);
   }
 
-  //APARTMENT/SUITE   INPUT FORMS
+  //ZIP CODE INPUT FORMS
   function handleZipCode(e) {
     setZipCode(e.target.value);
     zipCode.length >= 0 && setIsOpen5(false);
     !zipCode.length && setIsOpenCheck(false);
   }
 
-  //SERVICE ADDRESS  INPUT FORMS
+  //SERVICE ADDRESS INPUT FORMS
   function handleServiceAddress(e) {
     setServiceAddress(e.target.value);
     servicesAddress.length >= 0 && setIsOpen6(false);
     !servicesAddress.length && setIsOpenCheck(false);
-    // !servicesAddress.length ? setIsOpenCheck(false) : setIsOpenCheck(false);
   }
 
   //RESIDENTIAL HOME SQUARE FEET INPUT FORMS
@@ -499,34 +382,21 @@ export default function Main() {
     !lightCommercialOfficeSquareFeet.length && setIsOpenCheck(false);
   }
 
-  //  function handleSelectedBedRoomsValueNone() {
-  //   setSelectBedRoomsValue("none");
-  //   setSelectBedRooms(false);
-  //   setIsOpen9(false);
-
-  //   //CALL THE SELECTED BEDROOMS FUNCTION
-  //   handleResidentialBedRooms();
-  // }
-
-  //SELECT RESIDENTIAL BEDROOM VALUE INPUT FORMS
   function handleResidentialBedRooms() {
     selectBedRoomsValue.length >= 0 && setIsOpen9(false);
     !selectBedRoomsValue.length && setIsOpenCheck(false);
   }
 
-  //SELECT RESIDENTIAL BATHROOM VALUE INPUT FORM
   function handleResidentialBathRoom() {
     lightCommercialOfficeSquareFeet.length >= 0 && setIsOpen10(false);
     !lightCommercialOfficeSquareFeet.length && setIsOpenCheck(false);
   }
 
-  //SELECT LIGHT COMMERCIAL OFFICE VALUE INPUT FORM
   function handleLightCommercialOffices() {
     lightCommercialSelectedOfficeValue.length >= 0 && setIsOpen11(false);
     !lightCommercialSelectedOfficeValue.length && setIsOpenCheck(false);
   }
 
-  //SELECT LIGHT COMMERCIAL BATHROOM VALUE INPUT FORM
   function handleLightCommercialBathRooms() {
     lightCommercialSelectedOfficeBathRoomsValue.length >= 0 &&
       setIsOpen12(false);
@@ -534,166 +404,115 @@ export default function Main() {
       setIsOpenCheck(false);
   }
 
-  //YES TEXT ME MESSAGES FUNCTION
   function handleTextMeMessages() {
     setToggleRadio((is) => !is);
-    !toggleRadio && setTextMeMessages("Yes send me service reminders");
-
-    toggleRadio && setTextMeMessages("No don't send me service reminders");
+    setTextMeMessages(
+      !toggleRadio
+        ? "Yes send me service reminders"
+        : "No don't send me service reminders",
+    );
   }
 
-  //FORM SUBMIT BUTTON
-  //FORM SUBMIT BUTTON
-  //FORM SUBMIT BUTTON
+  // ── FORM SUBMIT — same logic as MainFull ──────────────────────────
+  function validate() {
+    let valid = true;
+    if (!firstName) {
+      setIsOpen1(true);
+      valid = false;
+    }
+    if (!lastName) {
+      setIsOpen2(true);
+      valid = false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      setIsOpen3(true);
+      valid = false;
+    }
+    if (!phoneNumber) {
+      setIsOpen4(true);
+      valid = false;
+    }
+    if (!zipCode) {
+      setIsOpen5(true);
+      valid = false;
+    }
+    if (!servicesAddress) {
+      setIsOpen6(true);
+      valid = false;
+    }
+    if (residential && oneTime && !residentialHomeSquareFeet) {
+      setIsOpen7(true);
+      valid = false;
+    }
+    if (lightCommercial && !lightCommercialOfficeSquareFeet) {
+      setIsOpen8(true);
+      valid = false;
+    }
+    return valid;
+  }
+
   async function handleSubmitForm(e) {
     e.preventDefault();
+    setSubmitError("");
 
-    !firstName.length && setIsOpenCheck(false);
-    !firstName.length && setIsOpen1(true);
-
-    !lastName.length && setIsOpenCheck(false);
-    !lastName.length && setIsOpen2(true);
-
-    !email.length && setIsOpenCheck(false);
-    !email.length && setIsOpen3(true);
-
-    !phoneNumber.length && setIsOpenCheck(false);
-    !phoneNumber.length && setIsOpen4(true);
-
-    !zipCode.length && setIsOpenCheck(false);
-    !zipCode.length && setIsOpen5(true);
-
-    !servicesAddress.length && setIsOpenCheck(false);
-    !servicesAddress.length && setIsOpen6(true);
-
-    !residentialHomeSquareFeet.length && setIsOpenCheck(false);
-    !residentialHomeSquareFeet.length && setIsOpen7(true);
-
-    !lightCommercialOfficeSquareFeet.length && setIsOpenCheck(false);
-    !lightCommercialOfficeSquareFeet.length && setIsOpen8(true);
-
-    !selectBedRoomsValue.length && setIsOpenCheck(false);
-    !selectBedRoomsValue.length && setIsOpen9(true);
-    selectBedRoomsValue === 0 && setIsOpen9(false);
-    selectBedRoomsValue === 1 && setIsOpen9(false);
-    selectBedRoomsValue === 2 && setIsOpen9(false);
-    selectBedRoomsValue === 3 && setIsOpen9(false);
-    selectBedRoomsValue === 4 && setIsOpen9(false);
-    selectBedRoomsValue === 5 && setIsOpen9(false);
-
-    !selectBathRoomsValue.length && setIsOpenCheck(false);
-    !selectBathRoomsValue.length && setIsOpen10(true);
-    selectBathRoomsValue === 0 && setIsOpen10(false);
-    selectBathRoomsValue === 1 && setIsOpen10(false);
-    selectBathRoomsValue === 2 && setIsOpen10(false);
-    selectBathRoomsValue === 3 && setIsOpen10(false);
-    selectBathRoomsValue === 4 && setIsOpen10(false);
-    selectBathRoomsValue === 5 && setIsOpen10(false);
-
-    !lightCommercialSelectedOfficeValue.length && setIsOpenCheck(false);
-    !lightCommercialSelectedOfficeValue.length && setIsOpen11(true);
-    lightCommercialSelectedOfficeValue === 0 && setIsOpen11(false);
-    lightCommercialSelectedOfficeValue === 1 && setIsOpen11(false);
-    lightCommercialSelectedOfficeValue === 2 && setIsOpen11(false);
-    lightCommercialSelectedOfficeValue === 3 && setIsOpen11(false);
-    lightCommercialSelectedOfficeValue === 4 && setIsOpen11(false);
-    lightCommercialSelectedOfficeValue === 5 && setIsOpen11(false);
-
-    !lightCommercialSelectedOfficeBathRoomsValue.length &&
-      setIsOpenCheck(false);
-    !lightCommercialSelectedOfficeBathRoomsValue.length && setIsOpen12(true);
-    lightCommercialSelectedOfficeBathRoomsValue === 0 && setIsOpen12(false);
-    lightCommercialSelectedOfficeBathRoomsValue === 1 && setIsOpen12(false);
-    lightCommercialSelectedOfficeBathRoomsValue === 2 && setIsOpen12(false);
-    lightCommercialSelectedOfficeBathRoomsValue === 3 && setIsOpen12(false);
-    lightCommercialSelectedOfficeBathRoomsValue === 4 && setIsOpen12(false);
-    lightCommercialSelectedOfficeBathRoomsValue === 5 && setIsOpen12(false);
-
-    setFormSubmit(true);
-
-    if (
-      firstName.length >= 1 &&
-      lastName.length >= 1 &&
-      email.length >= 1 &&
-      phoneNumber.length >= 1 &&
-      zipCode.length >= 1 &&
-      servicesAddress.length >= 1 &&
-      residentialHomeSquareFeet.length >= 1 &&
-      lightCommercialOfficeSquareFeet.length >= 1 &&
-      selectBedRoomsValue <= 5 &&
-      selectBathRoomsValue <= 5 &&
-      lightCommercialSelectedOfficeValue <= 5 &&
-      lightCommercialSelectedOfficeBathRoomsValue <= 5
-      // selectBedRoomsValue === 0
-      // selectBedRoomsValue.length
-    ) {
-      setIsOpenCheck(true),
-        setFirstName(""),
-        setLastName(""),
-        setEmail(""),
-        setPhoneNumber(""),
-        setZipCode(""),
-        setServiceAddress(""),
-        setApartmentOrSuite(""),
-        setResidentialHomeSquareFeet(""),
-        setLightCommercialOfficeSquareFeet(""),
-        setSelectBedRoomsValue(""),
-        setSelectBathRoomsValue(""),
-        setLightCommercialSelectedOfficeValue(""),
-        setLightCommercialSelectedOfficeBathRoomsValue(""),
-        setFormSubmit(false);
-
-      try {
-        await axios.post("http://localhost:8000/", {
-          firstName,
-          lastName,
-          email,
-          phoneNumber,
-          zipCode,
-          servicesAddress,
-          apartmentOrSuite,
-          residentialHomeSquareFeet,
-          lightCommercialOfficeSquareFeet,
-          selectBedRoomsValue,
-          selectBathRoomsValue,
-          lightCommercialSelectedOfficeValue,
-          lightCommercialSelectedOfficeBathRoomsValue,
-          lightCommercialRecurring,
-          lightCommercialOneTimeClean,
-          textMeMessages,
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      setIsOpenCheck(false);
+    if (!validate()) {
+      setFormSubmit(true);
+      return;
     }
-  }
 
-  async function Submit(e) {
-    e.preventDefault();
+    const cleaningType = residential ? "residential" : "light_commercial";
+    let frequency = "recurring";
+    if (residential && oneTime)
+      frequency = moveInOut ? "one_time" : "move_in_out";
 
+    setLoading(true);
     try {
-      await axios.post("http://localhost:8000/", {
+      await axios.post(`${API_URL}/api/leads`, {
         firstName,
         lastName,
         email,
         phoneNumber,
+        textMeMessages,
         zipCode,
         servicesAddress,
         apartmentOrSuite,
+        cleaningType,
+        frequency,
         residentialHomeSquareFeet,
-        lightCommercialOfficeSquareFeet,
         selectBedRoomsValue,
         selectBathRoomsValue,
+        lightCommercialRecurring,
+        lightCommercialOfficeSquareFeet,
         lightCommercialSelectedOfficeValue,
         lightCommercialSelectedOfficeBathRoomsValue,
-        lightCommercialRecurring,
         lightCommercialOneTimeClean,
-        textMeMessages,
       });
-    } catch (e) {
-      console.log(e);
+
+      setIsOpenCheck(true);
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPhoneNumber("");
+      setZipCode("");
+      setServiceAddress("");
+      setApartmentOrSuite("");
+      setResidentialHomeSquareFeet("");
+      setLightCommercialOfficeSquareFeet("");
+      setSelectBedRoomsValue("");
+      setSelectBathRoomsValue("");
+      setLightCommercialSelectedOfficeValue("");
+      setLightCommercialSelectedOfficeBathRoomsValue("");
+      setFormSubmit(false);
+    } catch (err) {
+      console.error(err);
+      const errMsg =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        "Something went wrong. Please try again.";
+      setSubmitError(errMsg);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -1007,43 +826,36 @@ export default function Main() {
                           className={styles.select}
                         >
                           <>{selectBedRoomsValue === "" && <p>Select</p>}</>
-
                           <>
                             {selectBedRoomsValue === "None" && (
                               <p>{selectBedRoomsValue}</p>
                             )}
                           </>
-
                           <>
                             {selectBedRoomsValue === 1 && (
                               <p>{selectBedRoomsValue}</p>
                             )}
                           </>
-
                           <>
                             {selectBedRoomsValue === 2 && (
                               <p>{selectBedRoomsValue}</p>
                             )}
                           </>
-
                           <>
                             {selectBedRoomsValue === 3 && (
                               <p>{selectBedRoomsValue}</p>
                             )}
                           </>
-
                           <>
                             {selectBedRoomsValue === 4 && (
                               <p>{selectBedRoomsValue}</p>
                             )}
                           </>
-
                           <>
                             {selectBedRoomsValue === 5 && (
                               <p>{selectBedRoomsValue}</p>
                             )}
                           </>
-
                           {selectBedRooms ? <p>&uarr;</p> : <p> &darr;</p>}
                         </div>
 
@@ -1056,21 +868,18 @@ export default function Main() {
                               >
                                 None
                               </p>
-
                               <p
                                 onClick={handleSelectedBedRoomsValue1}
                                 value={selectBedRoomsValue}
                               >
                                 1
                               </p>
-
                               <p
                                 onClick={handleSelectedBedRoomsValue2}
                                 value={selectBedRoomsValue}
                               >
                                 2
                               </p>
-
                               <p
                                 onClick={handleSelectedBedRoomsValue3}
                                 value={selectBedRoomsValue}
@@ -1099,15 +908,6 @@ export default function Main() {
                       )}
                     </div>
 
-                    {/* BATHROOM */}
-                    {/* BATHROOM */}
-                    {/* BATHROOM */}
-                    {/* BATHROOM */}
-                    {/* BATHROOM */}
-                    {/* BATHROOM */}
-                    {/* BATHROOM */}
-                    {/* BATHROOM */}
-
                     <div className={styles.bathroomsDiv}>
                       <div className={styles.name}>
                         <h4>Bathrooms*</h4>
@@ -1119,39 +919,32 @@ export default function Main() {
                           className={styles.select}
                         >
                           <>{selectBathRoomsValue === "" && <p>Select</p>}</>
-
                           <>{selectBathRoomsValue === "none" && <p>None</p>}</>
-
                           <>
                             {selectBathRoomsValue === 1 && (
                               <p>{selectBathRoomsValue}</p>
                             )}
                           </>
-
                           <>
                             {selectBathRoomsValue === 2 && (
                               <p>{selectBathRoomsValue}</p>
                             )}
                           </>
-
                           <>
                             {selectBathRoomsValue === 3 && (
                               <p>{selectBathRoomsValue}</p>
                             )}
                           </>
-
                           <>
                             {selectBathRoomsValue === 4 && (
                               <p>{selectBathRoomsValue}</p>
                             )}
                           </>
-
                           <>
                             {selectBathRoomsValue === 5 && (
                               <p>{selectBathRoomsValue}</p>
                             )}
                           </>
-
                           {selectBathRooms ? <p>&uarr;</p> : <p> &darr;</p>}
                         </div>
 
@@ -1170,21 +963,18 @@ export default function Main() {
                               >
                                 None
                               </p>
-
                               <p
                                 onClick={handleSelectedBathRoomsValue1}
                                 value={selectBathRoomsValue}
                               >
                                 1
                               </p>
-
                               <p
                                 onClick={handleSelectedBathRoomsValue2}
                                 value={selectBathRoomsValue}
                               >
                                 2
                               </p>
-
                               <p
                                 onClick={handleSelectedBathRoomsValue3}
                                 value={selectBathRoomsValue}
@@ -1237,15 +1027,6 @@ export default function Main() {
                     )}
                   </div>
 
-                  {/*LIGHT COMMERCIAL  OFFICES */}
-                  {/*LIGHT COMMERCIAL  OFFICES */}
-                  {/*LIGHT COMMERCIAL  OFFICES */}
-                  {/*LIGHT COMMERCIAL  OFFICES */}
-                  {/*LIGHT COMMERCIAL  OFFICES */}
-                  {/*LIGHT COMMERCIAL  OFFICES */}
-                  {/*LIGHT COMMERCIAL  OFFICES */}
-                  {/*LIGHT COMMERCIAL OFFICES */}
-
                   <div className={styles.bedroomsDivMain}>
                     <div className={styles.bedroomsDiv}>
                       <div className={styles.name}>
@@ -1262,43 +1043,36 @@ export default function Main() {
                               <p>Select</p>
                             )}
                           </>
-
                           <>
                             {lightCommercialSelectedOfficeValue === "none" && (
                               <p>None</p>
                             )}
                           </>
-
                           <>
                             {lightCommercialSelectedOfficeValue === 1 && (
                               <p>{lightCommercialSelectedOfficeValue}</p>
                             )}
                           </>
-
                           <>
                             {lightCommercialSelectedOfficeValue === 2 && (
                               <p>{lightCommercialSelectedOfficeValue}</p>
                             )}
                           </>
-
                           <>
                             {lightCommercialSelectedOfficeValue === 3 && (
                               <p>{lightCommercialSelectedOfficeValue}</p>
                             )}
                           </>
-
                           <>
                             {lightCommercialSelectedOfficeValue === 4 && (
                               <p>{lightCommercialSelectedOfficeValue}</p>
                             )}
                           </>
-
                           <>
                             {lightCommercialSelectedOfficeValue === 5 && (
                               <p>{lightCommercialSelectedOfficeValue}</p>
                             )}
                           </>
-
                           {selectedOffice ? <p>&uarr;</p> : <p> &darr;</p>}
                         </div>
 
@@ -1317,21 +1091,18 @@ export default function Main() {
                               >
                                 None
                               </p>
-
                               <p
                                 onClick={lightCommercialSelectedOfficeValue1}
                                 value={lightCommercialSelectedOfficeValue}
                               >
                                 1
                               </p>
-
                               <p
                                 onClick={lightCommercialSelectedOfficeValue2}
                                 value={lightCommercialSelectedOfficeValue}
                               >
                                 2
                               </p>
-
                               <p
                                 onClick={lightCommercialSelectedOfficeValue3}
                                 value={lightCommercialSelectedOfficeValue}
@@ -1356,15 +1127,6 @@ export default function Main() {
                       </div>
                     </div>
 
-                    {/*LIGHT COMMERCIAL  BATHROOM */}
-                    {/*LIGHT COMMERCIAL  BATHROOM */}
-                    {/*LIGHT COMMERCIAL  BATHROOM */}
-                    {/*LIGHT COMMERCIAL  BATHROOM */}
-                    {/*LIGHT COMMERCIAL  BATHROOM */}
-                    {/*LIGHT COMMERCIAL  BATHROOM */}
-                    {/*LIGHT COMMERCIAL  BATHROOM */}
-                    {/*LIGHT COMMERCIAL BATHROOM */}
-
                     <div className={styles.bathroomsDiv}>
                       <div className={styles.name}>
                         <h4>Bathrooms*</h4>
@@ -1379,7 +1141,6 @@ export default function Main() {
                             {lightCommercialSelectedOfficeBathRoomsValue ===
                               "" && <p>Select</p>}
                           </>
-
                           <>
                             {lightCommercialSelectedOfficeBathRoomsValue ===
                               "None" && (
@@ -1388,7 +1149,6 @@ export default function Main() {
                               </p>
                             )}
                           </>
-
                           <>
                             {lightCommercialSelectedOfficeBathRoomsValue ===
                               1 && (
@@ -1397,7 +1157,6 @@ export default function Main() {
                               </p>
                             )}
                           </>
-
                           <>
                             {lightCommercialSelectedOfficeBathRoomsValue ===
                               2 && (
@@ -1406,7 +1165,6 @@ export default function Main() {
                               </p>
                             )}
                           </>
-
                           <>
                             {lightCommercialSelectedOfficeBathRoomsValue ===
                               3 && (
@@ -1415,7 +1173,6 @@ export default function Main() {
                               </p>
                             )}
                           </>
-
                           <>
                             {lightCommercialSelectedOfficeBathRoomsValue ===
                               4 && (
@@ -1424,7 +1181,6 @@ export default function Main() {
                               </p>
                             )}
                           </>
-
                           <>
                             {lightCommercialSelectedOfficeBathRoomsValue ===
                               5 && (
@@ -1433,7 +1189,6 @@ export default function Main() {
                               </p>
                             )}
                           </>
-
                           {selectedOfficeBathRooms ? (
                             <p>&uarr;</p>
                           ) : (
@@ -1460,7 +1215,6 @@ export default function Main() {
                               >
                                 None
                               </p>
-
                               <p
                                 onClick={
                                   handlelightCommercialSelectedOfficeBathRoomsValue1
@@ -1471,7 +1225,6 @@ export default function Main() {
                               >
                                 1
                               </p>
-
                               <p
                                 onClick={
                                   handlelightCommercialSelectedOfficeBathRoomsValue2
@@ -1482,7 +1235,6 @@ export default function Main() {
                               >
                                 2
                               </p>
-
                               <p
                                 onClick={
                                   handlelightCommercialSelectedOfficeBathRoomsValue3
@@ -1573,7 +1325,7 @@ export default function Main() {
                             onClick={handleOtherWeek}
                             value={lightCommercialRecurring}
                             className={
-                              lightCommercialRecurring === "everyOtherWeek"
+                              lightCommercialRecurring === "every Other Week"
                                 ? styles.radio2
                                 : styles.radio
                             }
@@ -1587,7 +1339,7 @@ export default function Main() {
                             onClick={handle4Weeks}
                             value={lightCommercialRecurring}
                             className={
-                              lightCommercialRecurring === "onceIn4Weeks"
+                              lightCommercialRecurring === "once In 4 Weeks"
                                 ? styles.radio2
                                 : styles.radio
                             }
@@ -1652,18 +1404,20 @@ export default function Main() {
           </div>
 
           <form onClick={handleSubmitForm} className={styles.submitButton}>
-            {!isOpenCheck ? (
+            {loading ? (
+              <h4>Submitting...</h4>
+            ) : !isOpenCheck ? (
               <h4>Submit and Continue</h4>
             ) : (
               <h4>Form Submitted</h4>
             )}
-
             <p>&rarr;</p>
           </form>
 
           {formSubmit && (
             <p className={styles.error}>Please fill out the indicated parts</p>
           )}
+          <Modal message={submitError} onClose={() => setSubmitError("")} />
 
           <div>
             <p className={styles.term}>
@@ -1686,37 +1440,31 @@ export default function Main() {
 
           <div className={styles.checkMarkFooterDiv}>
             <p className={styles.checkMarkFooter}>&#10004;</p>
-
             <p>Dust baseboards, light fixtures, furniture, sills</p>
           </div>
 
           <div className={styles.checkMarkFooterDiv}>
             <p className={styles.checkMarkFooter}>&#10004;</p>
-
             <p>Vacuum/Mop all floors, carpets, and stairs</p>
           </div>
 
           <div className={styles.checkMarkFooterDiv}>
             <p className={styles.checkMarkFooter}>&#10004;</p>
-
             <p>Clean showers, tubs, toilets, and sinks</p>
           </div>
 
           <div className={styles.checkMarkFooterDiv}>
             <p className={styles.checkMarkFooter}>&#10004;</p>
-
             <p>Clean mirrors, glass, counters, and tile</p>
           </div>
 
           <div className={styles.checkMarkFooterDiv}>
             <p className={styles.checkMarkFooter}>&#10004;</p>
-
             <p>Dust all furniture and furnishings</p>
           </div>
 
           <div className={styles.checkMarkFooterDiv}>
             <p className={styles.checkMarkFooter}>&#10004;</p>
-
             <p>And much more!</p>
           </div>
         </div>
