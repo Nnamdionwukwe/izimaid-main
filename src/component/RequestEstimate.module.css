@@ -81,6 +81,7 @@
     cursor: pointer;
     text-decoration: none;
     color: white;
+    margin-top: -15px;
   }
 
   .sub2 i {
