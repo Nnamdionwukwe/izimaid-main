@@ -31,12 +31,6 @@ export default function OtherFooter() {
         independently owned and operated. Services may vary by location. Please
         contact the franchise location for additional information.
       </p>
-
-      <div className={styles.wrap}>
-        <span className={styles.brand}>
-          Powered by <span className={styles.ges}>GES</span>tech
-        </span>
-      </div>
     </div>
   );
 }

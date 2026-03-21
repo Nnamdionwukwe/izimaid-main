@@ -1,0 +1,24 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap");
+
+/* GESTech.module.css */
+
+.wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.brand {
+  font-family: "Orbitron", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: rgba(7, 51, 63, 0.6);
+  text-transform: uppercase;
+}
+
+.ges {
+  color: #00c8ff;
+}

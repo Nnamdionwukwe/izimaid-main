@@ -22,6 +22,7 @@ import IziMaidHelpFull from "./IziMaidHelpFull";
 import Customers from "./Customers";
 import IziBestLogo from "./IziBestLogo";
 import Footer from "./Footer";
+import OtherFooter from "./OtherFooter";
 
 export default function HomePage() {
   return (
@@ -86,6 +87,7 @@ export default function HomePage() {
 
         <IziBestLogo />
         <Footer />
+        <OtherFooter />
       </div>
     </>
   );
