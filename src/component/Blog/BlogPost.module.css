@@ -1,0 +1,425 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+@media screen and (min-width: 20px) {
+  .page {
+    font-family: "DM Sans", Arial, sans-serif;
+    background: #faf9f6;
+    overflow-x: hidden;
+    margin-top: 20px;
+  }
+
+  /* ── Article hero ────────────────────────────────────────────────── */
+  .hero {
+    background: rgb(32, 32, 65);
+    padding: 32px 20px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(187, 19, 47, 0.14);
+  }
+  .backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: background 0.15s;
+  }
+  .backLink:hover {
+    background: rgba(255, 255, 255, 0.16);
+    color: white;
+  }
+
+  .heroBadges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .catBadge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .tagBadge {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  .readTime {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .heroIcon {
+    font-size: 44px;
+    margin-bottom: 14px;
+  }
+  .heroTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    line-height: 1.25;
+  }
+  .heroDivider {
+    width: 40px;
+    height: 3px;
+    background: rgb(187, 19, 47);
+    margin: 20px 0 0;
+    border-radius: 2px;
+  }
+
+  /* ── Article body ────────────────────────────────────────────────── */
+  .article {
+    padding: 36px 20px;
+    max-width: 720px;
+  }
+
+  .intro {
+    font-size: 16px;
+    color: rgb(50, 48, 48);
+    line-height: 1.8;
+    margin: 0 0 32px;
+    border-left: 4px solid rgb(187, 19, 47);
+    padding-left: 16px;
+    font-style: italic;
+  }
+
+  .section {
+    margin-bottom: 28px;
+  }
+  .sectionHeading {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 10px;
+    line-height: 1.3;
+  }
+  .sectionBody {
+    font-size: 15px;
+    color: rgb(70, 68, 68);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* ── Tips callout ────────────────────────────────────────────────── */
+  .tipsBox {
+    background: rgb(240, 240, 255);
+    border: 1.5px solid rgb(200, 200, 240);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 32px 0;
+  }
+  .tipsLabel {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgb(32, 32, 65);
+    margin: 0 0 12px;
+  }
+  .tipsList {
+    margin: 0;
+    padding: 0 0 0 18px;
+  }
+  .tipItem {
+    font-size: 14px;
+    color: rgb(50, 48, 48);
+    line-height: 1.7;
+    margin-bottom: 6px;
+  }
+  .tipItem:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ── Inline CTA ──────────────────────────────────────────────────── */
+  .inlineCta {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: rgb(32, 32, 65);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 32px;
+  }
+  .inlineCtaTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 4px;
+  }
+  .inlineCtaText {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    line-height: 1.5;
+  }
+  .inlineCtaBtn {
+    height: 42px;
+    padding: 0 20px;
+    background: rgb(187, 19, 47);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    align-self: flex-start;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .inlineCtaBtn:hover {
+    background: rgb(150, 15, 37);
+  }
+
+  /* ── Related articles ────────────────────────────────────────────── */
+  .related {
+    padding: 0 20px 44px;
+  }
+  .relatedEyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(187, 19, 47);
+    margin: 0 0 16px;
+  }
+  .relatedGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .relatedCard {
+    background: white;
+    border: 1px solid rgb(235, 232, 225);
+    border-radius: 12px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition:
+      box-shadow 0.2s,
+      border-color 0.15s,
+      transform 0.15s;
+  }
+  .relatedCard:hover {
+    box-shadow: 0 6px 18px rgba(32, 32, 65, 0.1);
+    border-color: rgb(32, 32, 65);
+    transform: translateY(-1px);
+  }
+  .relatedCardTop {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .relatedIcon {
+    font-size: 22px;
+  }
+  .relatedTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 5px;
+    line-height: 1.4;
+  }
+  .relatedExcerpt {
+    font-size: 12px;
+    color: rgb(100, 98, 98);
+    line-height: 1.6;
+    margin: 0 0 8px;
+  }
+  .relatedRead {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgb(187, 19, 47);
+    margin: 0;
+  }
+
+  /* ── Not found ───────────────────────────────────────────────────── */
+  .notFound {
+    text-align: center;
+    padding: 80px 20px;
+  }
+  .notFoundIcon {
+    font-size: 52px;
+    margin-bottom: 16px;
+  }
+  .notFoundTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0 0 8px;
+  }
+  .notFoundSub {
+    font-size: 14px;
+    color: gray;
+    margin: 0 0 24px;
+  }
+  .backBtn {
+    height: 44px;
+    padding: 0 24px;
+    background: rgb(32, 32, 65);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .backBtn:hover {
+    background: rgb(20, 20, 50);
+  }
+
+  /* ── CTA ─────────────────────────────────────────────────────────── */
+  .cta {
+    background: rgb(187, 19, 47);
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .ctaTitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 10px;
+  }
+  .ctaText {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+  .ctaButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .ctaPrimary {
+    height: 48px;
+    padding: 0 28px;
+    background: white;
+    color: rgb(187, 19, 47);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .ctaPrimary:hover {
+    background: rgb(245, 245, 245);
+  }
+  .ctaSecondary {
+    height: 48px;
+    padding: 0 28px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    max-width: 260px;
+  }
+  .ctaSecondary:hover {
+    border-color: white;
+  }
+}
+
+/* ── Tablet (576px+) ─────────────────────────────────────────────────── */
+@media screen and (min-width: 576px) {
+  .heroTitle {
+    font-size: 34px;
+  }
+  .ctaButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .relatedGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .inlineCta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+/* ── Tablet large (768px+) ───────────────────────────────────────────── */
+@media screen and (min-width: 768px) {
+  .hero {
+    padding: 36px 40px 50px;
+  }
+  .article {
+    padding: 40px 40px;
+  }
+  .related {
+    padding: 0 40px 44px;
+  }
+  .cta {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+/* ── Desktop (992px+) ────────────────────────────────────────────────── */
+@media screen and (min-width: 992px) {
+  .hero {
+    padding: 44px 80px 60px;
+  }
+  .heroTitle {
+    font-size: 40px;
+  }
+  .article {
+    padding: 48px 80px;
+    max-width: 800px;
+  }
+  .related {
+    padding: 0 80px 60px;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .relatedGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .cta {
+    padding: 60px 80px;
+  }
+}

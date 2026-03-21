@@ -388,6 +388,8 @@ const CATEGORY_COLORS = {
   "How-To": { bg: "rgb(220, 240, 255)", color: "rgb(20, 80, 140)" },
 };
 
+export { POSTS, CATEGORY_COLORS };
+
 export default function Blog() {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("All");
@@ -423,7 +425,7 @@ export default function Blog() {
         <h1 className={styles.heroTitle}>
           Guides, graphics
           <br />
-          <em>& cleaning tips.</em>
+          <em>&amp; cleaning tips.</em>
         </h1>
         <p className={styles.heroDesc}>
           Practical cleaning guides, printable checklists, visual infographics,
