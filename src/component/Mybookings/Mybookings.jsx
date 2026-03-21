@@ -277,7 +277,7 @@ export default function MyBookings() {
                     className={styles.chatBtn}
                     onClick={(e) => handleOpenChat(e, b)}
                   >
-                    💬 Live Chat
+                    💬 Chat Maid
                   </button>
                 )}
                 {!isMaid && (
