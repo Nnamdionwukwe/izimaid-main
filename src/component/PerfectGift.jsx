@@ -31,10 +31,7 @@ export default function PerfectGift() {
           <h4>&rarr;</h4>
         </div>
 
-        <div
-          onClick={() => navigate("/guild-and-graphics")}
-          className={styles.mainDiv2}
-        >
+        <div onClick={() => navigate("/blog")} className={styles.mainDiv2}>
           <div className={styles.home}>
             <i class="fa-solid fa-spray-can"></i>
           </div>
@@ -120,7 +117,7 @@ export default function PerfectGift() {
                 Get expert advice from our team of cleaning specialists.
               </p>
               <div
-                onClick={() => navigate("/gruild-and-graphics")}
+                onClick={() => navigate("/blog")}
                 className={styles.learnMore}
               >
                 <p className={styles.p}>Learn More</p>
