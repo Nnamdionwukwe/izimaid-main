@@ -22,7 +22,7 @@ export default function RequestEstimate() {
         <MainFull />
       </div>
 
-      <OtherFooter />
+      {/* <OtherFooter /> */}
     </div>
   );
 }
