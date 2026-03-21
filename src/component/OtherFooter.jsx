@@ -3,6 +3,7 @@ import styles from "./Footer.module.css";
 
 export default function OtherFooter() {
   const navigate = useNavigate();
+  const currentYear = new Date().getFullYear();
 
   return (
     <div>
@@ -23,13 +24,12 @@ export default function OtherFooter() {
       </div>
 
       <p className={styles.border4}>
-        © <span>{new Date().getFullYear()}</span> Deusizi Sparkle Company and
-        its affiliates. All rights reserved. Deusizi Sparkle is a registered
-        trademark of Deusizi Sparkle SPV LLC. This site and all of its content
-        is protected under applicable law, including laws of the U.S. and other
-        countries. Each location is independently owned and operated. Services
-        may vary by location. Please contact the franchise location for
-        additional information.
+        © {currentYear} Deusizi Sparkle Company and its affiliates. All rights
+        reserved. Deusizi Sparkle is a registered trademark of Deusizi Sparkle
+        SPV LLC. This site and all of its content is protected under applicable
+        law, including laws of the U.S. and other countries. Each location is
+        independently owned and operated. Services may vary by location. Please
+        contact the franchise location for additional information.
       </p>
     </div>
   );
