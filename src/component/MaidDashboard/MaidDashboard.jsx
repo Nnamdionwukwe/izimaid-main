@@ -1059,7 +1059,7 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                       onOpenChat(b);
                     }}
                   >
-                    💬 Live Chat
+                    💬 Chat Customer
                   </button>
                 )}
                 <button
