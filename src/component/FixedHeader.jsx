@@ -1,9 +1,11 @@
 import { useState } from "react";
 import styles from "./FixedHeader.module.css";
 import SideBar from "./SideBar";
+import { useNavigate } from "react-router-dom";
 
 export default function FixedHeader() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -15,9 +17,9 @@ export default function FixedHeader() {
         </div>
 
         <div className={styles.header}>
-          <a href="https://deusizisparkle.com">
+          <div onClick={() => navigate("/")}>
             <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
-          </a>
+          </div>
 
           <div className={styles.hamburger}>
             <i

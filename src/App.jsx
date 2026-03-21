@@ -67,17 +67,17 @@ import Blog from "./component/Blog/Blog.jsx";
 import Seasonal from "./component/Blog/Seasonal.jsx";
 import TipsAndTricks from "./component/Blog/TipsAndTricks.jsx";
 import BlogPost from "./component/Blog/BlogPost.jsx";
-import OtherFooter from "./component/OtherFooter.jsx";
+import FixedHeader from "./component/FixedHeader.jsx";
 
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthProvider>
         <BrowserRouter>
+          <FixedHeader />
           {/* Floating support chat — only renders for logged-in customers */}
           <FloatingSupportChat />
           <AppRoutes />
-          <OtherFooter />
         </BrowserRouter>
       </AuthProvider>
     </GoogleOAuthProvider>
