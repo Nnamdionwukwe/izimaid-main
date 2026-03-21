@@ -345,9 +345,9 @@ export default function IziBestCleaningCar() {
                 {/* Use My Location shortcut */}
 
                 <div className={styles.Submain}>
-                  <div href="tel:+2348030588774" className={styles.Submain3}>
+                  <a href="tel:+2348030588774" className={styles.Submain3}>
                     <h2>Call us at +2348030588774</h2>
-                  </div>
+                  </a>
                 </div>
               </div>
             </div>
