@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./WhyChooseUs.module.css";
 
 export default function JoinOurTeamFull() {
+  const navigate = useNavigate();
+
   return (
     <div className={styles.main1}>
       <div className={styles.main2}>
@@ -27,8 +30,11 @@ export default function JoinOurTeamFull() {
             growth and success!
           </p>
 
-          <div className={styles.view}>
-            <h4>View All Open Positions</h4>
+          <div
+            onClick={() => navigate("/apply-locally")}
+            className={styles.view}
+          >
+            <h4>Apply Now</h4>
             <h2>&rarr;</h2>
           </div>
         </div>
