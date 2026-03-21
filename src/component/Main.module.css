@@ -60,6 +60,7 @@
   .name {
     margin-bottom: -15px;
   }
+
   .type {
     margin-bottom: -20px;
     color: rgb(47, 47, 47);
@@ -175,6 +176,7 @@
   .bedroomsDiv {
     width: 50%;
   }
+
   .bathroomsDiv {
     width: 50%;
   }
@@ -280,6 +282,7 @@
   .submitButton:hover {
     background: rgb(15, 15, 70);
   }
+
   .submitButton:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -298,67 +301,160 @@
     font-weight: bold;
     margin-top: 5px;
   }
+
+  /* ── Stacked form rows on mobile ─────────────────────────────────── */
+  .nameFlex {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .nameFlexSub {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .addressFull {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .addressFullDivSub {
+    width: 100%;
+  }
+
+  .mainDivSub {
+    width: 100%;
+  }
+
+  .mainDivMain {
+    padding: 0;
+  }
 }
 
+/* ── Tablet (577px+) ─────────────────────────────────────────────────────── */
 @media screen and (min-width: 577px) {
   .mainDiv {
     margin: 50px 10px 0 10px;
   }
+
   .checkMarkMain {
     margin: 0 60px;
   }
+
+  /* 2-col for name row */
+  .nameFlex {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .nameFlexSub {
+    display: contents;
+  }
+
+  /* 2-col for address row */
+  .addressFull {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
 }
 
+/* ── Desktop (992px+) ────────────────────────────────────────────────────── */
 @media screen and (min-width: 992px) {
+  .mainDivMain {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
   .mainDiv {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: flex-start;
     gap: 40px;
     margin: 10px;
+    padding: 30px;
+  }
+
+  .mainDivSub {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .checkMarkMain {
+    margin: 0 60px;
+  }
+
+  /* inputs fill their container */
+  .inputField {
+    width: 100%;
+    max-width: 100%;
   }
 
   .submitButton {
-    width: 200px;
+    width: 220px;
     justify-content: flex-start;
     padding-left: 25px;
   }
 
+  /* side panel — flexible, not fixed */
   .fullMain {
-    height: 470px;
-    width: 400px;
+    flex-shrink: 0;
+    width: 340px;
+    min-height: 400px;
     font-size: 14px;
     font-weight: bold;
     color: rgb(69, 68, 68);
     margin-top: 50px;
+    margin-bottom: 30px;
   }
 
   .image {
-    height: 60px;
-  }
-
-  .inputField {
-    width: 310px;
-    max-width: 100%;
+    height: 120px;
   }
 }
 
-@media screen and (min-width: 1112px) {
+/* ── Large desktop (1200px+) ─────────────────────────────────────────────── */
+@media screen and (min-width: 1200px) {
+  .mainDivMain {
+    max-width: 1400px;
+  }
+
   .mainDiv {
-    justify-content: center;
-    margin: 40px 10px 0 10px;
-    padding: 25px;
+    gap: 60px;
+    padding: 40px;
+    margin: 20px auto;
     box-shadow: 1px 2px 3px 4px rgb(225, 224, 224);
     border-radius: 5px;
   }
 
-  .fullMain {
-    height: 400px;
-    width: 430px;
-    font-size: 13px;
-    margin-top: 50px;
+  .checkMarkMain {
+    margin: 20px auto;
+    max-width: 1400px;
+    padding: 0 40px;
   }
 
-  .checkMarkMain {
-    margin: 20px 190px;
+  .fullMain {
+    width: 400px;
+    font-size: 13px;
+  }
+
+  .image {
+    height: 140px;
+  }
+}
+
+/* ── Extra large (1440px+) ───────────────────────────────────────────────── */
+@media screen and (min-width: 1440px) {
+  .mainDivMain {
+    max-width: 1600px;
+  }
+
+  .fullMain {
+    width: 460px;
   }
 }
