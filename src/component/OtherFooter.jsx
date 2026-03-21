@@ -33,23 +33,9 @@ export default function OtherFooter() {
       </p>
 
       <div className={styles.wrap}>
-        <div className={styles.gridBg}></div>
-        <div className={styles.card}>
-          <div className={`${styles.corner} ${styles.tl}`}></div>
-          <div className={`${styles.corner} ${styles.tr}`}></div>
-          <div className={`${styles.corner} ${styles.bl}`}></div>
-          <div className={`${styles.corner} ${styles.br}`}></div>
-          <div className={styles.labelTop}>System</div>
-          <div className={styles.brand}>
-            Powered by <span>GES</span>tech
-          </div>
-          <div className={styles.divider}></div>
-          <div className={styles.labelBot}>
-            <span className={styles.dot}></span>
-            <span className={styles.dot}></span>
-            <span className={styles.dot}></span>
-          </div>
-        </div>
+        <span className={styles.brand}>
+          Powered by <span className={styles.ges}>GES</span>tech
+        </span>
       </div>
     </div>
   );
