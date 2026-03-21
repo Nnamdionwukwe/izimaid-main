@@ -90,7 +90,7 @@ export default function Reviews() {
           <div className={styles.logoDiv2}>
             <h3>
               The Deusizi Sparkle Done Right Promise? delivered by Deusizi
-              Interior, a proud Deusizi company.
+              Sparkle, a proud Deusizi Group of Companies.
             </h3>
           </div>
 

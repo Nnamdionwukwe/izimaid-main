@@ -128,3 +128,155 @@
     margin-bottom: -10px;
   }
 }
+
+/* ── Original card styles — unchanged ───────────────────────────────────── */
+/* (keep whatever you already have in this file — paste your existing styles here) */
+
+/* Use my location shortcut row */
+.useLocation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(187, 19, 47);
+}
+.useLocation i {
+  font-size: 14px;
+}
+.useLocation:hover span {
+  text-decoration: underline;
+}
+
+/* ── Modal overlay ───────────────────────────────────────────────────────── */
+.modalOverlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  background: rgba(35, 33, 33, 0.98);
+  z-index: 500;
+}
+
+.modalBox {
+  background: white;
+  height: 23em;
+  width: 29em;
+  z-index: 600;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.modalInner {
+  position: relative;
+  padding: 0 16px;
+}
+
+.modalClose {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin-right: 15px;
+  cursor: pointer;
+}
+.modalClose h4 {
+  border: 2px solid rgb(6, 6, 60);
+  border-radius: 100%;
+  padding: 1px 6.5px 0.5px 6.5px;
+  background: white;
+}
+
+.modalLogoDiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 50px;
+}
+.modalLogo {
+  width: 100px;
+  object-fit: cover;
+}
+
+.modalLocated {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgb(6, 6, 60);
+  margin-top: -25px;
+}
+
+.modalZipRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 45px;
+  flex: 1;
+  border: 1px solid rgb(216, 213, 213);
+  margin: 0 15px;
+  padding: 0 10px;
+  background: rgb(242, 242, 242);
+  border-radius: 7px;
+}
+.modalZipRow input {
+  flex: 1;
+  background: rgb(242, 242, 242);
+  border: none;
+  outline: none;
+}
+
+.modalClear {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.modalUseLocation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgb(6, 6, 60);
+  height: 30px;
+  color: white;
+  cursor: pointer;
+  padding: 0 10px;
+  border-radius: 7px;
+}
+
+.modalError {
+  color: rgb(233, 42, 42);
+  margin-top: 8px;
+  margin-left: 15px;
+}
+
+.modalFindBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 45px;
+  border: 1px solid rgb(216, 213, 213);
+  margin: 20px 15px 0;
+  padding: 0 10px;
+  background: rgb(6, 6, 60);
+  color: white;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.modalFindBtn:hover {
+  background: rgb(4, 4, 36);
+}
+
+.modalField {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+}
+
+/* ── Desktop modal (≥ 992px) ─────────────────────────────────────────────── */
+@media screen and (min-width: 992px) {
+  .modalBox {
+    height: 27em;
+    width: 38em;
+  }
+}
