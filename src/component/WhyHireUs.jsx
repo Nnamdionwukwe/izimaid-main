@@ -1,38 +1,41 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./Residential.module.css";
 
+const ITEMS = [
+  { icon: "fa-th-large", label: "Our Approach", path: "/our-approach" },
+  { icon: "fa-th-large", label: "Our Results", path: "/our-results" },
+  { icon: "fa-th-large", label: "Our Commitment", path: "/our-commitment" },
+  // { icon: "fa-th-large", label: "Affordable Cleaning", path: "/home-cleaning" },
+  // { icon: "fa-th-large", label: "Reviews", path: "/our-results" },
+  // {
+  //   icon: "fa-th-large",
+  //   label: "Neighborly Done Right Promise",
+  //   path: "/our-commitment",
+  // },
+];
+
 export default function WhyHireUs() {
+  const navigate = useNavigate();
+
   return (
-    <>
-      <div className={styles.residentialMain3}>
-        <div className={styles.residentialDIv3}>
-          <div className={styles.hoverMainDiv1}>
-            <p className={styles.approch}>Our Approach</p>
-          </div>
-
-          <div className={styles.hoverMainDiv2}>
-            <p className={styles.approch}>Our Results</p>
-          </div>
-
-          <div className={styles.hoverMainDiv3}>
-            <p className={styles.approch}>Our Commitment</p>
-          </div>
-
-          <div className={styles.hoverMainDiv10}>
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p>Affordable Cleaning</p>
-          </div>
-
-          <div className={styles.hoverMainDiv11}>
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p>Reviews</p>
-          </div>
-
-          <div className={styles.hoverMainDiv12}>
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p className={styles.para6}>Neighborly Done Right Promise</p>
-          </div>
-        </div>
+    <div className={styles.panel}>
+      <div className={styles.panelHeader}>
+        <span className={styles.panelTitle}>Why Hire Us</span>
       </div>
-    </>
+      <div className={styles.grid}>
+        {ITEMS.map(({ icon, label, path }) => (
+          <div
+            key={label}
+            className={styles.item}
+            onClick={() => navigate(path)}
+          >
+            <div className={styles.iconWrap}>
+              <i className={`fa ${icon}`} aria-hidden="true" />
+            </div>
+            <span className={styles.label}>{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

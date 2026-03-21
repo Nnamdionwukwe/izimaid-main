@@ -1,56 +1,72 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./Residential.module.css";
 
+const ITEMS = [
+  {
+    icon: "fa fa-th-large",
+    label: "Recurring Cleaning",
+    path: "/recurring-cleaning",
+  },
+  {
+    icon: "fa fa-th-large",
+    label: "One Time Cleaning",
+    path: "/one-time-cleaning",
+  },
+  {
+    icon: "ffa fa-th-large",
+    label: "Move-In Cleaning",
+    path: "/move-in-cleaning",
+  },
+  {
+    icon: "fa fa-th-large",
+    label: "Eco Friendly Cleaning",
+    path: "/eco-friendly-cleaning",
+  },
+  {
+    icon: "fa fa-th-large",
+    label: "Apartment & Condo Cleaning",
+    path: "/apartment-cleaning",
+  },
+  {
+    icon: "fa fa-th-large",
+    label: "Occasional Cleaning",
+    path: "/occasional-cleaning",
+  },
+  {
+    icon: "fa fa-th-large",
+    label: "Move-Out Cleaning",
+    path: "/move-out-cleaning",
+  },
+  { icon: "fa fa-th-large", label: "Home Cleaning", path: "/home-cleaning" },
+  {
+    icon: "ffa fa-th-large",
+    label: "Special Event Cleaning",
+    path: "/special-event-cleaning",
+  },
+];
+
 export default function Residential() {
+  const navigate = useNavigate();
+
   return (
-    <>
-      <div className={styles.residentialMain}>
-        <div className={styles.residentialDIv}>
-          <div className={styles.hoverMainDiv1}>
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p>Recurring Cleaning</p>
-          </div>
-
-          <div className={styles.hoverMainDiv2}>
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p>One Time Cleaning</p>
-          </div>
-
-          <div className={styles.hoverMainDiv3}>
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p>Movin_in Cleaning</p>
-          </div>
-
-          <div className={styles.hoverMainDiv4}>
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p>Eco Friendly Cleaning </p>
-          </div>
-
-          <div className={styles.hoverMainDiv5}>
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p className={styles.para5}> Apartment and Condo Cleaning</p>
-          </div>
-
-          <div className={styles.hoverMainDiv6}>
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p>Occasional Cleaning</p>
-          </div>
-
-          <div className={styles.hoverMainDiv7}>
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p>Move-out Cleaning</p>
-          </div>
-
-          <div className={styles.hoverMainDiv8}>
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p>Home Cleaning</p>
-          </div>
-
-          <div className={styles.hoverMainDiv9}>
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p>Special Event Cleaning</p>
-          </div>
-        </div>
+    <div className={styles.panel}>
+      <div className={styles.panelHeader}>
+        <span className={styles.panelTitle}>Residential Services</span>
       </div>
-    </>
+      <div className={styles.grid}>
+        {ITEMS.map(({ icon, label, path }) => (
+          <div
+            key={path}
+            className={styles.item}
+            onClick={() => navigate(path)}
+          >
+            <div className={styles.iconWrap}>
+              <i className={`fa ${icon}`} aria-hidden="true" />
+            </div>
+            <span className={styles.label}>{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

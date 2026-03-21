@@ -323,16 +323,25 @@ export default function SubHeader() {
           </Link>
 
           <div className={styles.secondMain}>
-            <div className={styles.thirdPara1}>
+            <div
+              onClick={() => navigate("/gift-certificates")}
+              className={styles.thirdPara1}
+            >
               <p>Gift Certificates</p>
             </div>
-            <div className={styles.thirdPara2}>
+            <div
+              onClick={() => navigate("/apply-locally")}
+              className={styles.thirdPara2}
+            >
               <p>Apply Locally</p>
             </div>
-            <div className={styles.thirdPara2}>
+            <div
+              onClick={() => navigate("/aplicar-localmente")}
+              className={styles.thirdPara2}
+            >
               <p>Aplicar Localmente</p>
             </div>
-            <div>
+            <div onClick={() => navigate("/franchise")}>
               <p className={styles.thirdPara3}>Own a Franchise</p>
             </div>
             <div

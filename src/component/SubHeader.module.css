@@ -224,7 +224,6 @@
     font-size: 25px;
     color: rgb(187, 19, 47);
   }
-
   .thirdHeader p {
     font-size: 12px;
     font-weight: bold;
@@ -245,7 +244,6 @@
     font-size: 20px;
     opacity: 0.8;
   }
-
   .hamburger i {
     cursor: pointer;
   }
@@ -263,213 +261,8 @@
   .sub2 {
     margin-top: -5px;
   }
-
   .thirdHeader2 {
     display: none;
-  }
-}
-
-/* ── Desktop ──────────────────────────────────────────────────────────────── */
-@media screen and (min-width: 992px) {
-  .header {
-    display: none;
-  }
-
-  .localIzimaidMainDiv {
-    height: 27em;
-    width: 38em;
-  }
-
-  .zip {
-    font-size: 13px;
-  }
-
-  .thirdHeader2 {
-    display: flex;
-    align-items: center;
-    color: rgb(187, 19, 47);
-    margin-left: 20px;
-    margin-top: 20px;
-    padding-bottom: 20px;
-    cursor: pointer;
-  }
-
-  .thirdHeader2 i {
-    margin-right: 10px;
-    font-size: 25px;
-    color: rgb(187, 19, 47);
-  }
-
-  .thirdHeader2 p {
-    font-size: 12px;
-    font-weight: bold;
-  }
-
-  .thirdHeader3 {
-    display: flex;
-    align-items: center;
-    color: rgb(187, 19, 47);
-    padding: 20px;
-    cursor: pointer;
-  }
-
-  .thirdHeader3 p {
-    font-size: 12px;
-    font-weight: bold;
-  }
-
-  .thirdHeader3 p:hover {
-    text-decoration: underline;
-  }
-
-  .thirdHeader3 i {
-    margin-right: 10px;
-    font-size: 15px;
-    color: rgb(152, 26, 26);
-  }
-
-  .secondMain1 {
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid rgb(242, 238, 238);
-  }
-
-  .secondMainLogo {
-    flex: 1;
-  }
-
-  .secondMain {
-    display: flex;
-    align-items: center;
-    justify-content: right;
-    font-size: 13px;
-    font-weight: bold;
-    color: gray;
-    padding: 15px 0;
-  }
-
-  .thirdPara1 p,
-  .thirdPara2 p {
-    height: 20px;
-    margin-right: 20px;
-    padding: 0 20px;
-    cursor: pointer;
-  }
-
-  .thirdPara1 p {
-    border-left: 1px solid rgb(242, 238, 238);
-    border-right: 1px solid rgb(242, 238, 238);
-  }
-
-  .thirdPara2 p {
-    border-right: 1px solid rgb(242, 238, 238);
-  }
-
-  .thirdPara1 p:hover,
-  .thirdPara2 p:hover,
-  .thirdPara3:hover {
-    color: rgb(74, 74, 74);
-  }
-
-  .thirdPara3 {
-    cursor: pointer;
-  }
-
-  .thirdMain {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px 0 40px;
-    font-weight: bold;
-    color: rgb(61, 61, 61);
-    z-index: 100;
-  }
-
-  .sub3 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgb(187, 19, 47);
-    font-size: 16px;
-    font-weight: bold;
-    color: white;
-    width: 190px;
-    height: 70px;
-    border-radius: 10px;
-    margin-right: 20px;
-    cursor: pointer;
-    text-decoration: none;
-  }
-
-  .sub3 i {
-    margin: 0 15px;
-  }
-
-  .minsDi {
-    margin-left: -35px;
-  }
-
-  .thirdMainDiv1 {
-    padding: 22px 15px;
-  }
-  .thirdMainDiv2 {
-    width: 60px;
-    padding: 12px 50px 12px 22px;
-  }
-  .thirdMainDiv3 {
-    width: 60px;
-    padding: 12px 15px 12px 22px;
-  }
-  .thirdMainDiv4 {
-    width: 60px;
-    padding: 12px 10px 12px 22px;
-  }
-  .thirdMainDiv5 {
-    width: 60px;
-    padding: 12px 20px;
-  }
-  .thirdMainDiv6 {
-    width: 160px;
-    padding: 12px 10px 12px 20px;
-  }
-
-  .thirdMainDiv1:hover,
-  .thirdMainDiv2:hover,
-  .thirdMainDiv3:hover,
-  .thirdMainDiv4:hover,
-  .thirdMainDiv5:hover,
-  .thirdMainDiv6:hover {
-    background-color: rgb(73, 221, 73);
-    border-radius: 5px;
-    text-decoration: underline;
-    cursor: pointer;
-  }
-
-  .number {
-    font-size: 22px;
-    font-weight: bold;
-    color: green;
-    width: 157px;
-    z-index: 100;
-  }
-
-  .numberDiv {
-    text-decoration: none;
-  }
-
-  .residence {
-    position: relative;
-  }
-
-  .hoverMain {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .residence:hover .hoverMain {
-    opacity: 1;
-    transition: opacity 1s;
   }
 }
 
@@ -478,8 +271,443 @@
   .thirdHeaderMain {
     display: none;
   }
+  .thirdHeader2 {
+    display: none;
+  }
+}
+
+/* ── Desktop (992px+) ────────────────────────────────────────────────────── */
+@media screen and (min-width: 992px) {
+  .header {
+    display: none;
+  }
+  .localIzimaidMainDiv {
+    height: 27em;
+    width: 38em;
+  }
+  .zip {
+    font-size: 13px;
+  }
+
+  /* ── Top utility bar ─────────────────────────────────────────────── */
+  .secondMain1 {
+    display: flex;
+    align-items: center;
+    background: rgb(248, 248, 252);
+    border-bottom: 1px solid rgb(232, 230, 240);
+    padding: 0 40px;
+    height: 44px;
+  }
+
+  .secondMainLogo {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-right: 24px;
+  }
+
+  .logo {
+    width: 110px;
+    padding-left: 0;
+    cursor: pointer;
+  }
+
+  .secondMainLogo::after {
+    content: "";
+    display: block;
+    width: 1px;
+    height: 20px;
+    background: rgb(210, 208, 220);
+    margin-left: 24px;
+  }
+
+  .secondMain {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+    justify-content: flex-end;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgb(90, 88, 110);
+    letter-spacing: 0.01em;
+  }
+
+  .thirdPara1 p,
+  .thirdPara2 p {
+    height: auto;
+    margin: 0;
+    padding: 5px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    border: none;
+    transition:
+      background 0.15s,
+      color 0.15s;
+  }
+
+  .thirdPara1 p:hover,
+  .thirdPara2 p:hover {
+    background: rgb(237, 236, 245);
+    color: rgb(32, 32, 65);
+  }
+
+  .thirdPara3 {
+    padding: 5px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgb(90, 88, 110);
+    transition:
+      background 0.15s,
+      color 0.15s;
+  }
+
+  .thirdPara3:hover {
+    background: rgb(237, 236, 245);
+    color: rgb(32, 32, 65);
+  }
+
+  .thirdHeader3 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px 6px 10px;
+    border-radius: 20px;
+    background: rgb(187, 19, 47);
+    color: white;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .thirdHeader3:hover {
+    background: rgb(160, 14, 38);
+  }
+
+  .thirdHeader3 p {
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+  }
+
+  .thirdHeader3 p:hover {
+    text-decoration: none;
+  }
+
+  .thirdHeader3 i {
+    font-size: 13px;
+    color: white;
+    margin-right: 0;
+  }
+
+  /* ── Main nav bar ────────────────────────────────────────────────── */
+  .thirdMain {
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    height: 58px;
+    background: white;
+    border-bottom: 2px solid rgb(232, 230, 240);
+    gap: 2px;
+    position: relative;
+    z-index: 100;
+  }
+
+  .residence {
+    position: relative;
+    height: 58px;
+    display: flex;
+    align-items: center;
+  }
+
+  .thirdMainDiv1,
+  .thirdMainDiv2,
+  .thirdMainDiv3,
+  .thirdMainDiv4,
+  .thirdMainDiv5,
+  .thirdMainDiv6 {
+    display: flex;
+    align-items: center;
+    height: 58px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(40, 38, 65);
+    cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+    letter-spacing: 0.01em;
+    transition: color 0.15s;
+    width: auto;
+  }
+
+  .thirdMainDiv1::after,
+  .thirdMainDiv2::after,
+  .thirdMainDiv3::after,
+  .thirdMainDiv4::after,
+  .thirdMainDiv5::after,
+  .thirdMainDiv6::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 16px;
+    right: 16px;
+    height: 3px;
+    background: rgb(187, 19, 47);
+    border-radius: 2px 2px 0 0;
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+
+  .thirdMainDiv1:hover,
+  .thirdMainDiv2:hover,
+  .thirdMainDiv3:hover,
+  .thirdMainDiv4:hover,
+  .thirdMainDiv5:hover,
+  .thirdMainDiv6:hover {
+    color: rgb(187, 19, 47);
+    background: none;
+    text-decoration: none;
+    border-radius: 0;
+  }
+
+  .thirdMainDiv1:hover::after,
+  .thirdMainDiv2:hover::after,
+  .thirdMainDiv3:hover::after,
+  .thirdMainDiv4:hover::after,
+  .thirdMainDiv5:hover::after,
+  .thirdMainDiv6:hover::after {
+    transform: scaleX(1);
+  }
+
+  .hoverMain {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease;
+    transform: translateY(6px);
+    z-index: 500;
+    /* Never wider than viewport — prevents horizontal scroll on tablets */
+    max-width: calc(100vw - 24px);
+    filter: drop-shadow(0 8px 24px rgba(32, 32, 65, 0.14));
+  }
+
+  /* Last 3 nav items anchor panel to the right so it doesn't bleed off-screen */
+  .residence:nth-last-child(-n + 3) .hoverMain {
+    left: auto;
+    right: 0;
+  }
+
+  .residence:hover .hoverMain {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  /* ── Right side CTA + phone ──────────────────────────────────────── */
+  .SubMain {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: none;
+    padding: 0;
+    margin-top: 0;
+  }
+
+  .SubHeader3 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .sub3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgb(187, 19, 47);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    white-space: nowrap;
+    width: auto;
+    transition: background 0.15s;
+  }
+
+  .sub3:hover {
+    background: rgb(160, 14, 38);
+  }
+  .sub3 i {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .subP3 {
+    font-size: 13px;
+  }
+
+  .minsDi {
+    margin-left: 0;
+    margin-top: 2px;
+  }
+
+  .minsDi .mins {
+    font-size: 10px;
+    color: gray;
+    margin: 0;
+    padding-left: 2px;
+    margin-left: 0;
+  }
+
+  .numberDiv {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-left: 1px solid rgb(232, 230, 240);
+    padding-left: 14px;
+  }
+
+  .numberDiv::before {
+    content: "📞";
+    font-size: 14px;
+  }
+
+  .number {
+    font-size: 15px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    width: auto;
+    z-index: 100;
+    letter-spacing: 0.02em;
+  }
+
+  .numberDiv:hover .number {
+    color: rgb(187, 19, 47);
+  }
 
   .thirdHeader2 {
     display: none;
+  }
+}
+
+/* ── Large desktop (1200px+) ─────────────────────────────────────────────── */
+@media screen and (min-width: 1200px) {
+  .secondMain1 {
+    padding: 0 60px;
+  }
+
+  .thirdMain {
+    padding: 0 60px;
+    gap: 4px;
+  }
+
+  .thirdMainDiv1,
+  .thirdMainDiv2,
+  .thirdMainDiv3,
+  .thirdMainDiv4,
+  .thirdMainDiv5,
+  .thirdMainDiv6 {
+    padding: 0 18px;
+    font-size: 14px;
+  }
+
+  .thirdMainDiv1::after,
+  .thirdMainDiv2::after,
+  .thirdMainDiv3::after,
+  .thirdMainDiv4::after,
+  .thirdMainDiv5::after,
+  .thirdMainDiv6::after {
+    left: 18px;
+    right: 18px;
+  }
+
+  .sub3 {
+    height: 42px;
+    font-size: 14px;
+    padding: 0 20px;
+  }
+  .number {
+    font-size: 16px;
+  }
+  .logo {
+    width: 120px;
+  }
+}
+
+/* ── Tablet desktop edge (992px – 1100px) ────────────────────────────────── */
+@media screen and (min-width: 992px) and (max-width: 1100px) {
+  .secondMain1 {
+    padding: 0 16px;
+  }
+
+  .thirdMain {
+    padding: 0 16px;
+    gap: 0;
+  }
+
+  .thirdMainDiv1,
+  .thirdMainDiv2,
+  .thirdMainDiv3,
+  .thirdMainDiv4,
+  .thirdMainDiv5,
+  .thirdMainDiv6 {
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .thirdMainDiv1::after,
+  .thirdMainDiv2::after,
+  .thirdMainDiv3::after,
+  .thirdMainDiv4::after,
+  .thirdMainDiv5::after,
+  .thirdMainDiv6::after {
+    left: 10px;
+    right: 10px;
+  }
+
+  /* Tighter utility links */
+  .thirdPara1 p,
+  .thirdPara2 p,
+  .thirdPara3 {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  .thirdHeader3 {
+    padding: 5px 10px 5px 8px;
+    font-size: 11px;
+    margin-left: 4px;
+  }
+
+  /* Smaller CTA button */
+  .sub3 {
+    height: 36px;
+    font-size: 12px;
+    padding: 0 12px;
+  }
+
+  .number {
+    font-size: 13px;
+  }
+
+  .logo {
+    width: 95px;
   }
 }
