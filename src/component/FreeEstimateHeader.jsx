@@ -1,12 +1,15 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./RequestEstimate.module.css";
 
 export default function FreeEstimateHeader() {
+  const navigate = useNavigate();
+
   return (
     <>
       <div className={styles.SubHeader1}>
-        <a href="https://izimaid-sage.vercel.app">
+        <div onClick={() => navigate("/")}>
           <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
-        </a>
+        </div>
 
         <div className={styles.hamburger}>
           <div className={styles.number}>
