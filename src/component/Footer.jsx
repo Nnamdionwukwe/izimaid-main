@@ -298,9 +298,9 @@ export default function Footer() {
         >
           Privacy Policy
         </h4>
-        <h4 className={styles.h4}>Accessibility</h4>
+        {/* <h4 className={styles.h4}>Accessibility</h4>
         <h4 className={styles.h4}>Do Not Sell My Info</h4>
-        <h4 className={styles.h4}>Your Privacy Rights</h4>
+        <h4 className={styles.h4}>Your Privacy Rights</h4> */}
       </div>
 
       <p className={styles.border4}>
