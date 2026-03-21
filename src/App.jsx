@@ -68,6 +68,7 @@ import Seasonal from "./component/Blog/Seasonal.jsx";
 import TipsAndTricks from "./component/Blog/TipsAndTricks.jsx";
 import BlogPost from "./component/Blog/BlogPost.jsx";
 import Footer from "./component/Footer.jsx";
+import OtherFooter from "./component/OtherFooter.jsx";
 
 function App() {
   return (
@@ -77,7 +78,7 @@ function App() {
           {/* Floating support chat — only renders for logged-in customers */}
           <FloatingSupportChat />
           <AppRoutes />
-          <Footer />
+          <OtherFooter />
         </BrowserRouter>
       </AuthProvider>
     </GoogleOAuthProvider>
