@@ -1,183 +1,231 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "./OfficeCleaningTips.module.css";
+import styles from "./Kitchens.module.css";
 import FixedHeader from "../FixedHeader";
 
-const SERVICES = [
+const CATEGORIES = [
+  {
+    icon: "🖥️",
+    name: "Workstations",
+    tagline: "The highest-touch, highest-germ surface in the office",
+    tips: [
+      {
+        title: "Wipe your desk surface daily with a disinfectant cloth",
+        text: "The average office desk carries 400 times more bacteria than a toilet seat — primarily because it is touched constantly but rarely cleaned. Wipe the entire desk surface daily with a disinfectant wipe or spray, including the area under the monitor, the edges of the desk, and the desk mat. This daily habit prevents the bacterial build-up that causes illness in office environments.",
+      },
+      {
+        title: "Clean your keyboard and mouse weekly",
+        text: "Turn the keyboard upside down and tap firmly to dislodge crumbs and debris. Use compressed air between the keys. Wipe the key surfaces with an antibacterial wipe, paying attention to the most-used keys (QWERTY row, spacebar, enter). Clean the mouse entirely — including the underside sensor area and the scroll wheel — with a wipe. Keyboards and mice are the most bacteria-laden items on any desk and are cleaned by the fewest people.",
+      },
+      {
+        title: "Disinfect your phone handset and headset weekly",
+        text: "Telephone handsets and headsets are pressed against the mouth and ear repeatedly throughout the day. Spray an antibacterial solution onto a cloth (never directly onto the handset — liquid damages the electronics) and wipe the earpiece, mouthpiece, and body thoroughly. If shared between users, this should happen between each user and at the end of every day. Shared phones are one of the fastest vectors for respiratory illness in offices.",
+      },
+      {
+        title: "Clean monitor screens with a dry microfibre cloth only",
+        text: "Monitor screens should only be wiped with a dry or very slightly damp microfibre cloth — never with paper towels, which scratch the anti-glare coating, and never with glass cleaner or alcohol sprays, which permanently damage the screen surface. Wipe in smooth horizontal strokes rather than circular motions. Clean screens improve visual clarity and reduce eye strain during long working sessions.",
+      },
+      {
+        title: "Organise cables and wipe under equipment monthly",
+        text: "Cable buildup under desks and behind monitors accumulates dust that reduces airflow and causes electronics to run hot. Bundle cables with cable ties or a cable management sleeve. Once a month, move all desk equipment, vacuum the desk surface thoroughly, and wipe with a damp cloth before replacing items. Clean, organised cable runs also reduce the electromagnetic interference that degrades network signal quality.",
+      },
+    ],
+  },
+  {
+    icon: "🚽",
+    name: "Office Bathrooms",
+    tagline: "High footfall demands higher frequency",
+    tips: [
+      {
+        title: "Clean office bathrooms at minimum twice daily",
+        text: "Unlike a home bathroom used by two to four people, an office bathroom may be used by 20 or more people. The cleaning frequency must reflect this. A morning clean before staff arrive and a midday clean during or after lunch are the minimum for offices with 10 or more staff. Larger offices or those with high visitor footfall should clean three times daily. High-frequency cleaning is not optional — it is a hygiene and compliance requirement.",
+      },
+      {
+        title: "Disinfect all touch points every clean session",
+        text: "The highest-risk surfaces in an office bathroom are not the toilet — they are the door handle, door lock, tap handles, paper towel dispenser, and soap dispenser. These are touched by every user, often after toilet use and before handwashing is complete. Every cleaning session must include a targeted disinfectant wipe of all of these surfaces. Spraying a toilet and calling the bathroom clean while leaving the door handle untouched is insufficient.",
+      },
+      {
+        title: "Stock soap, paper towels, and toilet paper proactively",
+        text: "Running out of soap or paper towels in an office bathroom creates a hygiene emergency — staff who cannot wash and dry hands properly carry contamination back to their desks and communal areas. Check and restock consumables every cleaning session. Keep a minimum of two spare rolls per cubicle and one spare soap dispenser refill per sink. The cost of consumable stock is negligible compared to illness-related staff absence.",
+      },
+      {
+        title: "Clean grout and tile surfaces weekly with a specialist cleaner",
+        text: "Office bathroom tiles and grout are exposed to significantly more moisture and traffic than domestic equivalents and deteriorate faster without weekly attention. Apply a mould-inhibiting tile cleaner to grout lines weekly, scrub with a stiff brush, and rinse. This prevents the mould growth that requires professional remediation if left for months. A visibly clean bathroom also affects how clients and visitors perceive your business.",
+      },
+      {
+        title: "Empty bins after every session — never wait until full",
+        text: "Office bathroom bins fill faster than any other bin in a building. An overflowing bathroom bin is both a hygiene risk and an immediate negative impression for any visitor. Empty bins at every cleaning session regardless of how full they appear, replace the bin liner, and wipe the interior of the bin with a disinfectant spray. Bins should never reach more than two-thirds full before being changed.",
+      },
+    ],
+  },
+  {
+    icon: "🍽️",
+    name: "Kitchen & Breakroom",
+    tagline: "The most bacteria-dense shared space",
+    tips: [
+      {
+        title: "Establish a clean-as-you-go culture — and enforce it",
+        text: "Office kitchen culture determines hygiene standards more than any cleaning schedule. A kitchen where staff leave dishes in the sink, spill coffee on the counter, and return food containers to the fridge unlabelled will deteriorate faster than any cleaner can manage. Post a clear set of kitchen rules in a visible location. Designate a daily 'kitchen duty' rotation. When behaviour changes, the cleaner's job becomes achievable instead of Sisyphean.",
+      },
+      {
+        title: "Clean the fridge out completely every Friday",
+        text: "Office fridges accumulate forgotten food containers, expired items, and unlabelled leftovers at a rate that creates odour and bacterial contamination within days. Every Friday afternoon, remove everything from the fridge, discard anything unlabelled or past its date, wipe all shelves with a baking soda solution, and replace only current, labelled items. Monday morning should begin with a clean, fresh-smelling fridge — this has a measurable effect on staff satisfaction.",
+      },
+      {
+        title: "Descale the coffee machine and kettle weekly",
+        text: "Coffee machines and kettles in offices operate at a frequency — dozens of uses per day — that builds limescale rapidly. Limescale deposits alter the taste of coffee and water, reduce heating efficiency, and shorten appliance lifespan. Descale using a commercial descaling tablet or a 50/50 white vinegar and water solution weekly. Wipe the external surfaces of the machine daily — the drip tray and handle area are particularly prone to residue buildup.",
+      },
+      {
+        title: "Clean the microwave interior after every use",
+        text: "Office microwaves are used many more times per day than domestic ones, with a much wider variety of food types — increasing the frequency of splatter and the bacterial contamination risk from food residue. Post a sign above the microwave requesting users to cover food and wipe after use. During each cleaning session, remove the turntable, wash it in the sink, wipe the interior walls and roof with a disinfectant cloth, and replace.",
+      },
+      {
+        title: "Wipe communal tables and surfaces between uses",
+        text: "Breakroom and lunchroom tables accumulate food particles, liquid rings, and hand contact contamination from multiple users throughout the day. A spray bottle of diluted disinfectant and a cloth roll should be permanently accessible on or near the table. Tables should be wiped between each user — not just during the morning clean. This is particularly important for offices where the same breakroom tables are used for client meetings.",
+      },
+    ],
+  },
+  {
+    icon: "🌫️",
+    name: "Air Quality & Ventilation",
+    tagline: "What you breathe affects how you perform",
+    tips: [
+      {
+        title: "Clean air vents and grilles monthly",
+        text: "HVAC vents and air conditioning grilles accumulate dust that is then distributed through the office air supply. Dust on vents reduces airflow, increases energy consumption, and contributes to the particulate load in the air that occupants breathe. Remove vent covers monthly and vacuum the grille and the duct opening behind it. Wipe the cover with a damp cloth before replacing. An office with clean vents has measurably better air quality.",
+      },
+      {
+        title: "Replace or clean air filters on the recommended schedule",
+        text: "Air conditioning and HVAC filters capture dust, pollen, mould spores, and bacteria from the air circulating through the building. A filter operating beyond its replacement date passes these particles back into the office rather than capturing them. Check the manufacturer's recommended replacement interval — typically 1–3 months depending on filter type and usage intensity. In offices with high occupancy or in dusty environments, replace more frequently.",
+      },
+      {
+        title: "Open windows for at least 10 minutes daily",
+        text: "Recirculated office air accumulates CO2, VOCs from furniture and cleaning products, and biological contamination from occupants throughout the working day. The simplest and most effective ventilation strategy is opening windows for a minimum of 10 minutes, ideally during a period when occupancy is low. Research consistently shows improved cognitive performance — focus, decision-making, and response time — in better-ventilated offices.",
+      },
+      {
+        title: "Place air-purifying plants in high-traffic areas",
+        text: "Certain plants measurably reduce indoor air pollutants — spider plants, peace lilies, snake plants, and pothos remove benzene, formaldehyde, and VOCs from the air. Place one plant per approximately 10 square metres of office space in areas with high occupancy and low natural ventilation. Plants also reduce psychological stress in workplace environments, with research showing a 15% improvement in productivity in plant-containing offices.",
+      },
+      {
+        title: "Use fragrance-free cleaning products in enclosed spaces",
+        text: "Many commercial cleaning products contain synthetic fragrances that leave chemical residues in enclosed office air long after the cleaner has left. These VOCs cause headaches, respiratory irritation, and reduced air quality. Switch to fragrance-free or certified low-VOC cleaning products for all office cleaning tasks. If the office smells strongly of cleaning product the morning after cleaning, the product contains chemicals that should not be inhaled during the working day.",
+      },
+    ],
+  },
   {
     icon: "🏢",
-    name: "Daily Office Clean",
-    tagline: "Fresh every morning",
-    desc: "A thorough daily clean carried out before your team arrives or after they leave. Desks, floors, kitchen, and bathrooms maintained to a consistent standard every single working day.",
-    checklist: [
-      "Empty and reline all bins",
-      "Wipe all desks and workstations",
-      "Vacuum carpets and mop hard floors",
-      "Clean and sanitise kitchen area",
-      "Scrub toilets, basins, and mirrors",
-      "Restock soap and paper supplies",
+    name: "Common Areas & Floors",
+    tagline: "First impressions and footfall management",
+    tips: [
+      {
+        title: "Vacuum carpeted areas daily and deep-clean quarterly",
+        text: "Office carpets in high-traffic areas accumulate dust, particulate matter, and biological contamination at a rate that requires daily vacuuming to manage. Use a commercial-grade vacuum with a HEPA filter — domestic vacuums do not have sufficient suction for commercial carpet pile. Schedule a professional hot-water extraction carpet clean quarterly. Carpets that are not deep-cleaned regularly emit particles into the office air as they are walked on.",
+      },
+      {
+        title: "Mop hard floors with the two-bucket method",
+        text: "Single-bucket mopping spreads increasingly dirty water across an already-cleaned floor. Use two buckets — one with cleaning solution, one with clean rinse water — and wring into the dirty bucket, rinse in clean water, load from the clean bucket. This ensures the floor you finish is as clean as the floor you started on. Hard office floors should be mopped at minimum daily in reception and kitchen areas, and three times weekly in other zones.",
+      },
+      {
+        title: "Place entrance matting at all external door thresholds",
+        text: "Research shows that 80% of indoor dirt enters through doorways. Quality entrance matting traps particulates before they enter the building — reducing floor cleaning frequency, protecting carpet pile, and improving indoor air quality. Mats should be long enough for two full strides (a minimum of 1.5 metres) to be effective. Clean entrance mats twice weekly — a dirty mat re-deposits what it has captured every time it is walked on.",
+      },
+      {
+        title: "Clean glass partitions and doors weekly",
+        text: "Glass partitions and doors in modern offices accumulate fingerprints and smearing that degrade the visual environment significantly faster than solid surfaces. Use a glass cleaner and lint-free cloth or squeegee, working top to bottom in a single direction. In client-facing reception areas, glass should be cleaned daily. In internal areas, weekly is sufficient. Clean glass partitions make an office feel professionally maintained regardless of the state of other surfaces.",
+      },
+      {
+        title: "Disinfect lifts and staircases daily — handles especially",
+        text: "Lifts, staircase handrails, and communal door handles in multi-floor offices are among the highest-touch surfaces in any building and are touched by nearly every person in the building at some point during the day. Disinfect lift buttons (especially ground floor and most common destinations), handrails, and door handles as the first task of every cleaning session. These surfaces are the primary transmission vectors for illness across an entire building.",
+      },
     ],
-    from: "₦12,000",
-  },
-  {
-    icon: "🔬",
-    name: "Deep Office Clean",
-    tagline: "Top-to-bottom reset",
-    desc: "A comprehensive deep clean for offices that need more than daily maintenance. Perfect for quarterly resets, post-event cleans, or new office fit-outs before your team moves in.",
-    checklist: [
-      "Everything in Daily Clean",
-      "Clean inside kitchen appliances",
-      "Wipe down all walls and partitions",
-      "Clean air vents and ceiling fans",
-      "Sanitise all door handles and switches",
-      "Deep-clean all bathroom fixtures",
-    ],
-    from: "₦25,000",
-  },
-  {
-    icon: "🪟",
-    name: "Window & Glass Clean",
-    tagline: "Crystal-clear all round",
-    desc: "Internal window and glass partition cleaning for offices. Streak-free results on all glass surfaces including internal partitions, glass doors, display cases, and office windows.",
-    checklist: [
-      "Clean all internal window glass",
-      "Wipe glass partitions and doors",
-      "Clean glass display cases",
-      "Polish all mirrors",
-      "Wipe window frames and sills",
-      "Remove all fingerprints and smears",
-    ],
-    from: "₦8,000",
   },
 ];
 
-const CHECKLIST_AREAS = {
-  Workstations: [
-    "Wipe all desk surfaces",
-    "Clean monitor screens with microfibre",
-    "Sanitise keyboards and mice",
-    "Wipe telephone handsets",
-    "Clean desk pedestals and drawers",
-    "Remove all rubbish and clutter",
-  ],
-  Kitchen: [
-    "Wipe all countertops and surfaces",
-    "Clean sink and descale taps",
-    "Wipe microwave inside and out",
-    "Clean fridge exterior and handle",
-    "Wipe kettle and coffee machine",
-    "Mop kitchen floor",
-  ],
-  Bathrooms: [
-    "Scrub and disinfect all toilets",
-    "Clean and sanitise basins",
-    "Wipe mirrors and glass",
-    "Mop and disinfect floor",
-    "Restock soap and paper towels",
-    "Empty sanitary bins",
-  ],
-  "Common Areas": [
-    "Vacuum all carpeted areas",
-    "Mop all hard floors",
-    "Dust reception furniture",
-    "Wipe skirting boards",
-    "Clean entrance glass doors",
-    "Empty all bins and reline",
-  ],
-};
-
-const REASONS = [
+const QUICK_WINS = [
   {
-    icon: "🧠",
-    title: "Productivity rises with cleanliness",
-    text: "Studies show employees in clean, well-maintained offices are measurably more productive and report higher job satisfaction. A clean workspace reduces mental clutter and signals that the organisation values its team.",
+    icon: "🖥️",
+    time: "30 sec",
+    tip: "Keep a pack of antibacterial wipes in your desk drawer and wipe your keyboard at the start of each day.",
   },
   {
-    icon: "🦠",
-    title: "Reduce sick days significantly",
-    text: "Office surfaces — keyboards, phones, door handles — harbour bacteria that spread illness rapidly through teams. Regular professional sanitisation of high-touch surfaces significantly reduces workplace illness transmission and absenteeism.",
+    icon: "🗑️",
+    time: "1 min",
+    tip: "Empty your desk bin every evening — it takes 60 seconds and prevents the odour that accumulates from overnight decomposition.",
   },
   {
-    icon: "🤝",
-    title: "First impressions for clients",
-    text: "Your office tells every client and visitor exactly what standard to expect from your business. A clean, fresh-smelling, well-maintained office communicates professionalism before a single word is spoken.",
+    icon: "💨",
+    time: "2 min",
+    tip: "Open the office windows for 10 minutes first thing in the morning to flush out overnight accumulated CO2 and stale air.",
   },
   {
-    icon: "⚖️",
-    title: "Workplace health compliance",
-    text: "Employers in Nigeria have a legal obligation to provide a safe and clean working environment. Professional cleaning creates and maintains a documented standard of cleanliness that protects both employees and employers.",
-  },
-];
-
-const STEPS = [
-  {
-    title: "Tell us about your office",
-    text: "Share your office size, cleaning frequency, and any specific requirements. We tailor a cleaning plan to your layout, team size, and schedule.",
+    icon: "☕",
+    time: "30 sec",
+    tip: "Wipe the coffee machine drip tray and surrounding area immediately after use — dried coffee residue is far harder to remove.",
   },
   {
-    title: "We match you with the right professional",
-    text: "Your assigned cleaner is vetted, trained in commercial cleaning standards, and briefed on your specific office requirements before the first visit.",
+    icon: "📱",
+    time: "1 min",
+    tip: "Wipe your desk phone handset with an antibacterial wipe at the end of every call day — it is the most bacteria-dense object on any desk.",
   },
   {
-    title: "Cleaning on your schedule",
-    text: "We work before your team arrives, after they leave, or during the day — whatever disrupts your workflow the least. You set the schedule, we keep to it.",
+    icon: "🧴",
+    time: "30 sec",
+    tip: "Refill the hand soap dispenser before it runs out completely — an empty dispenser breaks the handwashing habit immediately.",
   },
   {
-    title: "Consistent quality, every time",
-    text: "The same professional cleans your office on each visit so they know your space. Any issues are reported to you same-day and resolved immediately.",
+    icon: "🌿",
+    time: "1 min",
+    tip: "Wipe dust off office plants' leaves monthly — dusty leaves reduce photosynthesis and the plant's air-purifying effectiveness.",
+  },
+  {
+    icon: "🚪",
+    time: "30 sec",
+    tip: "Wipe the office entrance door handle with a disinfectant wipe every morning — it is touched by every single person who enters.",
   },
 ];
 
 const TIPS = [
-  "Schedule office cleans for early morning or late evening to avoid disrupting your team's working hours.",
-  "Deep-clean your office kitchen weekly — it is the highest-traffic area and the fastest to deteriorate.",
-  "Provide a dedicated cleaning cupboard or storage area for your cleaning professional's products and equipment.",
-  "Brief your cleaner on any sensitive documents or equipment that should not be moved or touched.",
-  "Book a quarterly deep clean in addition to daily or weekly maintenance to reset the entire space.",
+  "Office cleaning frequency should be determined by headcount, not floor area. A 10-person office requires daily cleaning in kitchens and bathrooms; a 50-person office requires twice-daily cleaning in the same areas.",
+  "The return on investment for professional office cleaning is measurable — research shows that clean office environments reduce sick days by 25–30% by eliminating the bacterial and viral transmission vectors that cause seasonal illness.",
+  "Establish clear staff responsibility for shared spaces: a rota for kitchen duty, a sign-above-the-sink policy, and a labelling requirement for fridge items. The cleaner maintains standards — staff behaviour determines whether those standards are achievable.",
+  "Book a deep clean quarterly in addition to daily maintenance cleaning. Deep cleans should address areas daily cleaning does not reach: behind furniture, inside vents, carpet extraction, and the undersides of desks and chairs.",
+  "Fragrance-free, VOC-free cleaning products are not merely a preference — in enclosed office environments, synthetic cleaning fragrances contribute to air quality degradation that has measurable effects on staff cognitive performance and wellbeing.",
 ];
 
 const FAQS = [
   {
-    q: "Can you clean outside of business hours?",
-    a: "Yes. The majority of our office cleans take place before 8am or after 6pm so as not to disrupt your team. We can also clean during lunch hours or at weekends. You choose the schedule and we work to it.",
+    q: "How often should an office be professionally cleaned?",
+    a: "For most offices, daily professional cleaning of bathrooms, kitchen areas, and high-traffic surfaces is the minimum standard. Workstation areas should be cleaned 3–5 times per week. Deep cleaning of carpets, upholstery, air vents, and hard-to-reach areas should be scheduled quarterly. The frequency should increase with headcount — an office with 50+ staff needs more intensive cleaning than a 10-person workspace.",
   },
   {
-    q: "Do you supply all cleaning products and equipment?",
-    a: "Yes. Our professionals arrive with all commercial-grade cleaning products, microfibre cloths, mops, and equipment. You only need to provide access to running water and electricity. If you prefer specific products, let us know and we can accommodate.",
+    q: "Who is responsible for office cleaning — staff or the cleaning team?",
+    a: "The professional cleaning team handles systematic cleaning on the agreed schedule. Staff responsibility covers daily maintenance behaviours: washing their own dishes, wiping up spills immediately, keeping their desks tidy, labelling fridge items, and not leaving rubbish on desks overnight. When both sides fulfil their responsibilities, a professional cleaning schedule is achievable. When staff behaviour is poor, no cleaning schedule can maintain standards.",
   },
   {
-    q: "How do you handle sensitive areas like server rooms or executive offices?",
-    a: "We follow your briefing exactly. Areas that should not be entered are marked off. Executive offices can be cleaned only when the occupant is present if preferred. All our professionals are vetted and sign confidentiality agreements on engagement.",
+    q: "What cleaning products are safe to use in an office with staff present?",
+    a: "Products suitable for use while staff are present are those with low VOC content, fragrance-free formulations, and rapid drying times. Avoid bleach-based products in occupied spaces — the fumes are an irritant. Most surface disinfectants are safe once dry. For cleaning in occupied kitchens and bathrooms, always ensure ventilation is adequate during and after application. Supply a product data sheet for any chemical product used in a professional capacity.",
   },
   {
-    q: "What is the minimum contract for daily office cleaning?",
-    a: "We do not require long-term contracts. You can book on a weekly basis and adjust or cancel with 7 days' notice. We believe the quality of our work should be the only reason you stay with us.",
+    q: "How do I reduce illness transmission in a shared office?",
+    a: "The most effective interventions are: daily disinfection of all touch points (door handles, lift buttons, tap handles, keyboard and mice in shared workstations); accessible hand sanitiser at the entrance, kitchen, and bathroom; a clear sick-at-home policy that removes pressure to work through illness; and adequate ventilation. Illness transmission in offices drops significantly when touch-point cleaning frequency increases from weekly to daily.",
   },
   {
-    q: "Can you provide cleaning for multiple office locations?",
-    a: "Yes. We coordinate cleaning across multiple sites and ensure consistent standards at every location. A single point of contact manages all your offices and a unified reporting system tracks quality across sites.",
+    q: "How should we handle office cleaning around hot-desking?",
+    a: "Hot-desk environments require cleaning between occupants as a standard. Provide antibacterial wipes at each desk and establish a policy that desks are wiped before and after each use. Keyboards, mice, and phone handsets at hot-desk stations should be wipe-cleaned by the professional cleaning team daily. Shared storage areas and locker handles should be cleaned at least weekly.",
   },
   {
-    q: "Do you carry out post-construction or pre-move-in office cleans?",
-    a: "Yes. Post-construction cleans remove dust, debris, and installation residue before your team moves in. Pre-move-in cleans prepare a new office to a fresh, sanitised standard. Both are available as one-off services.",
+    q: "Can a professional cleaning team work outside business hours?",
+    a: "Yes — and for most offices, out-of-hours cleaning is strongly preferable. Evening or early morning cleaning allows thorough access to all areas without disruption, permits the use of more intensive cleaning methods (such as floor machines), allows cleaning products to be applied with adequate dwell time, and does not disturb staff concentration. Most professional cleaning services offer flexible scheduling around your office hours.",
   },
-];
-
-const INDUSTRIES = [
-  { icon: "💻", name: "Tech & Startups" },
-  { icon: "⚕️", name: "Healthcare Clinics" },
-  { icon: "🏦", name: "Finance & Banking" },
-  { icon: "⚖️", name: "Law Firms" },
-  { icon: "🏗️", name: "Construction Firms" },
-  { icon: "📚", name: "Education & Training" },
-  { icon: "🛍️", name: "Retail Offices" },
-  { icon: "📣", name: "Media & Agencies" },
 ];
 
 export default function OfficeCleaningTips() {
   const navigate = useNavigate();
-  const [activeArea, setActiveArea] = useState("Workstations");
+  const [activeCategory, setActiveCategory] = useState("Workstations");
+  const [openTip, setOpenTip] = useState(null);
   const [openFaq, setOpenFaq] = useState(null);
+
+  const category = CATEGORIES.find((c) => c.name === activeCategory);
 
   return (
     <div className={styles.page}>
@@ -185,15 +233,16 @@ export default function OfficeCleaningTips() {
 
       {/* Hero */}
       <div className={styles.hero}>
-        <p className={styles.heroEyebrow}>Professional office cleaning</p>
+        <p className={styles.heroEyebrow}>Office cleaning guide</p>
         <h1 className={styles.heroTitle}>
-          A workspace your team
+          Office cleaning tips
           <br />
-          <em>is proud of.</em>
+          <em>that raise the standard.</em>
         </h1>
         <p className={styles.heroDesc}>
-          Daily, weekly, and deep office cleans across Abuja and Lagos.
-          Consistent quality, flexible scheduling, no long-term contracts.
+          Professional-grade office cleaning advice — from daily desk hygiene to
+          deep-clean schedules that keep staff healthy and your workplace
+          looking its best.
         </p>
         <div className={styles.heroDivider} />
         <div className={styles.heroButtons}>
@@ -201,13 +250,17 @@ export default function OfficeCleaningTips() {
             className={styles.heroPrimary}
             onClick={() => navigate("/maids")}
           >
-            Book a Clean
+            Book a Professional
           </button>
           <button
             className={styles.heroSecondary}
-            onClick={() => navigate("/request-a-free-estimate")}
+            onClick={() =>
+              document
+                .getElementById("tips-section")
+                .scrollIntoView({ behavior: "smooth" })
+            }
           >
-            Get a Free Estimate
+            Read the Tips
           </button>
         </div>
       </div>
@@ -215,11 +268,11 @@ export default function OfficeCleaningTips() {
       {/* Trust bar */}
       <div className={styles.trustBar}>
         {[
-          ["✅", "Vetted professionals"],
-          ["🕐", "Before or after hours"],
-          ["📋", "No long-term contracts"],
-          ["⚡", "Same-week start"],
-          ["🔒", "Secure payment"],
+          ["🖥️", "Workstation hygiene"],
+          ["🚽", "Bathroom standards"],
+          ["☕", "Kitchen & breakroom"],
+          ["🌫️", "Air quality"],
+          ["✅", "Expert-approved"],
         ].map(([emoji, text]) => (
           <div key={text} className={styles.trustItem}>
             <span className={styles.trustEmoji}>{emoji}</span>
@@ -228,140 +281,93 @@ export default function OfficeCleaningTips() {
         ))}
       </div>
 
-      {/* Services */}
-      <div className={styles.section}>
-        <p className={styles.sectionEyebrow}>Our services</p>
+      {/* Category tips */}
+      <div className={styles.section} id="tips-section">
+        <p className={styles.sectionEyebrow}>Area-by-area guide</p>
         <h2 className={styles.sectionTitle}>
-          Choose the right clean for your office
+          Tips for every part of your office
         </h2>
-        <div className={styles.serviceCards}>
-          {SERVICES.map((s, i) => (
-            <div
-              key={s.name}
-              className={styles.serviceCard}
-              style={{ animationDelay: `${i * 0.07}s` }}
+
+        {/* Category tabs */}
+        <div className={styles.catTabs}>
+          {CATEGORIES.map((c) => (
+            <button
+              key={c.name}
+              className={`${styles.catTab} ${activeCategory === c.name ? styles.catTabActive : ""}`}
+              onClick={() => {
+                setActiveCategory(c.name);
+                setOpenTip(null);
+              }}
             >
-              <div className={styles.serviceCardBanner} />
-              <div className={styles.serviceCardBody}>
-                <div className={styles.serviceCardTop}>
-                  <div className={styles.serviceCardIcon}>{s.icon}</div>
-                  <div>
-                    <p className={styles.serviceCardName}>{s.name}</p>
-                    <p className={styles.serviceCardTagline}>{s.tagline}</p>
-                  </div>
+              <span className={styles.catTabIcon}>{c.icon}</span>
+              <span>{c.name}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Active category label */}
+        <div className={styles.catLabel}>
+          <span className={styles.catLabelIcon}>{category.icon}</span>
+          <div>
+            <p className={styles.catLabelName}>{category.name}</p>
+            <p className={styles.catLabelTagline}>{category.tagline}</p>
+          </div>
+        </div>
+
+        {/* Tips accordion */}
+        <div className={styles.tipsList}>
+          {category.tips.map((tip, i) => (
+            <div
+              key={tip.title}
+              className={`${styles.tipCard} ${openTip === i ? styles.tipCardOpen : ""}`}
+            >
+              <button
+                className={styles.tipQuestion}
+                onClick={() => setOpenTip(openTip === i ? null : i)}
+              >
+                <div className={styles.tipQuestionLeft}>
+                  <div className={styles.tipNum}>{i + 1}</div>
+                  <span className={styles.tipTitle}>{tip.title}</span>
                 </div>
-                <p className={styles.serviceCardDesc}>{s.desc}</p>
-                <div className={styles.checkList}>
-                  {s.checklist.map((item) => (
-                    <div key={item} className={styles.checkItem}>
-                      <div className={styles.checkDot}>✓</div>
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className={styles.serviceCardFooter}>
-                <div className={styles.priceBlock}>
-                  <span className={styles.priceFrom}>Starting from</span>
-                  <span className={styles.priceAmount}>{s.from}</span>
-                </div>
-                <button
-                  className={styles.bookBtn}
-                  onClick={() => navigate("/maids")}
+                <span
+                  className={`${styles.tipChevron} ${openTip === i ? styles.tipChevronOpen : ""}`}
                 >
-                  Book Now
-                </button>
-              </div>
+                  ▾
+                </span>
+              </button>
+              {openTip === i && <p className={styles.tipAnswer}>{tip.text}</p>}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Area-by-area checklist */}
-      <div className={styles.checklist}>
+      {/* Quick wins */}
+      <div className={styles.quickWins}>
         <p
           className={styles.sectionEyebrow}
           style={{ color: "rgba(255,255,255,0.6)" }}
         >
-          Full checklist
+          Instant results
         </p>
-        <h2 className={styles.checklistTitle}>Every area covered</h2>
-        <p className={styles.checklistSub}>
-          Here's exactly what's included in every office clean — nothing
-          overlooked.
-        </p>
-        <div className={styles.areaTabs}>
-          {Object.keys(CHECKLIST_AREAS).map((area) => (
-            <button
-              key={area}
-              className={`${styles.areaTab} ${activeArea === area ? styles.areaTabActive : ""}`}
-              onClick={() => setActiveArea(area)}
-            >
-              {area}
-            </button>
-          ))}
-        </div>
-        <div className={styles.areaItems}>
-          {CHECKLIST_AREAS[activeArea].map((item) => (
-            <div key={item} className={styles.areaItem}>
-              <div className={styles.areaCheck}>✓</div>
-              <span className={styles.areaText}>{item}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Industries */}
-      <div className={styles.section}>
-        <p className={styles.sectionEyebrow}>Who we serve</p>
-        <h2 className={styles.sectionTitle}>
-          Trusted by offices across every industry
+        <h2 className={styles.quickWinsTitle}>
+          8 office quick wins you can use today
         </h2>
-        <div className={styles.industriesGrid}>
-          {INDUSTRIES.map((ind) => (
-            <div key={ind.name} className={styles.industryCard}>
-              <span className={styles.industryIcon}>{ind.icon}</span>
-              <span className={styles.industryName}>{ind.name}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Why it matters */}
-      <div className={styles.reasons}>
-        <p className={styles.sectionEyebrow}>Why it matters</p>
-        <h2 className={styles.sectionTitle}>Clean offices perform better</h2>
-        <div className={styles.reasonCards}>
-          {REASONS.map((r, i) => (
+        <p className={styles.quickWinsSub}>
+          No specialist products or equipment — just smart habits that take
+          under 2 minutes and make a real difference.
+        </p>
+        <div className={styles.quickWinsGrid}>
+          {QUICK_WINS.map((w, i) => (
             <div
-              key={r.title}
-              className={styles.reasonCard}
-              style={{ animationDelay: `${i * 0.08}s` }}
+              key={i}
+              className={styles.quickWinCard}
+              style={{ animationDelay: `${i * 0.05}s` }}
             >
-              <div className={styles.reasonIcon}>{r.icon}</div>
-              <div>
-                <p className={styles.reasonTitle}>{r.title}</p>
-                <p className={styles.reasonText}>{r.text}</p>
+              <div className={styles.quickWinTop}>
+                <span className={styles.quickWinIcon}>{w.icon}</span>
+                <span className={styles.quickWinTime}>{w.time}</span>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* How it works */}
-      <div className={styles.timeline}>
-        <p className={styles.sectionEyebrow}>The process</p>
-        <h2 className={styles.sectionTitle}>
-          Up and running in 4 simple steps
-        </h2>
-        <div className={styles.steps}>
-          {STEPS.map((s, i) => (
-            <div key={s.title} className={styles.step}>
-              <div className={styles.stepNum}>{i + 1}</div>
-              <div className={styles.stepBody}>
-                <p className={styles.stepTitle}>{s.title}</p>
-                <p className={styles.stepText}>{s.text}</p>
-              </div>
+              <p className={styles.quickWinText}>{w.tip}</p>
             </div>
           ))}
         </div>
@@ -372,10 +378,10 @@ export default function OfficeCleaningTips() {
         <div className={styles.tipsBannerHeader}>
           <span className={styles.tipsHeaderIcon}>💡</span>
           <p className={styles.tipsHeaderTitle}>
-            Tips for a well-run office clean
+            The principles behind a clean office
           </p>
         </div>
-        <div className={styles.tipsList}>
+        <div className={styles.tipsList2}>
           {TIPS.map((tip, i) => (
             <div key={i} className={styles.tipItem}>
               <div className={styles.tipDot}>{i + 1}</div>
@@ -411,10 +417,13 @@ export default function OfficeCleaningTips() {
 
       {/* CTA */}
       <div className={styles.cta}>
-        <h2 className={styles.ctaTitle}>Ready to upgrade your office clean?</h2>
+        <h2 className={styles.ctaTitle}>
+          Rather leave it to the professionals?
+        </h2>
         <p className={styles.ctaText}>
-          No long-term contracts. All products supplied. Flexible scheduling
-          around your team. Book in under 2 minutes.
+          Our vetted maids and commercial cleaning teams know every tip on this
+          page. Book a professional office clean and come back to a spotless
+          workspace — guaranteed.
         </p>
         <div className={styles.ctaButtons}>
           <button

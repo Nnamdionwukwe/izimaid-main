@@ -166,17 +166,17 @@ function AppRoutes() {
       <Route path="/local-shelter-support" element={<LocalShelterSupport />} />
       <Route path="/board-of-directors" element={<BoardOfDirectors />} />
       <Route path="/general-household" element={<GeneralHousehold />} />
-      <Route path="/kitchens" element={<Kitchens />} />
+      {/* <Route path="/kitchens" element={<Kitchens />} /> */}
       <Route path="/move-cleaning-tips" element={<MoveCleaningTips />} />
       <Route path="/office-cleaning-tips" element={<OfficeCleaningTips />} />
       <Route path="/living-rooms" element={<LivingRooms />} />
       <Route path="/bathrooms" element={<Bathrooms />} />
+      <Route path="/kids-rooms" element={<KidsRooms />} />
+      <Route path="/bedrooms" element={<Bedrooms />} />
       <Route
         path="/schedules-charts-checklists"
         element={<SchedulesChartsChecklists />}
       />
-      <Route path="/kids-rooms" element={<KidsRooms />} />
-      <Route path="/bedrooms" element={<Bedrooms />} />
       <Route path="/spring-cleaning" element={<SpringCleaning />} />
       <Route path="/how-to-save-time" element={<HowToSaveTime />} />
       <Route path="/laundry-rooms" element={<LaundryRooms />} />

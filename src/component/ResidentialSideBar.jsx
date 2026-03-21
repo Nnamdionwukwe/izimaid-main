@@ -32,13 +32,13 @@ export default function ResidentialSideBar() {
             <p>Move-In Cleaning</p>
           </div>
 
-          <div
+          {/* <div
             onClick={() => navigate("/kitchens")}
             className={styles.hoverMainDiv3}
           >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Kitchens</p>
-          </div>
+          </div> */}
 
           <div
             onClick={() => navigate("/eco-friendly-cleaning")}
