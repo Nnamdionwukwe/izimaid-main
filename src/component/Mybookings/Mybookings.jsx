@@ -126,11 +126,13 @@ export default function MyBookings() {
 
   return (
     <div className={styles.page}>
+      <button className={styles.backLink} onClick={() => navigate("/")}>
+        ← Back to Home
+      </button>
       <h1 className={styles.pageTitle}>My Bookings</h1>
       <p className={styles.pageSubtitle}>
         {isMaid ? "Bookings assigned to you" : "Your cleaning bookings"}
       </p>
-
       {!isMaid && (
         <button
           className={styles.newBookingBtn}
@@ -147,7 +149,6 @@ export default function MyBookings() {
           + New Booking
         </button>
       )}
-
       <div className={styles.filters}>
         {FILTERS.map((f) => (
           <button
@@ -159,7 +160,6 @@ export default function MyBookings() {
           </button>
         ))}
       </div>
-
       {loading ? (
         <div className={styles.loading}>Loading bookings...</div>
       ) : bookings.length === 0 ? (

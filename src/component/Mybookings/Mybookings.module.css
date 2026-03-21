@@ -1,3 +1,25 @@
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgb(32, 32, 65);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: background 0.15s;
+}
+.backLink:hover {
+  background: rgb(32, 32, 65);
+  color: white;
+}
+
 @media screen and (min-width: 20px) {
   .page {
     padding: 20px 16px;

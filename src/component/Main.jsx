@@ -298,8 +298,8 @@ export default function Main() {
 
   return (
     <div className={styles.mainDiv}>
-      <button className={styles.backBtn} onClick={() => navigate("/")}>
-        Back to Home
+      <button className={styles.backLink} onClick={() => navigate("/")}>
+        ← Back to Home
       </button>
       <div>
         <div className={styles.checkMarkMain}>
