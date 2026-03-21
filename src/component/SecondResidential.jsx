@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styles from "./SecondResidentisl.module.css";
+import { useNavigate } from "react-router-dom";
 
 export default function SecondResidential() {
   const [isOpen1, setIsOpen1] = useState(false);
@@ -15,6 +16,8 @@ export default function SecondResidential() {
     setIsOpen1(false);
   }
 
+  const navigate = useNavigate();
+
   return (
     <div className={styles.main}>
       <div className={styles.mainSub}>
@@ -28,39 +31,66 @@ export default function SecondResidential() {
 
         {isOpen1 && (
           <ul className={styles.residentialDIv}>
-            <li className={styles.hoverMainliv1}>
+            <li
+              onClick={() => navigate("/recurring-cleaning")}
+              className={styles.hoverMainliv1}
+            >
               <p>Recurring Cleaning</p>
             </li>
 
-            <li className={styles.hoverMainliv2}>
+            <li
+              onClick={() => navigate("/one-time-cleaning")}
+              className={styles.hoverMainliv2}
+            >
               <p>One Time Cleaning</p>
             </li>
 
-            <li className={styles.hoverMainli3}>
+            <li
+              onClick={() => navigate("/move-in-cleaning")}
+              className={styles.hoverMainli3}
+            >
               <p>Movin_in Cleaning</p>
             </li>
 
-            <li className={styles.hoverMainli4}>
+            <li
+              onClick={() => navigate("/eco-friendly-cleaning")}
+              className={styles.hoverMainli4}
+            >
               <p>Eco Friendly Cleaning </p>
             </li>
 
-            <li className={styles.hoverMainli5}>
+            <li
+              onClick={() => navigate("/apartment-cleaning")}
+              className={styles.hoverMainli5}
+            >
               <p className={styles.para5}> Apartment and Condo Cleaning</p>
             </li>
 
-            <li className={styles.hoverMainli6}>
+            <li
+              onClick={() => navigate("/occasional-cleaning")}
+              className={styles.hoverMainli6}
+            >
               <p>Occasional Cleaning</p>
             </li>
 
-            <li className={styles.hoverMainli7}>
+            <li
+              onClick={() => navigate("/move-out-cleaning")}
+              className={styles.hoverMainli7}
+            >
               <p>Move-out Cleaning</p>
             </li>
 
-            <li className={styles.hoverMainli8}>
+            <li
+              onClick={() => navigate("/home-cleaning")}
+              className={styles.hoverMainli8}
+            >
               <p>Home Cleaning</p>
             </li>
 
-            <li className={styles.hoverMainli9}>
+            <li
+              onClick={() => navigate("/special-event-cleaning")}
+              className={styles.hoverMainli9}
+            >
               <p>Special Event Cleaning</p>
             </li>
           </ul>
@@ -78,15 +108,24 @@ export default function SecondResidential() {
 
         {isOpen2 && (
           <ul className={styles.residentialDIv2}>
-            <li className={styles.hoverMainli1}>
+            <li
+              onClick={() => navigate("/recurring-cleaning")}
+              className={styles.hoverMainli1}
+            >
               <p>Recurring Cleaning</p>
             </li>
 
-            <li className={styles.hoverMainli2}>
+            <li
+              onClick={() => navigate("/one-time-cleaning")}
+              className={styles.hoverMainli2}
+            >
               <p>One Time Cleaning</p>
             </li>
 
-            <li className={styles.hoverMainli6}>
+            <li
+              onClick={() => navigate("/occasional-cleaning")}
+              className={styles.hoverMainli6}
+            >
               <p>Occasional Cleaning</p>
             </li>
           </ul>
