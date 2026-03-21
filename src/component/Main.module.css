@@ -459,3 +459,19 @@
     width: 460px;
   }
 }
+
+.backBtn {
+  height: 44px;
+  padding: 0 24px;
+  background: rgb(32, 32, 65);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+.backBtn:hover {
+  background: rgb(20, 20, 50);
+}

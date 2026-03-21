@@ -1,7 +1,6 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { POSTS, CATEGORY_COLORS } from "./Blog";
 import styles from "./BlogPost.module.css";
-import FixedHeader from "../FixedHeader";
 
 // ── Full article content keyed by slug ──────────────────────────────────────
 const ARTICLE_CONTENT = {
@@ -951,7 +950,7 @@ export default function BlogPost() {
   if (!post || !content) {
     return (
       <div className={styles.page}>
-        <FixedHeader />
+        {/* <FixedHeader /> */}
         <div className={styles.notFound}>
           <div className={styles.notFoundIcon}>🔍</div>
           <h1 className={styles.notFoundTitle}>Article not found</h1>
@@ -970,7 +969,7 @@ export default function BlogPost() {
 
   return (
     <div className={styles.page}>
-      <FixedHeader />
+      {/* <FixedHeader /> */}
 
       {/* Article hero */}
       <div className={styles.hero}>

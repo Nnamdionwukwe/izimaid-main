@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import styles from "./Main.module.css";
 import Modal from "./Modal/Modal.jsx";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -293,8 +294,13 @@ export default function Main() {
     </div>
   );
 
+  const navigate = useNavigate();
+
   return (
     <div className={styles.mainDiv}>
+      <button className={styles.backBtn} onClick={() => navigate("/")}>
+        Back to Home
+      </button>
       <div>
         <div className={styles.checkMarkMain}>
           {!isOpenCheck ? (
