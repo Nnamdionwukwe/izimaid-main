@@ -12,10 +12,7 @@ export default function WhyChooseUs() {
       <div className={styles.main}>
         <h1 className={styles.mainh1}>Why Choose Us?</h1>
 
-        <img
-          alt="IziBest Cleaning"
-          src="https://media.istockphoto.com/id/480751546/vector/cleaner.jpg?s=612x612&w=0&k=20&c=U2w2T9sMsvNL3gHmv6ujRP8axazaseIKhq1sFVuk9Hc="
-        />
+        <img alt="IziBest Cleaning" src="public/chiefmaid2.JPG" />
 
         <div className={styles.mainSub}>
           <div
