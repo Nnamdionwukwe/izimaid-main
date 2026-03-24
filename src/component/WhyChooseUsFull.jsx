@@ -1,4 +1,5 @@
 import styles from "./WhyChooseUs.module.css";
+import chiefmaid2 from "../assets/chiefmaid2NBG.png";
 
 export default function WhyChooseUsFull() {
   return (
@@ -63,10 +64,7 @@ export default function WhyChooseUsFull() {
         </div>
 
         <div className={styles.mainImg}>
-          <img
-            alt="IziBest Cleaning"
-            src="https://media.istockphoto.com/id/480751546/vector/cleaner.jpg?s=612x612&w=0&k=20&c=U2w2T9sMsvNL3gHmv6ujRP8axazaseIKhq1sFVuk9Hc="
-          />
+          <img alt="IziBest Cleaning" src={chiefmaid2} />
         </div>
       </div>
     </div>
