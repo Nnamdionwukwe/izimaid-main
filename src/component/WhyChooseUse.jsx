@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./WhyChooseUs.module.css";
-import chiefmaid2 from "../assets/chiefmaid2.JPG";
+import chiefmaid2 from "../assets/chiefmaid2NBG.png";
 
 export default function WhyChooseUs() {
   const [isOpen1, setIsOpen1] = useState(true);
