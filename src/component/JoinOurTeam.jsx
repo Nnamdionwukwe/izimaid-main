@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./WhyChooseUs.module.css";
+import chiefmaid1 from "../assets/chiefmaid1NBG.png";
 
 export default function JoinOurTeam() {
   const navigate = useNavigate();
@@ -7,10 +8,7 @@ export default function JoinOurTeam() {
   return (
     <div className={styles.main1}>
       <div className={styles.main2}>
-        <img
-          alt="IziBest Cleaning"
-          src="https://img.freepik.com/premium-photo/adventures-joy-vibrant-cartoon-illustration-celebrating-happy-little-black-girl-with-bra_983420-19202.jpg"
-        />
+        <img alt="IziBest Cleaning" src={chiefmaid1} />
 
         <div className={styles.mainSub1}>
           <h2 className={styles.mainh1}>Join Our Team</h2>
