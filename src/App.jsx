@@ -219,6 +219,8 @@ function AppRoutes() {
       <Route path="/terms-of-service" element={<TermsOfService />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
+      <Route path="/settings" element={<SettingsPage />} />
+
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
