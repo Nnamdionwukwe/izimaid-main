@@ -3,7 +3,7 @@
 // Shows new password form, submits to API
 
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import styles from "./ResetPassword.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
@@ -38,7 +38,8 @@ const STRENGTH_COLOR = [
 ];
 
 export default function ResetPassword() {
-  const { token } = useParams();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
   const navigate = useNavigate();
 
   const [password, setPassword] = useState("");

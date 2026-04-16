@@ -1,18 +1,16 @@
 // src/component/VerifyEmail/VerifyEmail.jsx
-// Handles /verify-email/:token route
-// Automatically verifies on mount, shows result
-
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom"; // ← useSearchParams
 import styles from "./VerifyEmail.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const API = API_URL.replace(/\/$/, "").replace(/\/api$/, "") + "/api";
 
 export default function VerifyEmail() {
-  const { token } = useParams();
+  const [searchParams] = useSearchParams(); // ← reads ?token=
+  const token = searchParams.get("token"); // ← gets the value
   const navigate = useNavigate();
-  const [status, setStatus] = useState("verifying"); // "verifying" | "success" | "error"
+  const [status, setStatus] = useState("verifying");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -51,7 +49,6 @@ export default function VerifyEmail() {
             <p className={styles.subtitle}>Please wait a moment.</p>
           </>
         )}
-
         {status === "success" && (
           <>
             <div className={styles.icon}>✅</div>
@@ -65,7 +62,6 @@ export default function VerifyEmail() {
             </button>
           </>
         )}
-
         {status === "error" && (
           <>
             <div className={styles.icon}>❌</div>
@@ -78,16 +74,9 @@ export default function VerifyEmail() {
               >
                 Back to login
               </button>
-              <button
-                className={`${styles.btn} ${styles.btnOutline}`}
-                onClick={() => navigate("/resend-verification")}
-              >
-                Resend link
-              </button>
             </div>
           </>
         )}
-
         <div className={styles.brand}>Deusizi Sparkle</div>
       </div>
     </div>

@@ -132,8 +132,8 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={loginRedirect()} />
-      <Route path="/verify-email/:token" element={<VerifyEmail />} />
-      <Route path="/reset-password/:token" element={<ResetPassword />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/reset-password/" element={<ResetPassword />} />
       <Route path="/request-a-free-estimate" element={<RequestEstimate />} />
       <Route path="/why-hire-us" element={<LearnMore />} />
       <Route path="/maids" element={<Maids />} />
