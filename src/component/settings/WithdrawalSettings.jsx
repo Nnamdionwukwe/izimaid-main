@@ -12,7 +12,8 @@ import {
 } from "./SettingsUI";
 import { useBankDetails } from "../../pages/hooks/useSettings";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+const _raw = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+const API = _raw.replace(/\/$/, "").replace(/\/api$/, "") + "/api";
 
 const METHODS = [
   { value: "bank_transfer", label: "Nigerian Bank / Fintech", flag: "🇳🇬" },
