@@ -69,6 +69,8 @@ import TipsAndTricks from "./component/Blog/TipsAndTricks.jsx";
 import BlogPost from "./component/Blog/BlogPost.jsx";
 import PoweredByGestech from "./component/PoweredByGestech/PoweredByGestech.jsx";
 import SettingsPage from "./pages/settings/SettingsPage.jsx";
+import VerifyEmail from "./component/VerifyEmail/VerifyEmail.jsx";
+import ResetPassword from "./component/ResetPassword/ResetPassword.jsx";
 
 function App() {
   return (
@@ -130,6 +132,8 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={loginRedirect()} />
+      <Route path="/verify-email/:token" element={<VerifyEmail />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/request-a-free-estimate" element={<RequestEstimate />} />
       <Route path="/why-hire-us" element={<LearnMore />} />
       <Route path="/maids" element={<Maids />} />
