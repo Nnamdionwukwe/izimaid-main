@@ -1,7 +1,6 @@
 // src/pages/settings/components/WithdrawalSettings.jsx
-// Only rendered for users with role === 'maid'
 import { useState, useEffect } from "react";
-import { useBankDetails } from "../pages/hooks/useSettings";
+import styles from "../../pages/settings/Settings.module.css";
 import {
   Section,
   Field,
@@ -11,6 +10,7 @@ import {
   Toast,
   Badge,
 } from "./SettingsUI";
+import { useBankDetails } from "../../pages/hooks/useSettings";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
@@ -58,38 +58,30 @@ export default function WithdrawalSettings() {
   const [init, setInit] = useState(false);
 
   const [form, setForm] = useState({
-    // Bank
     bank_name: "",
     bank_code: "",
     account_number: "",
     account_name: "",
     bank_country: "NG",
-    // Wire
     swift_code: "",
     iban: "",
     bank_address: "",
-    // Mobile
     mobile_provider: "",
     mobile_number: "",
     mobile_country: "",
-    // Crypto
     crypto_currency: "USDT",
     crypto_address: "",
     crypto_network: "TRC20",
-    // PayPal
     paypal_email: "",
-    // Wise
     wise_email: "",
   });
 
-  // Load NG banks
   useEffect(() => {
     fetch(`${API}/withdrawals/ng-banks`)
       .then((r) => r.json())
       .then((d) => setBanks(d.banks || []));
   }, []);
 
-  // Populate from saved details
   useEffect(() => {
     if (details && !init) {
       setForm((f) => ({
@@ -104,7 +96,6 @@ export default function WithdrawalSettings() {
     }
   }, [details, init]);
 
-  // Auto-fill bank name when code is selected
   function handleBankSelect(e) {
     const code = e.target.value;
     const bank = banks.find((b) => b.code === code);
@@ -171,13 +162,9 @@ export default function WithdrawalSettings() {
 
   if (loading) {
     return (
-      <div className="ds-loading-section">
+      <div className={styles.loadingSection}>
         {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="ds-skeleton"
-            style={{ height: 44, marginBottom: 12 }}
-          />
+          <div key={i} className={styles.skeleton} style={{ height: 44 }} />
         ))}
       </div>
     );
@@ -191,14 +178,13 @@ export default function WithdrawalSettings() {
         onClose={() => setToast(null)}
       />
 
-      {/* Current saved details */}
       {details && (
         <Section title="Saved payout method">
-          <div className="ds-saved-method">
-            <div className="ds-saved-method-icon">🏦</div>
+          <div className={styles.savedMethod}>
+            <span className={styles.savedMethodIcon}>🏦</span>
             <div>
-              <div className="ds-saved-method-name">{details.bank_name}</div>
-              <div className="ds-hint">
+              <div className={styles.savedMethodName}>{details.bank_name}</div>
+              <div className={styles.hint}>
                 {details.account_number} · {details.account_name}
               </div>
               {details.verified && <Badge color="green">Verified</Badge>}
@@ -207,32 +193,29 @@ export default function WithdrawalSettings() {
         </Section>
       )}
 
-      {/* Method selector */}
       <Section
         title="Payout method"
         description="How should we send your earnings?"
       >
-        <div className="ds-method-grid">
+        <div className={styles.methodGrid}>
           {METHODS.map((m) => (
             <button
               key={m.value}
               type="button"
               onClick={() => setMethod(m.value)}
-              className={`ds-method-card ${method === m.value ? "ds-method-card-active" : ""}`}
+              className={`${styles.methodCard} ${method === m.value ? styles.methodCardActive : ""}`}
             >
-              <span className="ds-method-flag">{m.flag}</span>
-              <span className="ds-method-label">{m.label}</span>
+              <span className={styles.methodFlag}>{m.flag}</span>
+              <span>{m.label}</span>
             </button>
           ))}
         </div>
       </Section>
 
-      {/* Method-specific form */}
       <form onSubmit={handleSubmit}>
-        {/* Nigerian bank / fintech */}
         {method === "bank_transfer" && (
           <Section title="Nigerian bank details">
-            <div className="ds-form-grid">
+            <div className={styles.formGrid}>
               <Field label="Bank / Fintech">
                 <Select value={form.bank_code} onChange={handleBankSelect}>
                   <option value="">— Select bank —</option>
@@ -292,10 +275,9 @@ export default function WithdrawalSettings() {
                   />
                   <button
                     type="button"
-                    className="ds-btn-secondary"
+                    className={styles.btnSecondary}
                     onClick={verifyAccount}
                     disabled={verifying}
-                    style={{ whiteSpace: "nowrap" }}
                   >
                     {verifying ? "Checking…" : "Verify"}
                   </button>
@@ -310,16 +292,16 @@ export default function WithdrawalSettings() {
                   }
                   placeholder="Auto-filled after verification"
                   readOnly={!!verified}
-                  className={verified ? "ds-input-success" : ""}
+                  success={!!verified}
                 />
                 {verified && (
-                  <p className="ds-hint" style={{ color: "#16a34a" }}>
+                  <p className={styles.hint} style={{ color: "#16a34a" }}>
                     ✓ Account verified
                   </p>
                 )}
               </Field>
             </div>
-            <p className="ds-hint" style={{ marginTop: 8 }}>
+            <p className={styles.hint} style={{ marginTop: 8 }}>
               Works with GTB, Zenith, Access, UBA, First Bank, OPay, Moniepoint,
               Kuda, PalmPay, and all CBN-licensed banks. For PiggyVest — use
               your linked bank account details.
@@ -327,10 +309,9 @@ export default function WithdrawalSettings() {
           </Section>
         )}
 
-        {/* Wire transfer */}
         {method === "wire_transfer" && (
           <Section title="International wire details">
-            <div className="ds-form-grid">
+            <div className={styles.formGrid}>
               <Field label="Bank name">
                 <Input
                   value={form.bank_name}
@@ -377,17 +358,19 @@ export default function WithdrawalSettings() {
                 />
               </Field>
             </div>
-            <p className="ds-hint" style={{ marginTop: 8, color: "#f97316" }}>
+            <p
+              className={styles.hint}
+              style={{ marginTop: 8, color: "#c2410c" }}
+            >
               ⚠️ Wire transfer fee: ₦12,000 per withdrawal. Processing takes 3–5
               business days.
             </p>
           </Section>
         )}
 
-        {/* Mobile money */}
         {method === "mobile_money" && (
           <Section title="Mobile money details">
-            <div className="ds-form-grid">
+            <div className={styles.formGrid}>
               <Field label="Provider">
                 <Select
                   value={form.mobile_provider}
@@ -430,10 +413,9 @@ export default function WithdrawalSettings() {
           </Section>
         )}
 
-        {/* Crypto */}
         {method === "crypto" && (
           <Section title="Cryptocurrency wallet">
-            <div className="ds-form-grid">
+            <div className={styles.formGrid}>
               <Field label="Cryptocurrency">
                 <Select
                   value={form.crypto_currency}
@@ -478,14 +460,16 @@ export default function WithdrawalSettings() {
                 />
               </Field>
             </div>
-            <p className="ds-hint" style={{ color: "#16a34a" }}>
-              ✓ No withdrawal fee for crypto. Gas fees paid by the network. USDT
-              on TRC20 is recommended — cheapest and fastest.
+            <p
+              className={styles.hint}
+              style={{ color: "#15803d", marginTop: 8 }}
+            >
+              ✓ No withdrawal fee for crypto. USDT on TRC20 is recommended —
+              cheapest and fastest.
             </p>
           </Section>
         )}
 
-        {/* PayPal */}
         {method === "paypal" && (
           <Section title="PayPal details">
             <Field label="PayPal email address">
@@ -498,14 +482,12 @@ export default function WithdrawalSettings() {
                 type="email"
               />
             </Field>
-            <p className="ds-hint" style={{ marginTop: 8 }}>
-              PayPal withdrawal fee: ₦500 flat. Payments arrive within 1
-              business day.
+            <p className={styles.hint} style={{ marginTop: 8 }}>
+              PayPal withdrawal fee: ₦500 flat.
             </p>
           </Section>
         )}
 
-        {/* Wise */}
         {method === "wise" && (
           <Section title="Wise (TransferWise) details">
             <Field label="Wise email address">
@@ -518,17 +500,16 @@ export default function WithdrawalSettings() {
                 type="email"
               />
             </Field>
-            <p className="ds-hint" style={{ marginTop: 8 }}>
-              Wise withdrawal fee: ₦250 flat. Supports 80+ currencies in 160+
-              countries. Best option for international withdrawals.
+            <p className={styles.hint} style={{ marginTop: 8 }}>
+              Wise fee: ₦250 flat. Supports 80+ currencies. Best for
+              international withdrawals.
             </p>
           </Section>
         )}
 
-        {/* Flutterwave */}
         {method === "flutterwave" && (
           <Section title="Flutterwave bank details">
-            <div className="ds-form-grid">
+            <div className={styles.formGrid}>
               <Field label="Bank code">
                 <Input
                   value={form.bank_code}
@@ -557,14 +538,14 @@ export default function WithdrawalSettings() {
                 />
               </Field>
             </div>
-            <p className="ds-hint" style={{ marginTop: 8 }}>
+            <p className={styles.hint} style={{ marginTop: 8 }}>
               Flutterwave covers 34 African countries. Best for Ghana, Rwanda,
               Uganda, Cameroon.
             </p>
           </Section>
         )}
 
-        <div className="ds-form-footer">
+        <div className={styles.formFooter}>
           <SaveButton loading={saving}>Save payout details</SaveButton>
         </div>
       </form>

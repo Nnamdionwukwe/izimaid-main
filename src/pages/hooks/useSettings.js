@@ -1,14 +1,13 @@
 // src/hooks/useSettings.js
 import { useState, useEffect, useCallback } from "react";
 
-const BASE = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
-// Make sure trailing slash is stripped:
-const API = BASE.replace(/\/$/, "");
+const BASE = (
+  import.meta.env.VITE_API_URL || "http://localhost:8080/api"
+).replace(/\/$/, "");
 
 function getToken() {
   return localStorage.getItem("token");
 }
-
 function authHeaders() {
   return {
     "Content-Type": "application/json",
@@ -16,7 +15,6 @@ function authHeaders() {
   };
 }
 
-// ── Settings ──────────────────────────────────────────────────────────
 export function useSettings() {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,11 +22,10 @@ export function useSettings() {
 
   const fetch_ = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
-      const res = await fetch(`${API}/settings`, { headers: authHeaders() });
+      const res = await fetch(`${BASE}/settings`, { headers: authHeaders() });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to load settings");
+      if (!res.ok) throw new Error(data.error);
       setSettings(data.settings);
     } catch (err) {
       setError(err.message);
@@ -42,13 +39,13 @@ export function useSettings() {
   }, [fetch_]);
 
   const update = useCallback(async (payload) => {
-    const res = await fetch(`${API}/settings`, {
+    const res = await fetch(`${BASE}/settings`, {
       method: "PATCH",
       headers: authHeaders(),
       body: JSON.stringify(payload),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to update settings");
+    if (!res.ok) throw new Error(data.error);
     setSettings(data.settings);
     return data.settings;
   }, []);
@@ -56,11 +53,10 @@ export function useSettings() {
   return { settings, loading, error, refetch: fetch_, update };
 }
 
-// ── Languages & Currencies ────────────────────────────────────────────
 export function useLanguages() {
   const [languages, setLanguages] = useState([]);
   useEffect(() => {
-    fetch(`${API}/settings/languages`)
+    fetch(`${BASE}/settings/languages`)
       .then((r) => r.json())
       .then((d) => setLanguages(d.languages || []));
   }, []);
@@ -70,14 +66,13 @@ export function useLanguages() {
 export function useCurrencies() {
   const [currencies, setCurrencies] = useState([]);
   useEffect(() => {
-    fetch(`${API}/settings/currencies`)
+    fetch(`${BASE}/settings/currencies`)
       .then((r) => r.json())
       .then((d) => setCurrencies(d.currencies || []));
   }, []);
   return currencies;
 }
 
-// ── Notification Preferences ──────────────────────────────────────────
 export function useNotificationPrefs() {
   const [prefs, setPrefs] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -85,7 +80,7 @@ export function useNotificationPrefs() {
   const fetch_ = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/notifications/preferences`, {
+      const res = await fetch(`${BASE}/notifications/preferences`, {
         headers: authHeaders(),
       });
       const data = await res.json();
@@ -100,7 +95,7 @@ export function useNotificationPrefs() {
   }, [fetch_]);
 
   const update = useCallback(async (payload) => {
-    const res = await fetch(`${API}/notifications/preferences`, {
+    const res = await fetch(`${BASE}/notifications/preferences`, {
       method: "PATCH",
       headers: authHeaders(),
       body: JSON.stringify(payload),
@@ -114,29 +109,25 @@ export function useNotificationPrefs() {
   return { prefs, loading, update };
 }
 
-// ── Profile (GET /auth/me + PATCH /users/profile) ─────────────────────
 export function useProfile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}/auth/me`, { headers: authHeaders() })
+    fetch(`${BASE}/auth/me`, { headers: authHeaders() })
       .then((r) => r.json())
       .then((d) => {
         setProfile(d.user);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, []);
 
-  const update = useCallback(async (formData) => {
-    // formData can be FormData (for avatar) or plain object
-    const isForm = formData instanceof FormData;
-    const res = await fetch(`${API}/maids/profile`, {
+  const update = useCallback(async (payload) => {
+    const res = await fetch(`${BASE}/maids/profile`, {
       method: "PATCH",
-      headers: isForm
-        ? { Authorization: `Bearer ${getToken()}` }
-        : authHeaders(),
-      body: isForm ? formData : JSON.stringify(formData),
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
@@ -147,7 +138,7 @@ export function useProfile() {
   const uploadAvatar = useCallback(async (file) => {
     const form = new FormData();
     form.append("avatar", file);
-    const res = await fetch(`${API}/maids/avatar`, {
+    const res = await fetch(`${BASE}/maids/avatar`, {
       method: "POST",
       headers: { Authorization: `Bearer ${getToken()}` },
       body: form,
@@ -161,7 +152,6 @@ export function useProfile() {
   return { profile, loading, update, uploadAvatar };
 }
 
-// ── Subscription ──────────────────────────────────────────────────────
 export function useSubscription() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -169,7 +159,7 @@ export function useSubscription() {
   const fetch_ = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/subscriptions/my`, {
+      const res = await fetch(`${BASE}/subscriptions/my`, {
         headers: authHeaders(),
       });
       const json = await res.json();
@@ -185,7 +175,7 @@ export function useSubscription() {
 
   const cancel = useCallback(
     async (reason, immediate = false) => {
-      const res = await fetch(`${API}/subscriptions/cancel`, {
+      const res = await fetch(`${BASE}/subscriptions/cancel`, {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify({ reason, immediate }),
@@ -201,22 +191,22 @@ export function useSubscription() {
   return { data, loading, refetch: fetch_, cancel };
 }
 
-// ── Maid bank details ─────────────────────────────────────────────────
 export function useBankDetails() {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}/payments/bank-details`, { headers: authHeaders() })
+    fetch(`${BASE}/payments/bank-details`, { headers: authHeaders() })
       .then((r) => r.json())
       .then((d) => {
         setDetails(d.bank_details);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   const save = useCallback(async (payload) => {
-    const res = await fetch(`${API}/payments/bank-details`, {
+    const res = await fetch(`${BASE}/payments/bank-details`, {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify(payload),
@@ -230,9 +220,8 @@ export function useBankDetails() {
   return { details, loading, save };
 }
 
-// ── Auth (change password) ────────────────────────────────────────────
 export async function changePassword(currentPassword, newPassword) {
-  const res = await fetch(`${API}/auth/change-password`, {
+  const res = await fetch(`${BASE}/auth/change-password`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify({ currentPassword, newPassword }),

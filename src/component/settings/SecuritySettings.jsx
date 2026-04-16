@@ -1,6 +1,6 @@
 // src/pages/settings/components/SecuritySettings.jsx
 import { useState } from "react";
-import { changePassword } from "../pages/hooks/useSettings";
+import styles from "../../pages/settings/Settings.module.css";
 import {
   Section,
   Field,
@@ -9,6 +9,7 @@ import {
   Toast,
   DangerButton,
 } from "./SettingsUI";
+import { changePassword } from "../../pages/hooks/useSettings";
 
 export default function SecuritySettings() {
   const [form, setForm] = useState({
@@ -35,16 +36,15 @@ export default function SecuritySettings() {
     return e;
   }
 
-  // Password strength checker
   function strength(pwd) {
     if (!pwd) return 0;
-    let score = 0;
-    if (pwd.length >= 8) score++;
-    if (pwd.length >= 12) score++;
-    if (/[A-Z]/.test(pwd)) score++;
-    if (/[0-9]/.test(pwd)) score++;
-    if (/[^A-Za-z0-9]/.test(pwd)) score++;
-    return score;
+    let s = 0;
+    if (pwd.length >= 8) s++;
+    if (pwd.length >= 12) s++;
+    if (/[A-Z]/.test(pwd)) s++;
+    if (/[0-9]/.test(pwd)) s++;
+    if (/[^A-Za-z0-9]/.test(pwd)) s++;
+    return s;
   }
 
   const pwdStrength = strength(form.newPassword);
@@ -96,76 +96,77 @@ export default function SecuritySettings() {
         onClose={() => setToast(null)}
       />
 
-      {/* Change password */}
       <Section
         title="Change password"
         description="Use a strong password with a mix of letters, numbers, and symbols."
       >
-        <form onSubmit={handleSubmit} className="ds-form">
-          <Field label="Current password" error={errors.currentPassword}>
-            <div className="ds-input-icon-wrap">
+        <form onSubmit={handleSubmit}>
+          <div className={styles.formGrid}>
+            <Field label="Current password" error={errors.currentPassword}>
+              <div className={styles.inputGroup}>
+                <Input
+                  type={showPwd ? "text" : "password"}
+                  value={form.currentPassword}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, currentPassword: e.target.value }))
+                  }
+                  placeholder="Enter current password"
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  className={styles.inputSuffix}
+                  onClick={() => setShowPwd((s) => !s)}
+                  tabIndex={-1}
+                >
+                  {showPwd ? "🙈" : "👁️"}
+                </button>
+              </div>
+            </Field>
+
+            <Field label="New password" error={errors.newPassword}>
               <Input
                 type={showPwd ? "text" : "password"}
-                value={form.currentPassword}
+                value={form.newPassword}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, currentPassword: e.target.value }))
+                  setForm((f) => ({ ...f, newPassword: e.target.value }))
                 }
-                placeholder="Enter current password"
-                autoComplete="current-password"
+                placeholder="At least 8 characters"
+                autoComplete="new-password"
               />
-              <button
-                type="button"
-                className="ds-input-icon-btn"
-                onClick={() => setShowPwd((s) => !s)}
-                tabIndex={-1}
-              >
-                {showPwd ? "🙈" : "👁️"}
-              </button>
-            </div>
-          </Field>
+              {form.newPassword && (
+                <div className={styles.strengthBar}>
+                  <div
+                    className={styles.strengthFill}
+                    style={{
+                      width: `${(pwdStrength / 5) * 100}%`,
+                      background: strengthColor,
+                    }}
+                  />
+                  <span
+                    className={styles.strengthLabel}
+                    style={{ color: strengthColor }}
+                  >
+                    {strengthLabel}
+                  </span>
+                </div>
+              )}
+            </Field>
 
-          <Field label="New password" error={errors.newPassword}>
-            <Input
-              type={showPwd ? "text" : "password"}
-              value={form.newPassword}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, newPassword: e.target.value }))
-              }
-              placeholder="At least 8 characters"
-              autoComplete="new-password"
-            />
-            {form.newPassword && (
-              <div className="ds-strength-bar">
-                <div
-                  className="ds-strength-fill"
-                  style={{
-                    width: `${(pwdStrength / 5) * 100}%`,
-                    background: strengthColor,
-                  }}
-                />
-                <span
-                  className="ds-strength-label"
-                  style={{ color: strengthColor }}
-                >
-                  {strengthLabel}
-                </span>
-              </div>
-            )}
-          </Field>
+            <Field label="Confirm new password" error={errors.confirmPassword}>
+              <Input
+                type={showPwd ? "text" : "password"}
+                value={form.confirmPassword}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, confirmPassword: e.target.value }))
+                }
+                placeholder="Repeat new password"
+                autoComplete="new-password"
+              />
+            </Field>
+          </div>
 
-          <Field label="Confirm new password" error={errors.confirmPassword}>
-            <Input
-              type={showPwd ? "text" : "password"}
-              value={form.confirmPassword}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, confirmPassword: e.target.value }))
-              }
-              placeholder="Repeat new password"
-              autoComplete="new-password"
-            />
-          </Field>
-
-          <div className="ds-pwd-tips">
+          <div className={styles.pwdTips}>
             <p>Your password should:</p>
             <ul>
               {[
@@ -177,25 +178,24 @@ export default function SecuritySettings() {
                   "Contain a special character",
                 ],
               ].map(([met, text], i) => (
-                <li key={i} style={{ color: met ? "#16a34a" : "#94a3b8" }}>
+                <li key={i} style={{ color: met ? "#16a34a" : "#9fa4bf" }}>
                   {met ? "✓" : "○"} {text}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="ds-form-footer">
+          <div className={styles.formFooter}>
             <SaveButton loading={saving}>Change password</SaveButton>
           </div>
         </form>
       </Section>
 
-      {/* Active sessions info */}
       <Section
         title="Account security"
         description="Tips to keep your account safe."
       >
-        <div className="ds-security-tips">
+        <div className={styles.securityTips}>
           {[
             {
               icon: "🔑",
@@ -218,24 +218,23 @@ export default function SecuritySettings() {
               text: "Contact support immediately if you notice unusual activity.",
             },
           ].map((tip, i) => (
-            <div key={i} className="ds-security-tip">
-              <span className="ds-security-tip-icon">{tip.icon}</span>
+            <div key={i} className={styles.securityTip}>
+              <span className={styles.securityTipIcon}>{tip.icon}</span>
               <div>
-                <div className="ds-security-tip-title">{tip.title}</div>
-                <div className="ds-security-tip-text">{tip.text}</div>
+                <div className={styles.securityTipTitle}>{tip.title}</div>
+                <div className={styles.securityTipText}>{tip.text}</div>
               </div>
             </div>
           ))}
         </div>
       </Section>
 
-      {/* Danger zone */}
       <Section title="Danger zone">
-        <div className="ds-danger-zone">
-          <div className="ds-danger-item">
+        <div className={styles.dangerZone}>
+          <div className={styles.dangerItem}>
             <div>
-              <div className="ds-danger-title">Delete account</div>
-              <div className="ds-danger-desc">
+              <div className={styles.dangerTitle}>Delete account</div>
+              <div className={styles.dangerDesc}>
                 Permanently delete your account and all data. This cannot be
                 undone.
               </div>

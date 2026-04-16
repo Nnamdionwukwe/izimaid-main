@@ -1,11 +1,12 @@
 // src/pages/settings/components/AppearanceSettings.jsx
 import { useState, useEffect } from "react";
+import styles from "../../pages/settings/Settings.module.css";
+import { Section, Field, Select, SaveButton, Toast } from "./SettingsUI";
 import {
   useSettings,
   useLanguages,
   useCurrencies,
-} from "../pages/hooks/useSettings";
-import { Section, Field, Select, SaveButton, Toast } from "./SettingsUI";
+} from "../../pages/hooks/useSettings";
 
 const THEMES = [
   { value: "light", label: "Light", icon: "☀️" },
@@ -38,7 +39,6 @@ export default function AppearanceSettings() {
     }
   }, [settings, init]);
 
-  // Apply theme immediately on change
   function applyTheme(theme) {
     const root = document.documentElement;
     if (theme === "dark") root.setAttribute("data-theme", "dark");
@@ -75,13 +75,9 @@ export default function AppearanceSettings() {
 
   if (loading) {
     return (
-      <div className="ds-loading-section">
+      <div className={styles.loadingSection}>
         {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="ds-skeleton"
-            style={{ height: 44, marginBottom: 12 }}
-          />
+          <div key={i} className={styles.skeleton} style={{ height: 44 }} />
         ))}
       </div>
     );
@@ -101,18 +97,18 @@ export default function AppearanceSettings() {
           title="Theme"
           description="Choose how Deusizi Sparkle looks on your device."
         >
-          <div className="ds-theme-grid">
+          <div className={styles.themeGrid}>
             {THEMES.map((t) => (
               <button
                 key={t.value}
                 type="button"
                 onClick={() => handleThemeChange(t.value)}
-                className={`ds-theme-card ${form.theme === t.value ? "ds-theme-card-active" : ""}`}
+                className={`${styles.themeCard} ${form.theme === t.value ? styles.themeCardActive : ""}`}
               >
-                <span className="ds-theme-icon">{t.icon}</span>
-                <span className="ds-theme-label">{t.label}</span>
+                <span className={styles.themeIcon}>{t.icon}</span>
+                <span className={styles.themeLabel}>{t.label}</span>
                 {form.theme === t.value && (
-                  <span className="ds-theme-check">✓</span>
+                  <span className={styles.themeCheck}>✓</span>
                 )}
               </button>
             ))}
@@ -145,7 +141,7 @@ export default function AppearanceSettings() {
         {/* Currency */}
         <Section
           title="Currency"
-          description="Prices will be displayed in your chosen currency. Payments use the currency matching your location."
+          description="Prices will be displayed in your chosen currency."
         >
           <Field label="Display currency">
             <Select
@@ -169,13 +165,13 @@ export default function AppearanceSettings() {
               ))}
             </Select>
           </Field>
-          <p className="ds-hint" style={{ marginTop: 8 }}>
+          <p className={styles.hint} style={{ marginTop: 8 }}>
             Exchange rates are approximate. Final payment amounts are confirmed
             at checkout.
           </p>
         </Section>
 
-        <div className="ds-form-footer">
+        <div className={styles.formFooter}>
           <SaveButton loading={saving} />
         </div>
       </form>

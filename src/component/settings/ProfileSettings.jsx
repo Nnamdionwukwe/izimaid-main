@@ -1,5 +1,6 @@
 // src/pages/settings/components/ProfileSettings.jsx
 import { useState, useRef } from "react";
+import styles from "../../pages/settings/settings.module.css";
 import {
   Section,
   Field,
@@ -9,7 +10,9 @@ import {
   Avatar,
   Toast,
 } from "./SettingsUI";
-import { useProfile } from "../pages/hooks/useSettings";
+import { useProfile } from "../../pages/hooks/useSettings";
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 const COUNTRIES = [
   { code: "NG", name: "Nigeria" },
@@ -27,8 +30,7 @@ const COUNTRIES = [
   { code: "MX", name: "Mexico" },
   { code: "AE", name: "United Arab Emirates" },
   { code: "SG", name: "Singapore" },
-  { code: "NG", name: "Nigeria" },
-].filter((c, i, a) => a.findIndex((x) => x.code === c.code) === i);
+];
 
 export default function ProfileSettings() {
   const { profile, loading, update, uploadAvatar } = useProfile();
@@ -38,13 +40,8 @@ export default function ProfileSettings() {
   const [errors, setErrors] = useState({});
   const fileRef = useRef();
 
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    country: "NG",
-  });
+  const [form, setForm] = useState({ name: "", phone: "", country: "NG" });
 
-  // Populate form when profile loads
   if (profile && form.name === "" && profile.name) {
     setForm({
       name: profile.name || "",
@@ -58,9 +55,8 @@ export default function ProfileSettings() {
     if (!form.name.trim()) e.name = "Name is required";
     if (form.name.trim().length < 2)
       e.name = "Name must be at least 2 characters";
-    if (form.phone && !/^\+?[\d\s\-()]{7,15}$/.test(form.phone)) {
+    if (form.phone && !/^\+?[\d\s\-()]{7,15}$/.test(form.phone))
       e.phone = "Enter a valid phone number";
-    }
     return e;
   }
 
@@ -74,23 +70,18 @@ export default function ProfileSettings() {
     setErrors({});
     setSaving(true);
     try {
-      await update({ bio: form.bio, location: form.location });
-      // Update name/phone via user update
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL || "http://localhost:8080/api"}/auth/update-profile`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            name: form.name,
-            phone: form.phone,
-            country: form.country,
-          }),
+      const res = await fetch(`${API}/auth/update-profile`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      );
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          country: form.country,
+        }),
+      });
       if (!res.ok) throw new Error("Failed to update profile");
       setToast({ message: "Profile updated successfully", type: "success" });
     } catch (err) {
@@ -120,23 +111,14 @@ export default function ProfileSettings() {
 
   if (loading) {
     return (
-      <div className="ds-loading-section">
+      <div className={styles.loadingSection}>
         <div
-          className="ds-skeleton"
+          className={styles.skeleton}
           style={{ width: 80, height: 80, borderRadius: "50%" }}
         />
-        <div
-          className="ds-skeleton"
-          style={{ width: "60%", height: 20, marginTop: 16 }}
-        />
-        <div
-          className="ds-skeleton"
-          style={{ width: "100%", height: 44, marginTop: 12 }}
-        />
-        <div
-          className="ds-skeleton"
-          style={{ width: "100%", height: 44, marginTop: 12 }}
-        />
+        <div className={styles.skeleton} style={{ width: "60%", height: 20 }} />
+        <div className={styles.skeleton} style={{ height: 44 }} />
+        <div className={styles.skeleton} style={{ height: 44 }} />
       </div>
     );
   }
@@ -149,23 +131,22 @@ export default function ProfileSettings() {
         onClose={() => setToast(null)}
       />
 
-      {/* Avatar upload */}
       <Section
         title="Profile photo"
         description="Shown to customers and maids on bookings."
       >
-        <div className="ds-avatar-row">
+        <div className={styles.avatarRow}>
           <Avatar src={profile?.avatar} name={profile?.name} size={72} />
-          <div className="ds-avatar-actions">
+          <div className={styles.avatarActions}>
             <button
               type="button"
-              className="ds-btn-secondary"
+              className={styles.btnSecondary}
               disabled={uploading}
               onClick={() => fileRef.current?.click()}
             >
               {uploading ? "Uploading…" : "Change photo"}
             </button>
-            <p className="ds-hint">JPG or PNG, max 5 MB</p>
+            <p className={styles.hint}>JPG or PNG, max 5 MB</p>
           </div>
           <input
             ref={fileRef}
@@ -177,10 +158,9 @@ export default function ProfileSettings() {
         </div>
       </Section>
 
-      {/* Profile details */}
       <Section title="Personal information">
-        <form onSubmit={handleSubmit} className="ds-form">
-          <div className="ds-form-grid">
+        <form onSubmit={handleSubmit}>
+          <div className={styles.formGrid}>
             <Field label="Full name" error={errors.name}>
               <Input
                 value={form.name}
@@ -192,11 +172,7 @@ export default function ProfileSettings() {
             </Field>
 
             <Field label="Email address" hint="Email cannot be changed here.">
-              <Input
-                value={profile?.email || ""}
-                disabled
-                className="ds-input-disabled"
-              />
+              <Input value={profile?.email || ""} disabled />
             </Field>
 
             <Field
@@ -230,7 +206,7 @@ export default function ProfileSettings() {
             </Field>
           </div>
 
-          <div className="ds-form-footer">
+          <div className={styles.formFooter}>
             <SaveButton loading={saving} />
           </div>
         </form>

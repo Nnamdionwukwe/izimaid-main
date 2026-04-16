@@ -6,7 +6,7 @@ import MaidSupportTab from "../MaidsupportTab/Maidsupporttab";
 import MaidChat from "../MaidChat/MaidChat";
 import FloatingMaidSupportChat from "../MaidSupportChat/FloatingMaidSupportChat";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 const SERVICES_LIST = [
   "Cleaning",

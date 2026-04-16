@@ -1,31 +1,34 @@
 // src/pages/settings/SettingsPage.jsx
-import { useState, lazy, Suspense } from "react";
-import "./settings.css";
+// Uses Settings.module.css — no more global .ds-* classes
 
-// Lazy-load each tab — only fetches data when the user clicks it
-const ProfileSettings = lazy(() => import("../../component/ProfileSettings"));
+import { useState, lazy, Suspense } from "react";
+import styles from "./Settings.module.css";
+
+const ProfileSettings = lazy(
+  () => import("../../component/settings/ProfileSettings"),
+);
 const AppearanceSettings = lazy(
-  () => import("../../component/AppearanceSettings"),
+  () => import("../../component/settings/AppearanceSettings"),
 );
 const NotificationSettings = lazy(
-  () => import("../../component/NotificationSettings"),
+  () => import("../../component/settings/NotificationSettings"),
 );
 const SubscriptionSettings = lazy(
-  () => import("../../component/SubscriptionSettings"),
+  () => import("../../component/settings/SubscriptionSettings"),
 );
-const SecuritySettings = lazy(() => import("../../component/SecuritySettings"));
+const SecuritySettings = lazy(
+  () => import("../../component/settings/SecuritySettings"),
+);
 const WithdrawalSettings = lazy(
-  () => import("../../component/WithdrawalSettings"),
+  () => import("../../component/settings/WithdrawalSettings"),
 );
-const PinSettings = lazy(() => import("../../component/PinSettings"));
+const PinSettings = lazy(() => import("../../component/settings/PinSettings"));
 
-// Current user from JWT — adjust to your auth context
 function useCurrentUser() {
   try {
     const token = localStorage.getItem("token");
     if (!token) return null;
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload;
+    return JSON.parse(atob(token.split(".")[1]));
   } catch {
     return null;
   }
@@ -69,31 +72,27 @@ const ALL_TABS = [
     badge: "Maid",
   },
   {
+    id: "pin",
+    label: "Transaction PIN",
+    icon: "🔐",
+    component: PinSettings,
+    roles: ["maid"],
+    badge: "Maid",
+  },
+  {
     id: "security",
     label: "Security",
     icon: "🔒",
     component: SecuritySettings,
     roles: ["customer", "maid", "admin"],
   },
-  {
-    id: "pin",
-    label: "Transaction PIN",
-    icon: "🔐",
-    component: PinSettings,
-    roles: ["maid"], // customers can have PIN too if you want — add "customer"
-    badge: "Maid",
-  },
 ];
 
 function TabSkeleton() {
   return (
-    <div className="ds-loading-section">
-      {[120, 44, 44, 44].map((h, i) => (
-        <div
-          key={i}
-          className="ds-skeleton"
-          style={{ height: h, marginBottom: 12 }}
-        />
+    <div className={styles.loadingSection}>
+      {[100, 44, 44, 44, 44].map((h, i) => (
+        <div key={i} className={styles.skeleton} style={{ height: h }} />
       ))}
     </div>
   );
@@ -109,45 +108,42 @@ export default function SettingsPage() {
   const Component = current.component;
 
   return (
-    <div className="ds-settings-page">
+    <div className={styles.page}>
       {/* Page header */}
-      <div className="ds-settings-header">
-        <h1 className="ds-settings-title">Settings</h1>
-        <p className="ds-settings-subtitle">
-          Manage your account, preferences, and security.
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>Settings</h1>
+        <p className={styles.pageSubtitle}>
+          Manage your account, preferences, and security
         </p>
       </div>
 
-      <div className="ds-settings-layout">
+      <div className={styles.layout}>
         {/* Sidebar nav */}
-        <nav className="ds-settings-nav" aria-label="Settings navigation">
+        <nav className={styles.nav} aria-label="Settings navigation">
           {tabs.map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`ds-nav-item ${tab === t.id ? "ds-nav-item-active" : ""}`}
+              className={`${styles.navItem} ${tab === t.id ? styles.navItemActive : ""}`}
               aria-current={tab === t.id ? "page" : undefined}
             >
-              <span className="ds-nav-icon">{t.icon}</span>
-              <span className="ds-nav-label">{t.label}</span>
-              {t.badge && <span className="ds-nav-badge">{t.badge}</span>}
-              {tab === t.id && (
-                <span className="ds-nav-indicator" aria-hidden />
-              )}
+              <span className={styles.navIcon}>{t.icon}</span>
+              <span className={styles.navLabel}>{t.label}</span>
+              {t.badge && <span className={styles.navBadge}>{t.badge}</span>}
             </button>
           ))}
         </nav>
 
-        {/* Content area */}
-        <main className="ds-settings-content">
-          <div className="ds-content-header">
-            <h2 className="ds-content-title">
+        {/* Content panel */}
+        <main className={styles.content}>
+          <div className={styles.contentHeader}>
+            <h2 className={styles.contentTitle}>
               {current.icon} {current.label}
             </h2>
           </div>
 
           <Suspense fallback={<TabSkeleton />}>
-            <Component />
+            <Component styles={styles} />
           </Suspense>
         </main>
       </div>

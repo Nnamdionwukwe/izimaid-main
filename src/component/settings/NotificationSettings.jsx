@@ -1,6 +1,6 @@
 // src/pages/settings/components/NotificationSettings.jsx
 import { useState } from "react";
-import { useNotificationPrefs } from "../pages/hooks/useSettings";
+import styles from "../../pages/settings/Settings.module.css";
 import {
   Section,
   Toggle,
@@ -10,6 +10,7 @@ import {
   Input,
   Select,
 } from "./SettingsUI";
+import { useNotificationPrefs } from "../../pages/hooks/useSettings";
 
 const CATEGORIES = [
   {
@@ -82,10 +83,7 @@ export default function NotificationSettings() {
   const [toast, setToast] = useState(null);
   const [localPrefs, setLocalPrefs] = useState(null);
 
-  // Sync local state when prefs load
-  if (prefs && !localPrefs) {
-    setLocalPrefs({ ...prefs });
-  }
+  if (prefs && !localPrefs) setLocalPrefs({ ...prefs });
 
   function toggle(channel, category) {
     const key = `${channel}_${category}`;
@@ -111,13 +109,9 @@ export default function NotificationSettings() {
 
   if (loading || !localPrefs) {
     return (
-      <div className="ds-loading-section">
+      <div className={styles.loadingSection}>
         {[1, 2, 3, 4, 5].map((i) => (
-          <div
-            key={i}
-            className="ds-skeleton"
-            style={{ height: 52, marginBottom: 8 }}
-          />
+          <div key={i} className={styles.skeleton} style={{ height: 52 }} />
         ))}
       </div>
     );
@@ -132,17 +126,16 @@ export default function NotificationSettings() {
       />
 
       <form onSubmit={handleSubmit}>
-        {/* Channel matrix */}
         <Section
           title="Notification channels"
           description="Control how you're notified for each category."
         >
-          <div className="ds-notif-table">
+          <div className={styles.notifTable}>
             {/* Header */}
-            <div className="ds-notif-header">
-              <div className="ds-notif-category-col" />
+            <div className={styles.notifHeader}>
+              <div className={styles.notifCategoryCol} />
               {CHANNELS.map((ch) => (
-                <div key={ch.key} className="ds-notif-channel-col">
+                <div key={ch.key} className={styles.notifChannelCol}>
                   <span>{ch.icon}</span>
                   <span>{ch.label}</span>
                 </div>
@@ -153,14 +146,14 @@ export default function NotificationSettings() {
             {CATEGORIES.map((cat, i) => (
               <div
                 key={cat.key}
-                className={`ds-notif-row ${i % 2 === 0 ? "ds-notif-row-even" : ""}`}
+                className={`${styles.notifRow} ${i % 2 === 0 ? styles.notifRowEven : ""}`}
               >
-                <div className="ds-notif-category-col">
-                  <span className="ds-notif-cat-label">{cat.label}</span>
-                  <span className="ds-notif-cat-desc">{cat.description}</span>
+                <div className={styles.notifCategoryCol}>
+                  <span className={styles.notifCatLabel}>{cat.label}</span>
+                  <span className={styles.notifCatDesc}>{cat.description}</span>
                 </div>
                 {CHANNELS.map((ch) => (
-                  <div key={ch.key} className="ds-notif-channel-col">
+                  <div key={ch.key} className={styles.notifChannelCol}>
                     <Toggle
                       checked={localPrefs[`${ch.key}_${cat.key}`] !== false}
                       onChange={() => toggle(ch.key, cat.key)}
@@ -177,8 +170,8 @@ export default function NotificationSettings() {
           title="Quiet hours"
           description="Suppress push and in-app notifications during these hours."
         >
-          <div className="ds-quiet-row">
-            <div className="ds-quiet-toggle">
+          <div className={styles.quietRow}>
+            <div className={styles.quietToggle}>
               <span>Enable quiet hours</span>
               <Toggle
                 checked={localPrefs.quiet_hours_enabled || false}
@@ -187,7 +180,7 @@ export default function NotificationSettings() {
             </div>
 
             {localPrefs.quiet_hours_enabled && (
-              <div className="ds-form-grid" style={{ marginTop: 16 }}>
+              <div className={styles.formGrid} style={{ marginTop: 16 }}>
                 <Field label="Start time">
                   <Input
                     type="time"
@@ -215,7 +208,7 @@ export default function NotificationSettings() {
                   >
                     {TIMEZONES.map((tz) => (
                       <option key={tz} value={tz}>
-                        {tz.replace("_", " ")}
+                        {tz.replace(/_/g, " ")}
                       </option>
                     ))}
                   </Select>
@@ -225,7 +218,7 @@ export default function NotificationSettings() {
           </div>
         </Section>
 
-        <div className="ds-form-footer">
+        <div className={styles.formFooter}>
           <SaveButton loading={saving} />
         </div>
       </form>
