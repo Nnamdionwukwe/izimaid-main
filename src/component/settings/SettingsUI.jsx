@@ -1,6 +1,6 @@
 // src/pages/settings/components/SettingsUI.jsx
 // All shared primitives — fully CSS module based
-import styles from "../../pages/settings/settings.module.css";
+import styles from "../../pages/settings/Settings.module.css";
 
 export function Section({ title, description, children }) {
   return (
