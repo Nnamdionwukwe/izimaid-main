@@ -1,6 +1,6 @@
 // src/pages/settings/components/SecuritySettings.jsx
 import { useState } from "react";
-import { changePassword } from "../../../hooks/useSettings";
+import { changePassword } from "../pages/hooks/useSettings";
 import {
   Section,
   Field,

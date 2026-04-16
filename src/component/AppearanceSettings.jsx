@@ -4,7 +4,7 @@ import {
   useSettings,
   useLanguages,
   useCurrencies,
-} from "../../../hooks/useSettings";
+} from "../pages/hooks/useSettings";
 import { Section, Field, Select, SaveButton, Toast } from "./SettingsUI";
 
 const THEMES = [

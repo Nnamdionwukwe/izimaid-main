@@ -1,6 +1,5 @@
 // src/pages/settings/components/ProfileSettings.jsx
 import { useState, useRef } from "react";
-import { useProfile } from "../../../hooks/useSettings";
 import {
   Section,
   Field,
@@ -10,6 +9,7 @@ import {
   Avatar,
   Toast,
 } from "./SettingsUI";
+import { useProfile } from "../pages/hooks/useSettings";
 
 const COUNTRIES = [
   { code: "NG", name: "Nigeria" },

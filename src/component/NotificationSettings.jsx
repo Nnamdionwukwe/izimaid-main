@@ -1,6 +1,6 @@
 // src/pages/settings/components/NotificationSettings.jsx
 import { useState } from "react";
-import { useNotificationPrefs } from "../../../hooks/useSettings";
+import { useNotificationPrefs } from "../pages/hooks/useSettings";
 import {
   Section,
   Toggle,

@@ -68,6 +68,7 @@ import Seasonal from "./component/Blog/Seasonal.jsx";
 import TipsAndTricks from "./component/Blog/TipsAndTricks.jsx";
 import BlogPost from "./component/Blog/BlogPost.jsx";
 import PoweredByGestech from "./component/PoweredByGestech/PoweredByGestech.jsx";
+import SettingsPage from "./pages/settings/SettingsPage.jsx";
 
 function App() {
   return (

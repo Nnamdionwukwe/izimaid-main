@@ -1,7 +1,9 @@
 // src/hooks/useSettings.js
 import { useState, useEffect, useCallback } from "react";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+// Make sure trailing slash is stripped:
+const API = BASE.replace(/\/$/, "");
 
 function getToken() {
   return localStorage.getItem("token");

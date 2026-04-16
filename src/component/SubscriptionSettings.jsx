@@ -1,6 +1,6 @@
 // src/pages/settings/components/SubscriptionSettings.jsx
 import { useState } from "react";
-import { useSubscription } from "../../../hooks/useSettings";
+import { useSubscription } from "../pages/hooks/useSettings";
 import { Section, DangerButton, Badge, Toast } from "./SettingsUI";
 
 const PLAN_COLORS = {

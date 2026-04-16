@@ -1,7 +1,7 @@
 // src/pages/settings/components/WithdrawalSettings.jsx
 // Only rendered for users with role === 'maid'
 import { useState, useEffect } from "react";
-import { useBankDetails } from "../../../hooks/useSettings";
+import { useBankDetails } from "../pages/hooks/useSettings";
 import {
   Section,
   Field,

@@ -3,20 +3,21 @@ import { useState, lazy, Suspense } from "react";
 import "./settings.css";
 
 // Lazy-load each tab — only fetches data when the user clicks it
-const ProfileSettings = lazy(() => import("./components/ProfileSettings"));
+const ProfileSettings = lazy(() => import("../../component/ProfileSettings"));
 const AppearanceSettings = lazy(
-  () => import("./components/AppearanceSettings"),
+  () => import("../../component/AppearanceSettings"),
 );
 const NotificationSettings = lazy(
-  () => import("./components/NotificationSettings"),
+  () => import("../../component/NotificationSettings"),
 );
 const SubscriptionSettings = lazy(
-  () => import("./components/SubscriptionSettings"),
+  () => import("../../component/SubscriptionSettings"),
 );
-const SecuritySettings = lazy(() => import("./components/SecuritySettings"));
+const SecuritySettings = lazy(() => import("../../component/SecuritySettings"));
 const WithdrawalSettings = lazy(
-  () => import("./components/WithdrawalSettings"),
+  () => import("../../component/WithdrawalSettings"),
 );
+const PinSettings = lazy(() => import("../../component/PinSettings"));
 
 // Current user from JWT — adjust to your auth context
 function useCurrentUser() {
@@ -73,6 +74,14 @@ const ALL_TABS = [
     icon: "🔒",
     component: SecuritySettings,
     roles: ["customer", "maid", "admin"],
+  },
+  {
+    id: "pin",
+    label: "Transaction PIN",
+    icon: "🔐",
+    component: PinSettings,
+    roles: ["maid"], // customers can have PIN too if you want — add "customer"
+    badge: "Maid",
   },
 ];
 
