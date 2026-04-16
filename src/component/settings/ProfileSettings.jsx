@@ -1,6 +1,6 @@
 // src/pages/settings/components/ProfileSettings.jsx
 import { useState, useRef } from "react";
-import styles from "../../pages/settings/settings.module.css";
+import styles from "../../pages/settings/Settings.module.css";
 import {
   Section,
   Field,
