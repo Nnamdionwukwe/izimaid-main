@@ -1,69 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import styles from "./MaidDashboard.module.css";
-import { useAuth } from "../../context/AuthContext";
-import MaidSupportTab from "../MaidsupportTab/Maidsupporttab";
-import MaidChat from "../MaidChat/MaidChat";
-import FloatingMaidSupportChat from "../MaidSupportChat/FloatingMaidSupportChat";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
-// At the top of ProfileTab (or at the top of MaidDashboard.jsx alongside API_URL), add:
-const API = (() => {
-  const raw = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
-  return raw.replace(/\/$/, "").replace(/\/api$/, "") + "/api";
-})();
-
-const SERVICES_LIST = [
-  "Cleaning",
-  "Laundry",
-  "Cooking",
-  "Ironing",
-  "Organizing",
-  "Window Cleaning",
-  "Carpet Cleaning",
-  "Deep Cleaning",
-];
-
-const STATUS_CLASS = {
-  pending: styles.statusPending,
-  confirmed: styles.statusConfirmed,
-  in_progress: styles.statusInProgress,
-  completed: styles.statusCompleted,
-  cancelled: styles.statusCancelled,
-};
-
-function formatDate(d) {
-  return new Date(d).toLocaleDateString("en-NG", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function initials(name) {
-  return (
-    name
-      ?.split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase() || "?"
-  );
-}
-
-// ─── Profile Tab ──────────────────────────────────────────────
-// ─── Profile Tab ──────────────────────────────────────────────
-// Drop-in replacement for the ProfileTab function inside MaidDashboard.jsx
-// Uses existing MaidDashboard.module.css classes — no inline style overload
-
 // ─── Profile Tab ──────────────────────────────────────────────
 // Full version — covers all controller endpoints:
 //   updateProfile  (bio, rates, currency, location, services, availability)
 //   getMaidAvailability / setMaidAvailability
 //   uploadMaidDocument / getMaidDocuments
 // Drop-in replacement inside MaidDashboard.jsx
+import { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import styles from "./ProfileTab.module.css";
 
 const WORLD_CURRENCIES = [
   { code: "NGN", name: "Nigerian Naira", symbol: "₦" },
@@ -103,7 +46,7 @@ const DOC_TYPES = [
   { value: "utility_bill", label: "Utility Bill", icon: "🏠" },
 ];
 
-function ProfileTab({ token }) {
+export default function ProfileTab({ token }) {
   const { user, updateUser } = useAuth();
 
   // ── Profile fields ──────────────────────────────────────────
@@ -147,15 +90,13 @@ function ProfileTab({ token }) {
   const [currentCoords, setCurrentCoords] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
-  const [customServiceInput, setCustomServiceInput] = useState("");
-  const [customRates, setCustomRates] = useState([]);
 
   // ── Load all data on mount ──────────────────────────────────
   useEffect(() => {
     async function load() {
       try {
         // 1. Profile
-        const r1 = await fetch(`${API}/maids/${user.id}`, {
+        const r1 = await fetch(`${API_URL}/maids/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const d1 = await r1.json();
@@ -174,30 +115,10 @@ function ProfileTab({ token }) {
             pricing_note: m.pricing_note || "",
             currency: m.currency || "NGN",
           });
-
-          if (m.rate_custom) {
-            try {
-              const parsed =
-                typeof m.rate_custom === "string"
-                  ? JSON.parse(m.rate_custom)
-                  : m.rate_custom;
-              // Expects array of {label, price} or object — normalise both
-              if (Array.isArray(parsed)) {
-                setCustomRates(parsed);
-              } else if (typeof parsed === "object") {
-                setCustomRates(
-                  Object.entries(parsed).map(([label, price]) => ({
-                    label,
-                    price: String(price),
-                  })),
-                );
-              }
-            } catch {}
-          }
         }
 
         // 2. Availability
-        const r2 = await fetch(`${API}/maids/my/availability`, {
+        const r2 = await fetch(`${API_URL}/maids/${user.id}/availability`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const d2 = await r2.json();
@@ -214,7 +135,7 @@ function ProfileTab({ token }) {
         }
 
         // 3. Documents
-        const r3 = await fetch(`${API}/maids/my/documents`, {
+        const r3 = await fetch(`${API_URL}/maids/documents`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const d3 = await r3.json();
@@ -252,7 +173,7 @@ function ProfileTab({ token }) {
     const fd = new FormData();
     fd.append("avatar", file);
     try {
-      const res = await fetch(`${API}/maids/avatar`, {
+      const res = await fetch(`${API_URL}/maids/avatar`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -357,7 +278,7 @@ function ProfileTab({ token }) {
     setSaving(true);
     setMsg({ type: "", text: "" });
     try {
-      const res = await fetch(`${API}/maids/profile`, {
+      const res = await fetch(`${API_URL}/maids/profile`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -409,8 +330,8 @@ function ProfileTab({ token }) {
       }));
 
     try {
-      const res = await fetch(`${API}/maids/my/availability`, {
-        method: "PUT",
+      const res = await fetch(`${API_URL}/maids/availability`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -449,7 +370,7 @@ function ProfileTab({ token }) {
     fd.append("doc_type", docType);
 
     try {
-      const res = await fetch(`${API}/maids/my/documents`, {
+      const res = await fetch(`${API_URL}/maids/documents`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -458,7 +379,7 @@ function ProfileTab({ token }) {
       if (!res.ok) throw new Error(data.error);
 
       // Refresh docs list
-      const r2 = await fetch(`${API}/maids/my/documents`, {
+      const r2 = await fetch(`${API_URL}/maids/documents`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const d2 = await r2.json();
@@ -933,790 +854,5 @@ function ProfileTab({ token }) {
         </div>
       </div>
     </div>
-  );
-}
-
-// ─── Decline Modal ────────────────────────────────────────────
-function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
-  const [reason, setReason] = useState("");
-  return (
-    <div className={styles.modalOverlay} onClick={onCancel}>
-      <div className={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalHandle} />
-        <div style={{ textAlign: "center", paddingTop: 16 }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
-          <h2 style={{ fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
-            Decline Booking?
-          </h2>
-          <p
-            style={{
-              color: "rgb(100,100,100)",
-              fontSize: 14,
-              marginBottom: 16,
-            }}
-          >
-            Customer: <strong>{booking.customer_name}</strong>
-          </p>
-          <p
-            style={{
-              color: "rgb(100,100,100)",
-              fontSize: 12,
-              marginBottom: 16,
-            }}
-          >
-            {formatDate(booking.service_date)}
-          </p>
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <label
-            style={{
-              display: "block",
-              fontSize: 13,
-              fontWeight: "bold",
-              marginBottom: 6,
-              color: "rgb(47,47,47)",
-            }}
-          >
-            Reason for declining (optional)
-          </label>
-          <textarea
-            style={{
-              width: "100%",
-              border: "1px solid rgb(228,228,228)",
-              borderRadius: "8px",
-              padding: "10px",
-              fontSize: 13,
-              fontFamily: "inherit",
-              minHeight: "80px",
-              boxSizing: "border-box",
-              resize: "vertical",
-            }}
-            placeholder="Let the customer know why you're declining..."
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            disabled={isLoading}
-          />
-        </div>
-        <div className={styles.modalActions}>
-          <button
-            className={styles.modalBtn}
-            onClick={onCancel}
-            disabled={isLoading}
-          >
-            Keep Booking
-          </button>
-          <button
-            className={`${styles.modalBtn} ${styles.modalBtnDanger}`}
-            onClick={() => onConfirm(booking.id, reason)}
-            disabled={isLoading}
-            style={{
-              background: isLoading ? "rgb(200,100,100)" : "rgb(187,19,47)",
-            }}
-          >
-            {isLoading ? "Declining..." : "Decline Booking"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Floating Toast ───────────────────────────────────────────
-function FloatingToast({ message, type, visible }) {
-  if (!visible) return null;
-  const base = {
-    position: "fixed",
-    bottom: 24,
-    right: 24,
-    padding: "14px 18px",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontWeight: "bold",
-    maxWidth: 400,
-    zIndex: 10000,
-    animation: "slideIn 0.3s ease-in-out",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-  };
-  const types = {
-    success: { background: "rgb(209,247,224)", color: "rgb(10,107,46)" },
-    error: { background: "rgb(255,228,228)", color: "rgb(168,28,28)" },
-    warning: { background: "rgb(255,243,205)", color: "rgb(133,100,4)" },
-    info: { background: "rgb(209,236,255)", color: "rgb(10,76,140)" },
-  };
-  return (
-    <>
-      <style>{`@keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }`}</style>
-      <div style={{ ...base, ...(types[type] || types.info) }}>{message}</div>
-    </>
-  );
-}
-
-// ─── Bookings Tab ─────────────────────────────────────────────
-function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("all");
-  const [declineModal, setDeclineModal] = useState(null);
-  const [isDeclining, setIsDeclining] = useState(false);
-
-  const fetchBookings = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ limit: 50 });
-      if (filter !== "all") params.set("status", filter);
-      const res = await fetch(`${API_URL}/api/bookings?${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setBookings(data.bookings || []);
-    } catch (err) {
-      console.error("Error fetching bookings:", err);
-    }
-    setLoading(false);
-  }, [filter, token]);
-
-  useEffect(() => {
-    fetchBookings();
-  }, [fetchBookings]);
-
-  useEffect(() => {
-    const token_val = localStorage.getItem("token");
-    if (!token_val) return;
-    const id = setInterval(async () => {
-      try {
-        const params = new URLSearchParams({ limit: 50 });
-        if (filter !== "all") params.set("status", filter);
-        const res = await fetch(`${API_URL}/api/bookings?${params}`, {
-          headers: { Authorization: `Bearer ${token_val}` },
-        });
-        const data = await res.json();
-        setBookings(data.bookings || []);
-      } catch (err) {
-        console.error("Background refresh error:", err);
-      }
-    }, 30000);
-    return () => clearInterval(id);
-  }, [filter]);
-
-  async function updateStatus(id, status) {
-    try {
-      const res = await fetch(`${API_URL}/api/bookings/${id}/status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status }),
-      });
-      if (res.ok) fetchBookings();
-    } catch (err) {
-      console.error("Error updating booking status:", err);
-    }
-  }
-
-  async function handleDecline(bookingId, reason) {
-    setIsDeclining(true);
-    try {
-      const res = await fetch(`${API_URL}/api/bookings/${bookingId}/status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          status: "declined",
-          declined_reason: reason || undefined,
-          declined_by: "maid",
-        }),
-      });
-      if (res.ok) {
-        setDeclineModal(null);
-        fetchBookings();
-        onDeclineMessage({
-          message: "✅ Booking declined. Customer has been notified.",
-          type: "success",
-        });
-      } else
-        onDeclineMessage({
-          message: "❌ Failed to decline booking. Please try again.",
-          type: "error",
-        });
-    } catch {
-      onDeclineMessage({
-        message: "❌ Error declining booking. Please try again.",
-        type: "error",
-      });
-    } finally {
-      setIsDeclining(false);
-    }
-  }
-
-  const FILTERS = [
-    "all",
-    "pending",
-    "confirmed",
-    "in_progress",
-    "completed",
-    "declined",
-    "cancelled",
-  ];
-
-  return (
-    <div>
-      <p className={styles.sectionTitle}>My Bookings</p>
-      <div
-        className={styles.tabs}
-        style={{
-          marginBottom: 16,
-          border: "none",
-          borderBottom: "1px solid rgb(228,228,228)",
-        }}
-      >
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            className={`${styles.tab} ${filter === f ? styles.tabActive : ""}`}
-            onClick={() => setFilter(f)}
-          >
-            {f === "in_progress"
-              ? "In Progress"
-              : f.charAt(0).toUpperCase() + f.slice(1)}
-          </button>
-        ))}
-      </div>
-      {loading ? (
-        <div className={styles.loading}>Loading...</div>
-      ) : bookings.length === 0 ? (
-        <div className={styles.empty}>
-          No {filter !== "all" ? filter : ""} bookings
-        </div>
-      ) : (
-        <div className={styles.bookingList}>
-          {bookings.map((b) => (
-            <div key={b.id} className={styles.bookingCard}>
-              <div className={styles.bookingTop}>
-                <div>
-                  <p className={styles.bookingCustomer}>{b.customer_name}</p>
-                  <p className={styles.bookingDate}>
-                    {formatDate(b.service_date)}
-                  </p>
-                </div>
-                <span
-                  className={`${styles.statusBadge} ${STATUS_CLASS[b.status] || styles.statusPending}`}
-                >
-                  {b.status === "in_progress"
-                    ? "In Progress"
-                    : b.status?.replace("_", " ")}
-                </span>
-              </div>
-              <div className={styles.bookingMeta}>
-                <div className={styles.metaItem}>
-                  Duration:{" "}
-                  <span className={styles.metaValue}>{b.duration_hours}h</span>
-                </div>
-                <div className={styles.metaItem}>
-                  Earning:{" "}
-                  <span className={styles.metaValue}>
-                    ₦{Number(b.total_amount || 0).toLocaleString()}
-                  </span>
-                </div>
-                <div className={styles.metaItem}>
-                  Address: <span className={styles.metaValue}>{b.address}</span>
-                </div>
-              </div>
-              {b.status === "declined" && b.declined_reason && (
-                <div
-                  style={{
-                    padding: "10px",
-                    background: "rgb(255,243,205)",
-                    borderRadius: "6px",
-                    marginBottom: "10px",
-                    fontSize: "12px",
-                    color: "rgb(100,80,0)",
-                  }}
-                >
-                  <p style={{ margin: "0 0 4px", fontWeight: "bold" }}>
-                    Decline reason:
-                  </p>
-                  <p style={{ margin: 0 }}>{b.declined_reason}</p>
-                </div>
-              )}
-              <div className={styles.bookingActions}>
-                {b.status === "pending" && (
-                  <>
-                    <button
-                      className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
-                      onClick={() => updateStatus(b.id, "confirmed")}
-                    >
-                      Accept
-                    </button>
-                    <button
-                      className={styles.actionBtn}
-                      onClick={() => setDeclineModal(b)}
-                    >
-                      Decline
-                    </button>
-                  </>
-                )}
-                {b.status === "confirmed" && (
-                  <button
-                    className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
-                    onClick={() => updateStatus(b.id, "in_progress")}
-                  >
-                    Start Cleaning
-                  </button>
-                )}
-                {b.status === "in_progress" && (
-                  <button
-                    className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
-                    onClick={() => updateStatus(b.id, "completed")}
-                  >
-                    Mark Complete
-                  </button>
-                )}
-                {b.status === "declined" && (
-                  <p style={{ fontSize: 12, color: "gray", margin: 0 }}>
-                    Declined on {formatDate(b.updated_at)}
-                  </p>
-                )}
-                {["pending", "confirmed", "in_progress", "completed"].includes(
-                  b.status,
-                ) && (
-                  <button
-                    className={styles.actionBtn}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 5,
-                      color: "white",
-                      background: "rgb(19,19,103)",
-                      borderColor: "rgb(19,19,103)",
-                      fontSize: 12,
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpenChat(b);
-                    }}
-                  >
-                    💬 Chat Customer
-                  </button>
-                )}
-                <button
-                  className={styles.actionBtn}
-                  style={{
-                    marginLeft: "auto",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 5,
-                    color: "rgb(19,19,103)",
-                    borderColor: "rgb(200,210,240)",
-                    background: "rgb(245,245,255)",
-                    fontSize: 12,
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onGetSupport(b);
-                  }}
-                >
-                  🎫 Get Support
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-      {declineModal && (
-        <DeclineConfirmModal
-          booking={declineModal}
-          onConfirm={handleDecline}
-          onCancel={() => setDeclineModal(null)}
-          isLoading={isDeclining}
-        />
-      )}
-    </div>
-  );
-}
-
-// ─── Reviews Tab ──────────────────────────────────────────────
-function ReviewsTab({ token }) {
-  const { user } = useAuth();
-  const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch(`${API_URL}/api/maids/${user.id}/reviews`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        setReviews(data.reviews || []);
-      } catch {}
-      setLoading(false);
-    }
-    load();
-  }, [user.id, token]);
-
-  const avg = reviews.length
-    ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
-    : "—";
-
-  return (
-    <div>
-      <p className={styles.sectionTitle}>My Reviews</p>
-      {reviews.length > 0 && (
-        <div className={styles.statsGrid} style={{ marginBottom: 16 }}>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Average Rating</p>
-            <p className={styles.statValue}>★ {avg}</p>
-          </div>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Total Reviews</p>
-            <p className={styles.statValue}>{reviews.length}</p>
-          </div>
-        </div>
-      )}
-      {loading ? (
-        <div className={styles.loading}>Loading reviews...</div>
-      ) : reviews.length === 0 ? (
-        <div className={styles.empty}>
-          No reviews yet. Complete bookings to receive reviews.
-        </div>
-      ) : (
-        <div className={styles.reviewList}>
-          {reviews.map((r) => (
-            <div key={r.id ?? r.created_at} className={styles.reviewCard}>
-              <div className={styles.reviewTop}>
-                <span className={styles.reviewCustomer}>{r.customer_name}</span>
-                <span className={styles.reviewStars}>
-                  {"★".repeat(r.rating)}
-                  {"☆".repeat(5 - r.rating)}
-                </span>
-              </div>
-              {r.comment && (
-                <p className={styles.reviewComment}>"{r.comment}"</p>
-              )}
-              <p className={styles.reviewDate}>{formatDate(r.created_at)}</p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Main Dashboard ───────────────────────────────────────────
-export default function MaidDashboard({ onLogout }) {
-  const navigate = useNavigate();
-  const { user, token, logout } = useAuth();
-
-  const [tab, setTab] = useState("bookings");
-  const [available, setAvailable] = useState(true);
-  const [savingAvail, setSavingAvail] = useState(false);
-  const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    completed: 0,
-    earnings: 0,
-  });
-  const [toast, setToast] = useState({
-    visible: false,
-    message: "",
-    type: "success",
-  });
-  const [supportPrefill, setSupportPrefill] = useState(null);
-  const [chatBooking, setChatBooking] = useState(null);
-  const [supportOpenCount, setSupportOpenCount] = useState(0);
-
-  useEffect(() => {
-    if (!token || user.role !== "maid") {
-      navigate("/login");
-      return;
-    }
-    async function loadProfile() {
-      try {
-        const res = await fetch(`${API_URL}/api/maids/${user.id}`);
-        const data = await res.json();
-        if (res.ok && data.maid) setAvailable(data.maid.is_available);
-      } catch {}
-    }
-    async function loadStats() {
-      try {
-        const res = await fetch(`${API_URL}/api/bookings?limit=200`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        const b = data.bookings || [];
-        setStats({
-          total: b.length,
-          pending: b.filter((x) => x.status === "pending").length,
-          completed: b.filter((x) => x.status === "completed").length,
-          earnings: b
-            .filter((x) => x.status === "completed")
-            .reduce((s, x) => s + Number(x.total_amount), 0),
-        });
-      } catch {}
-    }
-    async function loadSupportCount() {
-      try {
-        const res = await fetch(`${API_URL}/api/maid-support?limit=50`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        const tickets = data.tickets || [];
-        setSupportOpenCount(
-          tickets.filter(
-            (t) => t.status === "open" || t.status === "in_progress",
-          ).length,
-        );
-      } catch {}
-    }
-    loadProfile();
-    loadStats();
-    loadSupportCount();
-  }, [token, user, navigate]);
-
-  useEffect(() => {
-    const token_val = localStorage.getItem("token");
-    if (!token_val) return;
-    const id = setInterval(async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/bookings?limit=200`, {
-          headers: { Authorization: `Bearer ${token_val}` },
-        });
-        const data = await res.json();
-        const b = data.bookings || [];
-        setStats({
-          total: b.length,
-          pending: b.filter((x) => x.status === "pending").length,
-          completed: b.filter((x) => x.status === "completed").length,
-          earnings: b
-            .filter((x) => x.status === "completed")
-            .reduce((s, x) => s + Number(x.total_amount), 0),
-        });
-      } catch (err) {
-        console.error("Background refresh error:", err);
-      }
-      try {
-        const sr = await fetch(`${API_URL}/api/maid-support?limit=50`, {
-          headers: { Authorization: `Bearer ${token_val}` },
-        });
-        const sd = await sr.json();
-        const st = sd.tickets || [];
-        setSupportOpenCount(
-          st.filter((t) => t.status === "open" || t.status === "in_progress")
-            .length,
-        );
-      } catch {}
-    }, 30000);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    if (toast.visible) {
-      const timer = setTimeout(
-        () => setToast({ ...toast, visible: false }),
-        4000,
-      );
-      return () => clearTimeout(timer);
-    }
-  }, [toast.visible]);
-
-  function handleDeclineMessage({ message, type }) {
-    setToast({ visible: true, message, type });
-  }
-  function handleOpenChat(booking) {
-    setChatBooking(booking);
-  }
-  function handleGetSupport(booking) {
-    setSupportPrefill(booking);
-    setTab("support");
-  }
-
-  async function toggleAvailability() {
-    setSavingAvail(true);
-    try {
-      const res = await fetch(`${API_URL}/api/maids/profile`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ is_available: !available }),
-      });
-      if (res.ok) setAvailable((v) => !v);
-    } catch {}
-    setSavingAvail(false);
-  }
-
-  function handleLogout() {
-    logout();
-    onLogout?.();
-  }
-
-  if (chatBooking) {
-    return (
-      <MaidChat
-        bookingId={chatBooking.id}
-        otherName={chatBooking.customer_name}
-        otherAvatar={chatBooking.customer_avatar}
-        onClose={() => setChatBooking(null)}
-      />
-    );
-  }
-
-  return (
-    <>
-      <div className={styles.dashboard}>
-        {/* Header */}
-        <div className={styles.header}>
-          <div className={styles.headerLeft}>
-            {user.avatar ? (
-              <img
-                onClick={() => navigate("/settings")}
-                src={user.avatar}
-                alt={user.name}
-                className={styles.headerAvatar}
-                onError={(ev) => {
-                  ev.target.style.display = "none";
-                }}
-              />
-            ) : (
-              <div className={styles.headerAvatarPlaceholder}>
-                {initials(user.name)}
-              </div>
-            )}
-            <div>
-              <p className={styles.headerName}>{user.name}</p>
-              <p className={styles.headerRole}>Maid · Deusizi Sparkle</p>
-            </div>
-          </div>
-          <button className={styles.logoutBtn} onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
-
-        {/* Availability */}
-        <div className={styles.availBar}>
-          <div>
-            <p className={styles.availLabel}>Availability</p>
-            <p className={styles.availStatus}>
-              {available
-                ? "You are visible to customers"
-                : "You are hidden from search"}
-            </p>
-          </div>
-          <button
-            className={`${styles.toggle} ${available ? styles.toggleOn : ""}`}
-            onClick={toggleAvailability}
-            disabled={savingAvail}
-          >
-            <div
-              className={`${styles.toggleKnob} ${available ? styles.toggleKnobOn : ""}`}
-            />
-          </button>
-        </div>
-
-        {/* Stats */}
-        <div className={styles.content}>
-          <div className={styles.statsGrid}>
-            <div className={styles.statCard}>
-              <p className={styles.statLabel}>Total Bookings</p>
-              <p className={styles.statValue}>{stats.total}</p>
-            </div>
-            <div className={styles.statCard}>
-              <p className={styles.statLabel}>Pending</p>
-              <p className={styles.statValue}>{stats.pending}</p>
-            </div>
-            <div className={styles.statCard}>
-              <p className={styles.statLabel}>Completed</p>
-              <p className={styles.statValue}>{stats.completed}</p>
-            </div>
-            <div className={styles.statCard}>
-              <p className={styles.statLabel}>Earnings</p>
-              <p className={styles.statValue} style={{ fontSize: 18 }}>
-                ₦{stats.earnings.toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        <div className={styles.tabs}>
-          {[
-            ["bookings", "Bookings"],
-            ["profile", "My Profile"],
-            ["reviews", "Reviews"],
-            ["support", "Support"],
-          ].map(([key, label]) => (
-            <button
-              key={key}
-              className={`${styles.tab} ${tab === key ? styles.tabActive : ""}`}
-              onClick={() => {
-                setTab(key);
-                if (key !== "support") setSupportPrefill(null);
-              }}
-            >
-              {label}
-              {key === "bookings" && stats.pending > 0 && (
-                <span
-                  style={{
-                    marginLeft: 6,
-                    background: "rgb(187,19,47)",
-                    color: "white",
-                    fontSize: 10,
-                    padding: "1px 6px",
-                    borderRadius: 10,
-                    fontWeight: "bold",
-                  }}
-                >
-                  {stats.pending}
-                </span>
-              )}
-              {key === "support" && supportOpenCount > 0 && (
-                <span
-                  style={{
-                    marginLeft: 6,
-                    background: "rgb(19,19,103)",
-                    color: "white",
-                    fontSize: 10,
-                    padding: "1px 6px",
-                    borderRadius: 10,
-                    fontWeight: "bold",
-                  }}
-                >
-                  {supportOpenCount > 99 ? "99+" : supportOpenCount}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-
-        <div className={styles.content}>
-          {tab === "bookings" && (
-            <BookingsTab
-              token={token}
-              onDeclineMessage={handleDeclineMessage}
-              onGetSupport={handleGetSupport}
-              onOpenChat={handleOpenChat}
-            />
-          )}
-          {tab === "profile" && <ProfileTab token={token} />}
-          {tab === "reviews" && <ReviewsTab token={token} />}
-          {tab === "support" && (
-            <MaidSupportTab token={token} prefillBooking={supportPrefill} />
-          )}
-        </div>
-
-        <FloatingToast
-          message={toast.message}
-          type={toast.type}
-          visible={toast.visible}
-        />
-      </div>
-
-      {/* Floating maid support chat — only renders for logged-in maids */}
-      <FloatingMaidSupportChat />
-    </>
   );
 }

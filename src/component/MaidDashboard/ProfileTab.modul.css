@@ -1,0 +1,426 @@
+/* ─── ADD TO BOTTOM of MaidDashboard.module.css ─────────────────────────────
+   All classes needed for the expanded ProfileTab
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Message banners ─────────────────────────────────────────────────── */
+.msgBanner {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+.successMsg {
+  background: rgb(209, 247, 224);
+  color: rgb(10, 107, 46);
+}
+.errorMsg {
+  background: rgb(255, 228, 228);
+  color: rgb(168, 28, 28);
+}
+.warningMsg {
+  background: rgb(255, 243, 205);
+  color: rgb(133, 100, 4);
+}
+.infoMsg {
+  background: rgb(209, 236, 255);
+  color: rgb(10, 76, 140);
+}
+
+/* ── Spinner ─────────────────────────────────────────────────────────── */
+.loadingSpinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgb(228, 228, 228);
+  border-top-color: rgb(19, 19, 103);
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  margin: 0 auto 10px;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Section dividers within the form ───────────────────────────────── */
+.profileSection {
+  background: white;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 10px;
+  padding: 18px 16px;
+  margin-bottom: 4px;
+}
+.profileSectionTitle {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 0 0 12px;
+}
+.profileSectionDesc {
+  font-size: 12px;
+  color: gray;
+  margin: -8px 0 14px;
+  line-height: 1.5;
+}
+
+/* ── Avatar ──────────────────────────────────────────────────────────── */
+.avatarRow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.avatarPreview {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgb(240, 240, 245);
+  border: 2px solid rgb(228, 228, 228);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.avatarInitials {
+  font-size: 28px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+}
+.avatarOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+.avatarActions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.avatarUploadBtn {
+  display: inline-block;
+  padding: 10px 16px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.avatarUploadBtn:hover {
+  background: rgb(15, 15, 70);
+}
+.avatarUploadBtnDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.avatarHint {
+  font-size: 11px;
+  color: rgb(140, 140, 140);
+  margin: 0;
+}
+
+/* ── Label helpers ───────────────────────────────────────────────────── */
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.locationBtn {
+  background: none;
+  border: none;
+  color: rgb(19, 19, 103);
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+  padding: 0;
+}
+.locationBtn:disabled {
+  color: gray;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.labelOptional {
+  font-weight: normal;
+  color: gray;
+  font-size: 12px;
+}
+.labelCount {
+  font-weight: normal;
+  color: gray;
+  font-size: 12px;
+}
+
+/* ── Address detail box ──────────────────────────────────────────────── */
+.addressDetail {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: rgb(245, 245, 248);
+  border-radius: 8px;
+  border-left: 3px solid rgb(19, 19, 103);
+  font-size: 12px;
+  color: gray;
+  line-height: 1.7;
+}
+.addressDetailTitle {
+  font-weight: bold;
+  color: rgb(47, 47, 47);
+  margin: 0 0 4px;
+}
+.addressDetail p {
+  margin: 0;
+}
+
+/* ── Rates grid ──────────────────────────────────────────────────────── */
+.ratesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.rateTag {
+  font-size: 10px;
+  font-weight: normal;
+  background: rgb(240, 240, 255);
+  color: rgb(19, 19, 103);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+
+/* ── Availability ────────────────────────────────────────────────────── */
+.availGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.availRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 8px;
+  background: rgb(250, 250, 252);
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.availRowActive {
+  border-color: rgb(19, 19, 103);
+  background: rgb(245, 245, 255);
+}
+
+.availDayToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  width: 72px;
+}
+
+.availToggleBtn {
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: rgb(220, 220, 220);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  padding: 2px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.availToggleBtnOn {
+  background: rgb(10, 107, 46);
+}
+.availToggleKnob {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+.availToggleBtnOn .availToggleKnob {
+  transform: translateX(18px);
+}
+
+.availDayLabel {
+  font-size: 13px;
+  font-weight: bold;
+  color: gray;
+  width: 28px;
+}
+.availDayLabelActive {
+  color: rgb(19, 19, 103);
+}
+
+.availTimes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+.timeInput {
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  flex: 1;
+  min-width: 0;
+}
+.timeInput:focus {
+  border-color: rgb(19, 19, 103);
+}
+.timeSep {
+  font-size: 13px;
+  color: gray;
+  flex-shrink: 0;
+}
+.availOff {
+  font-size: 12px;
+  color: rgb(180, 180, 180);
+  font-style: italic;
+  flex: 1;
+}
+
+/* ── Documents ───────────────────────────────────────────────────────── */
+.docsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.docCard {
+  padding: 14px;
+  border: 1.5px solid rgb(228, 228, 228);
+  border-radius: 10px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.docCardPending {
+  border-color: rgb(255, 195, 0);
+  background: rgb(255, 253, 235);
+}
+.docCardApproved {
+  border-color: rgb(10, 107, 46);
+  background: rgb(240, 255, 246);
+}
+.docCardRejected {
+  border-color: rgb(168, 28, 28);
+  background: rgb(255, 246, 246);
+}
+
+.docCardTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.docIcon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.docLabel {
+  font-size: 13px;
+  font-weight: bold;
+  color: rgb(30, 30, 30);
+  margin: 0 0 4px;
+}
+
+.docStatus {
+  font-size: 11px;
+  font-weight: bold;
+}
+.docStatus_pending {
+  color: rgb(133, 100, 4);
+}
+.docStatus_approved {
+  color: rgb(10, 107, 46);
+}
+.docStatus_rejected {
+  color: rgb(168, 28, 28);
+}
+.docStatusNone {
+  font-size: 11px;
+  color: gray;
+}
+
+.docNote {
+  font-size: 11px;
+  color: rgb(168, 28, 28);
+  background: rgb(255, 235, 235);
+  padding: 6px 8px;
+  border-radius: 6px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.docUploadBtn {
+  display: inline-block;
+  padding: 8px 12px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+  transition: background 0.2s;
+}
+.docUploadBtn:hover {
+  background: rgb(15, 15, 70);
+}
+.docUploadBtnLoading {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.docHint {
+  font-size: 11px;
+  color: gray;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .ratesGrid {
+    grid-template-columns: 1fr;
+  }
+  .docsGrid {
+    grid-template-columns: 1fr;
+  }
+  .availTimes {
+    flex-wrap: wrap;
+  }
+}
