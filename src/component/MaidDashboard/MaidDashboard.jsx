@@ -6,6 +6,7 @@ import MaidSupportTab from "../MaidsupportTab/Maidsupporttab";
 import MaidChat from "../MaidChat/MaidChat";
 import FloatingMaidSupportChat from "../MaidSupportChat/FloatingMaidSupportChat";
 import NotificationBell from "../Notifications/NotificationBell";
+import WithdrawTab from "../WithdrawTab/WithdrawTab";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 // At the top of ProfileTab (or at the top of MaidDashboard.jsx alongside API_URL), add:
@@ -1777,6 +1778,7 @@ export default function MaidDashboard({ onLogout }) {
             ["profile", "My Profile"],
             ["reviews", "Reviews"],
             ["support", "Support"],
+            ["withdraw", "Withdraw "],
           ].map(([key, label]) => (
             <button
               key={key}
@@ -1835,6 +1837,7 @@ export default function MaidDashboard({ onLogout }) {
           {tab === "support" && (
             <MaidSupportTab token={token} prefillBooking={supportPrefill} />
           )}
+          {tab === "withdraw" && <WithdrawTab token={token} />}
         </div>
 
         <FloatingToast
