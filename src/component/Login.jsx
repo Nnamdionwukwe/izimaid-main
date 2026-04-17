@@ -1,6 +1,5 @@
 // src/component/Login.jsx
-// Supports: Google OAuth, email/password login, register, forgot password
-// Styling: Login.module.css (unchanged) + platform CSS variables from index.css
+// Views: "signin" | "register" | "forgot" | "forgot_sent" | "phone_prompt"
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,8 +8,6 @@ import { useAuth } from "../context/AuthContext.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-// Normalize API base — works whether VITE_API_URL has /api or not
 const API = API_URL.replace(/\/$/, "").replace(/\/api$/, "") + "/api";
 
 function buildGoogleOAuthURL(role) {
@@ -25,7 +22,6 @@ function buildGoogleOAuthURL(role) {
   return `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
 }
 
-// ── Small shared sub-components ────────────────────────────────────────
 function InputField({
   label,
   type = "text",
@@ -38,21 +34,21 @@ function InputField({
   ...rest
 }) {
   const [show, setShow] = useState(false);
-  const isPassword = type === "password";
+  const isPwd = type === "password";
   return (
     <div className={styles.fieldGroup}>
       <label className={styles.fieldLabel}>{label}</label>
       <div className={styles.fieldWrap}>
         <input
           className={`${styles.input} ${error ? styles.inputError : ""}`}
-          type={isPassword && show ? "text" : type}
+          type={isPwd && show ? "text" : type}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
           disabled={disabled}
           {...rest}
         />
-        {isPassword && (
+        {isPwd && (
           <button
             type="button"
             className={styles.inputEye}
@@ -73,9 +69,6 @@ function Spinner() {
   return <span className={styles.loadingSpinner} />;
 }
 
-// ── VIEWS ──────────────────────────────────────────────────────────────
-// "signin" | "register" | "forgot" | "forgot_sent"
-
 export default function Login({ onSuccess }) {
   const [view, setView] = useState("signin");
   const [role, setRole] = useState("customer");
@@ -83,12 +76,12 @@ export default function Login({ onSuccess }) {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // Sign-in form
+  // Sign-in
   const [siEmail, setSiEmail] = useState("");
   const [siPass, setSiPass] = useState("");
   const [siErrors, setSiErrors] = useState({});
 
-  // Register form
+  // Register
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regPass, setRegPass] = useState("");
@@ -100,10 +93,16 @@ export default function Login({ onSuccess }) {
   const [fpEmail, setFpEmail] = useState("");
   const [fpErrors, setFpErrors] = useState({});
 
+  // Phone prompt (after Google register)
+  const [phoneVal, setPhoneVal] = useState("");
+  const [phoneError, setPhoneError] = useState(null);
+  const [googleToken, setGoogleToken] = useState(null); // token from Google login, needed for /complete-profile
+  const [googleUser, setGoogleUser] = useState(null);
+
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // ── Google OAuth callback handling ──────────────────────────────────
+  // ── Google OAuth callback ──────────────────────────────────────────
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash.includes("access_token")) return;
@@ -118,6 +117,7 @@ export default function Login({ onSuccess }) {
     setLoading(true);
     setError(null);
 
+    // Clear any stale session
     const currentToken = localStorage.getItem("token");
     if (currentToken) {
       localStorage.removeItem("token");
@@ -137,8 +137,21 @@ export default function Login({ onSuccess }) {
       .then(({ ok, data }) => {
         if (!ok) throw new Error(data.error || "Authentication failed");
         if (!data.token) throw new Error("No token in response");
-        login(data.user, data.token);
+
+        // Store token first so completeProfile request is authenticated
         setLoading(false);
+
+        if (data.needsPhone) {
+          // Don't call login() yet — it would trigger loginRedirect() in App.jsx
+          // and navigate away before the phone prompt renders
+          setGoogleToken(data.token);
+          setGoogleUser(data.user); // store user in state (add this state var)
+          setView("phone_prompt");
+          return;
+        }
+
+        // No phone needed — safe to login now
+        login(data.user, data.token);
         onSuccess?.(data);
         const path =
           data.user.role === "admin"
@@ -147,9 +160,19 @@ export default function Login({ onSuccess }) {
               ? "/maid"
               : "/my-bookings";
         navigate(path, { replace: true });
+
+        // Existing user or new user who already has phone
+        onSuccess?.(data);
+        const paths =
+          data.user.role === "admin"
+            ? "/admin"
+            : data.user.role === "maid"
+              ? "/maid"
+              : "/my-bookings";
+        navigate(paths, { replace: true });
       })
       .catch((err) => {
-        setError(err.message || "Something went wrong. Please try again.");
+        setError(err.message || "Something went wrong.");
         setLoading(false);
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -161,7 +184,51 @@ export default function Login({ onSuccess }) {
     window.location.href = buildGoogleOAuthURL(role);
   };
 
-  // ── Email / password sign in ─────────────────────────────────────────
+  // ── Phone prompt submit (after Google register) ────────────────────
+  async function handlePhoneSubmit(e) {
+    e.preventDefault();
+    if (!phoneVal.trim()) {
+      setPhoneError("Phone number is required");
+      return;
+    }
+    if (!/^\+?[\d\s\-()]{7,15}$/.test(phoneVal)) {
+      setPhoneError("Enter a valid phone number with country code");
+      return;
+    }
+    setPhoneError(null);
+    setLoading(true);
+
+    try {
+      const token = googleToken || localStorage.getItem("token");
+      const res = await fetch(`${API}/auth/complete-profile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ phone: phoneVal }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save phone");
+
+      // NOW call login — after phone is saved
+      login(data.user, token);
+      onSuccess?.({ user: data.user, token });
+      const path =
+        data.user.role === "admin"
+          ? "/admin"
+          : data.user.role === "maid"
+            ? "/maid"
+            : "/my-bookings";
+      navigate(path, { replace: true });
+    } catch (err) {
+      setPhoneError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── Email sign in ──────────────────────────────────────────────────
   async function handleSignIn(e) {
     e.preventDefault();
     const errs = {};
@@ -182,17 +249,26 @@ export default function Login({ onSuccess }) {
         body: JSON.stringify({ email: siEmail, password: siPass }),
       });
       const data = await res.json();
+
       if (!res.ok) {
         if (data.code === "EMAIL_NOT_VERIFIED") {
           setError(null);
           setSuccess(
-            "Please verify your email before logging in. Check your inbox.",
+            "Your email isn't verified yet. Check your inbox for the verification link.",
+          );
+          setLoading(false);
+          return;
+        }
+        if (data.code === "NO_PASSWORD_SET") {
+          setError(
+            'This account was created with Google. Use "Continue with Google" or click "Forgot password" to set a password.',
           );
           setLoading(false);
           return;
         }
         throw new Error(data.error || "Login failed");
       }
+
       login(data.user, data.token);
       onSuccess?.(data);
       const path =
@@ -209,7 +285,7 @@ export default function Login({ onSuccess }) {
     }
   }
 
-  // ── Register ─────────────────────────────────────────────────────────
+  // ── Register ───────────────────────────────────────────────────────
   async function handleRegister(e) {
     e.preventDefault();
     const errs = {};
@@ -239,9 +315,21 @@ export default function Login({ onSuccess }) {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Registration failed");
+
+      if (!res.ok) {
+        if (data.code === "GOOGLE_ACCOUNT_LINKED") {
+          setSuccess(
+            "Your Google account now has a password set. You can sign in with either method.",
+          );
+          setView("signin");
+          setLoading(false);
+          return;
+        }
+        throw new Error(data.error || "Registration failed");
+      }
+
       setSuccess(
-        "Account created! Check your email to verify before logging in.",
+        "Account created! Check your email to verify before signing in.",
       );
       setView("signin");
     } catch (err) {
@@ -251,7 +339,7 @@ export default function Login({ onSuccess }) {
     }
   }
 
-  // ── Forgot password ───────────────────────────────────────────────────
+  // ── Forgot password ────────────────────────────────────────────────
   async function handleForgotPassword(e) {
     e.preventDefault();
     if (!fpEmail) {
@@ -278,31 +366,7 @@ export default function Login({ onSuccess }) {
     }
   }
 
-  // ── Loading screen (Google OAuth processing) ──────────────────────
-  if (
-    window.location.hash.includes("access_token") ||
-    (loading && view === "signin" && !siEmail)
-  ) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.right} style={{ width: "100%" }}>
-          <div className={styles.formWrap} style={{ textAlign: "center" }}>
-            <Spinner />
-            <p style={{ color: "#8a7b6a", fontSize: "14px", marginTop: 16 }}>
-              Signing you in…
-            </p>
-            {error && (
-              <p style={{ color: "#d9534f", fontSize: "12px", marginTop: 8 }}>
-                {error}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Left panel (shared) ────────────────────────────────────────────
+  // ── Left panel ─────────────────────────────────────────────────────
   const LeftPanel = () => (
     <div className={styles.left}>
       <div className={styles.leftPattern} />
@@ -324,18 +388,16 @@ export default function Login({ onSuccess }) {
           in minutes, enjoy a spotless home.
         </p>
         <div className={styles.leftStats}>
-          <div className={styles.stat}>
-            <div className={styles.statNumber}>50+</div>
-            <div className={styles.statLabel}>Verified maids</div>
-          </div>
-          <div className={styles.stat}>
-            <div className={styles.statNumber}>98%</div>
-            <div className={styles.statLabel}>Satisfaction</div>
-          </div>
-          <div className={styles.stat}>
-            <div className={styles.statNumber}>100+</div>
-            <div className={styles.statLabel}>Homes cleaned</div>
-          </div>
+          {[
+            ["50+", "Verified maids"],
+            ["98%", "Satisfaction"],
+            ["100+", "Homes cleaned"],
+          ].map(([n, l]) => (
+            <div key={l} className={styles.stat}>
+              <div className={styles.statNumber}>{n}</div>
+              <div className={styles.statLabel}>{l}</div>
+            </div>
+          ))}
         </div>
       </div>
       <div className={styles.leftFooter}>
@@ -344,7 +406,97 @@ export default function Login({ onSuccess }) {
     </div>
   );
 
-  // ── FORGOT PASSWORD SENT ────────────────────────────────────────────
+  // ── Loading screen (Google OAuth processing) ───────────────────────
+  if (
+    window.location.hash.includes("access_token") ||
+    (loading && view === "signin" && !siEmail)
+  ) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.right} style={{ width: "100%" }}>
+          <div className={styles.formWrap} style={{ textAlign: "center" }}>
+            <Spinner />
+            <p style={{ color: "#8a7b6a", fontSize: 14, marginTop: 16 }}>
+              Signing you in…
+            </p>
+            {error && (
+              <p style={{ color: "#d9534f", fontSize: 12, marginTop: 8 }}>
+                {error}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── PHONE PROMPT (after Google register) ───────────────────────────
+  if (view === "phone_prompt") {
+    return (
+      <div className={styles.page}>
+        <LeftPanel />
+        <div className={styles.right}>
+          <div className={styles.formWrap}>
+            <div className={styles.formHeader}>
+              <h2 className={styles.formTitle}>One last step</h2>
+              <p className={styles.formSubtitle}>
+                Add your phone number so maids and customers can reach you.
+              </p>
+            </div>
+
+            <form onSubmit={handlePhoneSubmit} noValidate>
+              <InputField
+                label="Phone number"
+                type="tel"
+                value={phoneVal}
+                onChange={(e) => setPhoneVal(e.target.value)}
+                placeholder="+234 800 000 0000"
+                hint="Include country code — e.g. +234 for Nigeria"
+                error={phoneError}
+                disabled={loading}
+                autoFocus
+              />
+
+              <button
+                type="submit"
+                className={styles.submitBtn}
+                disabled={loading}
+                style={{ marginTop: 8 }}
+              >
+                {loading ? <Spinner /> : "Continue →"}
+              </button>
+            </form>
+
+            <p className={styles.switchPrompt}>
+              {/* <button
+                className={styles.switchLink}
+                onClick={() => {
+                  const token = googleToken;
+                  const user = googleUser;
+                  if (token && user) {
+                    login(user, token); // ← call login on skip too
+                    onSuccess?.({ user, token });
+                  }
+                  const role = googleUser?.role;
+                  const path =
+                    role === "admin"
+                      ? "/admin"
+                      : role === "maid"
+                        ? "/maid"
+                        : "/my-bookings";
+                  navigate(path, { replace: true });
+                }}
+              >
+                Skip for now
+              </button> */}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── FORGOT SENT ────────────────────────────────────────────────────
   if (view === "forgot_sent") {
     return (
       <div className={styles.page}>
@@ -375,7 +527,7 @@ export default function Login({ onSuccess }) {
     );
   }
 
-  // ── FORGOT PASSWORD FORM ────────────────────────────────────────────
+  // ── FORGOT PASSWORD ────────────────────────────────────────────────
   if (view === "forgot") {
     return (
       <div className={styles.page}>
@@ -388,7 +540,6 @@ export default function Login({ onSuccess }) {
                 Enter your email and we'll send a reset link
               </p>
             </div>
-
             <form onSubmit={handleForgotPassword} noValidate>
               <InputField
                 label="Email address"
@@ -399,24 +550,21 @@ export default function Login({ onSuccess }) {
                 error={fpErrors.email}
                 disabled={loading}
               />
-
               {error && (
                 <div className={styles.error}>
                   <div className={styles.errorDot} />
                   <p className={styles.errorText}>{error}</p>
                 </div>
               )}
-
               <button
                 type="submit"
                 className={styles.submitBtn}
                 disabled={loading}
-                style={{ marginTop: 24 }}
+                style={{ marginTop: 20 }}
               >
                 {loading ? <Spinner /> : "Send reset link"}
               </button>
             </form>
-
             <p className={styles.switchPrompt}>
               Remember your password?{" "}
               <button
@@ -435,7 +583,7 @@ export default function Login({ onSuccess }) {
     );
   }
 
-  // ── REGISTER VIEW ───────────────────────────────────────────────────
+  // ── REGISTER ───────────────────────────────────────────────────────
   if (view === "register") {
     return (
       <div className={styles.page}>
@@ -447,7 +595,6 @@ export default function Login({ onSuccess }) {
               <p className={styles.formSubtitle}>Join Deusizi Sparkle today</p>
             </div>
 
-            {/* Role toggle */}
             <div className={styles.roleToggle}>
               <button
                 className={`${styles.roleBtn} ${role === "customer" ? styles.roleBtnActive : ""}`}
@@ -465,31 +612,17 @@ export default function Login({ onSuccess }) {
               </button>
             </div>
 
-            {/* Google signup */}
+            <p className={styles.terms}>
+              Choose if you want a maid or you want to register as a
+              maid/cleaner
+            </p>
+
             <button
               className={styles.googleBtn}
               onClick={handleGoogleLogin}
               type="button"
             >
-              <svg className={styles.googleIcon} viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
-              Sign up with Google
+              <GoogleIcon /> Sign up with Google
             </button>
 
             <div className={styles.divider}>
@@ -573,7 +706,6 @@ export default function Login({ onSuccess }) {
                 Sign in
               </button>
             </p>
-
             <p className={styles.terms}>
               By creating an account, you agree to our{" "}
               <span
@@ -596,7 +728,7 @@ export default function Login({ onSuccess }) {
     );
   }
 
-  // ── SIGN IN VIEW (default) ──────────────────────────────────────────
+  // ── SIGN IN (default) ──────────────────────────────────────────────
   return (
     <div className={styles.page}>
       <LeftPanel />
@@ -609,7 +741,6 @@ export default function Login({ onSuccess }) {
             </p>
           </div>
 
-          {/* Role toggle */}
           <div className={styles.roleToggle}>
             <button
               className={`${styles.roleBtn} ${role === "customer" ? styles.roleBtnActive : ""}`}
@@ -627,31 +758,17 @@ export default function Login({ onSuccess }) {
             </button>
           </div>
 
-          {/* Google sign in */}
+          <p className={styles.terms}>
+            Choose if you want a maid or you want to sign in or register as a
+            maid/cleaner
+          </p>
+
           <button
             className={styles.googleBtn}
             onClick={handleGoogleLogin}
             type="button"
           >
-            <svg className={styles.googleIcon} viewBox="0 0 24 24">
-              <path
-                fill="#4285F4"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
-            </svg>
-            Continue with Google
+            <GoogleIcon /> Continue with Google
           </button>
 
           <div className={styles.divider}>
@@ -660,7 +777,6 @@ export default function Login({ onSuccess }) {
             <div className={styles.dividerLine} />
           </div>
 
-          {/* Success banner (after register / email check) */}
           {success && (
             <div className={styles.successBanner}>
               <span>✅</span>
@@ -752,5 +868,29 @@ export default function Login({ onSuccess }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// Google G icon — extracted to avoid repetition
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" style={{ flexShrink: 0 }}>
+      <path
+        fill="#4285F4"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+      />
+    </svg>
   );
 }

@@ -1,17 +1,19 @@
 // src/component/VerifyEmail/VerifyEmail.jsx
-import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom"; // ← useSearchParams
+import { useState, useEffect, useRef } from "react"; // ← add useRef
+import { useSearchParams, useNavigate } from "react-router-dom";
 import styles from "./VerifyEmail.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const API = API_URL.replace(/\/$/, "").replace(/\/api$/, "") + "/api";
 
 export default function VerifyEmail() {
-  const [searchParams] = useSearchParams(); // ← reads ?token=
-  const token = searchParams.get("token"); // ← gets the value
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
   const navigate = useNavigate();
   const [status, setStatus] = useState("verifying");
   const [message, setMessage] = useState("");
+
+  const calledRef = useRef(false); // ← prevents StrictMode double-call
 
   useEffect(() => {
     if (!token) {
@@ -19,6 +21,10 @@ export default function VerifyEmail() {
       setMessage("Invalid verification link.");
       return;
     }
+
+    // Guard — only call API once even if effect runs twice (React StrictMode)
+    if (calledRef.current) return;
+    calledRef.current = true;
 
     fetch(`${API}/auth/verify-email/${token}`)
       .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
