@@ -1,9 +1,13 @@
+// src/component/Mybookings/Mybookings.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Mybookings.module.css";
 import Chat from "../Chat/Chat";
+import NotificationBell from "../Notifications/NotificationBell";
+import { useAuth } from "../../context/AuthContext";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 const FILTERS = [
   "all",
   "awaiting_payment",
@@ -38,23 +42,36 @@ function formatDate(d) {
 function statusLabel(s) {
   if (s === "in_progress") return "In Progress";
   if (s === "awaiting_payment") return "⏳ Awaiting Payment";
-  if (s === "declined") return "Declined";
   return s?.charAt(0).toUpperCase() + s?.slice(1);
 }
 
-// Bookings where chat makes sense
+function initials(name) {
+  return (
+    name
+      ?.split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "?"
+  );
+}
+
 const CHAT_STATUSES = ["confirmed", "in_progress", "completed", "pending"];
 
 export default function MyBookings() {
   const navigate = useNavigate();
+  const { user, token, logout } = useAuth(); // ← token + logout from context
+
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [chatBooking, setChatBooking] = useState(null);
 
+  const isMaid = user?.role === "maid";
+
+  // ── Fetch bookings ──────────────────────────────────────────────────
   useEffect(() => {
     async function fetchBookings() {
-      const token = localStorage.getItem("token");
       if (!token) return navigate("/login");
       setLoading(true);
       try {
@@ -72,11 +89,10 @@ export default function MyBookings() {
       }
     }
     fetchBookings();
-  }, [filter]);
+  }, [filter, token]);
 
-  // Silent background refresh every 30 seconds
+  // ── Background refresh every 30s ────────────────────────────────────
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (!token) return;
     const id = setInterval(async () => {
       try {
@@ -87,15 +103,15 @@ export default function MyBookings() {
         });
         const data = await res.json();
         setBookings(data.bookings || []);
-      } catch (err) {
-        console.error("Background refresh error:", err);
-      }
+      } catch {}
     }, 30000);
     return () => clearInterval(id);
-  }, [filter]);
+  }, [filter, token]);
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const isMaid = user.role === "maid";
+  function handleLogout() {
+    logout();
+    navigate("/login", { replace: true });
+  }
 
   function handleGetSupport(e, booking) {
     e.stopPropagation();
@@ -107,6 +123,7 @@ export default function MyBookings() {
     setChatBooking(booking);
   }
 
+  // ── Chat view ────────────────────────────────────────────────────────
   if (chatBooking) {
     const otherName = isMaid
       ? chatBooking.customer_name
@@ -126,29 +143,60 @@ export default function MyBookings() {
 
   return (
     <div className={styles.page}>
-      <button className={styles.backLink} onClick={() => navigate("/")}>
-        ← Back to Home
-      </button>
-      <h1 className={styles.pageTitle}>My Bookings</h1>
-      <p className={styles.pageSubtitle}>
-        {isMaid ? "Bookings assigned to you" : "Your cleaning bookings"}
-      </p>
-      {!isMaid && (
-        <button
-          className={styles.newBookingBtn}
-          onClick={() => navigate("/customersupport")}
-        >
-          Customer Support
+      {/* ── Top bar ────────────────────────────────────────────── */}
+      <div className={styles.topBar}>
+        <button className={styles.backLink} onClick={() => navigate("/")}>
+          ← Home
         </button>
-      )}
-      {!isMaid && (
-        <button
-          className={styles.newBookingBtn}
-          onClick={() => navigate("/maids")}
-        >
-          + New Booking
-        </button>
-      )}
+        <div className={styles.topBarRight}>
+          <NotificationBell token={token} />
+          {/* <div className={styles.userChip}>
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className={styles.userAvatar}
+              />
+            ) : (
+              <div className={styles.userAvatarPlaceholder}>
+                {initials(user?.name)}
+              </div>
+            )}
+            <span className={styles.userName}>{user?.name?.split(" ")[0]}</span>
+          </div> */}
+          <button className={styles.logoutBtn} onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+      </div>
+
+      {/* ── Page heading ───────────────────────────────────────── */}
+      <div className={styles.heading}>
+        <div>
+          <h1 className={styles.pageTitle}>My Bookings</h1>
+          <p className={styles.pageSubtitle}>
+            {isMaid ? "Bookings assigned to you" : "Your cleaning bookings"}
+          </p>
+        </div>
+        {!isMaid && (
+          <div className={styles.headingActions}>
+            <button
+              className={styles.ghostBtn}
+              onClick={() => navigate("/customersupport")}
+            >
+              🎫 Support
+            </button>
+            <button
+              className={styles.newBookingBtn}
+              onClick={() => navigate("/maids")}
+            >
+              + New Booking
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ── Filter chips ───────────────────────────────────────── */}
       <div className={styles.filters}>
         {FILTERS.map((f) => (
           <button
@@ -160,27 +208,27 @@ export default function MyBookings() {
           </button>
         ))}
       </div>
+
+      {/* ── Content ────────────────────────────────────────────── */}
       {loading ? (
-        <div className={styles.loading}>Loading bookings...</div>
+        <div className={styles.loadingState}>
+          <div className={styles.spinner} />
+          <p>Loading bookings…</p>
+        </div>
       ) : bookings.length === 0 ? (
-        <div className={styles.empty}>
-          No {filter !== "all" ? filter.replace("_", " ") : ""} bookings found.
+        <div className={styles.emptyState}>
+          <div className={styles.emptyIcon}>📋</div>
+          <p className={styles.emptyTitle}>
+            No {filter !== "all" ? filter.replace(/_/g, " ") : ""} bookings
+            found
+          </p>
           {!isMaid && (
-            <>
-              <br />
-              <br />
-              <button
-                className={styles.newBookingBtn}
-                style={{
-                  display: "inline-flex",
-                  width: "auto",
-                  padding: "0 24px",
-                }}
-                onClick={() => navigate("/maids")}
-              >
-                Browse Maids
-              </button>
-            </>
+            <button
+              className={styles.newBookingBtn}
+              onClick={() => navigate("/maids")}
+            >
+              Browse Maids
+            </button>
           )}
         </div>
       ) : (
@@ -193,6 +241,7 @@ export default function MyBookings() {
                 navigate(`/bookings/${b.id}`, { state: { booking: b } })
               }
             >
+              {/* Card header */}
               <div className={styles.cardTop}>
                 <div>
                   <p className={styles.cardName}>
@@ -209,60 +258,48 @@ export default function MyBookings() {
                 </span>
               </div>
 
-              {/* Declined Alert */}
+              {/* Declined alert */}
               {b.status === "declined" && b.declined_reason && (
                 <div className={styles.declinedAlert}>
-                  <div className={styles.declinedIcon}>❌</div>
-                  <div className={styles.declinedContent}>
-                    <p className={styles.declinedReason}>
-                      <span className={styles.reasonLabel}>Reason:</span>
-                      {b.declined_reason}
-                    </p>
-                  </div>
+                  <span className={styles.declinedIcon}>⚠️</span>
+                  <p className={styles.declinedReason}>
+                    <span className={styles.reasonLabel}>Reason: </span>
+                    {b.declined_reason}
+                  </p>
                 </div>
               )}
 
+              {/* Meta row */}
               <div className={styles.cardMeta}>
                 <div className={styles.metaItem}>
-                  Duration:{" "}
+                  Duration{" "}
                   <span className={styles.metaValue}>{b.duration_hours}h</span>
                 </div>
                 <div className={styles.metaItem}>
-                  Total:{" "}
+                  Total{" "}
                   <span className={styles.metaValue}>
                     ₦{Number(b.total_amount).toLocaleString()}
                   </span>
                 </div>
                 <div className={styles.metaItem}>
-                  Address:{" "}
+                  Address{" "}
                   <span className={styles.metaValue}>
                     {b.address?.split(",")[0]}
                   </span>
                 </div>
               </div>
 
-              {/* Pay Now button for awaiting_payment bookings */}
+              {/* Pay now */}
               {!isMaid && b.status === "awaiting_payment" && (
                 <div
-                  style={{ marginTop: 10 }}
                   onClick={(e) => e.stopPropagation()}
+                  style={{ marginTop: 10 }}
                 >
                   <button
+                    className={styles.payBtn}
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate("/payment", { state: { booking: b } });
-                    }}
-                    style={{
-                      width: "100%",
-                      height: 38,
-                      background: "rgb(0,100,0)",
-                      color: "white",
-                      border: "none",
-                      borderRadius: 8,
-                      fontSize: 13,
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                      fontFamily: "inherit",
                     }}
                   >
                     🔒 Pay Now — ₦{Number(b.total_amount).toLocaleString()}
@@ -270,14 +307,14 @@ export default function MyBookings() {
                 </div>
               )}
 
-              {/* Action buttons row */}
+              {/* Action buttons */}
               <div className={styles.cardActions}>
                 {CHAT_STATUSES.includes(b.status) && (
                   <button
                     className={styles.chatBtn}
                     onClick={(e) => handleOpenChat(e, b)}
                   >
-                    💬 Chat Maid
+                    💬 {isMaid ? "Chat Customer" : "Chat Maid"}
                   </button>
                 )}
                 {!isMaid && (
@@ -285,7 +322,7 @@ export default function MyBookings() {
                     className={styles.supportBtn}
                     onClick={(e) => handleGetSupport(e, b)}
                   >
-                    🎫 Get Support
+                    🎫 Support
                   </button>
                 )}
               </div>

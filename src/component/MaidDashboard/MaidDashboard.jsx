@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import MaidSupportTab from "../MaidsupportTab/Maidsupporttab";
 import MaidChat from "../MaidChat/MaidChat";
 import FloatingMaidSupportChat from "../MaidSupportChat/FloatingMaidSupportChat";
+import NotificationBell from "../Notifications/NotificationBell";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 // At the top of ProfileTab (or at the top of MaidDashboard.jsx alongside API_URL), add:
@@ -808,6 +809,7 @@ function ProfileTab({ token }) {
         </div>
 
         {/* ══ SECTION: Services ═════════════════════════════════ */}
+        {/* ══ SECTION: Services ═════════════════════════════════ */}
         <div className={styles.profileSection}>
           <p className={styles.profileSectionTitle}>
             🧹 Services Offered
@@ -818,6 +820,8 @@ function ProfileTab({ token }) {
               </span>
             )}
           </p>
+
+          {/* Preset services grid */}
           <div className={styles.serviceGrid}>
             {SERVICES_LIST.map((s) => {
               const selected = profile.services.includes(s);
@@ -838,12 +842,33 @@ function ProfileTab({ token }) {
             })}
           </div>
 
-          {/* ── Add custom service ──────────────────────────── */}
+          {/* ── Custom services chips (services NOT in SERVICES_LIST) ── */}
+          {profile.services.filter((s) => !SERVICES_LIST.includes(s)).length >
+            0 && (
+            <div className={styles.customChips}>
+              {profile.services
+                .filter((s) => !SERVICES_LIST.includes(s))
+                .map((s) => (
+                  <span key={s} className={styles.customChip}>
+                    {s}
+                    <button
+                      type="button"
+                      className={styles.customChipRemove}
+                      onClick={() => toggleService(s)}
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))}
+            </div>
+          )}
+
+          {/* ── Add custom service input ── */}
           <div className={styles.customServiceRow}>
             <input
               className={styles.input}
               type="text"
-              placeholder="Add a custom service…"
+              placeholder="Add a custom service e.g. Fumigation, Exterior Cleaning…"
               value={customServiceInput}
               onChange={(e) => setCustomServiceInput(e.target.value)}
               onKeyDown={(e) =>
@@ -1692,9 +1717,12 @@ export default function MaidDashboard({ onLogout }) {
               <p className={styles.headerRole}>Maid · Deusizi Sparkle</p>
             </div>
           </div>
-          <button className={styles.logoutBtn} onClick={handleLogout}>
-            Logout
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <NotificationBell token={token} />
+            <button className={styles.logoutBtn} onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* Availability */}

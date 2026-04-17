@@ -6,15 +6,27 @@
   }
 
   /* Header */
+  /* 1. CHANGE .header from sticky → fixed */
   .header {
     background: rgb(19, 19, 103);
     padding: 14px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: sticky;
+    position: fixed; /* ← was: sticky */
     top: 0;
+    left: 0; /* ← add */
+    right: 0; /* ← add */
     z-index: 100;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* ← add */
+  }
+
+  /* 2. ADD padding-top to .dashboard so content doesn't hide under fixed header */
+  .dashboard {
+    min-height: 100vh;
+    background: rgb(245, 245, 248);
+    font-family: Arial, Helvetica, sans-serif;
+    padding-top: 65px; /* ← add this — matches header height */
   }
   .headerLeft {
     display: flex;
@@ -1117,4 +1129,38 @@
 .removeRateBtn:hover {
   background: rgb(255, 228, 228);
   border-color: rgb(168, 28, 28);
+}
+
+/* ── Custom service chips ────────────────────────────────────────────── */
+.customChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.customChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgb(240, 240, 255);
+  border: 1px solid rgb(19, 19, 103);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+}
+.customChipRemove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgb(168, 28, 28);
+  font-size: 11px;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+.customChipRemove:hover {
+  color: rgb(130, 10, 10);
 }
