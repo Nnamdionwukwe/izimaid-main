@@ -1064,3 +1064,57 @@
     flex-wrap: wrap;
   }
 }
+
+/* ── Custom service input row ────────────────────────────────────────── */
+.customServiceRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.addCustomBtn {
+  height: 44px;
+  padding: 0 16px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.addCustomBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.addCustomBtn:hover:not(:disabled) {
+  background: rgb(15, 15, 70);
+}
+
+/* ── Custom rate row ─────────────────────────────────────────────────── */
+.customRateRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+.removeRateBtn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 6px;
+  background: white;
+  color: rgb(168, 28, 28);
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.removeRateBtn:hover {
+  background: rgb(255, 228, 228);
+  border-color: rgb(168, 28, 28);
+}

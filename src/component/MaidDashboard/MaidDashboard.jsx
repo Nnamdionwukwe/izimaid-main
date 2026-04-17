@@ -383,8 +383,16 @@ function ProfileTab({ token }) {
             : undefined,
           pricing_note: profile.pricing_note || undefined,
           currency: profile.currency,
+
+          rate_custom: customRates.length
+            ? customRates.reduce((acc, r) => {
+                if (r.label.trim()) acc[r.label.trim()] = Number(r.price) || 0;
+                return acc;
+              }, {})
+            : undefined,
         }),
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setMsg({ type: "success", text: "✅ Profile saved!" });
@@ -393,6 +401,25 @@ function ProfileTab({ token }) {
     } finally {
       setSaving(false);
     }
+  }
+
+  function addCustomService() {
+    const s = customServiceInput.trim();
+    if (!s || profile.services.includes(s)) return;
+    setProfile((p) => ({ ...p, services: [...p.services, s] }));
+    setCustomServiceInput("");
+  }
+
+  function addCustomRate() {
+    setCustomRates((r) => [...r, { label: "", price: "" }]);
+  }
+  function updateCustomRate(i, field, val) {
+    setCustomRates((r) =>
+      r.map((item, idx) => (idx === i ? { ...item, [field]: val } : item)),
+    );
+  }
+  function removeCustomRate(i) {
+    setCustomRates((r) => r.filter((_, idx) => idx !== i));
   }
 
   // ── Save availability ───────────────────────────────────────
@@ -726,6 +753,58 @@ function ProfileTab({ token }) {
               }
             />
           </div>
+
+          {/* ══ Custom rates ═════════════════════════════════ */}
+          <div className={styles.field} style={{ marginTop: 16 }}>
+            <div className={styles.labelRow}>
+              <label className={styles.label}>
+                Custom Rates
+                <span className={styles.labelOptional}> (optional)</span>
+              </label>
+              <button
+                type="button"
+                className={styles.locationBtn}
+                onClick={addCustomRate}
+              >
+                + Add rate
+              </button>
+            </div>
+
+            {customRates.length === 0 && (
+              <p style={{ fontSize: 12, color: "gray", margin: 0 }}>
+                e.g. Deep Clean, Move-In Clean, Office Clean with specific
+                pricing
+              </p>
+            )}
+
+            {customRates.map((r, i) => (
+              <div key={i} className={styles.customRateRow}>
+                <input
+                  className={styles.input}
+                  type="text"
+                  placeholder="Service name"
+                  value={r.label}
+                  onChange={(e) => updateCustomRate(i, "label", e.target.value)}
+                />
+                <input
+                  className={styles.input}
+                  type="number"
+                  placeholder="Price"
+                  min="0"
+                  value={r.price}
+                  style={{ maxWidth: 120 }}
+                  onChange={(e) => updateCustomRate(i, "price", e.target.value)}
+                />
+                <button
+                  type="button"
+                  className={styles.removeRateBtn}
+                  onClick={() => removeCustomRate(i)}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* ══ SECTION: Services ═════════════════════════════════ */}
@@ -757,6 +836,28 @@ function ProfileTab({ token }) {
                 </div>
               );
             })}
+          </div>
+
+          {/* ── Add custom service ──────────────────────────── */}
+          <div className={styles.customServiceRow}>
+            <input
+              className={styles.input}
+              type="text"
+              placeholder="Add a custom service…"
+              value={customServiceInput}
+              onChange={(e) => setCustomServiceInput(e.target.value)}
+              onKeyDown={(e) =>
+                e.key === "Enter" && (e.preventDefault(), addCustomService())
+              }
+            />
+            <button
+              type="button"
+              className={styles.addCustomBtn}
+              onClick={addCustomService}
+              disabled={!customServiceInput.trim()}
+            >
+              + Add
+            </button>
           </div>
         </div>
 
