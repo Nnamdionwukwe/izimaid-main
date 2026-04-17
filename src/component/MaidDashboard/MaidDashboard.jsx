@@ -6,7 +6,8 @@ import MaidSupportTab from "../MaidsupportTab/Maidsupporttab";
 import MaidChat from "../MaidChat/MaidChat";
 import FloatingMaidSupportChat from "../MaidSupportChat/FloatingMaidSupportChat";
 import NotificationBell from "../Notifications/NotificationBell";
-import WithdrawTab from "../WithdrawTab/WithdrawTab";
+import WithdrawTab, { WalletOverview } from "../WithdrawTab/WithdrawPage";
+import WithdrawPage from "../WithdrawTab/WithdrawPage";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 // At the top of ProfileTab (or at the top of MaidDashboard.jsx alongside API_URL), add:
@@ -1554,6 +1555,7 @@ export default function MaidDashboard({ onLogout }) {
   const [supportPrefill, setSupportPrefill] = useState(null);
   const [chatBooking, setChatBooking] = useState(null);
   const [supportOpenCount, setSupportOpenCount] = useState(0);
+  const [showWithdraw, setShowWithdraw] = useState(false);
 
   useEffect(() => {
     if (!token || user.role !== "maid") {
@@ -1692,6 +1694,11 @@ export default function MaidDashboard({ onLogout }) {
     );
   }
 
+  if (showWithdraw)
+    return (
+      <WithdrawPage token={token} onClose={() => setShowWithdraw(false)} />
+    );
+
   return (
     <>
       <div className={styles.dashboard}>
@@ -1779,6 +1786,7 @@ export default function MaidDashboard({ onLogout }) {
             ["reviews", "Reviews"],
             ["support", "Support"],
             ["withdraw", "Withdraw "],
+            ["wallet", "Wallet"],
           ].map(([key, label]) => (
             <button
               key={key}
@@ -1838,6 +1846,12 @@ export default function MaidDashboard({ onLogout }) {
             <MaidSupportTab token={token} prefillBooking={supportPrefill} />
           )}
           {tab === "withdraw" && <WithdrawTab token={token} />}
+          {tab === "wallet" && (
+            <WalletOverview
+              token={token}
+              onWithdraw={() => setShowWithdraw(true)}
+            />
+          )}
         </div>
 
         <FloatingToast

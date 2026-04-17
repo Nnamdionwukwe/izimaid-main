@@ -1,0 +1,777 @@
+/* src/component/WithdrawPage/WithdrawPage.module.css */
+
+/* ── Page shell ─────────────────────────────────────────────────────── */
+.page {
+  position: fixed;
+  inset: 0;
+  background: #f4f2ef;
+  display: flex;
+  flex-direction: column;
+  z-index: 500;
+  font-family: "DM Sans", system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* ── Page header ──────────────────────────────────────────────────── */
+.pageHeader {
+  background: rgb(19, 19, 103);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.backBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.backBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.pageTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  text-align: center;
+  flex: 1;
+}
+.balancePill {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* ── Scrollable body ──────────────────────────────────────────────── */
+.pageBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+.pageBody::-webkit-scrollbar {
+  width: 4px;
+}
+.pageBody::-webkit-scrollbar-thumb {
+  background: #d0c9be;
+  border-radius: 2px;
+}
+
+.stepLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #8a7b6a;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Method grid ──────────────────────────────────────────────────── */
+.methodGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.methodCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  border: 1px solid rgb(228, 225, 218);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  transition:
+    box-shadow 0.15s,
+    border-color 0.15s,
+    transform 0.1s;
+}
+.methodCard:hover {
+  border-color: rgb(19, 19, 103);
+  box-shadow: 0 4px 14px rgba(19, 19, 103, 0.12);
+  transform: translateY(-1px);
+}
+.methodCard:active {
+  transform: scale(0.99);
+}
+
+.methodIcon {
+  font-size: 26px;
+  flex-shrink: 0;
+}
+.methodInfo {
+  flex: 1;
+  min-width: 0;
+}
+.methodName {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgb(26, 18, 8);
+  margin: 0 0 2px;
+}
+.methodDesc {
+  font-size: 11px;
+  color: #8a7b6a;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.methodRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.methodFee {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgb(15, 103, 46);
+  background: rgb(232, 245, 233);
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.methodArrow {
+  font-size: 20px;
+  color: #c9b99a;
+  font-weight: 300;
+}
+
+/* ── Fee banner ───────────────────────────────────────────────────── */
+.feeBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgb(232, 245, 233);
+  border: 1px solid rgb(165, 214, 167);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: rgb(27, 94, 32);
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.feeCurrencies {
+  font-size: 11px;
+  color: rgb(50, 120, 60);
+  opacity: 0.8;
+}
+
+/* ── Form card ────────────────────────────────────────────────────── */
+.formCard {
+  background: white;
+  border: 1px solid rgb(228, 225, 218);
+  border-radius: 12px;
+  padding: 16px;
+}
+.formCardTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #8a7b6a;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 14px;
+}
+
+/* ── Form fields ──────────────────────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.field:last-child {
+  margin-bottom: 0;
+}
+.field label {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgb(47, 47, 47);
+}
+.field input,
+.field select,
+.field textarea {
+  height: 44px;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+  background: white;
+  color: rgb(30, 30, 30);
+  transition: border-color 0.15s;
+}
+.field textarea {
+  height: auto;
+  padding: 10px 14px;
+  resize: vertical;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: rgb(19, 19, 103);
+}
+
+.hint {
+  font-size: 11px;
+  color: #8a7b6a;
+  margin: 2px 0 0;
+  line-height: 1.5;
+}
+.manualTag {
+  font-size: 10px;
+  background: rgb(255, 243, 205);
+  color: rgb(133, 100, 4);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+.optionalTag {
+  font-size: 11px;
+  color: gray;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.inlineRow {
+  display: flex;
+  gap: 8px;
+}
+.inlineRow input {
+  flex: 1;
+}
+
+.verifyBtn {
+  height: 44px;
+  padding: 0 16px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.verifyBtn:hover:not(:disabled) {
+  background: rgb(15, 15, 70);
+}
+.verifyBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.verifiedBadge {
+  padding: 10px 14px;
+  background: rgb(232, 245, 233);
+  color: rgb(27, 94, 32);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid rgb(165, 214, 167);
+}
+
+.maxBtn {
+  height: 44px;
+  padding: 0 14px;
+  background: rgb(240, 240, 255);
+  color: rgb(19, 19, 103);
+  border: 1px solid rgb(200, 210, 240);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.maxBtn:hover {
+  background: rgb(225, 225, 255);
+}
+
+/* ── Alerts ───────────────────────────────────────────────────────── */
+.alert {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.alert_success {
+  background: rgb(232, 245, 233);
+  color: rgb(27, 94, 32);
+}
+.alert_error {
+  background: rgb(255, 235, 238);
+  color: rgb(183, 28, 28);
+}
+.alert_warning {
+  background: rgb(255, 248, 225);
+  color: rgb(130, 100, 0);
+  border: 1px solid #ffd54f;
+}
+.alert_info {
+  background: rgb(227, 242, 253);
+  color: rgb(13, 71, 161);
+}
+
+/* ── Navigation buttons ───────────────────────────────────────────── */
+.nextBtn {
+  width: 100%;
+  height: 50px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 16px;
+  transition:
+    background 0.15s,
+    transform 0.1s;
+}
+.nextBtn:hover {
+  background: rgb(15, 15, 70);
+  transform: translateY(-1px);
+}
+.nextBtn:active {
+  transform: scale(0.99);
+}
+
+/* ── PIN step ─────────────────────────────────────────────────────── */
+.pinCard {
+  background: white;
+  border: 1px solid rgb(228, 225, 218);
+  border-radius: 16px;
+  padding: 24px;
+}
+.pinSummary {
+  text-align: center;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgb(240, 237, 232);
+}
+.pinAmt {
+  font-size: 36px;
+  font-weight: 800;
+  color: rgb(19, 19, 103);
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+}
+.pinMethod {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgb(47, 47, 47);
+  margin: 0 0 4px;
+}
+.pinDest {
+  font-size: 13px;
+  color: gray;
+  margin: 0;
+}
+
+.pinInput {
+  text-align: center;
+  letter-spacing: 8px;
+  font-size: 24px !important;
+  height: 56px !important;
+  font-weight: 700;
+}
+
+.submitBtn {
+  width: 100%;
+  height: 50px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 16px;
+  transition: background 0.15s;
+}
+.submitBtn:hover:not(:disabled) {
+  background: rgb(15, 15, 70);
+}
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Done step ────────────────────────────────────────────────────── */
+.doneCard {
+  background: white;
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  border: 1px solid rgb(228, 225, 218);
+}
+.doneIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+.doneCard h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: rgb(19, 19, 103);
+  margin: 0 0 12px;
+}
+.doneCard p {
+  font-size: 14px;
+  color: gray;
+  line-height: 1.6;
+  margin: 0 0 8px;
+}
+.doneEta {
+  font-size: 13px !important;
+  color: rgb(15, 103, 46) !important;
+  background: rgb(232, 245, 233);
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: inline-block;
+  margin: 8px 0 24px !important;
+}
+.doneBtn {
+  width: 100%;
+  height: 50px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+.doneBtn:hover {
+  background: rgb(15, 15, 70);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   WalletOverview (sits inside MaidDashboard wallet tab)
+═══════════════════════════════════════════════════════════════════ */
+.ov_wrap {
+  padding-bottom: 32px;
+}
+
+.ov_card {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgb(19, 19, 103) 0%,
+    rgb(35, 35, 180) 100%
+  );
+  border-radius: 16px;
+  padding: 22px 20px 18px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  color: white;
+}
+.ov_card_bg {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+}
+.ov_card_label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 6px;
+  position: relative;
+}
+.ov_card_balance {
+  font-size: 36px;
+  font-weight: 800;
+  margin: 0 0 18px;
+  letter-spacing: -0.02em;
+  position: relative;
+}
+.ov_card_balance span {
+  font-size: 20px;
+  opacity: 0.8;
+}
+
+.ov_card_stats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.ov_card_stats > div {
+  flex: 1;
+}
+.ov_card_stats span {
+  display: block;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ov_card_stats strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+}
+.ov_divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.ov_withdrawBtn {
+  width: 100%;
+  height: 44px;
+  background: white;
+  color: rgb(19, 19, 103);
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    opacity 0.15s,
+    transform 0.1s;
+  position: relative;
+}
+.ov_withdrawBtn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+.ov_withdrawBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ov_nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.ov_navBtn {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1.5px solid rgb(220, 216, 210);
+  background: white;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8a7b6a;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.ov_navBtn:hover {
+  color: rgb(19, 19, 103);
+  border-color: rgb(19, 19, 103);
+}
+.ov_navBtnActive {
+  background: rgb(19, 19, 103);
+  color: white;
+  border-color: rgb(19, 19, 103);
+}
+
+.ov_wdCard {
+  background: white;
+  border: 1px solid rgb(228, 225, 218);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 8px;
+}
+.ov_wdRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.ov_wdAmt {
+  font-size: 17px;
+  font-weight: 800;
+  color: rgb(19, 19, 103);
+  margin: 0 0 3px;
+}
+.ov_wdMeta {
+  font-size: 12px;
+  color: gray;
+  margin: 0;
+  text-transform: capitalize;
+}
+.ov_badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+.ov_fail {
+  font-size: 12px;
+  color: rgb(183, 28, 28);
+  background: rgb(255, 235, 238);
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin: 8px 0 0;
+}
+.ov_cancelBtn {
+  margin-top: 10px;
+  padding: 5px 14px;
+  background: white;
+  color: rgb(183, 28, 28);
+  border: 1.5px solid rgb(255, 205, 210);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.ov_cancelBtn:hover {
+  background: rgb(255, 235, 238);
+}
+
+.ov_txRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgb(240, 237, 232);
+}
+.ov_txRow:last-child {
+  border-bottom: none;
+}
+.ov_txIcon {
+  width: 36px;
+  height: 36px;
+  background: rgb(245, 245, 248);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.ov_txInfo {
+  flex: 1;
+  min-width: 0;
+}
+.ov_txInfo p {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(30, 30, 30);
+  margin: 0 0 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ov_txInfo span {
+  font-size: 11px;
+  color: #aaa;
+}
+.ov_credit {
+  font-size: 14px;
+  font-weight: 800;
+  color: rgb(15, 103, 46);
+  flex-shrink: 0;
+}
+.ov_debit {
+  font-size: 14px;
+  font-weight: 800;
+  color: rgb(168, 28, 28);
+  flex-shrink: 0;
+}
+
+.ov_empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: gray;
+  font-size: 13px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid rgb(228, 225, 218);
+}
+
+.ov_loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  color: gray;
+  font-size: 13px;
+  gap: 10px;
+}
+
+/* ── Shared spinner ───────────────────────────────────────────────── */
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgb(228, 228, 228);
+  border-top-color: rgb(19, 19, 103);
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Responsive ───────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .pageBody {
+    padding: 12px;
+  }
+  .pinAmt {
+    font-size: 28px;
+  }
+  .ov_card_balance {
+    font-size: 28px;
+  }
+}

@@ -71,6 +71,7 @@ import PoweredByGestech from "./component/PoweredByGestech/PoweredByGestech.jsx"
 import SettingsPage from "./pages/settings/SettingsPage.jsx";
 import VerifyEmail from "./component/VerifyEmail/VerifyEmail.jsx";
 import ResetPassword from "./component/ResetPassword/ResetPassword.jsx";
+import WithdrawTab from "./component/WithdrawTab/WithdrawPage.jsx";
 
 function App() {
   return (
@@ -141,6 +142,7 @@ function AppRoutes() {
       <Route path="/maid/:maidId" element={<MaidDetail />} />
       <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="/bookings/:id" element={<BookingDetail />} />
+      <Route path="/withdrawal" element={<WithdrawTab />} />
       <Route path="/payment" element={<Payment />} />
       <Route path="/payment/verify" element={<Payment />} />
       <Route path="/recurring-cleaning" element={<RecurringCleaning />} />
