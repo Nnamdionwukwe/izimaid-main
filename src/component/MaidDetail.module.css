@@ -1,3 +1,5 @@
+/* MaidDetail.module.css — original preserved + new additions */
+
 .page {
   max-width: 1000px;
   margin: 0 auto;
@@ -20,12 +22,11 @@
   margin-bottom: 20px;
   transition: opacity 0.2s;
 }
-
 .backBtn:hover {
   opacity: 0.7;
 }
 
-/* Header section */
+/* ── Header ─────────────────────────────────────────────────── */
 .header {
   display: flex;
   gap: 24px;
@@ -35,6 +36,12 @@
   border-radius: 12px;
   margin-bottom: 32px;
   border: 1px solid rgb(240, 240, 245);
+  flex-wrap: wrap;
+}
+
+.headerAvatarWrap {
+  position: relative;
+  flex-shrink: 0;
 }
 
 .avatar {
@@ -42,9 +49,7 @@
   height: 120px;
   border-radius: 12px;
   object-fit: cover;
-  flex-shrink: 0;
 }
-
 .avatarPlaceholder {
   width: 120px;
   height: 120px;
@@ -54,28 +59,43 @@
   justify-content: center;
   font-size: 40px;
   font-weight: bold;
-  background: linear-gradient(
-    135deg,
-    rgb(200, 200, 220) 0%,
-    rgb(150, 150, 180) 100%
-  );
+  background: linear-gradient(135deg, rgb(200, 200, 220), rgb(150, 150, 180));
   color: white;
-  flex-shrink: 0;
 }
 
 .headerInfo {
   flex: 1;
+  min-width: 200px;
 }
 
+.headerNameRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
 .name {
-  margin: 0 0 8px;
-  font-size: 28px;
+  margin: 0;
+  font-size: 26px;
   font-weight: bold;
   color: rgb(19, 19, 103);
 }
+.badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+.badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
 
 .location {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   font-size: 14px;
   color: gray;
 }
@@ -84,25 +104,54 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
 }
-
 .ratingNumber {
   font-size: 16px;
   font-weight: bold;
   color: rgb(255, 165, 0);
 }
-
 .ratingCount {
   font-size: 12px;
   color: gray;
 }
+.expPill {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgb(19, 19, 103);
+  background: rgb(240, 240, 255);
+  padding: 2px 10px;
+  border-radius: 20px;
+}
 
-.hourlyRate {
-  margin: 0;
-  font-size: 16px;
+.headerRate {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.primaryRate {
+  font-size: 20px;
   font-weight: bold;
   color: rgb(19, 19, 103);
+}
+.rateUnit {
+  font-size: 13px;
+  font-weight: 400;
+  color: gray;
+}
+.altRate {
+  font-size: 13px;
+  color: gray;
+}
+
+.pricingNote {
+  font-size: 12px;
+  color: gray;
+  margin: 0;
+  font-style: italic;
 }
 
 .bookBtn {
@@ -118,16 +167,11 @@
   white-space: nowrap;
   align-self: flex-start;
 }
-
 .bookBtn:hover {
   background: rgb(15, 15, 80);
 }
 
-.bookBtn:active {
-  transform: scale(0.98);
-}
-
-/* Content layout */
+/* ── Content layout ─────────────────────────────────────────── */
 .content {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -138,25 +182,22 @@
   .content {
     grid-template-columns: 1fr;
   }
-
   .header {
     flex-direction: column;
     gap: 16px;
   }
 }
 
-/* Sections */
+/* ── Sections ───────────────────────────────────────────────── */
 .section {
   margin-bottom: 24px;
 }
-
 .sectionTitle {
   margin: 0 0 14px;
   font-size: 16px;
   font-weight: bold;
   color: rgb(19, 19, 103);
 }
-
 .bio {
   margin: 0;
   font-size: 14px;
@@ -164,68 +205,152 @@
   color: rgb(70, 70, 70);
 }
 
-/* Experience */
+/* ── Pricing grid ───────────────────────────────────────────── */
+.priceGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.priceCard {
+  background: rgb(245, 245, 255);
+  border: 1px solid rgb(220, 220, 240);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.priceLabel {
+  font-size: 11px;
+  color: gray;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.priceValue {
+  font-size: 18px;
+  font-weight: 800;
+  color: rgb(19, 19, 103);
+}
+
+/* Custom rates */
+.customRates {
+  margin-top: 12px;
+  border-top: 1px solid rgb(228, 228, 228);
+  padding-top: 12px;
+}
+.customRatesTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: gray;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 10px;
+}
+.customRateRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid rgb(240, 240, 240);
+  font-size: 13px;
+  color: rgb(47, 47, 47);
+}
+.customRateRow:last-child {
+  border-bottom: none;
+}
+.customRatePrice {
+  font-weight: 700;
+  color: rgb(19, 19, 103);
+}
+
+/* ── Services ───────────────────────────────────────────────── */
+.services {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.serviceTag {
+  padding: 6px 12px;
+  background: rgb(240, 240, 255);
+  color: rgb(19, 19, 103);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border: 1px solid rgb(200, 210, 240);
+}
+
+/* ── Availability ───────────────────────────────────────────── */
+.availGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.availRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.availRowOn {
+  background: rgb(232, 245, 233);
+  border: 1px solid rgb(165, 214, 167);
+}
+.availRowOff {
+  background: rgb(250, 250, 252);
+  border: 1px solid rgb(228, 228, 228);
+}
+.availDay {
+  font-weight: 700;
+  color: rgb(47, 47, 47);
+  width: 36px;
+}
+.availTime {
+  font-weight: 600;
+  color: rgb(27, 94, 32);
+}
+.availOff {
+  color: #bbb;
+  font-style: italic;
+}
+
+/* ── Experience box ─────────────────────────────────────────── */
 .experienceBox {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
-
 .experienceItem {
   padding: 12px;
   background: rgb(248, 248, 255);
   border-radius: 8px;
   border: 1px solid rgb(240, 240, 245);
 }
-
 .experienceLabel {
   display: block;
   font-size: 12px;
   color: gray;
   margin-bottom: 4px;
 }
-
 .experienceValue {
   display: block;
   font-size: 14px;
   font-weight: bold;
   color: rgb(19, 19, 103);
 }
-
 .available {
-  color: rgb(34, 139, 34);
+  color: rgb(34, 139, 34) !important;
 }
-
 .unavailable {
-  color: rgb(178, 34, 34);
+  color: rgb(178, 34, 34) !important;
 }
 
-/* Services */
-.services {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.serviceTag {
-  padding: 6px 12px;
-  background: linear-gradient(
-    135deg,
-    rgb(200, 200, 220) 0%,
-    rgb(180, 180, 200) 100%
-  );
-  color: white;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-/* Reviews section */
+/* ── Reviews ────────────────────────────────────────────────── */
 .right {
   border-left: 1px solid rgb(240, 240, 245);
   padding-left: 32px;
 }
-
 @media (max-width: 768px) {
   .right {
     border-left: none;
@@ -240,7 +365,6 @@
   border-radius: 8px;
   color: gray;
 }
-
 .noReviews p {
   margin: 0;
 }
@@ -251,27 +375,23 @@
   gap: 12px;
   margin-bottom: 16px;
 }
-
 .reviewCard {
   padding: 14px;
   background: rgb(248, 248, 255);
   border-radius: 8px;
   border: 1px solid rgb(240, 240, 245);
 }
-
 .reviewHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 10px;
 }
-
 .reviewerInfo {
   display: flex;
   gap: 10px;
   align-items: flex-start;
 }
-
 .reviewerAvatar {
   width: 36px;
   height: 36px;
@@ -279,36 +399,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    135deg,
-    rgb(200, 200, 220) 0%,
-    rgb(150, 150, 180) 100%
-  );
+  background: linear-gradient(135deg, rgb(200, 200, 220), rgb(150, 150, 180));
   color: white;
   font-size: 12px;
   font-weight: bold;
   flex-shrink: 0;
 }
-
 .reviewerName {
   margin: 0 0 2px;
   font-size: 13px;
   font-weight: bold;
   color: rgb(19, 19, 103);
 }
-
 .reviewDate {
   margin: 0;
   font-size: 11px;
   color: gray;
 }
-
 .reviewRating {
   font-size: 12px;
   color: rgb(255, 165, 0);
   white-space: nowrap;
 }
-
 .reviewComment {
   margin: 0;
   font-size: 13px;
@@ -316,7 +428,7 @@
   color: rgb(70, 70, 70);
 }
 
-/* Pagination */
+/* ── Pagination ─────────────────────────────────────────────── */
 .pagination {
   display: flex;
   justify-content: center;
@@ -326,7 +438,6 @@
   background: rgb(248, 248, 255);
   border-radius: 8px;
 }
-
 .pageBtn {
   padding: 8px 12px;
   border: 1px solid rgb(240, 240, 245);
@@ -338,17 +449,14 @@
   cursor: pointer;
   transition: all 0.2s;
 }
-
 .pageBtn:hover:not(:disabled) {
   background: rgb(19, 19, 103);
   color: white;
 }
-
 .pageBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 .pageInfo {
   font-size: 12px;
   color: gray;

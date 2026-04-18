@@ -1,3 +1,5 @@
+/* Maids.module.css */
+
 .backLink {
   display: inline-flex;
   align-items: center;
@@ -11,13 +13,11 @@
   border-radius: 20px;
   cursor: pointer;
   font-family: inherit;
-  text-decoration: none;
   margin-bottom: 20px;
   transition: background 0.15s;
 }
 .backLink:hover {
-  background: rgb(32, 32, 65);
-  color: white;
+  background: rgb(45, 45, 90);
 }
 
 @media screen and (min-width: 20px) {
@@ -38,107 +38,270 @@
     color: gray;
     margin: 0 0 20px;
   }
+
+  /* ── Search row ──────────────────────────────────────────── */
   .searchBar {
     display: flex;
-    flex-direction: column;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
   }
   .searchInput {
-    width: 100%;
+    flex: 1;
+    min-width: 180px;
     height: 44px;
-    border: 1px solid rgb(228, 228, 228);
+    border: 1.5px solid rgb(228, 228, 228);
     border-radius: 8px;
     padding: 0 14px;
     font-size: 14px;
     outline: none;
     box-sizing: border-box;
     font-family: inherit;
+    transition: border-color 0.15s;
   }
   .searchInput:focus {
     border-color: rgb(19, 19, 103);
   }
+
+  .geoBtn {
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 8px;
+    border: 1.5px solid rgb(19, 19, 103);
+    background: white;
+    color: rgb(19, 19, 103);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .geoBtn:hover:not(:disabled) {
+    background: rgb(240, 240, 255);
+  }
+  .geoBtn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .geoBtnActive {
+    background: rgb(19, 19, 103);
+    color: white;
+  }
+
+  .geoError {
+    font-size: 12px;
+    color: rgb(168, 28, 28);
+    background: rgb(255, 235, 238);
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+
+  /* ── Service chips ───────────────────────────────────────── */
   .filters {
     display: flex;
-    gap: 8px;
+    gap: 7px;
     overflow-x: auto;
     scrollbar-width: none;
     padding-bottom: 2px;
+    margin-bottom: 10px;
   }
   .filters::-webkit-scrollbar {
     display: none;
   }
   .filterBtn {
     flex-shrink: 0;
-    padding: 7px 16px;
+    padding: 6px 14px;
     border-radius: 20px;
-    border: 1px solid rgb(228, 228, 228);
+    border: 1.5px solid rgb(228, 228, 228);
     background: white;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 600;
     color: gray;
     cursor: pointer;
     font-family: inherit;
     white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .filterBtn:hover {
+    border-color: rgb(19, 19, 103);
+    color: rgb(19, 19, 103);
   }
   .filterBtnActive {
     background: rgb(19, 19, 103);
     color: white;
     border-color: rgb(19, 19, 103);
   }
+
+  /* ── Sort row ────────────────────────────────────────────── */
+  .sortRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .sortLabel {
+    font-size: 12px;
+    color: gray;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .sortBtn {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1.5px solid rgb(220, 216, 210);
+    background: white;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b6b6b;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .sortBtn:hover {
+    border-color: rgb(19, 19, 103);
+    color: rgb(19, 19, 103);
+  }
+  .sortBtnActive {
+    background: rgb(19, 19, 103);
+    color: white;
+    border-color: rgb(19, 19, 103);
+  }
+  .sortBtnDisabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .sortBtnDisabled:hover {
+    border-color: rgb(220, 216, 210);
+    color: #6b6b6b;
+  }
+
+  /* ── Results count ───────────────────────────────────────── */
+  .resultsCount {
+    font-size: 12px;
+    color: gray;
+    margin: 0 0 14px;
+    font-weight: 600;
+  }
+
+  /* ── Grid ────────────────────────────────────────────────── */
   .grid {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
   }
+
+  /* ── Card ────────────────────────────────────────────────── */
   .card {
     background: white;
-    border: 1px solid rgb(228, 228, 228);
-    border-radius: 10px;
+    border: 1px solid rgb(228, 225, 218);
+    border-radius: 12px;
     padding: 16px;
     display: flex;
     gap: 14px;
     align-items: flex-start;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition:
+      box-shadow 0.15s,
+      transform 0.1s,
+      border-color 0.15s;
   }
   .card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 16px rgba(19, 19, 103, 0.1);
+    border-color: rgb(200, 210, 240);
+    transform: translateY(-1px);
   }
-  .avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
+
+  /* ── Avatar ──────────────────────────────────────────────── */
+  .cardAvatarWrap {
+    position: relative;
     flex-shrink: 0;
   }
+  .avatar {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgb(228, 225, 218);
+  }
   .avatarPlaceholder {
-    width: 60px;
-    height: 60px;
+    width: 62px;
+    height: 62px;
     border-radius: 50%;
     background: rgb(19, 19, 103);
     color: white;
-    display: flex;
     align-items: center;
     justify-content: center;
     font-size: 20px;
     font-weight: bold;
     flex-shrink: 0;
   }
+  .verifiedDot {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 18px;
+    height: 18px;
+    background: rgb(15, 103, 46);
+    color: white;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+  }
+
+  /* ── Card info ───────────────────────────────────────────── */
   .cardInfo {
     flex: 1;
     min-width: 0;
   }
+
+  .cardNameRow {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 3px;
+    flex-wrap: wrap;
+  }
   .cardName {
     font-size: 15px;
-    font-weight: bold;
-    color: rgb(30, 30, 30);
-    margin: 0 0 3px;
+    font-weight: 700;
+    color: rgb(26, 18, 8);
+    margin: 0;
   }
+  .verifiedTag {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgb(15, 103, 46);
+    background: rgb(232, 245, 233);
+    padding: 1px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
   .cardLocation {
     font-size: 12px;
-    color: gray;
+    color: #8a7b6a;
+    margin: 0 0 3px;
+  }
+  .cardDistance {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgb(19, 19, 103);
+    background: rgb(240, 240, 255);
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
     margin: 0 0 6px;
   }
+
   .cardTags {
     display: flex;
     flex-wrap: wrap;
@@ -151,70 +314,107 @@
     color: rgb(19, 19, 103);
     padding: 2px 8px;
     border-radius: 4px;
-    font-weight: bold;
+    font-weight: 600;
   }
+  .tagMore {
+    font-size: 11px;
+    color: gray;
+    padding: 2px 4px;
+  }
+
   .cardMeta {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
+    margin-bottom: 10px;
   }
   .cardRating {
-    font-size: 12px;
+    font-size: 13px;
     color: rgb(150, 107, 7);
-    font-weight: bold;
+    font-weight: 700;
+  }
+  .cardReviews {
+    font-size: 11px;
+    color: gray;
+    margin-left: 3px;
   }
   .cardRate {
-    font-size: 13px;
-    font-weight: bold;
+    font-size: 14px;
+    font-weight: 800;
     color: rgb(19, 19, 103);
   }
+  .cardRateAlt {
+    font-size: 11px;
+    color: gray;
+  }
+
   .bookBtn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     height: 36px;
-    padding: 0 16px;
+    padding: 0 18px;
     background: rgb(19, 19, 103);
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
     font-family: inherit;
+    transition: background 0.15s;
   }
   .bookBtn:hover {
     background: rgb(15, 15, 70);
   }
+
+  /* ── Loading / empty ─────────────────────────────────────── */
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: gray;
+    font-size: 14px;
+    gap: 12px;
+  }
+  .spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgb(228, 228, 228);
+    border-top-color: rgb(19, 19, 103);
+    border-radius: 50%;
+    animation: spin 0.65s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   .empty {
     text-align: center;
     padding: 60px 20px;
     color: gray;
     font-size: 14px;
-  }
-  .loading {
-    text-align: center;
-    padding: 60px 20px;
-    color: gray;
-    font-size: 14px;
+    line-height: 1.8;
   }
 }
+
 @media screen and (min-width: 768px) {
-  .searchBar {
-    flex-direction: row;
-  }
-  .searchInput {
-    max-width: 340px;
-  }
   .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 14px;
+  }
+  .searchInput {
+    max-width: 360px;
   }
 }
-@media screen and (min-width: 992px) {
+@media screen and (min-width: 1024px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
   }

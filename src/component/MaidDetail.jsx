@@ -1,8 +1,25 @@
+// src/component/MaidDetail/MaidDetail.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./MaidDetail.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
+const CURRENCY_SYMBOLS = {
+  NGN: "₦",
+  USD: "$",
+  GBP: "£",
+  EUR: "€",
+  KES: "KSh",
+  GHS: "₵",
+  ZAR: "R",
+  UGX: "USh",
+  CAD: "CA$",
+  AUD: "A$",
+};
+function sym(c) {
+  return CURRENCY_SYMBOLS[c] || (c ? c + " " : "₦");
+}
 
 function initials(name) {
   return (
@@ -14,14 +31,23 @@ function initials(name) {
       .toUpperCase() || "?"
   );
 }
-
-function formatDate(dateStr) {
-  return new Date(dateStr).toLocaleDateString("en-NG", {
+function formatDate(d) {
+  return new Date(d).toLocaleDateString("en-NG", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
 }
+
+const DAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 export default function MaidDetail() {
   const { maidId } = useParams();
@@ -29,64 +55,66 @@ export default function MaidDetail() {
 
   const [maid, setMaid] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [availability, setAvailability] = useState([]);
   const [loading, setLoading] = useState(true);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalReviews, setTotalReviews] = useState(0);
   const REVIEWS_PER_PAGE = 10;
 
+  // ── Fetch maid + availability ────────────────────────────────────
   useEffect(() => {
-    async function fetchMaidDetails() {
+    async function fetchAll() {
       try {
-        const res = await fetch(`${API_URL}/api/maids/${maidId}`);
-        const data = await res.json();
-        setMaid(data.maid || {});
+        const [maidRes, availRes] = await Promise.all([
+          fetch(`${API_URL}/api/maids/${maidId}`),
+          fetch(`${API_URL}/api/maids/${maidId}/availability`),
+        ]);
+        const [maidData, availData] = await Promise.all([
+          maidRes.json(),
+          availRes.json(),
+        ]);
+        setMaid(maidData.maid || {});
+        setAvailability(availData.availability || []);
       } catch (err) {
-        console.error("Error fetching maid details:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     }
-
-    fetchMaidDetails();
+    fetchAll();
   }, [maidId]);
 
+  // ── Fetch reviews ────────────────────────────────────────────────
   useEffect(() => {
-    async function fetchReviews() {
-      if (!maid) return;
-      setReviewsLoading(true);
-      try {
-        const res = await fetch(
-          `${API_URL}/api/maids/${maidId}/reviews?page=${page}&limit=${REVIEWS_PER_PAGE}`,
-        );
-        const data = await res.json();
-        setReviews(data.reviews || []);
-        setTotalReviews(data.total || 0);
-      } catch (err) {
-        console.error("Error fetching reviews:", err);
-      } finally {
-        setReviewsLoading(false);
-      }
-    }
-
-    fetchReviews();
+    if (!maid) return;
+    setReviewsLoading(true);
+    fetch(
+      `${API_URL}/api/maids/${maidId}/reviews?page=${page}&limit=${REVIEWS_PER_PAGE}`,
+    )
+      .then((r) => r.json())
+      .then((d) => {
+        setReviews(d.reviews || []);
+        setTotalReviews(d.total || 0);
+      })
+      .catch(console.error)
+      .finally(() => setReviewsLoading(false));
   }, [maidId, page, maid]);
 
   const totalPages = Math.ceil(totalReviews / REVIEWS_PER_PAGE);
 
-  if (loading) {
+  if (loading)
     return (
       <div className={styles.page}>
         <div
-          style={{ textAlign: "center", padding: "40px 20px", color: "gray" }}
+          style={{ textAlign: "center", padding: "60px 20px", color: "gray" }}
         >
           Loading maid details...
         </div>
       </div>
     );
-  }
 
-  if (!maid || !maid.id) {
+  if (!maid?.id)
     return (
       <div className={styles.page}>
         <div style={{ textAlign: "center", padding: "40px 20px" }}>
@@ -97,25 +125,89 @@ export default function MaidDetail() {
         </div>
       </div>
     );
+
+  const c = maid.currency || "NGN";
+  const s = sym(c);
+  const hasRates = maid.rate_daily || maid.rate_weekly || maid.rate_monthly;
+
+  // Parse custom rates — stored as JSONB object { "Deep Clean": 5000, ... }
+  let customRates = [];
+  if (maid.rate_custom) {
+    try {
+      const parsed =
+        typeof maid.rate_custom === "string"
+          ? JSON.parse(maid.rate_custom)
+          : maid.rate_custom;
+      customRates = Object.entries(parsed)
+        .filter(([, v]) => Number(v) > 0)
+        .map(([label, price]) => ({ label, price }));
+    } catch {}
   }
+
+  // Availability — group by day, sort by day_of_week
+  const availByDay = {};
+  availability.forEach((a) => {
+    availByDay[a.day_of_week] = a;
+  });
+  const activeDays = DAYS.filter((_, i) => availByDay[i]);
 
   return (
     <div className={styles.page}>
-      {/* Back button */}
       <button className={styles.backBtn} onClick={() => navigate("/maids")}>
         ← Back to maids
       </button>
 
-      {/* Header with avatar and basic info */}
+      {/* ── Header ─────────────────────────────────────────────── */}
       <div className={styles.header}>
-        {maid.avatar ? (
-          <img src={maid.avatar} alt={maid.name} className={styles.avatar} />
-        ) : (
-          <div className={styles.avatarPlaceholder}>{initials(maid.name)}</div>
-        )}
+        <div className={styles.headerAvatarWrap}>
+          {maid.avatar ? (
+            <img
+              src={maid.avatar}
+              alt={maid.name}
+              className={styles.avatar}
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                e.currentTarget.nextSibling.style.display = "flex";
+              }}
+            />
+          ) : null}
+          <div
+            className={styles.avatarPlaceholder}
+            style={{ display: maid.avatar ? "none" : "flex" }}
+          >
+            {initials(maid.name)}
+          </div>
+        </div>
 
         <div className={styles.headerInfo}>
-          <h1 className={styles.name}>{maid.name}</h1>
+          <div className={styles.headerNameRow}>
+            <h1 className={styles.name}>{maid.name}</h1>
+            <div className={styles.badges}>
+              {maid.id_verified && (
+                <span
+                  className={styles.badge}
+                  style={{
+                    background: "rgb(232,245,233)",
+                    color: "rgb(27,94,32)",
+                  }}
+                >
+                  🪪 ID Verified
+                </span>
+              )}
+              {maid.background_checked && (
+                <span
+                  className={styles.badge}
+                  style={{
+                    background: "rgb(227,242,253)",
+                    color: "rgb(13,71,161)",
+                  }}
+                >
+                  🔍 Background Checked
+                </span>
+              )}
+            </div>
+          </div>
+
           {maid.location && (
             <p className={styles.location}>📍 {maid.location}</p>
           )}
@@ -127,11 +219,32 @@ export default function MaidDetail() {
             <span className={styles.ratingCount}>
               ({maid.total_reviews || 0} reviews)
             </span>
+            {maid.years_exp > 0 && (
+              <span className={styles.expPill}>
+                🎓 {maid.years_exp} yr{maid.years_exp !== 1 ? "s" : ""} exp
+              </span>
+            )}
           </div>
 
-          <p className={styles.hourlyRate}>
-            ₦{Number(maid.hourly_rate || 0).toLocaleString()} per hour
-          </p>
+          <div className={styles.headerRate}>
+            <span className={styles.primaryRate}>
+              {s}
+              {Number(
+                maid.hourly_rate || maid.rate_hourly || 0,
+              ).toLocaleString()}
+              <span className={styles.rateUnit}>/hr</span>
+            </span>
+            {maid.rate_daily && (
+              <span className={styles.altRate}>
+                {s}
+                {Number(maid.rate_daily).toLocaleString()}/day
+              </span>
+            )}
+          </div>
+
+          {maid.pricing_note && (
+            <p className={styles.pricingNote}>💬 {maid.pricing_note}</p>
+          )}
         </div>
 
         <button
@@ -142,9 +255,9 @@ export default function MaidDetail() {
         </button>
       </div>
 
-      {/* Main content */}
+      {/* ── Content grid ───────────────────────────────────────── */}
       <div className={styles.content}>
-        {/* Left section - Profile info */}
+        {/* ── LEFT ─────────────────────────────────────────────── */}
         <div className={styles.left}>
           {/* Bio */}
           {maid.bio && (
@@ -154,12 +267,113 @@ export default function MaidDetail() {
             </div>
           )}
 
-          {/* Experience */}
+          {/* Pricing */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Experience</h2>
+            <h2 className={styles.sectionTitle}>Pricing ({c})</h2>
+            <div className={styles.priceGrid}>
+              <div className={styles.priceCard}>
+                <span className={styles.priceLabel}>Per Hour</span>
+                <span className={styles.priceValue}>
+                  {s}
+                  {Number(
+                    maid.hourly_rate || maid.rate_hourly || 0,
+                  ).toLocaleString()}
+                </span>
+              </div>
+              {maid.rate_daily && (
+                <div className={styles.priceCard}>
+                  <span className={styles.priceLabel}>Per Day</span>
+                  <span className={styles.priceValue}>
+                    {s}
+                    {Number(maid.rate_daily).toLocaleString()}
+                  </span>
+                </div>
+              )}
+              {maid.rate_weekly && (
+                <div className={styles.priceCard}>
+                  <span className={styles.priceLabel}>Per Week</span>
+                  <span className={styles.priceValue}>
+                    {s}
+                    {Number(maid.rate_weekly).toLocaleString()}
+                  </span>
+                </div>
+              )}
+              {maid.rate_monthly && (
+                <div className={styles.priceCard}>
+                  <span className={styles.priceLabel}>Per Month</span>
+                  <span className={styles.priceValue}>
+                    {s}
+                    {Number(maid.rate_monthly).toLocaleString()}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Custom rates */}
+            {customRates.length > 0 && (
+              <div className={styles.customRates}>
+                <p className={styles.customRatesTitle}>Custom Services</p>
+                {customRates.map((r) => (
+                  <div key={r.label} className={styles.customRateRow}>
+                    <span>{r.label}</span>
+                    <span className={styles.customRatePrice}>
+                      {s}
+                      {Number(r.price).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Services */}
+          {maid.services?.length > 0 && (
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>Services Offered</h2>
+              <div className={styles.services}>
+                {maid.services.map((sv) => (
+                  <span key={sv} className={styles.serviceTag}>
+                    {sv}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Availability */}
+          {activeDays.length > 0 && (
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>Weekly Availability</h2>
+              <div className={styles.availGrid}>
+                {DAYS.map((day, i) => {
+                  const slot = availByDay[i];
+                  return (
+                    <div
+                      key={i}
+                      className={`${styles.availRow} ${slot ? styles.availRowOn : styles.availRowOff}`}
+                    >
+                      <span className={styles.availDay}>{day.slice(0, 3)}</span>
+                      {slot ? (
+                        <span className={styles.availTime}>
+                          {slot.start_time?.slice(0, 5)} –{" "}
+                          {slot.end_time?.slice(0, 5)}
+                        </span>
+                      ) : (
+                        <span className={styles.availOff}>Unavailable</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Experience / languages */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>Details</h2>
             <div className={styles.experienceBox}>
               <div className={styles.experienceItem}>
-                <span className={styles.experienceLabel}>Years</span>
+                <span className={styles.experienceLabel}>Experience</span>
                 <span className={styles.experienceValue}>
                   {Number(maid.years_exp || 0)} years
                 </span>
@@ -167,32 +381,35 @@ export default function MaidDetail() {
               <div className={styles.experienceItem}>
                 <span className={styles.experienceLabel}>Status</span>
                 <span
-                  className={`${styles.experienceValue} ${
-                    maid.is_available ? styles.available : styles.unavailable
-                  }`}
+                  className={`${styles.experienceValue} ${maid.is_available ? styles.available : styles.unavailable}`}
                 >
-                  {maid.is_available ? "Available" : "Unavailable"}
+                  {maid.is_available ? "✅ Available" : "❌ Unavailable"}
                 </span>
               </div>
+              {maid.languages?.length > 0 && (
+                <div
+                  className={styles.experienceItem}
+                  style={{ gridColumn: "1/-1" }}
+                >
+                  <span className={styles.experienceLabel}>Languages</span>
+                  <span className={styles.experienceValue}>
+                    {maid.languages.join(", ")}
+                  </span>
+                </div>
+              )}
+              {maid.member_since && (
+                <div className={styles.experienceItem}>
+                  <span className={styles.experienceLabel}>Member Since</span>
+                  <span className={styles.experienceValue}>
+                    {formatDate(maid.member_since)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
-
-          {/* Services */}
-          {maid.services && maid.services.length > 0 && (
-            <div className={styles.section}>
-              <h2 className={styles.sectionTitle}>Services Offered</h2>
-              <div className={styles.services}>
-                {maid.services.map((service) => (
-                  <span key={service} className={styles.serviceTag}>
-                    {service}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Right section - Reviews */}
+        {/* ── RIGHT — Reviews ───────────────────────────────────── */}
         <div className={styles.right}>
           <h2 className={styles.sectionTitle}>Customer Reviews</h2>
 
@@ -240,7 +457,6 @@ export default function MaidDetail() {
                 ))}
               </div>
 
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className={styles.pagination}>
                   <button
