@@ -1,10 +1,14 @@
+/* Booking.module.css */
+
 @media screen and (min-width: 20px) {
   .page {
-    padding: 20px 16px;
+    padding: 20px 16px 40px;
     font-family: Arial, Helvetica, sans-serif;
     max-width: 600px;
     margin: 0 auto;
   }
+
+  /* ── Back button ─────────────────────────────────────────── */
   .backBtn {
     background: none;
     border: none;
@@ -17,7 +21,13 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    transition: opacity 0.15s;
   }
+  .backBtn:hover {
+    opacity: 0.7;
+  }
+
+  /* ── Maid card ───────────────────────────────────────────── */
   .maidCard {
     display: flex;
     align-items: center;
@@ -41,12 +51,14 @@
     border-radius: 50%;
     background: rgb(19, 19, 103);
     color: white;
-    display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
     font-weight: bold;
     flex-shrink: 0;
+  }
+  .maidCardInfo {
+    flex: 1;
   }
   .maidName {
     font-size: 16px;
@@ -58,26 +70,213 @@
     font-size: 13px;
     color: rgb(19, 19, 103);
     font-weight: bold;
-    margin: 0;
+    margin: 0 0 4px;
   }
+  .maidVerified {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgb(15, 103, 46);
+    background: rgb(232, 245, 233);
+    padding: 2px 8px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  /* ── Form layout ─────────────────────────────────────────── */
   .form {
     display: flex;
     flex-direction: column;
     gap: 18px;
   }
+
   .field {
     display: flex;
     flex-direction: column;
     gap: 6px;
   }
+
   .label {
     font-size: 13px;
     font-weight: bold;
     color: rgb(47, 47, 47);
   }
+  .optional {
+    font-weight: normal;
+    color: gray;
+    font-size: 12px;
+  }
+  .fieldHint {
+    font-size: 11px;
+    color: gray;
+    margin: 0;
+  }
+  .fieldError {
+    font-size: 12px;
+    color: rgb(168, 28, 28);
+    margin: 2px 0 0;
+  }
+
+  .labelRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .geoLink {
+    background: none;
+    border: none;
+    color: rgb(19, 19, 103);
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-family: inherit;
+    padding: 0;
+  }
+  .geoLink:disabled {
+    color: gray;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  /* ── Rate grid ───────────────────────────────────────────── */
+  .rateGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .rateCard {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    border: 1.5px solid rgb(228, 225, 218);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s,
+      background 0.15s;
+    position: relative;
+  }
+  .rateCard:hover {
+    border-color: rgb(19, 19, 103);
+    box-shadow: 0 2px 8px rgba(19, 19, 103, 0.1);
+  }
+  .rateCardActive {
+    border-color: rgb(19, 19, 103) !important;
+    background: rgb(245, 245, 255);
+    box-shadow: 0 2px 10px rgba(19, 19, 103, 0.14);
+  }
+  .rateCardNegotiated {
+    border-style: dashed;
+    border-color: rgb(200, 180, 240);
+    background: rgb(252, 250, 255);
+  }
+  .rateCardNegotiated.rateCardActive {
+    border-color: rgb(120, 60, 200) !important;
+    background: rgb(248, 244, 255);
+  }
+
+  .rateCardIcon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .rateCardBody {
+    flex: 1;
+    min-width: 0;
+  }
+  .rateCardLabel {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgb(47, 47, 47);
+    margin: 0 0 2px;
+  }
+  .rateCardPrice {
+    font-size: 17px;
+    font-weight: 800;
+    color: rgb(19, 19, 103);
+    margin: 0;
+  }
+  .rateCardUnit {
+    font-size: 12px;
+    font-weight: 400;
+    color: gray;
+    margin-left: 2px;
+  }
+  .rateCardPriceCustom {
+    font-size: 13px;
+    color: rgb(100, 60, 180);
+    font-style: italic;
+    margin: 0;
+  }
+  .rateCardCheck {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgb(19, 19, 103);
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Negotiated price ────────────────────────────────────── */
+  .negotiatedRow {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid rgb(120, 60, 200);
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+  }
+  .currencyPrefix {
+    background: rgb(248, 244, 255);
+    color: rgb(100, 60, 180);
+    font-size: 18px;
+    font-weight: 700;
+    padding: 0 14px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid rgb(200, 180, 240);
+    flex-shrink: 0;
+  }
+  .negotiatedInput {
+    border: none !important;
+    border-radius: 0 !important;
+    flex: 1;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: rgb(60, 30, 120) !important;
+  }
+  .negotiatedInput:focus {
+    outline: none;
+  }
+  .negotiatedNote {
+    font-size: 11px;
+    color: rgb(100, 60, 180);
+    background: rgb(248, 244, 255);
+    border: 1px solid rgb(220, 200, 250);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 4px 0 0;
+    line-height: 1.5;
+  }
+
+  /* ── Standard inputs ─────────────────────────────────────── */
   .input {
     height: 44px;
-    border: 1px solid rgb(228, 228, 228);
+    border: 1.5px solid rgb(228, 228, 228);
     border-radius: 8px;
     padding: 0 14px;
     font-size: 14px;
@@ -85,12 +284,14 @@
     font-family: inherit;
     box-sizing: border-box;
     width: 100%;
+    transition: border-color 0.15s;
   }
   .input:focus {
     border-color: rgb(19, 19, 103);
   }
+
   .textarea {
-    border: 1px solid rgb(228, 228, 228);
+    border: 1.5px solid rgb(228, 228, 228);
     border-radius: 8px;
     padding: 10px 14px;
     font-size: 14px;
@@ -100,15 +301,33 @@
     width: 100%;
     min-height: 80px;
     resize: vertical;
+    transition: border-color 0.15s;
   }
   .textarea:focus {
     border-color: rgb(19, 19, 103);
   }
-  .row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+
+  /* ── Address box ─────────────────────────────────────────── */
+  .addressBox {
+    font-size: 11px;
+    color: gray;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgb(245, 245, 248);
+    border-left: 3px solid rgb(19, 19, 103);
+    border-radius: 6px;
+    line-height: 1.7;
   }
+  .addressBox p {
+    margin: 0;
+  }
+  .addressBoxTitle {
+    font-weight: bold;
+    color: rgb(47, 47, 47);
+    margin-bottom: 2px !important;
+  }
+
+  /* ── Summary ─────────────────────────────────────────────── */
   .summary {
     background: rgb(240, 240, 255);
     border-radius: 10px;
@@ -130,15 +349,38 @@
   .summaryTotal {
     display: flex;
     justify-content: space-between;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: bold;
     color: rgb(19, 19, 103);
     border-top: 1px solid rgb(200, 200, 230);
     padding-top: 10px;
     margin-top: 6px;
   }
+
+  /* ── Payment note ────────────────────────────────────────── */
+  .paymentNote {
+    background: rgb(240, 248, 255);
+    border: 1px solid rgb(200, 220, 255);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: rgb(30, 60, 120);
+    line-height: 1.5;
+  }
+
+  /* ── Error ───────────────────────────────────────────────── */
+  .error {
+    font-size: 13px;
+    color: rgb(168, 28, 28);
+    font-weight: bold;
+    padding: 10px 14px;
+    background: rgb(255, 235, 238);
+    border-radius: 8px;
+  }
+
+  /* ── Submit ──────────────────────────────────────────────── */
   .submitBtn {
-    height: 50px;
+    height: 52px;
     background: rgb(19, 19, 103);
     color: white;
     border: none;
@@ -147,46 +389,22 @@
     font-weight: bold;
     cursor: pointer;
     font-family: inherit;
+    transition:
+      background 0.15s,
+      transform 0.1s;
   }
-  .submitBtn:hover {
+  .submitBtn:hover:not(:disabled) {
     background: rgb(15, 15, 70);
+    transform: translateY(-1px);
   }
   .submitBtn:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
   }
-  .error {
-    font-size: 13px;
-    color: red;
-    font-weight: bold;
-  }
-  .success {
-    background: rgb(210, 247, 224);
-    border-radius: 10px;
-    padding: 20px;
-    text-align: center;
-  }
-  .successTitle {
-    font-size: 18px;
-    font-weight: bold;
-    color: rgb(10, 107, 46);
-    margin: 0 0 8px;
-  }
-  .successText {
-    font-size: 14px;
-    color: rgb(40, 80, 60);
-    margin: 0 0 16px;
-  }
-  .successBtn {
-    height: 44px;
-    padding: 0 24px;
-    background: rgb(19, 19, 103);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    font-family: inherit;
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
 }

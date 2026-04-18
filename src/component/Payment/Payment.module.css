@@ -1,10 +1,14 @@
+/* Payment.module.css */
+
 @media screen and (min-width: 20px) {
   .page {
-    padding: 20px 16px;
+    padding: 20px 16px 48px;
     font-family: Arial, Helvetica, sans-serif;
-    max-width: 520px;
+    max-width: 540px;
     margin: 0 auto;
   }
+
+  /* ── Back button ───────────────────────────────────────── */
   .backBtn {
     background: none;
     border: none;
@@ -14,27 +18,40 @@
     cursor: pointer;
     padding: 0 0 16px;
     font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.15s;
   }
+  .backBtn:hover {
+    opacity: 0.7;
+  }
+
+  /* ── Cards ─────────────────────────────────────────────── */
   .card {
     background: white;
     border: 1px solid rgb(228, 228, 228);
     border-radius: 12px;
     padding: 20px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .cardTitle {
-    font-size: 12px;
+    font-size: 11px;
     color: gray;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.07em;
     margin: 0 0 14px;
-    font-weight: bold;
+    font-weight: 700;
   }
+
+  /* ── Summary rows ──────────────────────────────────────── */
   .row {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
     font-size: 13px;
-    padding: 6px 0;
+    padding: 7px 0;
     border-bottom: 1px solid rgb(248, 248, 248);
   }
   .row:last-child {
@@ -42,114 +59,371 @@
   }
   .rowKey {
     color: gray;
+    line-height: 1.4;
+    flex-shrink: 0;
   }
   .rowVal {
-    font-weight: bold;
+    font-weight: 700;
     color: rgb(47, 47, 47);
     text-align: right;
+    line-height: 1.4;
+  }
+
+  .feeDivider {
+    border-top: 1px dashed rgb(228, 228, 228);
+    margin: 8px 0;
+  }
+  .feeTip {
+    display: block;
+    font-size: 10px;
+    color: #bbb;
+    font-weight: 400;
+    margin-top: 1px;
   }
   .totalRow {
     display: flex;
     justify-content: space-between;
-    font-size: 16px;
-    font-weight: bold;
+    font-size: 17px;
+    font-weight: 800;
     color: rgb(19, 19, 103);
     padding-top: 12px;
     border-top: 2px solid rgb(19, 19, 103);
-    margin-top: 6px;
+    margin-top: 8px;
   }
+
+  /* ── Method list ───────────────────────────────────────── */
+  .methodList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .methodCard {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: white;
+    border: 1.5px solid rgb(228, 225, 218);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s,
+      background 0.15s;
+    position: relative;
+  }
+  .methodCard:hover {
+    border-color: var(--method-color, rgb(19, 19, 103));
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  }
+  .methodCardActive {
+    border-color: var(--method-color, rgb(19, 19, 103)) !important;
+    background: rgb(250, 250, 255);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .methodIcon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .methodInfo {
+    flex: 1;
+    min-width: 0;
+  }
+  .methodLabel {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(30, 30, 30);
+    margin: 0 0 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .methodBadge {
+    font-size: 9px;
+    font-weight: 700;
+    background: rgb(15, 103, 46);
+    color: white;
+    padding: 2px 7px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .methodSub {
+    font-size: 11px;
+    color: gray;
+    margin: 0 0 2px;
+  }
+  .methodCurrencies {
+    font-size: 10px;
+    color: #aaa;
+    margin: 0;
+  }
+  .methodCheck {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--method-color, rgb(19, 19, 103));
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Method note ───────────────────────────────────────── */
+  .methodNote {
+    background: white;
+    border: 1.5px solid rgb(228, 228, 228);
+    border-left-width: 4px;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: rgb(47, 47, 47);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  /* ── Steps ─────────────────────────────────────────────── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: rgb(60, 60, 60);
+    line-height: 1.5;
+  }
+  .step > span:first-child {
+    flex-shrink: 0;
+  }
+
+  /* ── Pay button ─────────────────────────────────────────── */
   .payBtn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
-    height: 52px;
-    background: rgb(0, 100, 0);
+    height: 54px;
     color: white;
     border: none;
     border-radius: 10px;
     font-size: 15px;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
     font-family: inherit;
     margin-bottom: 12px;
+    transition:
+      opacity 0.15s,
+      transform 0.1s;
   }
-  .payBtn:hover {
-    background: rgb(0, 80, 0);
+  .payBtn:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
   }
   .payBtn:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
   }
-  .paystackLogo {
-    font-size: 12px;
-    opacity: 0.8;
-  }
+
   .secureNote {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-size: 12px;
+    text-align: center;
+    font-size: 11px;
     color: gray;
+    line-height: 1.6;
     margin-bottom: 20px;
   }
+
+  /* ── Bank transfer ──────────────────────────────────────── */
+  .bankInstructions {
+    background: rgb(245, 245, 255);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .bankRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgb(230, 228, 245);
+  }
+  .bankRow:last-child {
+    border-bottom: none;
+  }
+  .bankRow > span:first-child {
+    color: gray;
+    flex-shrink: 0;
+  }
+  .acctNo {
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: rgb(19, 19, 103);
+  }
+  .bankAmount {
+    font-size: 18px;
+    color: rgb(19, 19, 103);
+  }
+  .bankRef {
+    font-size: 12px;
+    color: gray;
+  }
+  .bankNote {
+    font-size: 12px;
+    color: rgb(100, 80, 0);
+    background: rgb(255, 248, 225);
+    padding: 10px 12px;
+    border-radius: 6px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .proofField {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 12px;
+  }
+  .proofField label {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgb(47, 47, 47);
+  }
+  .proofInput {
+    height: 42px;
+    border: 1.5px solid rgb(228, 228, 228);
+    border-radius: 8px;
+    padding: 0 14px;
+    font-size: 13px;
+    outline: none;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+  }
+  .proofInput:focus {
+    border-color: rgb(19, 19, 103);
+  }
+
+  /* ── Status cards ───────────────────────────────────────── */
   .statusCard {
-    border-radius: 12px;
-    padding: 24px;
+    border-radius: 14px;
+    padding: 32px 24px;
     text-align: center;
+    margin-top: 20px;
   }
   .statusSuccess {
     background: rgb(209, 247, 224);
     border: 1px solid rgb(100, 200, 130);
   }
-  .statusPending {
-    background: rgb(255, 243, 205);
-    border: 1px solid rgb(200, 170, 50);
-  }
   .statusFailed {
     background: rgb(255, 228, 228);
     border: 1px solid rgb(200, 100, 100);
   }
+
   .statusIcon {
-    font-size: 40px;
-    margin-bottom: 10px;
+    font-size: 52px;
+    margin-bottom: 12px;
   }
   .statusTitle {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 800;
+    color: rgb(30, 30, 30);
+    margin: 0 0 10px;
   }
   .statusText {
     font-size: 13px;
     color: gray;
-    margin: 0 0 16px;
-    line-height: 1.5;
+    margin: 0 0 20px;
+    line-height: 1.6;
+    max-width: 340px;
+    margin-left: auto;
+    margin-right: auto;
   }
+
   .actionBtn {
-    height: 44px;
+    height: 46px;
     padding: 0 24px;
     background: rgb(19, 19, 103);
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
     font-family: inherit;
+    width: 100%;
+    transition: background 0.15s;
   }
   .actionBtn:hover {
     background: rgb(15, 15, 70);
   }
-  .awaitingBadge {
-    display: inline-block;
-    background: rgb(255, 243, 205);
-    color: rgb(133, 100, 4);
-    font-size: 12px;
-    font-weight: bold;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 16px;
+
+  .ghostBtn {
+    height: 40px;
+    background: none;
+    border: 1.5px solid rgb(228, 228, 228);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: gray;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    transition: background 0.15s;
+  }
+  .ghostBtn:hover {
+    background: rgb(245, 245, 245);
+  }
+
+  /* ── Error ──────────────────────────────────────────────── */
+  .errorMsg {
+    font-size: 13px;
+    color: rgb(168, 28, 28);
+    font-weight: 600;
+    padding: 10px 14px;
+    background: rgb(255, 235, 238);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  /* ── Spinner ────────────────────────────────────────────── */
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgb(228, 228, 228);
+    border-top-color: rgb(19, 19, 103);
+    border-radius: 50%;
+    animation: spin 0.65s linear infinite;
+    margin: 0 auto;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .page {
+    padding: 32px 24px 60px;
   }
 }

@@ -1,5 +1,5 @@
 // src/component/Maids/Maids.jsx
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./Maids.module.css";
 
@@ -32,6 +32,7 @@ const CURRENCY_SYMBOLS = {
 function sym(c) {
   return CURRENCY_SYMBOLS[c] || (c ? c + " " : "₦");
 }
+
 function initials(name) {
   return (
     name
@@ -43,50 +44,61 @@ function initials(name) {
   );
 }
 
+// ── Haversine distance (km) — works entirely client-side ─────────────
+function haversine(lat1, lon1, lat2, lon2) {
+  if (lat2 == null || lon2 == null || isNaN(lat2) || isNaN(lon2)) return null;
+  const R = 6371;
+  const dL = ((lat2 - lat1) * Math.PI) / 180;
+  const dG = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dL / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dG / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
 export default function Maids() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const [maids, setMaids] = useState([]);
+  const [allMaids, setAllMaids] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(searchParams.get("location") || "");
   const [service, setService] = useState("All");
-  const [sortBy, setSortBy] = useState("rating"); // "rating"|"rate_asc"|"distance"
-  const [coords, setCoords] = useState(null); // { lat, lng }
-  const [geoStatus, setGeoStatus] = useState("idle"); // "idle"|"loading"|"ok"|"denied"
+  const [sortBy, setSortBy] = useState("rating");
+  const [coords, setCoords] = useState(null);
+  const [geoStatus, setGeoStatus] = useState("idle"); // idle | loading | ok | denied
   const [geoError, setGeoError] = useState("");
 
-  // ── Fetch whenever service or coords change ──────────────────────
+  // ── Fetch ALL maids — NO radius filter — we sort distance client-side
+  // This guarantees we never show "No maids found" just because
+  // the maid hasn't saved GPS coordinates in their profile yet.
   useEffect(() => {
     let cancelled = false;
-
     async function fetchMaids() {
       setLoading(true);
       try {
-        const params = new URLSearchParams({ limit: 50 });
+        const params = new URLSearchParams({ limit: 200 });
         if (service !== "All") params.set("service", service);
-        if (coords) {
-          params.set("lat", String(coords.lat));
-          params.set("lng", String(coords.lng));
-          params.set("radius_km", "150");
-        }
+        // ⚠️ Do NOT pass lat/lng to backend — backend radius filter would
+        //    exclude maids with no coordinates set. We compute distance here.
         const res = await fetch(`${API_URL}/api/maids?${params}`);
         const data = await res.json();
-        if (!cancelled) setMaids(data.maids || []);
+        if (!cancelled) setAllMaids(data.maids || []);
       } catch (err) {
-        console.error("fetchMaids error:", err);
+        console.error("fetchMaids:", err);
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
-
     fetchMaids();
     return () => {
       cancelled = true;
     };
-  }, [service, coords]);
+  }, [service]);
 
-  // ── Geolocation ──────────────────────────────────────────────────
+  // ── Request location ─────────────────────────────────────────────────
   function handleUseLocation() {
     if (!navigator.geolocation) {
       setGeoStatus("denied");
@@ -106,11 +118,11 @@ export default function Maids() {
         setGeoStatus("denied");
         setGeoError(
           err.code === 1
-            ? "Location denied. Please allow location access in your browser."
-            : "Could not get location. Try again or search manually.",
+            ? "Location permission denied. Please allow access in your browser settings then try again."
+            : "Could not get your location. Try again.",
         );
       },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 },
+      { enableHighAccuracy: false, timeout: 12000, maximumAge: 60000 },
     );
   }
 
@@ -121,8 +133,21 @@ export default function Maids() {
     setGeoError("");
   }
 
-  // ── Filter ───────────────────────────────────────────────────────
-  const filtered = maids.filter((m) => {
+  // ── Attach client-side distance to every maid ────────────────────────
+  const maidsWithDist = allMaids.map((m) => ({
+    ...m,
+    _dist: coords
+      ? haversine(
+          coords.lat,
+          coords.lng,
+          Number(m.latitude),
+          Number(m.longitude),
+        )
+      : null,
+  }));
+
+  // ── Text filter ──────────────────────────────────────────────────────
+  const filtered = maidsWithDist.filter((m) => {
     if (!search) return true;
     const q = search.toLowerCase();
     return (
@@ -130,13 +155,11 @@ export default function Maids() {
     );
   });
 
-  // ── Sort ─────────────────────────────────────────────────────────
+  // ── Sort ─────────────────────────────────────────────────────────────
   const sorted = [...filtered].sort((a, b) => {
     if (sortBy === "distance") {
-      // Both have distance from backend when coords are sent
-      const da = Number(a.distance_km ?? 9999);
-      const db = Number(b.distance_km ?? 9999);
-      return da - db;
+      // Maids with no GPS coordinates sort to end — never excluded
+      return (a._dist ?? 99999) - (b._dist ?? 99999);
     }
     if (sortBy === "rate_asc") {
       return (
@@ -144,8 +167,7 @@ export default function Maids() {
         Number(b.hourly_rate || b.rate_hourly || 0)
       );
     }
-    // Default: rating DESC
-    return Number(b.rating || 0) - Number(a.rating || 0);
+    return Number(b.rating || 0) - Number(a.rating || 0); // rating DESC
   });
 
   return (
@@ -158,7 +180,7 @@ export default function Maids() {
         Browse verified cleaning professionals near you
       </p>
 
-      {/* ── Search + location ─────────────────────────────────── */}
+      {/* ── Search row ─────────────────────────────────────────── */}
       <div className={styles.searchBar}>
         <input
           className={styles.searchInput}
@@ -186,10 +208,9 @@ export default function Maids() {
         )}
       </div>
 
-      {/* Geo error */}
       {geoError && <p className={styles.geoError}>⚠️ {geoError}</p>}
 
-      {/* ── Service chips ─────────────────────────────────────── */}
+      {/* ── Service chips ───────────────────────────────────────── */}
       <div className={styles.filters}>
         {SERVICES.map((sv) => (
           <button
@@ -202,49 +223,59 @@ export default function Maids() {
         ))}
       </div>
 
-      {/* ── Sort row ──────────────────────────────────────────── */}
+      {/* ── Sort ────────────────────────────────────────────────── */}
       <div className={styles.sortRow}>
-        <span className={styles.sortLabel}>Sort:</span>
+        <span className={styles.sortLabel}>Sort by:</span>
+
         <button
           className={`${styles.sortBtn} ${sortBy === "rating" ? styles.sortBtnActive : ""}`}
           onClick={() => setSortBy("rating")}
         >
           ⭐ Top Rated
         </button>
+
         <button
           className={`${styles.sortBtn} ${sortBy === "rate_asc" ? styles.sortBtnActive : ""}`}
           onClick={() => setSortBy("rate_asc")}
         >
           💰 Lowest Rate
         </button>
+
         <button
-          className={`${styles.sortBtn} ${sortBy === "distance" ? styles.sortBtnActive : ""} ${!coords ? styles.sortBtnDisabled : ""}`}
-          onClick={() => (coords ? setSortBy("distance") : handleUseLocation())}
-          title={!coords ? "Enable location first" : "Sort by distance"}
+          className={`${styles.sortBtn} ${sortBy === "distance" ? styles.sortBtnActive : ""}`}
+          onClick={() =>
+            geoStatus === "ok" ? setSortBy("distance") : handleUseLocation()
+          }
         >
-          📍 {coords ? "Nearest" : "Nearest (enable location)"}
+          {geoStatus === "loading" ? "📍 Getting…" : "📍 Nearest First"}
         </button>
       </div>
 
-      {/* ── Results count ─────────────────────────────────────── */}
+      {/* ── Results count ───────────────────────────────────────── */}
       {!loading && (
         <p className={styles.resultsCount}>
-          {sorted.length} maid{sorted.length !== 1 ? "s" : ""} found
-          {coords ? " near you" : ""}
+          {sorted.length} maid{sorted.length !== 1 ? "s" : ""}
+          {geoStatus === "ok" ? " — sorted nearest to you" : ""}
         </p>
       )}
 
-      {/* ── Maid grid ─────────────────────────────────────────── */}
+      {/* ── Grid ────────────────────────────────────────────────── */}
       {loading ? (
         <div className={styles.loading}>
           <div className={styles.spinner} />
-          <p>Finding maids{coords ? " near you" : ""}…</p>
+          <p>Finding maids…</p>
         </div>
       ) : sorted.length === 0 ? (
         <div className={styles.empty}>
-          No maids found.
-          {search && <> Try removing the search filter.</>}
-          {coords && <> Try increasing the search radius.</>}
+          <p>No maids match{search ? ` "${search}"` : ""}.</p>
+          {search && (
+            <button
+              className={styles.clearSearchBtn}
+              onClick={() => setSearch("")}
+            >
+              Clear search
+            </button>
+          )}
         </div>
       ) : (
         <div className={styles.grid}>
@@ -252,6 +283,8 @@ export default function Maids() {
             const currency = maid.currency || "NGN";
             const s = sym(currency);
             const rate = Number(maid.hourly_rate || maid.rate_hourly || 0);
+            const dist = maid._dist;
+
             return (
               <div
                 key={maid.id}
@@ -284,7 +317,7 @@ export default function Maids() {
                   )}
                 </div>
 
-                {/* Info */}
+                {/* Card body */}
                 <div className={styles.cardInfo}>
                   <div className={styles.cardNameRow}>
                     <p className={styles.cardName}>{maid.name}</p>
@@ -297,12 +330,20 @@ export default function Maids() {
                     <p className={styles.cardLocation}>📍 {maid.location}</p>
                   )}
 
-                  {/* Distance — only shown when coords are active */}
-                  {coords && maid.distance_km != null && (
-                    <p className={styles.cardDistance}>
-                      🗺 {Number(maid.distance_km).toFixed(1)} km away
-                    </p>
-                  )}
+                  {/* Distance — shown when location is active */}
+                  {geoStatus === "ok" &&
+                    (dist != null ? (
+                      <p className={styles.cardDistance}>
+                        🗺{" "}
+                        {dist < 1
+                          ? `${(dist * 1000).toFixed(0)} m away`
+                          : `${dist.toFixed(1)} km away`}
+                      </p>
+                    ) : (
+                      <p className={styles.cardDistanceUnknown}>
+                        📍 Location not set by maid
+                      </p>
+                    ))}
 
                   {/* Services */}
                   {maid.services?.length > 0 && (
@@ -337,8 +378,8 @@ export default function Maids() {
                       </span>
                       {maid.rate_daily && (
                         <span className={styles.cardRateAlt}>
-                          {" "}
-                          · {s}
+                          {" · "}
+                          {s}
                           {Number(maid.rate_daily).toLocaleString()}/day
                         </span>
                       )}

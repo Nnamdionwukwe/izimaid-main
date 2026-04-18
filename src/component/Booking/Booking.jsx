@@ -1,8 +1,25 @@
+// src/component/Booking/Booking.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import styles from "./Booking.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
+const CURRENCY_SYMBOLS = {
+  NGN: "₦",
+  USD: "$",
+  GBP: "£",
+  EUR: "€",
+  KES: "KSh",
+  GHS: "₵",
+  ZAR: "R",
+  UGX: "USh",
+  CAD: "CA$",
+  AUD: "A$",
+};
+function sym(c) {
+  return CURRENCY_SYMBOLS[c] || (c ? c + " " : "₦");
+}
 
 function initials(name) {
   return (
@@ -19,7 +36,6 @@ function extractAddressDetails(data) {
   const address = data.address || {};
   return {
     street: address.road || address.house_number || "",
-    houseNumber: address.house_number || "",
     city: address.city || address.town || address.village || "",
     state: address.state || address.region || address.county || "",
     country: address.country || "",
@@ -27,14 +43,99 @@ function extractAddressDetails(data) {
     displayName: data.display_name || "",
   };
 }
+function formatAddress(a) {
+  return (
+    [a.street, a.city, a.state, a.country].filter(Boolean).join(", ") ||
+    a.displayName
+  );
+}
 
-function formatAddress(addressDetails) {
-  const parts = [];
-  if (addressDetails.street) parts.push(addressDetails.street);
-  if (addressDetails.city) parts.push(addressDetails.city);
-  if (addressDetails.state) parts.push(addressDetails.state);
-  if (addressDetails.country) parts.push(addressDetails.country);
-  return parts.length > 0 ? parts.join(", ") : addressDetails.displayName;
+// ── Build rate options from maid profile ──────────────────────────────
+function buildRateOptions(maid, s) {
+  const options = [];
+
+  const hourly = Number(maid.rate_hourly || maid.hourly_rate || 0);
+  const daily = Number(maid.rate_daily || 0);
+  const weekly = Number(maid.rate_weekly || 0);
+  const monthly = Number(maid.rate_monthly || 0);
+
+  if (hourly > 0)
+    options.push({
+      id: "hourly",
+      label: "Hourly",
+      icon: "⏱",
+      price: hourly,
+      unit: "/hr",
+      desc: `${s}${hourly.toLocaleString()} per hour`,
+      rateType: "hourly",
+    });
+  if (daily > 0)
+    options.push({
+      id: "daily",
+      label: "Daily",
+      icon: "📅",
+      price: daily,
+      unit: "/day",
+      desc: `${s}${daily.toLocaleString()} per day`,
+      rateType: "daily",
+    });
+  if (weekly > 0)
+    options.push({
+      id: "weekly",
+      label: "Weekly",
+      icon: "🗓",
+      price: weekly,
+      unit: "/week",
+      desc: `${s}${weekly.toLocaleString()} per week`,
+      rateType: "weekly",
+    });
+  if (monthly > 0)
+    options.push({
+      id: "monthly",
+      label: "Monthly",
+      icon: "📆",
+      price: monthly,
+      unit: "/month",
+      desc: `${s}${monthly.toLocaleString()} per month`,
+      rateType: "monthly",
+    });
+
+  // Custom named rates from maid profile (JSONB object)
+  if (maid.rate_custom) {
+    try {
+      const parsed =
+        typeof maid.rate_custom === "string"
+          ? JSON.parse(maid.rate_custom)
+          : maid.rate_custom;
+      Object.entries(parsed).forEach(([label, price]) => {
+        if (Number(price) > 0) {
+          options.push({
+            id: `custom_${label}`,
+            label,
+            icon: "✨",
+            price: Number(price),
+            unit: "",
+            desc: `${s}${Number(price).toLocaleString()} (fixed rate)`,
+            rateType: "custom",
+            customLabel: label,
+          });
+        }
+      });
+    } catch {}
+  }
+
+  // Always show negotiated option last
+  options.push({
+    id: "negotiated",
+    label: "Custom / Negotiated",
+    icon: "🤝",
+    price: null,
+    unit: "",
+    desc: "Enter a price you've agreed with the maid",
+    rateType: "negotiated",
+  });
+
+  return options;
 }
 
 export default function Booking() {
@@ -42,6 +143,15 @@ export default function Booking() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const maid = state?.maid || {};
+
+  const currency = maid.currency || "NGN";
+  const s = sym(currency);
+  const rateOptions = buildRateOptions(maid, s);
+
+  const [selectedRateId, setSelectedRateId] = useState(
+    rateOptions[0]?.id || "hourly",
+  );
+  const [negotiatedPrice, setNegotiatedPrice] = useState("");
 
   const [form, setForm] = useState({
     service_date: "",
@@ -51,19 +161,25 @@ export default function Booking() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(null);
   const [gettingLocation, setGettingLocation] = useState(false);
   const [locationError, setLocationError] = useState("");
   const [detectedAddress, setDetectedAddress] = useState(null);
 
-  const total =
-    Number(maid.hourly_rate || 0) * Number(form.duration_hours || 0);
+  const selected = rateOptions.find((r) => r.id === selectedRateId);
 
-  // ── Redirect to payment page once booking is created ─────────
+  // ── Total calculation ─────────────────────────────────────────────
+  function calcTotal() {
+    if (!selected) return 0;
+    if (selected.rateType === "negotiated") return Number(negotiatedPrice) || 0;
+    if (selected.rateType === "custom") return selected.price; // fixed, no multiply
+    return selected.price * Number(form.duration_hours || 0);
+  }
+  const total = calcTotal();
+
+  // ── Navigate to payment once booking is created ───────────────────
+  const [success, setSuccess] = useState(null);
   useEffect(() => {
-    if (success) {
-      navigate("/payment", { state: { booking: success } });
-    }
+    if (success) navigate("/payment", { state: { booking: success } });
   }, [success]);
 
   function handleChange(e) {
@@ -71,85 +187,65 @@ export default function Booking() {
     setError("");
   }
 
+  // ── Geolocation ───────────────────────────────────────────────────
   async function getCurrentLocation() {
     setGettingLocation(true);
     setLocationError("");
     setDetectedAddress(null);
 
     if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported by your browser");
+      setLocationError("Geolocation is not supported by your browser.");
       setGettingLocation(false);
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
+      async ({ coords: { latitude, longitude } }) => {
         try {
-          const { latitude, longitude } = position.coords;
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
           );
-          if (!res.ok) throw new Error("Address lookup failed");
           const data = await res.json();
-          const addressDetails = extractAddressDetails(data);
-          setDetectedAddress(addressDetails);
+          const det = extractAddressDetails(data);
+          setDetectedAddress(det);
+          setForm((prev) => ({ ...prev, address: formatAddress(det) }));
+        } catch {
           setForm((prev) => ({
             ...prev,
-            address: formatAddress(addressDetails),
+            address: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
           }));
-          setLocationError("");
-        } catch {
-          try {
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`,
-            );
-            const data = await res.json();
-            const city =
-              data.address?.city ||
-              data.address?.town ||
-              data.address?.village ||
-              "";
-            const postcode = data.address?.postcode || "";
-            const country = data.address?.country || "";
-            const location =
-              [city, postcode, country].filter(Boolean).join(", ") ||
-              `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`;
-            setForm((prev) => ({ ...prev, address: location }));
-            setDetectedAddress({
-              city,
-              postalCode: postcode,
-              country,
-              street: "",
-              state: "",
-            });
-            setLocationError("");
-          } catch {
-            setLocationError(
-              "Could not detect your location. Try entering it manually.",
-            );
-          }
         }
         setGettingLocation(false);
       },
       (err) => {
-        setGettingLocation(false);
         setLocationError(
           err.code === 1
-            ? "📍 Location access denied. Please allow location access or enter manually."
-            : err.code === 3
-              ? "📍 Location request timed out. Please try again or enter manually."
-              : "📍 Could not get your location. Try enabling GPS or entering manually.",
+            ? "Location access denied. Please allow access or enter manually."
+            : "Could not get your location. Enter manually.",
         );
+        setGettingLocation(false);
       },
-      { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
     );
   }
 
+  // ── Submit ────────────────────────────────────────────────────────
   async function handleSubmit() {
     if (!form.service_date) return setError("Please select a service date");
     if (!form.address) return setError("Please enter your address");
-    if (!form.duration_hours || Number(form.duration_hours) < 1)
-      return setError("Minimum 1 hour");
+    if (!selected) return setError("Please select a pricing option");
+
+    if (selected.rateType === "negotiated") {
+      if (!negotiatedPrice || Number(negotiatedPrice) <= 0)
+        return setError("Please enter the agreed price");
+    }
+
+    if (selected.rateType !== "custom" && selected.rateType !== "negotiated") {
+      if (!form.duration_hours || Number(form.duration_hours) < 1)
+        return setError("Minimum 1 hour");
+    }
+
+    if (total <= 0) return setError("Total amount must be greater than 0");
 
     const token = localStorage.getItem("token");
     if (!token) return navigate("/login");
@@ -158,29 +254,53 @@ export default function Booking() {
     setError("");
 
     try {
+      // For negotiated price — send total_override so backend uses it directly
+      const payload = {
+        maid_id: maidId,
+        service_date: form.service_date,
+        duration_hours: Number(form.duration_hours) || 1,
+        address: form.address,
+        notes: form.notes || undefined,
+        rate_type:
+          selected.rateType === "negotiated" ? "hourly" : selected.rateType,
+      };
+
+      // total_override lets backend skip its own calculation
+      if (selected.rateType === "negotiated") {
+        payload.total_override = Number(negotiatedPrice);
+        payload.notes = [
+          form.notes,
+          `[Negotiated price: ${s}${Number(negotiatedPrice).toLocaleString()}]`,
+        ]
+          .filter(Boolean)
+          .join(" — ");
+      }
+      if (selected.rateType === "custom" && selected.customLabel) {
+        payload.notes = [form.notes, `[Custom rate: ${selected.customLabel}]`]
+          .filter(Boolean)
+          .join(" — ");
+      }
+
       const res = await fetch(`${API_URL}/api/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          maid_id: maidId,
-          service_date: form.service_date,
-          duration_hours: Number(form.duration_hours),
-          address: form.address,
-          notes: form.notes || undefined,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Booking failed");
-      setSuccess(data.booking); // triggers useEffect → navigate to /payment
+      setSuccess(data.booking);
     } catch (err) {
       setError(err.message || "Something went wrong");
       setLoading(false);
     }
   }
+
+  // ── Whether to show duration field ───────────────────────────────
+  const showDuration = selected?.rateType === "hourly";
 
   return (
     <div className={styles.page}>
@@ -188,24 +308,133 @@ export default function Booking() {
         ← Back to maids
       </button>
 
-      {/* Maid summary */}
+      {/* ── Maid card ───────────────────────────────────────────── */}
       <div className={styles.maidCard}>
         {maid.avatar ? (
-          <img src={maid.avatar} alt={maid.name} className={styles.avatar} />
-        ) : (
-          <div className={styles.avatarPlaceholder}>{initials(maid.name)}</div>
-        )}
-        <div>
+          <img
+            src={maid.avatar}
+            alt={maid.name}
+            className={styles.avatar}
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              e.currentTarget.nextSibling.style.display = "flex";
+            }}
+          />
+        ) : null}
+        <div
+          className={styles.avatarPlaceholder}
+          style={{ display: maid.avatar ? "none" : "flex" }}
+        >
+          {initials(maid.name)}
+        </div>
+        <div className={styles.maidCardInfo}>
           <p className={styles.maidName}>{maid.name || "Selected Maid"}</p>
           <p className={styles.maidRate}>
-            ₦{Number(maid.hourly_rate || 0).toLocaleString()} / hour
+            {s}
+            {Number(maid.hourly_rate || maid.rate_hourly || 0).toLocaleString()}
+            /hr · {currency}
           </p>
+          {maid.id_verified && (
+            <span className={styles.maidVerified}>✓ Verified</span>
+          )}
         </div>
       </div>
 
       <div className={styles.form}>
+        {/* ── Rate selector ─────────────────────────────────────── */}
         <div className={styles.field}>
-          <label className={styles.label}>Service Date & Time*</label>
+          <label className={styles.label}>💰 Choose Pricing Option</label>
+          <p className={styles.fieldHint}>
+            All rates are set by the maid. Choose what works for you.
+          </p>
+          <div className={styles.rateGrid}>
+            {rateOptions.map((opt) => {
+              const isSelected = selectedRateId === opt.id;
+              const isNegotiated = opt.rateType === "negotiated";
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  className={`${styles.rateCard} ${isSelected ? styles.rateCardActive : ""} ${isNegotiated ? styles.rateCardNegotiated : ""}`}
+                  onClick={() => {
+                    setSelectedRateId(opt.id);
+                    setError("");
+                  }}
+                >
+                  <span className={styles.rateCardIcon}>{opt.icon}</span>
+                  <div className={styles.rateCardBody}>
+                    <p className={styles.rateCardLabel}>{opt.label}</p>
+                    {opt.price != null ? (
+                      <p className={styles.rateCardPrice}>
+                        {s}
+                        {opt.price.toLocaleString()}
+                        {opt.unit && (
+                          <span className={styles.rateCardUnit}>
+                            {opt.unit}
+                          </span>
+                        )}
+                      </p>
+                    ) : (
+                      <p className={styles.rateCardPriceCustom}>Enter amount</p>
+                    )}
+                  </div>
+                  {isSelected && (
+                    <span className={styles.rateCardCheck}>✓</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Negotiated price input ─────────────────────────────── */}
+        {selected?.rateType === "negotiated" && (
+          <div className={styles.field}>
+            <label className={styles.label}>🤝 Agreed Price ({currency})</label>
+            <p className={styles.fieldHint}>
+              Enter the total amount you and the maid agreed on.
+            </p>
+            <div className={styles.negotiatedRow}>
+              <span className={styles.currencyPrefix}>{s}</span>
+              <input
+                className={`${styles.input} ${styles.negotiatedInput}`}
+                type="number"
+                min="1"
+                placeholder="e.g. 15000"
+                value={negotiatedPrice}
+                onChange={(e) => {
+                  setNegotiatedPrice(e.target.value);
+                  setError("");
+                }}
+              />
+            </div>
+            <p className={styles.negotiatedNote}>
+              ℹ️ This is a custom price you've privately agreed with the maid.
+              Please ensure the maid is aware of this amount before booking.
+            </p>
+          </div>
+        )}
+
+        {/* ── Duration (hourly only) ─────────────────────────────── */}
+        {showDuration && (
+          <div className={styles.field}>
+            <label className={styles.label}>⏱ Duration (hours)</label>
+            <input
+              className={styles.input}
+              type="number"
+              name="duration_hours"
+              value={form.duration_hours}
+              onChange={handleChange}
+              min="1"
+              max="24"
+              step="0.5"
+            />
+          </div>
+        )}
+
+        {/* ── Date ──────────────────────────────────────────────── */}
+        <div className={styles.field}>
+          <label className={styles.label}>📅 Service Date & Time *</label>
           <input
             className={styles.input}
             type="datetime-local"
@@ -216,67 +445,19 @@ export default function Booking() {
           />
         </div>
 
-        <div className={styles.row}>
-          <div className={styles.field}>
-            <label className={styles.label}>Duration (hours)*</label>
-            <input
-              className={styles.input}
-              type="number"
-              name="duration_hours"
-              value={form.duration_hours}
-              onChange={handleChange}
-              min="1"
-              max="12"
-              step="0.5"
-            />
-          </div>
-          <div className={styles.field}>
-            <label className={styles.label}>Total Cost</label>
-            <input
-              className={styles.input}
-              type="text"
-              value={`₦${total.toLocaleString()}`}
-              readOnly
-              style={{
-                background: "rgb(248,248,248)",
-                color: "rgb(19,19,103)",
-                fontWeight: "bold",
-              }}
-            />
-          </div>
-        </div>
-
+        {/* ── Address ───────────────────────────────────────────── */}
         <div className={styles.field}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 6,
-            }}
-          >
-            <label className={styles.label}>Service Address*</label>
+          <div className={styles.labelRow}>
+            <label className={styles.label}>📍 Service Address *</label>
             <button
+              type="button"
+              className={styles.geoLink}
               onClick={getCurrentLocation}
               disabled={gettingLocation}
-              style={{
-                background: "none",
-                border: "none",
-                color: gettingLocation ? "rgb(100,100,100)" : "rgb(19,19,103)",
-                fontSize: 12,
-                fontWeight: "bold",
-                cursor: gettingLocation ? "not-allowed" : "pointer",
-                opacity: gettingLocation ? 0.6 : 1,
-                textDecoration: "underline",
-                fontFamily: "inherit",
-              }}
             >
-              {gettingLocation
-                ? "📍 Getting location..."
-                : "📍 Use Current Location"}
+              {gettingLocation ? "Getting location…" : "Use my location"}
             </button>
           </div>
-
           <input
             className={styles.input}
             type="text"
@@ -285,63 +466,35 @@ export default function Booking() {
             onChange={handleChange}
             placeholder="e.g. 12 Banana Street, Lekki, Lagos"
           />
-
-          {detectedAddress &&
-            (detectedAddress.street ||
-              detectedAddress.city ||
-              detectedAddress.state ||
-              detectedAddress.country) && (
-              <div
-                style={{
-                  fontSize: 11,
-                  color: "gray",
-                  marginTop: 8,
-                  padding: 8,
-                  background: "rgb(245,245,248)",
-                  borderRadius: 6,
-                  lineHeight: 1.6,
-                }}
-              >
-                <p style={{ margin: "0 0 4px", fontWeight: "bold" }}>
-                  📍 Address Details:
-                </p>
-                {detectedAddress.street && (
-                  <p style={{ margin: "2px 0" }}>🏠 {detectedAddress.street}</p>
-                )}
-                {(detectedAddress.city || detectedAddress.state) && (
-                  <p style={{ margin: "2px 0" }}>
-                    🏙️{" "}
-                    {[detectedAddress.city, detectedAddress.state]
-                      .filter(Boolean)
-                      .join(", ")}
-                  </p>
-                )}
-                {detectedAddress.country && (
-                  <p style={{ margin: "2px 0" }}>
-                    🌍 {detectedAddress.country}
-                  </p>
-                )}
-              </div>
-            )}
-
+          {detectedAddress && (
+            <div className={styles.addressBox}>
+              <p className={styles.addressBoxTitle}>📍 Detected:</p>
+              {detectedAddress.street && <p>🏠 {detectedAddress.street}</p>}
+              {detectedAddress.city && <p>🏙️ {detectedAddress.city}</p>}
+              {detectedAddress.state && <p>📌 {detectedAddress.state}</p>}
+              {detectedAddress.country && <p>🌍 {detectedAddress.country}</p>}
+            </div>
+          )}
           {locationError && (
-            <p style={{ color: "rgb(187,19,47)", fontSize: 12, marginTop: 4 }}>
-              {locationError}
-            </p>
+            <p className={styles.fieldError}>{locationError}</p>
           )}
         </div>
 
+        {/* ── Notes ─────────────────────────────────────────────── */}
         <div className={styles.field}>
-          <label className={styles.label}>Notes (optional)</label>
+          <label className={styles.label}>
+            📝 Notes <span className={styles.optional}>(optional)</span>
+          </label>
           <textarea
             className={styles.textarea}
             name="notes"
             value={form.notes}
             onChange={handleChange}
-            placeholder="Any special instructions for the maid..."
+            placeholder="Any special instructions for the maid…"
           />
         </div>
 
+        {/* ── Summary ───────────────────────────────────────────── */}
         <div className={styles.summary}>
           <p className={styles.summaryTitle}>Booking Summary</p>
           <div className={styles.summaryRow}>
@@ -349,33 +502,42 @@ export default function Booking() {
             <span>{maid.name || "—"}</span>
           </div>
           <div className={styles.summaryRow}>
-            <span>Rate</span>
-            <span>₦{Number(maid.hourly_rate || 0).toLocaleString()}/hr</span>
+            <span>Pricing</span>
+            <span>
+              {selected?.label || "—"}
+              {selected?.price != null
+                ? ` · ${s}${selected.price.toLocaleString()}${selected.unit}`
+                : ""}
+            </span>
           </div>
-          <div className={styles.summaryRow}>
-            <span>Duration</span>
-            <span>{form.duration_hours} hour(s)</span>
-          </div>
+          {showDuration && (
+            <div className={styles.summaryRow}>
+              <span>Duration</span>
+              <span>{form.duration_hours} hour(s)</span>
+            </div>
+          )}
+          {selected?.rateType === "negotiated" && negotiatedPrice && (
+            <div className={styles.summaryRow}>
+              <span>Agreed Price</span>
+              <span>
+                {s}
+                {Number(negotiatedPrice).toLocaleString()}
+              </span>
+            </div>
+          )}
           <div className={styles.summaryTotal}>
             <span>Total</span>
-            <span>₦{total.toLocaleString()}</span>
+            <span>
+              {s}
+              {total.toLocaleString()}
+            </span>
           </div>
         </div>
 
-        {/* Payment notice */}
-        <div
-          style={{
-            background: "rgb(240,248,255)",
-            border: "1px solid rgb(200,220,255)",
-            borderRadius: 8,
-            padding: "12px 14px",
-            fontSize: 13,
-            color: "rgb(30,60,120)",
-          }}
-        >
-          🔒 After booking, you'll be redirected to pay securely via{" "}
-          <strong>Paystack</strong>. Your booking is only confirmed after
-          payment and admin approval.
+        {/* ── Payment note ──────────────────────────────────────── */}
+        <div className={styles.paymentNote}>
+          🔒 After booking, you'll pay securely via <strong>Paystack</strong>.
+          Your booking is only confirmed after payment and admin approval.
         </div>
 
         {error && <p className={styles.error}>{error}</p>}
@@ -383,9 +545,11 @@ export default function Booking() {
         <button
           className={styles.submitBtn}
           onClick={handleSubmit}
-          disabled={loading}
+          disabled={loading || total <= 0}
         >
-          {loading ? "Creating booking..." : "Continue to Payment →"}
+          {loading
+            ? "Creating booking…"
+            : `Continue to Payment → ${total > 0 ? `(${s}${total.toLocaleString()})` : ""}`}
         </button>
       </div>
     </div>
