@@ -8,6 +8,7 @@ import FloatingMaidSupportChat from "../MaidSupportChat/FloatingMaidSupportChat"
 import NotificationBell from "../Notifications/NotificationBell";
 import WithdrawTab, { WalletOverview } from "../WithdrawTab/WithdrawPage";
 import WithdrawPage from "../WithdrawTab/WithdrawPage";
+import EarningsTab from "../EarningsTab/EarningsTab";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 // At the top of ProfileTab (or at the top of MaidDashboard.jsx alongside API_URL), add:
@@ -1787,6 +1788,7 @@ export default function MaidDashboard({ onLogout }) {
             ["support", "Support"],
             ["withdraw", "Withdraw "],
             ["wallet", "Wallet"],
+            ["earnings", "Earnings"],
           ].map(([key, label]) => (
             <button
               key={key}
@@ -1852,6 +1854,7 @@ export default function MaidDashboard({ onLogout }) {
               onWithdraw={() => setShowWithdraw(true)}
             />
           )}
+          {tab === "earnings" && <EarningsTab token={token} />}
         </div>
 
         <FloatingToast
