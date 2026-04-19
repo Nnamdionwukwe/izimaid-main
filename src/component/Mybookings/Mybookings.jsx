@@ -39,6 +39,23 @@ function formatDate(d) {
   });
 }
 
+const CURRENCY_SYMBOLS = {
+  NGN: "₦",
+  USD: "$",
+  GBP: "£",
+  EUR: "€",
+  KES: "KSh",
+  GHS: "₵",
+  ZAR: "R",
+  UGX: "USh",
+  CAD: "CA$",
+  AUD: "A$",
+};
+function fmtBookingAmt(b) {
+  const c = b.payment_currency || b.maid_currency || "NGN";
+  return `${CURRENCY_SYMBOLS[c] || c + " "}${Number(b.total_amount || 0).toLocaleString()}`;
+}
+
 function statusLabel(s) {
   if (s === "in_progress") return "In Progress";
   if (s === "awaiting_payment") return "⏳ Awaiting Payment";

@@ -1188,6 +1188,8 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
   const [declineModal, setDeclineModal] = useState(null);
   const [isDeclining, setIsDeclining] = useState(false);
 
+  const navigate = useNavigate();
+
   const fetchBookings = useCallback(async () => {
     setLoading(true);
     try {
@@ -1322,7 +1324,13 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
       ) : (
         <div className={styles.bookingList}>
           {bookings.map((b) => (
-            <div key={b.id} className={styles.bookingCard}>
+            <div
+              onClick={() =>
+                navigate(`/bookings/${b.id}`, { state: { booking: b } })
+              }
+              key={b.id}
+              className={styles.bookingCard}
+            >
               <div className={styles.bookingTop}>
                 <div>
                   <p className={styles.bookingCustomer}>{b.customer_name}</p>
