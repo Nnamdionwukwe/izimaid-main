@@ -1,8 +1,8 @@
+/* FloatingMaidSupportChat.module.css */
+
 /* ── Floating chat window ──────────────────────────────────────────── */
 .chatWindow {
   position: fixed;
-  bottom: 90px;
-  right: 20px;
   width: 370px;
   height: 560px;
   z-index: 1000;
@@ -12,16 +12,6 @@
     0 8px 24px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-  /* dragging removes animation so it doesn't fight the pointer */
-  user-select: none;
-}
-
-.chatWindowDragging {
-  animation: none !important;
-  box-shadow:
-    0 32px 80px rgba(19, 19, 103, 0.28),
-    0 12px 32px rgba(0, 0, 0, 0.18);
-  cursor: grabbing !important;
 }
 
 @keyframes slideUp {
@@ -35,42 +25,10 @@
   }
 }
 
-/* drag handle strip at top of chat window */
-.chatDragHandle {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 36px;
-  z-index: 10;
-  cursor: grab;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(
-    to bottom,
-    rgba(19, 19, 103, 0.08) 0%,
-    transparent 100%
-  );
-  border-radius: 16px 16px 0 0;
-}
-.chatDragHandle:active {
-  cursor: grabbing;
-}
-
-.chatDragPill {
-  width: 36px;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(19, 19, 103, 0.25);
-}
-
-/* ── FAB button ────────────────────────────────────────────────────── */
+/* ── FAB ───────────────────────────────────────────────────────────── */
 .fab {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 1000;
+  z-index: 1001; /* above chat window so it's always draggable */
   display: flex;
   align-items: center;
   gap: 8px;
@@ -80,22 +38,17 @@
   border: none;
   background: rgb(19, 19, 103);
   color: white;
-  cursor: grab;
   box-shadow:
     0 8px 24px rgba(19, 19, 103, 0.4),
     0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: box-shadow 0.2s;
+  transition:
+    box-shadow 0.2s,
+    transform 0.15s;
   animation: fabIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* cursor set inline (grab / grabbing) */
   user-select: none;
-  touch-action: none;
-}
-
-.fabDragging {
-  cursor: grabbing !important;
-  box-shadow:
-    0 16px 40px rgba(19, 19, 103, 0.5),
-    0 6px 16px rgba(0, 0, 0, 0.2);
-  transform: scale(1.05);
+  -webkit-user-select: none;
+  touch-action: none; /* needed for touch drag */
 }
 
 @keyframes fabIn {
@@ -109,27 +62,34 @@
   }
 }
 
-/* only apply hover transform when NOT dragging */
-.fab:not(.fabDragging):hover {
+.fab:hover:not(.fabDragging) {
   transform: translateY(-2px) scale(1.03);
   box-shadow:
     0 12px 32px rgba(19, 19, 103, 0.48),
     0 4px 12px rgba(0, 0, 0, 0.18);
 }
-.fab:not(.fabDragging):active {
-  transform: scale(0.97);
+
+/* While dragging — lift effect, no scale */
+.fabDragging {
+  transform: scale(1.06);
+  box-shadow:
+    0 20px 48px rgba(19, 19, 103, 0.5),
+    0 8px 20px rgba(0, 0, 0, 0.2);
+  transition: none; /* instant feedback during drag */
 }
 
 .fabIcon {
   font-size: 20px;
   line-height: 1;
   flex-shrink: 0;
+  pointer-events: none;
 }
 .fabLabel {
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.2px;
   white-space: nowrap;
+  pointer-events: none;
 }
 
 /* ── Unread badge ──────────────────────────────────────────────────── */
@@ -149,8 +109,8 @@
   justify-content: center;
   padding: 0 5px;
   border: 2px solid white;
-  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   pointer-events: none;
+  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes badgePop {
@@ -169,8 +129,8 @@
   border-radius: 26px;
   border: 2px solid rgb(19, 19, 103);
   opacity: 0;
-  animation: pulseRing 2.5s ease-out infinite;
   pointer-events: none;
+  animation: pulseRing 2.5s ease-out infinite;
 }
 
 @keyframes pulseRing {
@@ -193,14 +153,7 @@
     height: 100%;
     border-radius: 0;
   }
-  /* disable dragging on mobile — full-screen sheet doesn't need it */
-  .chatDragHandle {
-    display: none;
-  }
-
   .fab {
-    bottom: 16px;
-    right: 16px;
     height: 48px;
     padding: 0 16px 0 14px;
   }
