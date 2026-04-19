@@ -1784,11 +1784,11 @@ export default function MaidDashboard({ onLogout }) {
           {[
             ["bookings", "Bookings"],
             ["profile", "My Profile"],
+            ["earnings", "Earnings"],
+            ["wallet", "Wallet"],
+            ["withdraw", "Withdraw "],
             ["reviews", "Reviews"],
             ["support", "Support"],
-            ["withdraw", "Withdraw "],
-            ["wallet", "Wallet"],
-            ["earnings", "Earnings"],
           ].map(([key, label]) => (
             <button
               key={key}
