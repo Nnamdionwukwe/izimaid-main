@@ -3,11 +3,31 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import styles from "./Payment.module.css";
 
+const CLOUDINARY_CLOUD =
+  import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || "dlh6z8ygd";
+const CLOUDINARY_PRESET =
+  import.meta.env.VITE_CLOUDINARY_PRESET || "deusizi_unsigned";
+
+// REMOVE the old uploadToCloudinary function and Cloudinary constants entirely.
+// REPLACE with:
+async function uploadProof(file, token) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await fetch(`${API_URL}/api/maids/upload-proof`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Upload failed");
+  return data.url;
+}
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const PLATFORM_FEE_PCT = 10; // Must match backend PLATFORM_FEE_PERCENT
 
-// ── Currencies Paystack handles natively ───────────────────────────────
-const PAYSTACK_CURRENCIES = new Set(["NGN", "GHS", "ZAR", "KES", "USD"]);
+// Paystack handles these natively — all others go to Stripe
+const PAYSTACK_CURRENCIES = new Set(["NGN", "GHS", "ZAR", "KES"]);
 
 const CURRENCY_SYMBOLS = {
   NGN: "₦",
@@ -30,7 +50,9 @@ function sym(c) {
 }
 
 function fmt(amount, currency) {
-  return `${sym(currency)}${Number(amount || 0).toLocaleString("en-US", {
+  const c = currency || "NGN";
+  const n = Number(amount || 0);
+  return `${sym(c)}${n.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
@@ -47,107 +69,84 @@ function formatDate(d) {
   });
 }
 
-// ── Fee calculator (mirrors backend) ─────────────────────────────────
-function calcFees(total) {
+// ── Fee: platform adds 10% ON TOP of the maid's service cost ─────────
+// Maid charges ₦10,000 → Customer pays ₦11,000 → Maid gets ₦10,000
+function calcFees(serviceAmount) {
   const platformFee =
-    Math.round(((total * PLATFORM_FEE_PCT) / 100) * 100) / 100;
-  const maidPayout = Math.round((total - platformFee) * 100) / 100;
-  return { platformFee, maidPayout };
+    Math.round(((serviceAmount * PLATFORM_FEE_PCT) / 100) * 100) / 100;
+  const customerPays = Math.round((serviceAmount + platformFee) * 100) / 100;
+  return { platformFee, customerPays };
 }
 
-// ── Determine available payment methods for a currency ────────────────
-function getPaymentMethods(currency) {
-  const methods = [];
+function autoGateway(currency) {
+  return PAYSTACK_CURRENCIES.has(currency) ? "paystack" : "stripe";
+}
 
-  if (PAYSTACK_CURRENCIES.has(currency)) {
-    methods.push({
-      id: "paystack",
-      label: "Card / Mobile Money",
-      sublabel: "Powered by Paystack",
-      icon: "💳",
-      currencies: "NGN · GHS · KES · ZAR",
-      color: "#00C3F7",
-      recommended: currency === "NGN",
-    });
-  }
-
-  // Stripe for all other currencies + alternative for Paystack ones
-  methods.push({
-    id: "stripe",
-    label: "International Card",
-    sublabel: "Powered by Stripe",
-    icon: "🌍",
-    currencies: "USD · GBP · EUR · CAD · AUD · 135+ currencies",
-    color: "#635BFF",
-    recommended: !PAYSTACK_CURRENCIES.has(currency),
-  });
-
-  methods.push({
+// ── Alternative payment methods (bank + crypto always available) ──────
+const ALT_METHODS = [
+  {
     id: "bank",
     label: "Bank Transfer",
-    sublabel: "Manual — upload proof",
+    sublabel: "Manual — upload proof after transfer",
     icon: "🏦",
-    currencies: "Any currency",
     color: "#1a2466",
-  });
-
-  methods.push({
+  },
+  {
     id: "crypto",
     label: "Cryptocurrency",
-    sublabel: "BTC · ETH · USDT · USDC",
+    sublabel: "BTC · ETH · USDT · USDC via Coinbase",
     icon: "₿",
-    currencies: "Any crypto",
     color: "#F7931A",
-  });
+  },
+];
 
-  return methods;
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// Main Payment component
-// ═══════════════════════════════════════════════════════════════════════
 export default function Payment() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const [searchParams] = useSearchParams();
 
   const [booking, setBooking] = useState(state?.booking || null);
-  const [selectedMethod, setSelectedMethod] = useState(null);
+  const [altMethod, setAltMethod] = useState(null); // null | "bank" | "crypto"
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  const [payStatus, setPayStatus] = useState(null); // null | success | failed | pending_bank
+  const [payStatus, setPayStatus] = useState(null);
   const [error, setError] = useState("");
-
-  // Bank transfer state
   const [bankDetails, setBankDetails] = useState(null);
   const [proofUrl, setProofUrl] = useState("");
   const [proofRef, setProofRef] = useState("");
   const [submittingProof, setSubmittingProof] = useState(false);
 
+  const [uploadingProof, setUploadingProof] = useState(false);
+  const [proofPreview, setProofPreview] = useState(null);
+
   const token = localStorage.getItem("token");
 
-  // ── Detect Paystack / Stripe callback ───────────────────────────────
+  // ── Derive currency + amounts early so ALL branches can use them ────
+  const currency = booking?.maid_currency || booking?.currency || "NGN";
+  const serviceAmt = Number(booking?.total_amount || 0); // maid's price
+  const { platformFee, customerPays } = calcFees(serviceAmt);
+  const gateway = autoGateway(currency); // "paystack" | "stripe"
+
+  // ── Detect callback from payment gateways ────────────────────────
   const reference = searchParams.get("reference") || searchParams.get("trxref");
   const session_id = searchParams.get("session_id");
-  const gateway = searchParams.get("gateway");
+  const gwParam = searchParams.get("gateway");
 
   useEffect(() => {
     if (!reference && !session_id) return;
     setVerifying(true);
+    const q = new URLSearchParams();
+    if (gwParam) q.set("gateway", gwParam);
+    if (reference) q.set("reference", reference);
+    if (session_id) q.set("session_id", session_id);
 
-    const query = new URLSearchParams();
-    if (gateway) query.set("gateway", gateway);
-    if (reference) query.set("reference", reference);
-    if (session_id) query.set("session_id", session_id);
-
-    fetch(`${API_URL}/api/payments/verify?${query}`, {
+    fetch(`${API_URL}/api/payments/verify?${q}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json().then((d) => ({ ok: r.ok, d })))
       .then(({ ok, d }) => {
         if (ok) {
           setPayStatus("success");
-          // Refresh booking data
           if (d.booking_id) {
             fetch(`${API_URL}/api/bookings/${d.booking_id}`, {
               headers: { Authorization: `Bearer ${token}` },
@@ -169,20 +168,13 @@ export default function Payment() {
       .finally(() => setVerifying(false));
   }, [reference, session_id]);
 
-  // ── Auto-select recommended method when booking loads ───────────────
-  useEffect(() => {
-    if (!booking) return;
-    const currency = booking.maid_currency || booking.currency || "NGN";
-    const methods = getPaymentMethods(currency);
-    const recommended = methods.find((m) => m.recommended) || methods[0];
-    setSelectedMethod(recommended.id);
-  }, [booking]);
-
-  // ── Pay handlers ─────────────────────────────────────────────────────
+  // ── Pay ───────────────────────────────────────────────────────────
   async function handlePay() {
-    if (!booking || !selectedMethod) return;
+    if (!booking) return;
     setLoading(true);
     setError("");
+
+    const method = altMethod || gateway; // use alt if chosen, else auto
 
     const endpoints = {
       paystack: "/api/payments/initialize",
@@ -193,16 +185,11 @@ export default function Payment() {
 
     try {
       const body = { booking_id: booking.id };
-      if (selectedMethod === "stripe") {
-        const c = (
-          booking.maid_currency ||
-          booking.currency ||
-          "ngn"
-        ).toLowerCase();
-        body.currency = c;
+      if (method === "stripe") {
+        body.currency = currency.toLowerCase();
       }
 
-      const res = await fetch(`${API_URL}${endpoints[selectedMethod]}`, {
+      const res = await fetch(`${API_URL}${endpoints[method]}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -214,21 +201,19 @@ export default function Payment() {
       if (!res.ok)
         throw new Error(data.error || "Payment initialization failed");
 
-      // Redirect gateways
-      if (selectedMethod === "paystack") {
+      if (method === "paystack") {
         window.location.href = data.authorization_url;
         return;
       }
-      if (selectedMethod === "stripe") {
+      if (method === "stripe") {
         window.location.href = data.url;
         return;
       }
-      if (selectedMethod === "crypto") {
+      if (method === "crypto") {
         window.location.href = data.hosted_url;
         return;
       }
-      // Bank transfer — show instructions
-      if (selectedMethod === "bank") {
+      if (method === "bank") {
         setBankDetails(data);
         setPayStatus("pending_bank");
       }
@@ -239,10 +224,9 @@ export default function Payment() {
     }
   }
 
-  // ── Submit bank proof ────────────────────────────────────────────────
   async function handleSubmitProof() {
     if (!proofUrl) {
-      setError("Please enter the proof URL or reference");
+      setError("Paste an image URL or receipt link");
       return;
     }
     setSubmittingProof(true);
@@ -270,8 +254,7 @@ export default function Payment() {
     }
   }
 
-  // ─────────────────────────────────────────────────────────────────────
-  // ── VERIFYING ────────────────────────────────────────────────────────
+  // ── VERIFYING ─────────────────────────────────────────────────────
   if (verifying)
     return (
       <div className={styles.page}>
@@ -288,7 +271,7 @@ export default function Payment() {
       </div>
     );
 
-  // ── SUCCESS ───────────────────────────────────────────────────────────
+  // ── SUCCESS ───────────────────────────────────────────────────────
   if (payStatus === "success" || payStatus === "success_bank")
     return (
       <div className={styles.page}>
@@ -301,8 +284,8 @@ export default function Payment() {
           </p>
           <p className={styles.statusText}>
             {payStatus === "success_bank"
-              ? "Your payment proof has been submitted. Our admin team will verify and confirm your booking within 24 hours."
-              : "Your payment has been received. Our admin team will review and confirm your booking shortly — usually within a few minutes."}
+              ? "Your proof has been submitted. Admin will verify within 24 hours."
+              : "Payment received. Admin will review and confirm your booking shortly."}
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <button
@@ -319,7 +302,7 @@ export default function Payment() {
       </div>
     );
 
-  // ── FAILED ────────────────────────────────────────────────────────────
+  // ── FAILED ────────────────────────────────────────────────────────
   if (payStatus === "failed")
     return (
       <div className={styles.page}>
@@ -327,7 +310,7 @@ export default function Payment() {
           <div className={styles.statusIcon}>❌</div>
           <p className={styles.statusTitle}>Payment Failed</p>
           <p className={styles.statusText}>
-            {error || "Your payment could not be processed. Please try again."}
+            {error || "Could not process payment. Please try again."}
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <button
@@ -347,7 +330,8 @@ export default function Payment() {
       </div>
     );
 
-  // ── BANK TRANSFER INSTRUCTIONS ───────────────────────────────────────
+  // ── BANK TRANSFER INSTRUCTIONS ────────────────────────────────────
+  // NOTE: currency / customerPays are declared at top of component so they're always available
   if (payStatus === "pending_bank" && bankDetails)
     return (
       <div className={styles.page}>
@@ -369,38 +353,92 @@ export default function Payment() {
               <strong>{bankDetails.bank_details?.account_name}</strong>
             </div>
             <div className={styles.bankRow}>
-              <span>Amount</span>
+              <span>Amount to Transfer</span>
               <strong className={styles.bankAmount}>
-                {fmt(booking.total_amount, booking.maid_currency || "NGN")}
+                {fmt(customerPays, currency)}
               </strong>
             </div>
             <div className={styles.bankRow}>
-              <span>Narration</span>
+              <span>Narration / Reference</span>
               <strong className={styles.bankRef}>
                 {bankDetails.bank_details?.narration}
               </strong>
             </div>
           </div>
           <p className={styles.bankNote}>
-            ⚠️ Transfer the <strong>exact amount</strong> and use the narration
-            above. Then upload your proof below.
+            ⚠️ Transfer exactly <strong>{fmt(customerPays, currency)}</strong>{" "}
+            and include the narration so we can match your payment.
           </p>
         </div>
 
         <div className={styles.card}>
           <p className={styles.cardTitle}>Upload Payment Proof</p>
+
+          {/* File picker */}
           <div className={styles.proofField}>
-            <label>Screenshot / Receipt URL</label>
-            <input
-              className={styles.proofInput}
-              type="text"
-              placeholder="Paste image URL or Cloudinary link"
-              value={proofUrl}
-              onChange={(e) => setProofUrl(e.target.value)}
-            />
+            <label>Receipt / Screenshot</label>
+            <div className={styles.proofUploadBox}>
+              {proofPreview ? (
+                <div className={styles.proofPreviewWrap}>
+                  <img
+                    src={proofPreview}
+                    alt="Proof"
+                    className={styles.proofPreviewImg}
+                  />
+                  <button
+                    className={styles.proofRemoveBtn}
+                    onClick={() => {
+                      setProofPreview(null);
+                      setProofUrl("");
+                    }}
+                  >
+                    ✕ Remove
+                  </button>
+                </div>
+              ) : (
+                <label
+                  className={styles.proofUploadLabel}
+                  style={{ opacity: uploadingProof ? 0.5 : 1 }}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    disabled={uploadingProof}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setUploadingProof(true);
+                      setError("");
+                      try {
+                        const url = await uploadProof(file, token); // ← pass token
+                        setProofUrl(url);
+                        setProofPreview(url);
+                      } catch (err) {
+                        setError("Upload failed: " + err.message);
+                      } finally {
+                        setUploadingProof(false);
+                      }
+                    }}
+                  />
+                  <span className={styles.proofUploadIcon}>📎</span>
+                  <span>
+                    {uploadingProof ? "Uploading…" : "Tap to upload receipt"}
+                  </span>
+                  <span className={styles.proofUploadHint}>
+                    JPG, PNG or PDF · max 10MB
+                  </span>
+                </label>
+              )}
+            </div>
           </div>
+
+          {/* Optional reference */}
           <div className={styles.proofField}>
-            <label>Bank Reference / Transaction ID</label>
+            <label>
+              Bank Reference / Transaction ID{" "}
+              <span style={{ fontWeight: 400, color: "gray" }}>(optional)</span>
+            </label>
             <input
               className={styles.proofInput}
               type="text"
@@ -409,19 +447,26 @@ export default function Payment() {
               onChange={(e) => setProofRef(e.target.value)}
             />
           </div>
+
           {error && <p className={styles.errorMsg}>{error}</p>}
+
           <button
             className={styles.payBtn}
+            style={{ background: "#1a2466" }}
             onClick={handleSubmitProof}
-            disabled={submittingProof || !proofUrl}
+            disabled={submittingProof || !proofUrl || uploadingProof}
           >
-            {submittingProof ? "Submitting…" : "Submit Payment Proof"}
+            {submittingProof
+              ? "Submitting…"
+              : uploadingProof
+                ? "Uploading…"
+                : "Submit Payment Proof"}
           </button>
         </div>
       </div>
     );
 
-  // ── NO BOOKING ────────────────────────────────────────────────────────
+  // ── NO BOOKING ────────────────────────────────────────────────────
   if (!booking)
     return (
       <div className={styles.page}>
@@ -438,12 +483,15 @@ export default function Payment() {
       </div>
     );
 
-  // ── MAIN PAYMENT PAGE ─────────────────────────────────────────────────
-  const currency = booking.maid_currency || booking.currency || "NGN";
-  const total = Number(booking.total_amount || 0);
-  const { platformFee, maidPayout } = calcFees(total);
-  const methods = getPaymentMethods(currency);
-  const usePaystack = PAYSTACK_CURRENCIES.has(currency);
+  // ── MAIN PAYMENT PAGE ──────────────────────────────────────────────
+  const activeMethod = altMethod || gateway;
+  const gatewayLabel = gateway === "paystack" ? "Paystack" : "Stripe";
+  const gatewayIcon = gateway === "paystack" ? "💳" : "🌍";
+  const gatewayColor = gateway === "paystack" ? "#00C3F7" : "#635BFF";
+  const gatewayDesc =
+    gateway === "paystack"
+      ? `Cards, bank transfer & mobile money — recommended for ${currency}`
+      : `International cards — recommended for ${currency}`;
 
   return (
     <div className={styles.page}>
@@ -451,9 +499,10 @@ export default function Payment() {
         ← Back
       </button>
 
-      {/* ── Booking summary ──────────────────────────────────── */}
+      {/* ── Fee breakdown ──────────────────────────────────── */}
       <div className={styles.card}>
         <p className={styles.cardTitle}>Booking Summary</p>
+
         <div className={styles.row}>
           <span className={styles.rowKey}>Maid</span>
           <span className={styles.rowVal}>{booking.maid_name}</span>
@@ -466,9 +515,7 @@ export default function Payment() {
         </div>
         <div className={styles.row}>
           <span className={styles.rowKey}>Duration</span>
-          <span className={styles.rowVal}>
-            {booking.duration_hours} hour(s)
-          </span>
+          <span className={styles.rowVal}>{booking.duration_hours} hr(s)</span>
         </div>
         <div className={styles.row}>
           <span className={styles.rowKey}>Address</span>
@@ -486,96 +533,119 @@ export default function Payment() {
           </div>
         )}
 
-        {/* Fee breakdown */}
+        {/* Fee breakdown — additive model */}
         <div className={styles.feeDivider} />
         <div className={styles.row}>
-          <span className={styles.rowKey}>Service cost</span>
-          <span className={styles.rowVal}>{fmt(maidPayout, currency)}</span>
+          <span className={styles.rowKey}>
+            Service cost
+            <span className={styles.feeTip}>Maid's rate × duration</span>
+          </span>
+          <span className={styles.rowVal}>{fmt(serviceAmt, currency)}</span>
         </div>
         <div className={styles.row}>
           <span className={styles.rowKey}>
-            Platform fee ({PLATFORM_FEE_PCT}%)
+            + Platform fee ({PLATFORM_FEE_PCT}%)
             <span className={styles.feeTip}>
-              covers insurance, support & secure payments
+              Insurance, support & secure payments
             </span>
           </span>
           <span className={styles.rowVal}>{fmt(platformFee, currency)}</span>
         </div>
         <div className={styles.totalRow}>
           <span>Total you pay</span>
-          <span>{fmt(total, currency)}</span>
+          <span>{fmt(customerPays, currency)}</span>
         </div>
       </div>
 
-      {/* ── Payment method selector ──────────────────────────── */}
+      {/* ── Auto-selected gateway banner ─────────────────── */}
+      <div className={styles.autoBanner} style={{ borderColor: gatewayColor }}>
+        <div className={styles.autoBannerLeft}>
+          <span className={styles.autoBannerIcon}>{gatewayIcon}</span>
+          <div>
+            <p className={styles.autoBannerTitle}>
+              Paying via <strong>{gatewayLabel}</strong>
+              <span
+                className={styles.autoBadge}
+                style={{ background: gatewayColor }}
+              >
+                Auto-selected
+              </span>
+            </p>
+            <p className={styles.autoBannerDesc}>{gatewayDesc}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Alternative methods ───────────────────────────── */}
       <div className={styles.card}>
-        <p className={styles.cardTitle}>Choose Payment Method</p>
+        <p className={styles.cardTitle}>Or pay differently</p>
         <div className={styles.methodList}>
-          {methods.map((m) => (
+          {ALT_METHODS.map((m) => (
             <button
               key={m.id}
-              className={`${styles.methodCard} ${selectedMethod === m.id ? styles.methodCardActive : ""}`}
-              onClick={() => {
-                setSelectedMethod(m.id);
-                setError("");
-              }}
+              className={`${styles.methodCard} ${altMethod === m.id ? styles.methodCardActive : ""}`}
+              onClick={() => setAltMethod(altMethod === m.id ? null : m.id)}
               style={{ "--method-color": m.color }}
             >
               <span className={styles.methodIcon}>{m.icon}</span>
               <div className={styles.methodInfo}>
-                <p className={styles.methodLabel}>
-                  {m.label}
-                  {m.recommended && (
-                    <span className={styles.methodBadge}>Recommended</span>
-                  )}
-                </p>
+                <p className={styles.methodLabel}>{m.label}</p>
                 <p className={styles.methodSub}>{m.sublabel}</p>
-                <p className={styles.methodCurrencies}>{m.currencies}</p>
               </div>
-              {selectedMethod === m.id && (
+              {altMethod === m.id && (
                 <span className={styles.methodCheck}>✓</span>
               )}
             </button>
           ))}
         </div>
+        {altMethod && (
+          <button
+            className={styles.clearAltBtn}
+            onClick={() => setAltMethod(null)}
+          >
+            ← Use {gatewayLabel} instead
+          </button>
+        )}
       </div>
 
-      {/* ── Context note per method ───────────────────────────── */}
-      {selectedMethod === "paystack" && (
-        <div className={styles.methodNote} style={{ borderColor: "#00C3F7" }}>
-          💳 You'll be redirected to <strong>Paystack</strong> to complete
-          payment securely. Supports cards, bank transfer, USSD, and mobile
-          money in {currency}.
+      {/* ── Context note ─────────────────────────────────── */}
+      {!altMethod && (
+        <div
+          className={styles.methodNote}
+          style={{ borderColor: gatewayColor }}
+        >
+          {gatewayIcon} You'll be redirected to <strong>{gatewayLabel}</strong>{" "}
+          to complete payment securely. You'll return here automatically after
+          payment.
         </div>
       )}
-      {selectedMethod === "stripe" && (
-        <div className={styles.methodNote} style={{ borderColor: "#635BFF" }}>
-          🌍 You'll be redirected to <strong>Stripe</strong> — accepts 135+
-          currencies worldwide. Great for USD, GBP, EUR, CAD, AUD and all
-          international cards.
-        </div>
-      )}
-      {selectedMethod === "bank" && (
+      {altMethod === "bank" && (
         <div className={styles.methodNote} style={{ borderColor: "#1a2466" }}>
           🏦 Make a direct bank transfer and upload your receipt. Admin verifies
           within
           <strong> 24 hours</strong> and confirms your booking.
         </div>
       )}
-      {selectedMethod === "crypto" && (
+      {altMethod === "crypto" && (
         <div className={styles.methodNote} style={{ borderColor: "#F7931A" }}>
-          ₿ Pay with <strong>Bitcoin, Ethereum, USDT, USDC</strong> and more via
-          Coinbase Commerce. You'll be redirected to complete payment securely.
+          ₿ Pay with <strong>Bitcoin, Ethereum, USDT or USDC</strong> via
+          Coinbase Commerce. You'll be redirected to a secure hosted payment
+          page.
         </div>
       )}
 
-      {/* ── How it works ─────────────────────────────────────── */}
+      {/* ── Steps ────────────────────────────────────────── */}
       <div className={styles.card}>
         <p className={styles.cardTitle}>How it works</p>
         <div className={styles.steps}>
           <div className={styles.step}>
             <span>1️⃣</span>
-            <span>Pay securely via your chosen method</span>
+            <span>
+              Pay via{" "}
+              {altMethod
+                ? ALT_METHODS.find((m) => m.id === altMethod)?.label
+                : gatewayLabel}
+            </span>
           </div>
           <div className={styles.step}>
             <span>2️⃣</span>
@@ -583,52 +653,51 @@ export default function Payment() {
           </div>
           <div className={styles.step}>
             <span>3️⃣</span>
-            <span>Maid is notified and confirms the schedule</span>
+            <span>Maid is notified and confirms</span>
           </div>
           <div className={styles.step}>
             <span>4️⃣</span>
-            <span>Maid is paid after job completion</span>
+            <span>Maid is paid after the job is done</span>
           </div>
         </div>
       </div>
 
       {error && <p className={styles.errorMsg}>{error}</p>}
 
-      {/* ── Pay button ───────────────────────────────────────── */}
+      {/* ── Pay button ────────────────────────────────────── */}
       <button
         className={styles.payBtn}
         onClick={handlePay}
-        disabled={loading || !selectedMethod}
+        disabled={loading}
         style={{
           background:
-            selectedMethod === "paystack"
+            activeMethod === "paystack"
               ? "#00C3F7"
-              : selectedMethod === "stripe"
+              : activeMethod === "stripe"
                 ? "#635BFF"
-                : selectedMethod === "crypto"
+                : activeMethod === "crypto"
                   ? "#F7931A"
-                  : "rgb(19,19,103)",
+                  : "#1a2466",
         }}
       >
         {loading ? (
           "Redirecting…"
         ) : (
           <>
-            {selectedMethod === "paystack" &&
-              `💳 Pay ${fmt(total, currency)} via Paystack`}
-            {selectedMethod === "stripe" &&
-              `🌍 Pay ${fmt(total, currency)} via Stripe`}
-            {selectedMethod === "bank" && `🏦 Get Bank Transfer Details`}
-            {selectedMethod === "crypto" &&
-              `₿ Pay ${fmt(total, currency)} in Crypto`}
-            {!selectedMethod && "Select a payment method"}
+            {activeMethod === "paystack" &&
+              `💳 Pay ${fmt(customerPays, currency)} via Paystack`}
+            {activeMethod === "stripe" &&
+              `🌍 Pay ${fmt(customerPays, currency)} via Stripe`}
+            {activeMethod === "bank" && `🏦 Get Bank Transfer Details`}
+            {activeMethod === "crypto" &&
+              `₿ Pay ${fmt(customerPays, currency)} in Crypto`}
           </>
         )}
       </button>
 
       <p className={styles.secureNote}>
-        🔐 All payments are encrypted and secured · Your money is held safely
-        until the job is done
+        🔐 All payments are encrypted · Your money is held safely until the job
+        is done
       </p>
     </div>
   );

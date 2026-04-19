@@ -50,10 +50,65 @@ function formatAddress(a) {
   );
 }
 
-// ── Build rate options from maid profile ──────────────────────────────
+// ── Duration config per rate type ────────────────────────────────────
+const DURATION_CONFIG = {
+  hourly: {
+    label: "Hours",
+    min: 1,
+    max: 24,
+    step: 0.5,
+    default: "2",
+    unit: "hr",
+    toHours: (n) => n,
+  },
+  daily: {
+    label: "Days",
+    min: 1,
+    max: 31,
+    step: 1,
+    default: "1",
+    unit: "day",
+    toHours: (n) => n * 8,
+  },
+  weekly: {
+    label: "Weeks",
+    min: 1,
+    max: 52,
+    step: 1,
+    default: "1",
+    unit: "week",
+    toHours: (n) => n * 40,
+  },
+  monthly: {
+    label: "Months",
+    min: 1,
+    max: 12,
+    step: 1,
+    default: "1",
+    unit: "month",
+    toHours: (n) => n * 160,
+  },
+  custom: {
+    label: "Units",
+    min: 1,
+    max: 999,
+    step: 1,
+    default: "1",
+    unit: "",
+    toHours: (n) => n,
+  },
+};
+
+// Negotiated duration unit options
+const NEGOT_UNITS = [
+  { value: "hours", label: "Hours", toHours: (n) => n },
+  { value: "days", label: "Days", toHours: (n) => n * 8 },
+  { value: "weeks", label: "Weeks", toHours: (n) => n * 40 },
+  { value: "months", label: "Months", toHours: (n) => n * 160 },
+];
+
 function buildRateOptions(maid, s) {
   const options = [];
-
   const hourly = Number(maid.rate_hourly || maid.hourly_rate || 0);
   const daily = Number(maid.rate_daily || 0);
   const weekly = Number(maid.rate_weekly || 0);
@@ -66,7 +121,6 @@ function buildRateOptions(maid, s) {
       icon: "⏱",
       price: hourly,
       unit: "/hr",
-      desc: `${s}${hourly.toLocaleString()} per hour`,
       rateType: "hourly",
     });
   if (daily > 0)
@@ -76,7 +130,6 @@ function buildRateOptions(maid, s) {
       icon: "📅",
       price: daily,
       unit: "/day",
-      desc: `${s}${daily.toLocaleString()} per day`,
       rateType: "daily",
     });
   if (weekly > 0)
@@ -86,7 +139,6 @@ function buildRateOptions(maid, s) {
       icon: "🗓",
       price: weekly,
       unit: "/week",
-      desc: `${s}${weekly.toLocaleString()} per week`,
       rateType: "weekly",
     });
   if (monthly > 0)
@@ -96,11 +148,9 @@ function buildRateOptions(maid, s) {
       icon: "📆",
       price: monthly,
       unit: "/month",
-      desc: `${s}${monthly.toLocaleString()} per month`,
       rateType: "monthly",
     });
 
-  // Custom named rates from maid profile (JSONB object)
   if (maid.rate_custom) {
     try {
       const parsed =
@@ -115,7 +165,6 @@ function buildRateOptions(maid, s) {
             icon: "✨",
             price: Number(price),
             unit: "",
-            desc: `${s}${Number(price).toLocaleString()} (fixed rate)`,
             rateType: "custom",
             customLabel: label,
           });
@@ -124,15 +173,14 @@ function buildRateOptions(maid, s) {
     } catch {}
   }
 
-  // Always show negotiated option last
   options.push({
     id: "negotiated",
     label: "Custom / Negotiated",
     icon: "🤝",
     price: null,
     unit: "",
-    desc: "Enter a price you've agreed with the maid",
     rateType: "negotiated",
+    desc: "Enter the price and duration you've agreed with the maid",
   });
 
   return options;
@@ -151,11 +199,13 @@ export default function Booking() {
   const [selectedRateId, setSelectedRateId] = useState(
     rateOptions[0]?.id || "hourly",
   );
+  const [duration, setDuration] = useState("2"); // for all rate types
   const [negotiatedPrice, setNegotiatedPrice] = useState("");
+  const [negotiatedQty, setNegotiatedQty] = useState("2"); // how many units
+  const [negotiatedUnit, setNegotiatedUnit] = useState("hours"); // hours|days|weeks|months
 
   const [form, setForm] = useState({
     service_date: "",
-    duration_hours: "2",
     address: "",
     notes: "",
   });
@@ -164,41 +214,59 @@ export default function Booking() {
   const [gettingLocation, setGettingLocation] = useState(false);
   const [locationError, setLocationError] = useState("");
   const [detectedAddress, setDetectedAddress] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const selected = rateOptions.find((r) => r.id === selectedRateId);
+  const durConfig =
+    DURATION_CONFIG[selected?.rateType] || DURATION_CONFIG.hourly;
+
+  // Reset duration to sensible default when rate type changes
+  useEffect(() => {
+    const cfg = DURATION_CONFIG[selected?.rateType];
+    if (cfg) setDuration(cfg.default);
+  }, [selectedRateId]);
+
+  useEffect(() => {
+    if (success) navigate("/payment", { state: { booking: success } });
+  }, [success]);
 
   // ── Total calculation ─────────────────────────────────────────────
   function calcTotal() {
     if (!selected) return 0;
     if (selected.rateType === "negotiated") return Number(negotiatedPrice) || 0;
-    if (selected.rateType === "custom") return selected.price; // fixed, no multiply
-    return selected.price * Number(form.duration_hours || 0);
+    if (selected.rateType === "custom")
+      return selected.price * Number(duration || 1);
+    return selected.price * Number(duration || 0);
   }
+
+  function calcDurationHours() {
+    if (selected?.rateType === "negotiated") {
+      const unitCfg = NEGOT_UNITS.find((u) => u.value === negotiatedUnit);
+      return unitCfg
+        ? unitCfg.toHours(Number(negotiatedQty) || 1)
+        : Number(negotiatedQty) || 1;
+    }
+    const cfg = DURATION_CONFIG[selected?.rateType];
+    return cfg ? cfg.toHours(Number(duration) || 1) : Number(duration) || 1;
+  }
+
   const total = calcTotal();
 
-  // ── Navigate to payment once booking is created ───────────────────
-  const [success, setSuccess] = useState(null);
-  useEffect(() => {
-    if (success) navigate("/payment", { state: { booking: success } });
-  }, [success]);
-
   function handleChange(e) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
     setError("");
   }
 
   // ── Geolocation ───────────────────────────────────────────────────
-  async function getCurrentLocation() {
+  function getCurrentLocation() {
     setGettingLocation(true);
     setLocationError("");
     setDetectedAddress(null);
-
     if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported by your browser.");
+      setLocationError("Geolocation not supported.");
       setGettingLocation(false);
       return;
     }
-
     navigator.geolocation.getCurrentPosition(
       async ({ coords: { latitude, longitude } }) => {
         try {
@@ -208,10 +276,10 @@ export default function Booking() {
           const data = await res.json();
           const det = extractAddressDetails(data);
           setDetectedAddress(det);
-          setForm((prev) => ({ ...prev, address: formatAddress(det) }));
+          setForm((p) => ({ ...p, address: formatAddress(det) }));
         } catch {
-          setForm((prev) => ({
-            ...prev,
+          setForm((p) => ({
+            ...p,
             address: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
           }));
         }
@@ -220,8 +288,8 @@ export default function Booking() {
       (err) => {
         setLocationError(
           err.code === 1
-            ? "Location access denied. Please allow access or enter manually."
-            : "Could not get your location. Enter manually.",
+            ? "Location denied. Enter manually."
+            : "Could not get location.",
         );
         setGettingLocation(false);
       },
@@ -238,11 +306,13 @@ export default function Booking() {
     if (selected.rateType === "negotiated") {
       if (!negotiatedPrice || Number(negotiatedPrice) <= 0)
         return setError("Please enter the agreed price");
-    }
-
-    if (selected.rateType !== "custom" && selected.rateType !== "negotiated") {
-      if (!form.duration_hours || Number(form.duration_hours) < 1)
-        return setError("Minimum 1 hour");
+      if (!negotiatedQty || Number(negotiatedQty) < 1)
+        return setError("Please enter the duration");
+    } else {
+      if (!duration || Number(duration) < 1)
+        return setError(
+          `Please enter the number of ${durConfig.label.toLowerCase()}`,
+        );
     }
 
     if (total <= 0) return setError("Total amount must be greater than 0");
@@ -254,32 +324,45 @@ export default function Booking() {
     setError("");
 
     try {
-      // For negotiated price — send total_override so backend uses it directly
+      const durationHours = calcDurationHours();
+      const unitLabel =
+        NEGOT_UNITS.find((u) => u.value === negotiatedUnit)?.label || "Hours";
+
       const payload = {
         maid_id: maidId,
         service_date: form.service_date,
-        duration_hours: Number(form.duration_hours) || 1,
+        duration_hours: durationHours,
+        duration_qty:
+          selected.rateType === "negotiated"
+            ? Number(negotiatedQty) || 1
+            : Number(duration) || 1, // ← raw count (days/weeks/months/units)
         address: form.address,
-        notes: form.notes || undefined,
         rate_type:
           selected.rateType === "negotiated" ? "hourly" : selected.rateType,
       };
+      // Build human-readable notes
+      const noteLines = [];
+      if (form.notes) noteLines.push(form.notes);
 
-      // total_override lets backend skip its own calculation
       if (selected.rateType === "negotiated") {
         payload.total_override = Number(negotiatedPrice);
-        payload.notes = [
-          form.notes,
-          `[Negotiated price: ${s}${Number(negotiatedPrice).toLocaleString()}]`,
-        ]
-          .filter(Boolean)
-          .join(" — ");
+        noteLines.push(
+          `[Negotiated: ${s}${Number(negotiatedPrice).toLocaleString()} for ${negotiatedQty} ${unitLabel.toLowerCase()}]`,
+        );
       }
       if (selected.rateType === "custom" && selected.customLabel) {
-        payload.notes = [form.notes, `[Custom rate: ${selected.customLabel}]`]
-          .filter(Boolean)
-          .join(" — ");
+        noteLines.push(
+          `[Custom rate: ${selected.customLabel} × ${duration} unit(s)]`,
+        );
       }
+      if (selected.rateType === "daily")
+        noteLines.push(`[Duration: ${duration} day(s)]`);
+      if (selected.rateType === "weekly")
+        noteLines.push(`[Duration: ${duration} week(s)]`);
+      if (selected.rateType === "monthly")
+        noteLines.push(`[Duration: ${duration} month(s)]`);
+
+      if (noteLines.length) payload.notes = noteLines.join(" — ");
 
       const res = await fetch(`${API_URL}/api/bookings`, {
         method: "POST",
@@ -289,18 +372,28 @@ export default function Booking() {
         },
         body: JSON.stringify(payload),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Booking failed");
-      setSuccess(data.booking);
+      setSuccess({
+        ...data.booking,
+        maid_name: maid.name || "",
+        maid_avatar: maid.avatar || "",
+        maid_currency: maid.currency || "NGN",
+        // total_amount is already on data.booking from the INSERT RETURNING *
+      });
     } catch (err) {
       setError(err.message || "Something went wrong");
       setLoading(false);
     }
   }
 
-  // ── Whether to show duration field ───────────────────────────────
-  const showDuration = selected?.rateType === "hourly";
+  // ── Duration label helper ────────────────────────────────────────
+  function durationLabel() {
+    if (!selected) return "";
+    if (selected.rateType === "custom")
+      return `Number of ${selected.label} sessions`;
+    return `Number of ${durConfig.label}`;
+  }
 
   return (
     <div className={styles.page}>
@@ -375,7 +468,9 @@ export default function Booking() {
                         )}
                       </p>
                     ) : (
-                      <p className={styles.rateCardPriceCustom}>Enter amount</p>
+                      <p className={styles.rateCardPriceCustom}>
+                        Enter amount + duration
+                      </p>
                     )}
                   </div>
                   {isSelected && (
@@ -387,49 +482,157 @@ export default function Booking() {
           </div>
         </div>
 
-        {/* ── Negotiated price input ─────────────────────────────── */}
-        {selected?.rateType === "negotiated" && (
+        {/* ── Duration — shown for ALL rate types except negotiated ── */}
+        {selected && selected.rateType !== "negotiated" && (
           <div className={styles.field}>
-            <label className={styles.label}>🤝 Agreed Price ({currency})</label>
-            <p className={styles.fieldHint}>
-              Enter the total amount you and the maid agreed on.
-            </p>
-            <div className={styles.negotiatedRow}>
-              <span className={styles.currencyPrefix}>{s}</span>
+            <label className={styles.label}>
+              {selected.rateType === "hourly" && "⏱ "}
+              {selected.rateType === "daily" && "📅 "}
+              {selected.rateType === "weekly" && "🗓 "}
+              {selected.rateType === "monthly" && "📆 "}
+              {selected.rateType === "custom" && "✨ "}
+              {durationLabel()} *
+            </label>
+            <div className={styles.durationRow}>
+              <button
+                type="button"
+                className={styles.durationBtn}
+                onClick={() =>
+                  setDuration((d) =>
+                    String(Math.max(durConfig.min, Number(d) - durConfig.step)),
+                  )
+                }
+              >
+                −
+              </button>
               <input
-                className={`${styles.input} ${styles.negotiatedInput}`}
+                className={`${styles.input} ${styles.durationInput}`}
                 type="number"
-                min="1"
-                placeholder="e.g. 15000"
-                value={negotiatedPrice}
-                onChange={(e) => {
-                  setNegotiatedPrice(e.target.value);
-                  setError("");
-                }}
+                min={durConfig.min}
+                max={durConfig.max}
+                step={durConfig.step}
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
               />
+              <span className={styles.durationUnit}>
+                {durConfig.unit || selected.label?.toLowerCase()}
+              </span>
+              <button
+                type="button"
+                className={styles.durationBtn}
+                onClick={() =>
+                  setDuration((d) =>
+                    String(Math.min(durConfig.max, Number(d) + durConfig.step)),
+                  )
+                }
+              >
+                +
+              </button>
             </div>
-            <p className={styles.negotiatedNote}>
-              ℹ️ This is a custom price you've privately agreed with the maid.
-              Please ensure the maid is aware of this amount before booking.
-            </p>
+            {/* Live cost preview */}
+            {selected.price && Number(duration) > 0 && (
+              <p className={styles.costPreview}>
+                {s}
+                {selected.price.toLocaleString()} × {duration}{" "}
+                {durConfig.label.toLowerCase()}
+                {" = "}
+                <strong>
+                  {s}
+                  {(selected.price * Number(duration)).toLocaleString()}
+                </strong>
+              </p>
+            )}
           </div>
         )}
 
-        {/* ── Duration (hourly only) ─────────────────────────────── */}
-        {showDuration && (
-          <div className={styles.field}>
-            <label className={styles.label}>⏱ Duration (hours)</label>
-            <input
-              className={styles.input}
-              type="number"
-              name="duration_hours"
-              value={form.duration_hours}
-              onChange={handleChange}
-              min="1"
-              max="24"
-              step="0.5"
-            />
-          </div>
+        {/* ── Negotiated — price + duration picker ─────────────── */}
+        {selected?.rateType === "negotiated" && (
+          <>
+            <div className={styles.field}>
+              <label className={styles.label}>
+                🤝 Agreed Total Price ({currency})
+              </label>
+              <p className={styles.fieldHint}>
+                Enter the total amount you and the maid agreed on.
+              </p>
+              <div className={styles.negotiatedRow}>
+                <span className={styles.currencyPrefix}>{s}</span>
+                <input
+                  className={`${styles.input} ${styles.negotiatedInput}`}
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 15000"
+                  value={negotiatedPrice}
+                  onChange={(e) => {
+                    setNegotiatedPrice(e.target.value);
+                    setError("");
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>⏳ Agreed Duration</label>
+              <p className={styles.fieldHint}>
+                How long did you agree the service will run?
+              </p>
+              <div className={styles.negotiatedDurationRow}>
+                <div className={styles.durationRow} style={{ flex: 1 }}>
+                  <button
+                    type="button"
+                    className={styles.durationBtn}
+                    onClick={() =>
+                      setNegotiatedQty((q) =>
+                        String(Math.max(1, Number(q) - 1)),
+                      )
+                    }
+                  >
+                    −
+                  </button>
+                  <input
+                    className={`${styles.input} ${styles.durationInput}`}
+                    type="number"
+                    min="1"
+                    value={negotiatedQty}
+                    onChange={(e) => {
+                      setNegotiatedQty(e.target.value);
+                      setError("");
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className={styles.durationBtn}
+                    onClick={() =>
+                      setNegotiatedQty((q) => String(Number(q) + 1))
+                    }
+                  >
+                    +
+                  </button>
+                </div>
+                <select
+                  className={`${styles.input} ${styles.unitSelect}`}
+                  value={negotiatedUnit}
+                  onChange={(e) => setNegotiatedUnit(e.target.value)}
+                >
+                  {NEGOT_UNITS.map((u) => (
+                    <option key={u.value} value={u.value}>
+                      {u.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p className={styles.negotiatedNote}>
+                ℹ️ {negotiatedQty}{" "}
+                {NEGOT_UNITS.find(
+                  (u) => u.value === negotiatedUnit,
+                )?.label.toLowerCase()}
+                {negotiatedPrice
+                  ? ` · ${s}${Number(negotiatedPrice).toLocaleString()} total`
+                  : ""}
+                {" — ensure the maid knows this amount before booking."}
+              </p>
+            </div>
+          </>
         )}
 
         {/* ── Date ──────────────────────────────────────────────── */}
@@ -510,20 +713,36 @@ export default function Booking() {
                 : ""}
             </span>
           </div>
-          {showDuration && (
-            <div className={styles.summaryRow}>
-              <span>Duration</span>
-              <span>{form.duration_hours} hour(s)</span>
-            </div>
-          )}
-          {selected?.rateType === "negotiated" && negotiatedPrice && (
-            <div className={styles.summaryRow}>
-              <span>Agreed Price</span>
-              <span>
-                {s}
-                {Number(negotiatedPrice).toLocaleString()}
-              </span>
-            </div>
+          {selected?.rateType !== "negotiated" &&
+            selected?.rateType &&
+            duration && (
+              <div className={styles.summaryRow}>
+                <span>Duration</span>
+                <span>
+                  {duration} {durConfig.label.toLowerCase()}
+                </span>
+              </div>
+            )}
+          {selected?.rateType === "negotiated" && (
+            <>
+              <div className={styles.summaryRow}>
+                <span>Agreed price</span>
+                <span>
+                  {negotiatedPrice
+                    ? `${s}${Number(negotiatedPrice).toLocaleString()}`
+                    : "—"}
+                </span>
+              </div>
+              <div className={styles.summaryRow}>
+                <span>Duration</span>
+                <span>
+                  {negotiatedQty}{" "}
+                  {NEGOT_UNITS.find(
+                    (u) => u.value === negotiatedUnit,
+                  )?.label.toLowerCase()}
+                </span>
+              </div>
+            </>
           )}
           <div className={styles.summaryTotal}>
             <span>Total</span>
@@ -536,8 +755,8 @@ export default function Booking() {
 
         {/* ── Payment note ──────────────────────────────────────── */}
         <div className={styles.paymentNote}>
-          🔒 After booking, you'll pay securely via <strong>Paystack</strong>.
-          Your booking is only confirmed after payment and admin approval.
+          🔒 After booking, you'll be taken to payment. Your booking is only
+          confirmed after payment and admin approval.
         </div>
 
         {error && <p className={styles.error}>{error}</p>}

@@ -8,7 +8,6 @@
     margin: 0 auto;
   }
 
-  /* ── Back button ───────────────────────────────────────── */
   .backBtn {
     background: none;
     border: none;
@@ -27,7 +26,6 @@
     opacity: 0.7;
   }
 
-  /* ── Cards ─────────────────────────────────────────────── */
   .card {
     background: white;
     border: 1px solid rgb(228, 228, 228);
@@ -60,7 +58,6 @@
   .rowKey {
     color: gray;
     line-height: 1.4;
-    flex-shrink: 0;
   }
   .rowVal {
     font-weight: 700;
@@ -91,13 +88,58 @@
     margin-top: 8px;
   }
 
-  /* ── Method list ───────────────────────────────────────── */
+  /* ── Auto gateway banner ─────────────────────────────── */
+  .autoBanner {
+    background: white;
+    border: 2px solid;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .autoBannerLeft {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .autoBannerIcon {
+    font-size: 26px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+  .autoBannerTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(30, 30, 30);
+    margin: 0 0 3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .autoBadge {
+    font-size: 9px;
+    font-weight: 700;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .autoBannerDesc {
+    font-size: 11px;
+    color: gray;
+    margin: 0;
+  }
+
+  /* ── Alternative methods ─────────────────────────────── */
   .methodList {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
-
   .methodCard {
     display: flex;
     align-items: center;
@@ -110,11 +152,11 @@
     text-align: left;
     width: 100%;
     font-family: inherit;
+    position: relative;
     transition:
       border-color 0.15s,
       box-shadow 0.15s,
       background 0.15s;
-    position: relative;
   }
   .methodCard:hover {
     border-color: var(--method-color, rgb(19, 19, 103));
@@ -123,11 +165,9 @@
   .methodCardActive {
     border-color: var(--method-color, rgb(19, 19, 103)) !important;
     background: rgb(250, 250, 255);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   }
-
   .methodIcon {
-    font-size: 24px;
+    font-size: 22px;
     flex-shrink: 0;
   }
   .methodInfo {
@@ -139,29 +179,10 @@
     font-weight: 700;
     color: rgb(30, 30, 30);
     margin: 0 0 2px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .methodBadge {
-    font-size: 9px;
-    font-weight: 700;
-    background: rgb(15, 103, 46);
-    color: white;
-    padding: 2px 7px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
   .methodSub {
     font-size: 11px;
     color: gray;
-    margin: 0 0 2px;
-  }
-  .methodCurrencies {
-    font-size: 10px;
-    color: #aaa;
     margin: 0;
   }
   .methodCheck {
@@ -180,10 +201,24 @@
     justify-content: center;
   }
 
-  /* ── Method note ───────────────────────────────────────── */
+  .clearAltBtn {
+    margin-top: 10px;
+    background: none;
+    border: none;
+    color: rgb(19, 19, 103);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* ── Method note ─────────────────────────────────────── */
   .methodNote {
     background: white;
-    border: 1.5px solid rgb(228, 228, 228);
+    border: 1.5px solid;
     border-left-width: 4px;
     border-radius: 8px;
     padding: 12px 14px;
@@ -193,7 +228,7 @@
     margin-bottom: 14px;
   }
 
-  /* ── Steps ─────────────────────────────────────────────── */
+  /* ── Steps ───────────────────────────────────────────── */
   .steps {
     display: flex;
     flex-direction: column;
@@ -211,7 +246,7 @@
     flex-shrink: 0;
   }
 
-  /* ── Pay button ─────────────────────────────────────────── */
+  /* ── Pay button ──────────────────────────────────────── */
   .payBtn {
     display: flex;
     align-items: center;
@@ -249,7 +284,7 @@
     margin-bottom: 20px;
   }
 
-  /* ── Bank transfer ──────────────────────────────────────── */
+  /* ── Bank transfer ───────────────────────────────────── */
   .bankInstructions {
     background: rgb(245, 245, 255);
     border-radius: 8px;
@@ -279,6 +314,7 @@
   }
   .bankAmount {
     font-size: 18px;
+    font-weight: 800;
     color: rgb(19, 19, 103);
   }
   .bankRef {
@@ -322,7 +358,7 @@
     border-color: rgb(19, 19, 103);
   }
 
-  /* ── Status cards ───────────────────────────────────────── */
+  /* ── Status cards ────────────────────────────────────── */
   .statusCard {
     border-radius: 14px;
     padding: 32px 24px;
@@ -337,7 +373,6 @@
     background: rgb(255, 228, 228);
     border: 1px solid rgb(200, 100, 100);
   }
-
   .statusIcon {
     font-size: 52px;
     margin-bottom: 12px;
@@ -393,7 +428,6 @@
     background: rgb(245, 245, 245);
   }
 
-  /* ── Error ──────────────────────────────────────────────── */
   .errorMsg {
     font-size: 13px;
     color: rgb(168, 28, 28);
@@ -405,7 +439,6 @@
     line-height: 1.5;
   }
 
-  /* ── Spinner ────────────────────────────────────────────── */
   .spinner {
     width: 32px;
     height: 32px;
@@ -426,4 +459,60 @@
   .page {
     padding: 32px 24px 60px;
   }
+}
+
+.proofUploadBox {
+  border: 2px dashed rgb(200, 210, 240);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.proofUploadLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 28px 20px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(19, 19, 103);
+  transition: background 0.15s;
+}
+.proofUploadLabel:hover {
+  background: rgb(245, 245, 255);
+}
+.proofUploadIcon {
+  font-size: 28px;
+}
+.proofUploadHint {
+  font-size: 11px;
+  color: gray;
+  font-weight: 400;
+}
+
+.proofPreviewWrap {
+  position: relative;
+}
+.proofPreviewImg {
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  display: block;
+  background: rgb(245, 245, 248);
+}
+.proofRemoveBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: inherit;
 }

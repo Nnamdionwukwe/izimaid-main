@@ -8,7 +8,6 @@
     margin: 0 auto;
   }
 
-  /* ── Back button ─────────────────────────────────────────── */
   .backBtn {
     background: none;
     border: none;
@@ -82,19 +81,17 @@
     display: inline-block;
   }
 
-  /* ── Form layout ─────────────────────────────────────────── */
+  /* ── Form ────────────────────────────────────────────────── */
   .form {
     display: flex;
     flex-direction: column;
     gap: 18px;
   }
-
   .field {
     display: flex;
     flex-direction: column;
     gap: 6px;
   }
-
   .label {
     font-size: 13px;
     font-weight: bold;
@@ -115,7 +112,6 @@
     color: rgb(168, 28, 28);
     margin: 2px 0 0;
   }
-
   .labelRow {
     display: flex;
     justify-content: space-between;
@@ -139,7 +135,7 @@
     opacity: 0.6;
   }
 
-  /* ── Rate grid ───────────────────────────────────────────── */
+  /* ── Rate cards ──────────────────────────────────────────── */
   .rateGrid {
     display: flex;
     flex-direction: column;
@@ -157,11 +153,11 @@
     text-align: left;
     width: 100%;
     font-family: inherit;
+    position: relative;
     transition:
       border-color 0.15s,
       box-shadow 0.15s,
       background 0.15s;
-    position: relative;
   }
   .rateCard:hover {
     border-color: rgb(19, 19, 103);
@@ -170,7 +166,6 @@
   .rateCardActive {
     border-color: rgb(19, 19, 103) !important;
     background: rgb(245, 245, 255);
-    box-shadow: 0 2px 10px rgba(19, 19, 103, 0.14);
   }
   .rateCardNegotiated {
     border-style: dashed;
@@ -181,7 +176,6 @@
     border-color: rgb(120, 60, 200) !important;
     background: rgb(248, 244, 255);
   }
-
   .rateCardIcon {
     font-size: 22px;
     flex-shrink: 0;
@@ -230,7 +224,62 @@
     justify-content: center;
   }
 
-  /* ── Negotiated price ────────────────────────────────────── */
+  /* ── Duration row (+/− stepper) ──────────────────────────── */
+  .durationRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .durationBtn {
+    width: 40px;
+    height: 44px;
+    flex-shrink: 0;
+    background: rgb(240, 240, 255);
+    border: 1.5px solid rgb(200, 210, 240);
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: 700;
+    color: rgb(19, 19, 103);
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .durationBtn:hover {
+    background: rgb(220, 220, 255);
+  }
+
+  .durationInput {
+    text-align: center !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: rgb(19, 19, 103) !important;
+    max-width: 90px;
+    flex: 1;
+  }
+  .durationUnit {
+    font-size: 13px;
+    font-weight: 600;
+    color: gray;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .costPreview {
+    font-size: 12px;
+    color: gray;
+    margin: 2px 0 0;
+    background: rgb(245, 245, 255);
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+  .costPreview strong {
+    color: rgb(19, 19, 103);
+  }
+
+  /* ── Negotiated ──────────────────────────────────────────── */
   .negotiatedRow {
     display: flex;
     align-items: center;
@@ -262,6 +311,20 @@
   .negotiatedInput:focus {
     outline: none;
   }
+
+  .negotiatedDurationRow {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .unitSelect {
+    flex-shrink: 0;
+    width: auto !important;
+    min-width: 110px;
+    font-weight: 600;
+    color: rgb(47, 47, 47);
+  }
+
   .negotiatedNote {
     font-size: 11px;
     color: rgb(100, 60, 180);
@@ -273,7 +336,7 @@
     line-height: 1.5;
   }
 
-  /* ── Standard inputs ─────────────────────────────────────── */
+  /* ── Inputs ──────────────────────────────────────────────── */
   .input {
     height: 44px;
     border: 1.5px solid rgb(228, 228, 228);
@@ -289,7 +352,6 @@
   .input:focus {
     border-color: rgb(19, 19, 103);
   }
-
   .textarea {
     border: 1.5px solid rgb(228, 228, 228);
     border-radius: 8px;
@@ -368,7 +430,7 @@
     line-height: 1.5;
   }
 
-  /* ── Error ───────────────────────────────────────────────── */
+  /* ── Error + submit ──────────────────────────────────────── */
   .error {
     font-size: 13px;
     color: rgb(168, 28, 28);
@@ -377,8 +439,6 @@
     background: rgb(255, 235, 238);
     border-radius: 8px;
   }
-
-  /* ── Submit ──────────────────────────────────────────────── */
   .submitBtn {
     height: 52px;
     background: rgb(19, 19, 103);
@@ -401,10 +461,45 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+}
 
-  .row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
+.locationFallback {
+  margin-top: 8px;
+}
+
+.searchRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.searchDropdown {
+  background: white;
+  border: 1.5px solid rgb(228, 228, 228);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.searchResult {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: 1px solid rgb(245, 245, 245);
+  background: white;
+  font-size: 12px;
+  color: rgb(47, 47, 47);
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1.5;
+  transition: background 0.1s;
+}
+.searchResult:last-child {
+  border-bottom: none;
+}
+.searchResult:hover {
+  background: rgb(245, 245, 255);
 }
