@@ -629,7 +629,7 @@ export default function Booking() {
                 {negotiatedPrice
                   ? ` · ${s}${Number(negotiatedPrice).toLocaleString()} total`
                   : ""}
-                {" — ensure the maid knows this amount before booking."}
+                {" — Please ensure the maid knows this amount before booking."}
               </p>
             </div>
           </>
