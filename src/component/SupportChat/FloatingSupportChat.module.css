@@ -12,6 +12,16 @@
     0 8px 24px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* dragging removes animation so it doesn't fight the pointer */
+  user-select: none;
+}
+
+.chatWindowDragging {
+  animation: none !important;
+  box-shadow:
+    0 32px 80px rgba(19, 19, 103, 0.28),
+    0 12px 32px rgba(0, 0, 0, 0.18);
+  cursor: grabbing !important;
 }
 
 @keyframes slideUp {
@@ -23,6 +33,36 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+/* drag handle strip at top of chat window */
+.chatDragHandle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  z-index: 10;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    to bottom,
+    rgba(19, 19, 103, 0.08) 0%,
+    transparent 100%
+  );
+  border-radius: 16px 16px 0 0;
+}
+.chatDragHandle:active {
+  cursor: grabbing;
+}
+
+.chatDragPill {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(19, 19, 103, 0.25);
 }
 
 /* ── FAB button ────────────────────────────────────────────────────── */
@@ -40,14 +80,22 @@
   border: none;
   background: rgb(19, 19, 103);
   color: white;
-  cursor: pointer;
+  cursor: grab;
   box-shadow:
     0 8px 24px rgba(19, 19, 103, 0.4),
     0 2px 8px rgba(0, 0, 0, 0.15);
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: box-shadow 0.2s;
   animation: fabIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  touch-action: none;
+}
+
+.fabDragging {
+  cursor: grabbing !important;
+  box-shadow:
+    0 16px 40px rgba(19, 19, 103, 0.5),
+    0 6px 16px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
 }
 
 @keyframes fabIn {
@@ -61,14 +109,14 @@
   }
 }
 
-.fab:hover {
+/* only apply hover transform when NOT dragging */
+.fab:not(.fabDragging):hover {
   transform: translateY(-2px) scale(1.03);
   box-shadow:
     0 12px 32px rgba(19, 19, 103, 0.48),
     0 4px 12px rgba(0, 0, 0, 0.18);
 }
-
-.fab:active {
+.fab:not(.fabDragging):active {
   transform: scale(0.97);
 }
 
@@ -77,7 +125,6 @@
   line-height: 1;
   flex-shrink: 0;
 }
-
 .fabLabel {
   font-size: 14px;
   font-weight: 700;
@@ -103,6 +150,7 @@
   padding: 0 5px;
   border: 2px solid white;
   animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
 }
 
 @keyframes badgePop {
@@ -141,11 +189,13 @@
   .chatWindow {
     position: fixed;
     inset: 0;
-    bottom: 0;
-    right: 0;
     width: 100%;
     height: 100%;
     border-radius: 0;
+  }
+  /* disable dragging on mobile — full-screen sheet doesn't need it */
+  .chatDragHandle {
+    display: none;
   }
 
   .fab {
