@@ -294,9 +294,7 @@ export default function MyBookings() {
                 </div>
                 <div className={styles.metaItem}>
                   Total{" "}
-                  <span className={styles.metaValue}>
-                    ₦{Number(b.total_amount).toLocaleString()}
-                  </span>
+                  <span className={styles.metaValue}>{fmtBookingAmt(b)}</span>
                 </div>
                 <div className={styles.metaItem}>
                   Address{" "}
@@ -319,7 +317,7 @@ export default function MyBookings() {
                       navigate("/payment", { state: { booking: b } });
                     }}
                   >
-                    🔒 Pay Now — ₦{Number(b.total_amount).toLocaleString()}
+                    🔒 Pay Now — {fmtBookingAmt(b)}
                   </button>
                 </div>
               )}

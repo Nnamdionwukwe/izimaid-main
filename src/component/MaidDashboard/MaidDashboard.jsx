@@ -46,6 +46,23 @@ function formatDate(d) {
   });
 }
 
+const CURRENCY_SYMBOLS = {
+  NGN: "₦",
+  USD: "$",
+  GBP: "£",
+  EUR: "€",
+  KES: "KSh",
+  GHS: "₵",
+  ZAR: "R",
+  UGX: "USh",
+  CAD: "CA$",
+  AUD: "A$",
+};
+function fmtBookingAmt(b) {
+  const c = b.payment_currency || b.maid_currency || "NGN";
+  return `${CURRENCY_SYMBOLS[c] || c + " "}${Number(b.total_amount || 0).toLocaleString()}`;
+}
+
 function initials(name) {
   return (
     name
@@ -1199,7 +1216,13 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      setBookings(data.bookings || []);
+      const seen = new Set();
+      const unique = (data.bookings || []).filter((b) => {
+        if (seen.has(b.id)) return false;
+        seen.add(b.id);
+        return true;
+      });
+      setBookings(unique);
     } catch (err) {
       console.error("Error fetching bookings:", err);
     }
@@ -1354,7 +1377,8 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                 <div className={styles.metaItem}>
                   Earning:{" "}
                   <span className={styles.metaValue}>
-                    ₦{Number(b.total_amount || 0).toLocaleString()}
+                    Earning:{" "}
+                    <span className={styles.metaValue}>{fmtBookingAmt(b)}</span>
                   </span>
                 </div>
                 <div className={styles.metaItem}>
