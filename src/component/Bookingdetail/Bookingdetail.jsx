@@ -108,7 +108,8 @@ export default function BookingDetail() {
 
   useEffect(() => {
     async function fetchAll() {
-      setLoading(true);
+      // Don't show full-page spinner if we already have booking from state
+      if (!booking) setLoading(true);
       try {
         const res = await fetch(`${API_URL}/api/bookings/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -125,7 +126,7 @@ export default function BookingDetail() {
         setLoading(false);
       }
     }
-    if (!booking) fetchAll();
+    fetchAll(); // ← always call, not just when booking is null
 
     async function fetchPayment() {
       try {
@@ -530,15 +531,31 @@ export default function BookingDetail() {
           <p className={styles.sectionTitle}>
             🆘 {isMaid ? "Customer's" : "Maid's"} Emergency Contacts
           </p>
+
           {emergency.map((c, i) => (
             <div key={i} className={styles.emergencyCard}>
               <div>
                 <p className={styles.emergencyName}>{c.name}</p>
                 <p className={styles.emergencyMeta}>{c.relationship}</p>
+                {c.email && <p className={styles.emergencyEmail}>{c.email}</p>}
               </div>
-              <a href={`tel:${c.phone}`} className={styles.callBtn}>
-                📞 {c.phone}
-              </a>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 6,
+                  flexShrink: 0,
+                }}
+              >
+                <a href={`tel:${c.phone}`} className={styles.callBtn}>
+                  📞 {c.phone}
+                </a>
+                {c.email && (
+                  <a href={`mailto:${c.email}`} className={styles.emailBtn}>
+                    ✉️ Email
+                  </a>
+                )}
+              </div>
             </div>
           ))}
         </div>

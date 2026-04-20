@@ -1,7 +1,5 @@
-// src/pages/settings/SettingsPage.jsx
-// Uses Settings.module.css — no more global .ds-* classes
-
 import { useState, lazy, Suspense } from "react";
+import { useAuth } from "../../context/AuthContext";
 import styles from "./Settings.module.css";
 
 const ProfileSettings = lazy(
@@ -23,16 +21,6 @@ const WithdrawalSettings = lazy(
   () => import("../../component/settings/WithdrawalSettings"),
 );
 const PinSettings = lazy(() => import("../../component/settings/PinSettings"));
-
-function useCurrentUser() {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
-    return JSON.parse(atob(token.split(".")[1]));
-  } catch {
-    return null;
-  }
-}
 
 const ALL_TABS = [
   {
@@ -88,7 +76,7 @@ const ALL_TABS = [
   },
 ];
 
-function TabSkeleton() {
+function TabSkeleton({ styles }) {
   return (
     <div className={styles.loadingSection}>
       {[100, 44, 44, 44, 44].map((h, i) => (
@@ -99,7 +87,7 @@ function TabSkeleton() {
 }
 
 export default function SettingsPage() {
-  const user = useCurrentUser();
+  const { user, token } = useAuth();
   const role = user?.role || "customer";
   const [tab, setTab] = useState("profile");
 
@@ -107,18 +95,25 @@ export default function SettingsPage() {
   const current = tabs.find((t) => t.id === tab) || tabs[0];
   const Component = current.component;
 
+  // Replace the return block in SettingsPage.jsx:
   return (
     <div className={styles.page}>
-      {/* Page header */}
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Settings</h1>
-        <p className={styles.pageSubtitle}>
-          Manage your account, preferences, and security
-        </p>
+        <button
+          className={styles.backBtn}
+          onClick={() => window.history.back()}
+        >
+          ← Back
+        </button>
+        <div className={styles.pageHeaderText}>
+          <h1 className={styles.pageTitle}>Settings</h1>
+          <p className={styles.pageSubtitle}>
+            Manage your account, preferences, and security
+          </p>
+        </div>
       </div>
 
       <div className={styles.layout}>
-        {/* Sidebar nav */}
         <nav className={styles.nav} aria-label="Settings navigation">
           {tabs.map((t) => (
             <button
@@ -134,15 +129,12 @@ export default function SettingsPage() {
           ))}
         </nav>
 
-        {/* Content panel */}
         <main className={styles.content}>
           <div className={styles.contentHeader}>
-            <h2 className={styles.contentTitle}>
-              {current.icon} {current.label}
-            </h2>
+            <span style={{ fontSize: 18 }}>{current.icon}</span>
+            <h2 className={styles.contentTitle}>{current.label}</h2>
           </div>
-
-          <Suspense fallback={<TabSkeleton />}>
+          <Suspense fallback={<TabSkeleton styles={styles} />}>
             <Component styles={styles} />
           </Suspense>
         </main>
