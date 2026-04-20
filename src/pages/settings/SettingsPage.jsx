@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import styles from "./Settings.module.css";
+import EmergencySettings from "./EmergencySettings";
 
 const ProfileSettings = lazy(
   () => import("../../component/settings/ProfileSettings"),
@@ -28,6 +29,13 @@ const ALL_TABS = [
     label: "Profile",
     icon: "👤",
     component: ProfileSettings,
+    roles: ["customer", "maid", "admin"],
+  },
+  {
+    id: "emergency",
+    label: "Emergency",
+    icon: "🆘",
+    component: EmergencySettings,
     roles: ["customer", "maid", "admin"],
   },
   {
