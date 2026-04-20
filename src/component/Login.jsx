@@ -613,7 +613,7 @@ export default function Login({ onSuccess }) {
             </div>
 
             <p className={styles.terms}>
-              Choose if you want a maid or you want to register as a
+              Choose if you need a maid or you want to register as a
               maid/cleaner
             </p>
 
@@ -759,7 +759,7 @@ export default function Login({ onSuccess }) {
           </div>
 
           <p className={styles.terms}>
-            Choose if you want a maid or you want to sign in or register as a
+            Choose if you need a maid or you want to sign in or register as a
             maid/cleaner
           </p>
 
