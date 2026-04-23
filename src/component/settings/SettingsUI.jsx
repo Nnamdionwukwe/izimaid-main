@@ -60,12 +60,19 @@ export function Toggle({ checked, onChange, disabled }) {
   );
 }
 
-export function SaveButton({ loading, children = "Save changes", disabled }) {
+// REPLACE the existing SaveButton with:
+export function SaveButton({
+  loading,
+  onClick,
+  children = "Save changes",
+  disabled,
+}) {
   return (
     <button
-      type="submit"
+      type={onClick ? "button" : "submit"}
       className={styles.btnPrimary}
       disabled={loading || disabled}
+      onClick={onClick}
     >
       {loading ? <span className={styles.spinner} /> : children}
     </button>
@@ -90,12 +97,13 @@ export function SecondaryButton({
   onClick,
   children,
   type = "button",
+  disabled,
 }) {
   return (
     <button
       type={type}
       className={styles.btnSecondary}
-      disabled={loading}
+      disabled={loading || disabled}
       onClick={onClick}
     >
       {loading ? <span className={styles.spinner} /> : children}

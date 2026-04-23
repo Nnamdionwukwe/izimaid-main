@@ -153,20 +153,26 @@ export function useProfile() {
 
 export function useSubscription() {
   const [data, setData] = useState(null);
+  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const role =
+    JSON.parse(localStorage.getItem("user") || "{}").role || "customer";
 
   const fetch_ = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${BASE}/subscriptions/my`, {
-        headers: authHeaders(),
-      });
-      const json = await res.json();
-      setData(json);
+      const [rSub, rPlans] = await Promise.all([
+        fetch(`${BASE}/subscriptions/my`, { headers: authHeaders() }),
+        fetch(`${BASE}/subscriptions/plans?role=${role}`),
+      ]);
+      const [dSub, dPlans] = await Promise.all([rSub.json(), rPlans.json()]);
+      if (rSub.ok) setData(dSub);
+      if (rPlans.ok) setPlans(dPlans.plans || []);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [role]);
 
   useEffect(() => {
     fetch_();
@@ -181,13 +187,91 @@ export function useSubscription() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
-      fetch_();
+      await fetch_();
       return json;
     },
     [fetch_],
   );
 
-  return { data, loading, refetch: fetch_, cancel };
+  const pause = useCallback(async () => {
+    const res = await fetch(`${BASE}/subscriptions/pause`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({}),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error);
+    await fetch_();
+    return json;
+  }, [fetch_]);
+
+  const resume = useCallback(async () => {
+    const res = await fetch(`${BASE}/subscriptions/resume`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({}),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error);
+    await fetch_();
+    return json;
+  }, [fetch_]);
+
+  const subscribe = useCallback(
+    async (planId, gateway = "paystack", promoCode) => {
+      const res = await fetch(`${BASE}/subscriptions/subscribe/${gateway}`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({
+          plan_id: planId,
+          promo_code: promoCode || undefined,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      return json;
+    },
+    [],
+  );
+
+  const changePlan = useCallback(
+    async (planId) => {
+      const res = await fetch(`${BASE}/subscriptions/change-plan`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ new_plan_id: planId }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      await fetch_();
+      return json;
+    },
+    [fetch_],
+  );
+
+  const validatePromo = useCallback(async (code, planId) => {
+    const res = await fetch(`${BASE}/subscriptions/validate-promo`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ code, plan_id: planId }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error);
+    return json;
+  }, []);
+
+  return {
+    data,
+    plans,
+    loading,
+    refetch: fetch_,
+    cancel,
+    pause,
+    resume,
+    subscribe,
+    changePlan,
+    validatePromo,
+  };
 }
 
 export function useBankDetails() {

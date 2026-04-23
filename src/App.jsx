@@ -72,6 +72,7 @@ import SettingsPage from "./pages/settings/SettingsPage.jsx";
 import VerifyEmail from "./component/VerifyEmail/VerifyEmail.jsx";
 import ResetPassword from "./component/ResetPassword/ResetPassword.jsx";
 import WithdrawTab from "./component/WithdrawTab/WithdrawPage.jsx";
+import SubscriptionVerify from "./pages/subscription/SubscriptionVerify.jsx";
 
 function App() {
   return (
@@ -227,6 +228,7 @@ function AppRoutes() {
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
       <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/subscription/verify" element={<SubscriptionVerify />} />
 
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,0 +1,521 @@
+/* src/component/settings/Subscription.module.css
+   Deusizi Sparkle — Subscription Settings — CSS Module only
+*/
+
+/* ── View toggle ─────────────────────────────────────────────── */
+.toggleWrap {
+  display: flex;
+  background: rgb(245, 245, 248);
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+.toggleBtn {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  background: transparent;
+  color: rgb(138, 123, 106);
+  transition:
+    background 140ms,
+    color 140ms,
+    box-shadow 140ms;
+}
+.toggleBtnActive {
+  background: white;
+  color: rgb(19, 19, 103);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Free plan card ──────────────────────────────────────────── */
+.freePlanCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgb(245, 245, 248);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  border: 1px solid rgb(228, 228, 228);
+}
+.freePlanIcon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.freePlanName {
+  font-weight: 700;
+  font-size: 15px;
+  color: rgb(47, 47, 47);
+  margin: 0 0 2px;
+}
+.freePlanHint {
+  font-size: 12px;
+  color: rgb(138, 123, 106);
+  margin: 0;
+}
+
+/* ── Active plan header ──────────────────────────────────────── */
+.planHeader {
+  background: rgb(19, 19, 103);
+  border-radius: 10px;
+  padding: 18px 20px;
+  color: white;
+  margin-bottom: 16px;
+}
+.planHeaderTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.planHeaderLeft {
+  flex: 1;
+  min-width: 0;
+}
+.planBadgeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.planHeaderName {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: white;
+}
+.planHeaderMeta {
+  font-size: 12px;
+  opacity: 0.75;
+  margin: 0;
+  color: white;
+}
+.planHeaderRight {
+  text-align: right;
+  flex-shrink: 0;
+}
+.planHeaderPrice {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 2px;
+  color: white;
+}
+.planHeaderInterval {
+  font-size: 12px;
+  opacity: 0.75;
+  margin: 0;
+  color: white;
+}
+.planProgressWrap {
+  margin-top: 14px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.planProgressFill {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 2px;
+  transition: width 0.4s;
+}
+
+/* ── Plan features list ──────────────────────────────────────── */
+.featuresList {
+  margin-bottom: 16px;
+}
+.featureRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgb(47, 47, 47);
+  padding: 4px 0;
+}
+.featureCheck {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgb(209, 247, 224);
+  color: rgb(10, 107, 46);
+  font-size: 10px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Action row ──────────────────────────────────────────────── */
+.actionRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+/* ── Cancel form ─────────────────────────────────────────────── */
+.cancelLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgb(47, 47, 47);
+  margin: 0 0 8px;
+}
+.cancelTextarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid rgb(228, 228, 228);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  color: rgb(47, 47, 47);
+  background: white;
+  outline: none;
+  resize: vertical;
+  min-height: 70px;
+  box-sizing: border-box;
+}
+.cancelTextarea:focus {
+  border-color: rgb(19, 19, 103);
+  box-shadow: 0 0 0 3px rgba(19, 19, 103, 0.1);
+}
+.cancelActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── Invoice list ────────────────────────────────────────────── */
+.invoiceList {
+  display: flex;
+  flex-direction: column;
+}
+.invoiceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgb(228, 228, 228);
+}
+.invoiceRow:last-child {
+  border-bottom: none;
+}
+.invoicePeriod {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(47, 47, 47);
+  margin: 0 0 2px;
+}
+.invoiceDate {
+  font-size: 11px;
+  color: rgb(180, 170, 160);
+  margin: 0;
+}
+.invoiceAmt {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgb(47, 47, 47);
+  flex-shrink: 0;
+}
+
+/* ── Gateway picker ──────────────────────────────────────────── */
+.gatewayRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.gatewayBtn {
+  flex: 1;
+  padding: 10px 12px;
+  text-align: left;
+  border: 1.5px solid rgb(228, 228, 228);
+  border-radius: 8px;
+  font-family: inherit;
+  cursor: pointer;
+  background: white;
+  transition: all 140ms;
+}
+.gatewayBtnActive {
+  border-color: rgb(19, 19, 103);
+  background: rgb(240, 240, 255);
+}
+.gatewayLabel {
+  font-weight: 700;
+  font-size: 13px;
+  margin: 0 0 2px;
+  color: rgb(47, 47, 47);
+}
+.gatewayBtnActive .gatewayLabel {
+  color: rgb(19, 19, 103);
+}
+.gatewayHint {
+  font-size: 11px;
+  color: rgb(138, 123, 106);
+  margin: 0;
+}
+
+/* ── Promo row ───────────────────────────────────────────────── */
+.promoLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgb(47, 47, 47);
+  margin: 0 0 8px;
+  display: block;
+}
+.promoRow {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.promoInput {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0 12px;
+  border: 1.5px solid rgb(228, 228, 228);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  outline: none;
+  color: rgb(47, 47, 47);
+  background: white;
+  box-sizing: border-box;
+}
+.promoInput:focus {
+  border-color: rgb(19, 19, 103);
+}
+.promoInput::placeholder {
+  letter-spacing: 0;
+  font-weight: 400;
+  color: rgb(180, 170, 160);
+}
+.promoBtn {
+  flex-shrink: 0;
+  height: 42px;
+  padding: 0 16px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 140ms;
+}
+.promoBtn:hover:not(:disabled) {
+  background: rgb(13, 13, 72);
+}
+.promoBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.promoSuccess {
+  font-size: 12px;
+  color: rgb(10, 107, 46);
+  font-weight: 700;
+  margin: 6px 0 0;
+}
+.promoError {
+  font-size: 12px;
+  color: rgb(168, 28, 28);
+  font-weight: 700;
+  margin: 6px 0 0;
+}
+
+/* ── Plans grid ──────────────────────────────────────────────── */
+.plansGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  gap: 14px;
+}
+.planCard {
+  border: 1.5px solid rgb(228, 228, 228);
+  border-radius: 12px;
+  padding: 16px 16px 18px;
+  background: white;
+  position: relative;
+  transition: box-shadow 160ms;
+}
+.planCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+.planCardPopular {
+  border: 2px solid rgb(19, 19, 103);
+}
+.planCardCurrent {
+  border: 2px solid rgb(10, 107, 46);
+  background: rgb(240, 255, 246);
+}
+
+.planCardBadge {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 0 0 7px 7px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.planCardBadgePopular {
+  background: rgb(19, 19, 103);
+}
+.planCardBadgeCurrent {
+  background: rgb(10, 107, 46);
+}
+
+.planCardName {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgb(19, 19, 103);
+  margin: 0 0 6px;
+}
+.planCardNameOffset {
+  margin-top: 14px;
+}
+
+.planPriceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.planPriceStrike {
+  font-size: 12px;
+  color: rgb(170, 170, 170);
+  text-decoration: line-through;
+}
+.planPriceMain {
+  font-size: 22px;
+  font-weight: 700;
+  color: rgb(19, 19, 103);
+}
+.planPriceInterval {
+  font-size: 12px;
+  color: rgb(138, 123, 106);
+}
+
+.trialBadge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgb(10, 76, 140);
+  background: rgb(209, 236, 255);
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.planFeatures {
+  margin: 8px 0 14px;
+}
+.planFeatureRow {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+  color: rgb(60, 60, 60);
+  padding: 3px 0;
+}
+.planFeatureTick {
+  color: rgb(10, 107, 46);
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.planCta {
+  margin-top: 14px;
+}
+.planCtaCurrent {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgb(10, 107, 46);
+  padding: 8px 0;
+  margin: 0;
+}
+.planCtaBtn {
+  width: 100%;
+  padding: 9px 0;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 140ms;
+}
+.planCtaBtn:hover:not(:disabled) {
+  background: rgb(13, 13, 72);
+}
+.planCtaBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.plansFootnote {
+  font-size: 11px;
+  color: rgb(138, 123, 106);
+  text-align: center;
+  margin: 16px 0 0;
+}
+
+/* ── Spinner (dark variant for plan cta) ─────────────────────── */
+.spinnerDark {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .plansGrid {
+    grid-template-columns: 1fr;
+  }
+  .gatewayRow {
+    flex-direction: column;
+  }
+  .actionRow {
+    flex-direction: column;
+  }
+  .cancelActions {
+    flex-direction: column;
+  }
+  .planHeaderTop {
+    flex-direction: column;
+  }
+}
