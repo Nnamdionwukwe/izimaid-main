@@ -1818,7 +1818,6 @@ export default function MaidDashboard({ onLogout }) {
             ["profile", "My Profile"],
             ["earnings", "Earnings"],
             ["wallet", "Wallet"],
-            ["withdraw", "Withdraw "],
             ["reviews", "Reviews"],
             ["support", "Support"],
           ].map(([key, label]) => (
@@ -1879,7 +1878,7 @@ export default function MaidDashboard({ onLogout }) {
           {tab === "support" && (
             <MaidSupportTab token={token} prefillBooking={supportPrefill} />
           )}
-          {tab === "withdraw" && <WithdrawTab token={token} />}
+
           {tab === "wallet" && (
             <WalletOverview
               token={token}

@@ -106,8 +106,9 @@ function BarChart({ data, currency }) {
 }
 
 // ── Summary cards ─────────────────────────────────────────────────────
-function SummaryCards({ summary, currency }) {
-  const row = summary.find((s) => s.currency === currency) || summary[0];
+// REPLACE SummaryCards to accept active currency from filter:
+function SummaryCards({ summary, activeCurrency }) {
+  const row = summary.find((s) => s.currency === activeCurrency) || summary[0];
   if (!row) return null;
   const c = row.currency;
   return (
@@ -146,6 +147,7 @@ function SummaryCards({ summary, currency }) {
 
 // ── Main EarningsTab ──────────────────────────────────────────────────
 export default function EarningsTab({ token }) {
+  // ── State FIRST — activeCurrency depends on currency ──
   const [data, setData] = useState({
     bookings: [],
     summary: [],
@@ -155,13 +157,21 @@ export default function EarningsTab({ token }) {
     page: 1,
     limit: 15,
   });
-  const activeCurrency = data?.summary?.[0]?.currency || "NGN";
   const [loading, setLoading] = useState(true);
   const [currency, setCurrency] = useState(""); // "" = all
   const [period, setPeriod] = useState("all");
   const [status, setStatus] = useState("completed");
   const [page, setPage] = useState(1);
   const LIMIT = 15;
+
+  // ── Derived — must come AFTER state declarations ──
+  const activeCurrency = currency || data?.summary?.[0]?.currency || "NGN";
+  const allCurrencies = data?.currencies || [];
+
+  // Filter monthly chart to selected currency only
+  const monthlyFiltered = currency
+    ? data.monthly.filter((m) => m.currency === currency)
+    : data.monthly.filter((m) => m.currency === activeCurrency);
 
   const load = useCallback(
     async (p = 1) => {
@@ -174,7 +184,6 @@ export default function EarningsTab({ token }) {
           limit: LIMIT,
         });
         if (currency) params.set("currency", currency);
-
         const res = await fetch(`${API}/earnings?${params}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -204,12 +213,9 @@ export default function EarningsTab({ token }) {
 
   const hasMore = data?.bookings ? data.bookings.length < data.total : false;
 
-  // ── Multi-currency switcher pills ────────────────────────────────
-  const allCurrencies = data?.currencies || [];
-
   return (
     <div className={styles.wrap}>
-      {/* ── Page title ────────────────────────────────────────── */}
+      {/* Title */}
       <div className={styles.titleRow}>
         <p className={styles.title}>Earnings</p>
         {data && (
@@ -219,7 +225,7 @@ export default function EarningsTab({ token }) {
         )}
       </div>
 
-      {/* ── Currency filter chips ─────────────────────────────── */}
+      {/* Currency filter chips — only shown when maid has multiple currencies */}
       {allCurrencies.length > 1 && (
         <div className={styles.chipRow}>
           <button
@@ -247,7 +253,7 @@ export default function EarningsTab({ token }) {
         </div>
       )}
 
-      {/* ── Period + status filters ───────────────────────────── */}
+      {/* Period + status filters */}
       <div className={styles.filterRow}>
         <div className={styles.filterGroup}>
           {PERIODS.map((p) => (
@@ -278,20 +284,22 @@ export default function EarningsTab({ token }) {
         </select>
       </div>
 
-      {/* ── Summary cards ─────────────────────────────────────── */}
+      {/* Summary cards */}
       {data?.summary?.length > 0 && (
-        <SummaryCards summary={data.summary} currency={activeCurrency} />
+        <SummaryCards summary={data.summary} activeCurrency={activeCurrency} />
       )}
 
-      {/* ── Bar chart ─────────────────────────────────────────── */}
-      {data?.monthly?.length > 0 && (
+      {/* Bar chart — filtered to active currency */}
+      {monthlyFiltered.length > 0 && (
         <div className={styles.chartSection}>
-          <p className={styles.sectionLabel}>Last 6 months</p>
-          <BarChart data={data.monthly} currency={activeCurrency} />
+          <p className={styles.sectionLabel}>
+            Last 6 months · {activeCurrency}
+          </p>
+          <BarChart data={monthlyFiltered} currency={activeCurrency} />
         </div>
       )}
 
-      {/* ── Multi-currency breakdown ──────────────────────────── */}
+      {/* Multi-currency breakdown — only when showing all */}
       {!currency && data?.summary?.length > 1 && (
         <div className={styles.breakdownSection}>
           <p className={styles.sectionLabel}>By currency</p>
@@ -316,7 +324,7 @@ export default function EarningsTab({ token }) {
         </div>
       )}
 
-      {/* ── Bookings list ─────────────────────────────────────── */}
+      {/* Bookings list */}
       <div className={styles.listSection}>
         <p className={styles.sectionLabel}>Booking history</p>
 
@@ -363,7 +371,6 @@ export default function EarningsTab({ token }) {
                           .join("")
                           .toUpperCase() || "?"}
                       </div>
-
                       <div>
                         <p className={styles.customerName}>{b.customer_name}</p>
                         <p className={styles.bookingDate}>
@@ -372,8 +379,9 @@ export default function EarningsTab({ token }) {
                       </div>
                     </div>
                     <div className={styles.bookingRight}>
+                      {/* Use booking's own currency — each row shows the right symbol */}
                       <p className={styles.bookingAmount}>
-                        {fmt(b.total_amount, activeCurrency)}
+                        {fmt(b.total_amount, b.currency || activeCurrency)}
                       </p>
                       <span
                         className={styles.statusBadge}
@@ -396,7 +404,6 @@ export default function EarningsTab({ token }) {
                 </div>
               );
             })}
-
             {hasMore && (
               <button
                 className={styles.loadMoreBtn}
