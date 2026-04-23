@@ -519,3 +519,28 @@
     flex-direction: column;
   }
 }
+
+/* ── Billing interval toggle ─────────────────────────────────── */
+.intervalToggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.intervalBtn {
+  flex: 1;
+  height: 38px;
+  border: 1.5px solid rgb(228, 228, 228);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: white;
+  color: rgb(100, 100, 100);
+  transition: all 140ms;
+}
+.intervalBtnActive {
+  border-color: rgb(19, 19, 103);
+  background: rgb(19, 19, 103);
+  color: white;
+}

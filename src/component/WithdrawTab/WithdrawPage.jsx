@@ -171,23 +171,53 @@ const STATUS_CFG = {
 // WalletOverview — sits inside the Wallet tab of MaidDashboard
 // ══════════════════════════════════════════════════════════════════════
 export function WalletOverview({ token, onWithdraw }) {
-  const [wallet, setWallet] = useState(null);
+  const [wallets, setWallets] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeCur, setActiveCur] = useState(null); // selected currency tab
   const [innerView, setInnerView] = useState("overview");
+
+  const CURRENCY_SYMBOLS = {
+    NGN: "₦",
+    USD: "$",
+    GBP: "£",
+    EUR: "€",
+    GHS: "₵",
+    KES: "KSh",
+    ZAR: "R",
+    UGX: "USh",
+    CAD: "CA$",
+    AUD: "A$",
+    TZS: "TSh",
+    RWF: "FRw",
+    XOF: "CFA",
+    EGP: "E£",
+    MAD: "MAD",
+    BTC: "₿",
+    ETH: "Ξ",
+    USDT: "₮",
+    USDC: "$",
+  };
+  function sym(c) {
+    return CURRENCY_SYMBOLS[c] || c + " ";
+  }
+  function fmtBal(n, c) {
+    return `${sym(c)}${Number(n || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
 
   useEffect(() => {
     async function load() {
       try {
+        // Try /api/wallet first, fall back to /api/withdrawals/wallet
         const [wR, wdR, hR] = await Promise.all([
-          fetch(`${API}/withdrawals/wallet`, {
+          fetch(`${API}/wallet`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${API}/withdrawals`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(`${API}/withdrawals/wallet/history?limit=30`, {
+          fetch(`${API}/wallet/history?limit=30`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -196,10 +226,16 @@ export function WalletOverview({ token, onWithdraw }) {
           wdR.json(),
           hR.json(),
         ]);
-        if (wR.ok) setWallet(wD.wallet);
+
+        const walletList = wD.wallets || (wD.wallet ? [wD.wallet] : []);
+        setWallets(walletList);
+        if (walletList.length) setActiveCur(walletList[0].currency);
+
         if (wdR.ok) setWithdrawals(wdD.withdrawals || []);
         if (hR.ok) setHistory(hD.transactions || hD.history || []);
-      } catch {}
+      } catch (err) {
+        console.error("[WalletOverview]", err);
+      }
       setLoading(false);
     }
     load();
@@ -210,8 +246,8 @@ export function WalletOverview({ token, onWithdraw }) {
       method: "PATCH",
       headers: { Authorization: `Bearer ${token}` },
     });
-    setWithdrawals((prev) =>
-      prev.map((w) => (w.id === id ? { ...w, status: "cancelled" } : w)),
+    setWithdrawals((p) =>
+      p.map((w) => (w.id === id ? { ...w, status: "cancelled" } : w)),
     );
   }
 
@@ -223,46 +259,133 @@ export function WalletOverview({ token, onWithdraw }) {
       </div>
     );
 
+  // No wallets at all
+  if (!wallets.length)
+    return (
+      <div className={styles.ov_wrap}>
+        <div
+          className={styles.ov_empty}
+          style={{ padding: "40px 20px", textAlign: "center" }}
+        >
+          <p style={{ fontSize: 40, marginBottom: 12 }}>💰</p>
+          <p style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>
+            No wallet yet
+          </p>
+          <p style={{ fontSize: 13, color: "gray" }}>
+            Complete bookings to start earning. Your wallet will appear here.
+          </p>
+        </div>
+      </div>
+    );
+
+  const activeWallet =
+    wallets.find((w) => w.currency === activeCur) || wallets[0];
+
   return (
     <div className={styles.ov_wrap}>
-      {/* Balance card */}
+      {/* ── Currency tabs — only shown if multiple currencies ── */}
+      {wallets.length > 1 && (
+        <div className={styles.ov_curTabs}>
+          {wallets.map((w) => (
+            <button
+              key={w.currency}
+              className={`${styles.ov_curTab} ${activeCur === w.currency ? styles.ov_curTabActive : ""}`}
+              onClick={() => setActiveCur(w.currency)}
+            >
+              <span className={styles.ov_curTabSymbol}>{sym(w.currency)}</span>
+              <span className={styles.ov_curTabCode}>{w.currency}</span>
+              {Number(w.available_balance || 0) > 0 && (
+                <span className={styles.ov_curTabBal}>
+                  {fmtBal(w.available_balance, w.currency)}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ── Balance card ── */}
       <div className={styles.ov_card}>
         <div className={styles.ov_card_bg} />
+        <div className={styles.ov_card_curBadge}>{activeWallet.currency}</div>
         <p className={styles.ov_card_label}>Available Balance</p>
         <p className={styles.ov_card_balance}>
-          <span>₦</span>
-          {fmt(wallet?.available || wallet?.available_balance || 0)}
+          <span>{sym(activeWallet.currency)}</span>
+          {fmt(activeWallet.available_balance || activeWallet.available || 0)}
         </p>
         <div className={styles.ov_card_stats}>
           <div>
             <span>Earned</span>
-            <strong>₦{fmt(wallet?.total_earned || 0)}</strong>
+            <strong>
+              {fmtBal(activeWallet.total_earned, activeWallet.currency)}
+            </strong>
           </div>
           <div className={styles.ov_divider} />
           <div>
             <span>Pending</span>
             <strong>
-              ₦{fmt(wallet?.pending || wallet?.pending_balance || 0)}
+              {fmtBal(
+                activeWallet.pending_balance || activeWallet.pending || 0,
+                activeWallet.currency,
+              )}
             </strong>
           </div>
           <div className={styles.ov_divider} />
           <div>
             <span>Withdrawn</span>
-            <strong>₦{fmt(wallet?.total_withdrawn || 0)}</strong>
+            <strong>
+              {fmtBal(activeWallet.total_withdrawn, activeWallet.currency)}
+            </strong>
           </div>
         </div>
+
+        {/* Pending note */}
+        {Number(activeWallet.pending_balance || 0) > 0 && (
+          <p className={styles.ov_pendingNote}>
+            ⏳ {fmtBal(activeWallet.pending_balance, activeWallet.currency)}{" "}
+            pending release (released 24h after booking completion)
+          </p>
+        )}
+
         <button
           className={styles.ov_withdrawBtn}
           onClick={onWithdraw}
           disabled={
-            Number(wallet?.available || wallet?.available_balance || 0) <= 0
+            Number(
+              activeWallet.available_balance || activeWallet.available || 0,
+            ) <= 0
           }
         >
-          💸 Withdraw Funds
+          💸 Withdraw {activeWallet.currency}
         </button>
       </div>
 
-      {/* Inner nav */}
+      {/* ── All currencies summary (if multiple) ── */}
+      {wallets.length > 1 && (
+        <div className={styles.ov_allCur}>
+          <p className={styles.ov_allCurTitle}>All currency balances</p>
+          {wallets.map((w) => (
+            <div key={w.currency} className={styles.ov_allCurRow}>
+              <span className={styles.ov_allCurCode}>{w.currency}</span>
+              <div className={styles.ov_allCurBals}>
+                <span>
+                  Available:{" "}
+                  <strong>
+                    {fmtBal(w.available_balance || 0, w.currency)}
+                  </strong>
+                </span>
+                {Number(w.pending_balance || 0) > 0 && (
+                  <span className={styles.ov_allCurPending}>
+                    Pending: {fmtBal(w.pending_balance, w.currency)}
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Inner nav ── */}
       <div className={styles.ov_nav}>
         {[
           ["requests", "Requests"],
@@ -278,7 +401,7 @@ export function WalletOverview({ token, onWithdraw }) {
         ))}
       </div>
 
-      {/* Requests */}
+      {/* ── Requests ── */}
       {innerView === "requests" &&
         (withdrawals.length === 0 ? (
           <div className={styles.ov_empty}>📭 No withdrawal requests yet.</div>
@@ -289,7 +412,13 @@ export function WalletOverview({ token, onWithdraw }) {
               <div key={w.id} className={styles.ov_wdCard}>
                 <div className={styles.ov_wdRow}>
                   <div>
-                    <p className={styles.ov_wdAmt}>₦{fmt(w.amount)}</p>
+                    <p className={styles.ov_wdAmt}>
+                      {sym(w.currency || "NGN")}
+                      {fmt(w.amount)}
+                      <span className={styles.ov_wdCurBadge}>
+                        {w.currency || "NGN"}
+                      </span>
+                    </p>
                     <p className={styles.ov_wdMeta}>
                       {w.method?.replace(/_/g, " ")} · {timeAgo(w.created_at)}
                     </p>
@@ -317,13 +446,13 @@ export function WalletOverview({ token, onWithdraw }) {
           })
         ))}
 
-      {/* History */}
+      {/* ── History ── */}
       {innerView === "history" &&
         (history.length === 0 ? (
           <div className={styles.ov_empty}>📊 No transactions yet.</div>
         ) : (
           history.map((tx, i) => {
-            const isCredit = tx.type === "credit" || Number(tx.amount) > 0;
+            const isCredit = tx.type === "credit" || tx.type === "release";
             return (
               <div key={tx.id || i} className={styles.ov_txRow}>
                 <div className={styles.ov_txIcon}>{isCredit ? "💰" : "📤"}</div>
@@ -331,9 +460,14 @@ export function WalletOverview({ token, onWithdraw }) {
                   <p>{tx.description || tx.type}</p>
                   <span>{timeAgo(tx.created_at)}</span>
                 </div>
-                <p className={isCredit ? styles.ov_credit : styles.ov_debit}>
-                  {isCredit ? "+" : "−"}₦{fmt(Math.abs(tx.amount))}
-                </p>
+                <div className={styles.ov_txRight}>
+                  <p className={isCredit ? styles.ov_credit : styles.ov_debit}>
+                    {isCredit ? "+" : "−"}
+                    {sym(tx.currency)}
+                    {fmt(Math.abs(tx.amount))}
+                  </p>
+                  <span className={styles.ov_txCur}>{tx.currency}</span>
+                </div>
               </div>
             );
           })

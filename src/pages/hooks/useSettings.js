@@ -151,7 +151,7 @@ export function useProfile() {
   return { profile, loading, update, uploadAvatar };
 }
 
-export function useSubscription() {
+export function useSubscription(interval = null) {
   const [data, setData] = useState(null);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -162,17 +162,20 @@ export function useSubscription() {
   const fetch_ = useCallback(async () => {
     setLoading(true);
     try {
+      const plansUrl = `${BASE}/subscriptions/plans?role=${role}${interval ? `&interval=${interval}` : ""}`;
       const [rSub, rPlans] = await Promise.all([
         fetch(`${BASE}/subscriptions/my`, { headers: authHeaders() }),
-        fetch(`${BASE}/subscriptions/plans?role=${role}`),
+        fetch(plansUrl),
       ]);
       const [dSub, dPlans] = await Promise.all([rSub.json(), rPlans.json()]);
       if (rSub.ok) setData(dSub);
       if (rPlans.ok) setPlans(dPlans.plans || []);
+    } catch (err) {
+      console.error("[useSubscription]", err);
     } finally {
       setLoading(false);
     }
-  }, [role]);
+  }, [role, interval]);
 
   useEffect(() => {
     fetch_();

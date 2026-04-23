@@ -61,6 +61,19 @@ const GATEWAYS = [
 ];
 
 export default function SubscriptionSettings({ styles }) {
+  // ── State must be declared BEFORE useSubscription ──
+  const [view, setView] = useState("overview");
+  const [billingInterval, setBillingInterval] = useState("monthly");
+  const [toast, setToast] = useState({ message: null, type: "success" });
+  const [busy, setBusy] = useState("");
+  const [showCancelForm, setShowCancelForm] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [gateway, setGateway] = useState("paystack");
+  const [promo, setPromo] = useState("");
+  const [promoResult, setPromoResult] = useState(null);
+  const [promoLoading, setPromoLoading] = useState(false);
+
+  // ── Hook called AFTER state so billingInterval is defined ──
   const {
     data,
     plans,
@@ -71,18 +84,7 @@ export default function SubscriptionSettings({ styles }) {
     subscribe,
     changePlan,
     validatePromo,
-  } = useSubscription();
-
-  const [view, setView] = useState("overview");
-  const [toast, setToast] = useState({ message: null, type: "success" });
-  const [busy, setBusy] = useState("");
-  const [showCancelForm, setShowCancelForm] = useState(false);
-  const [cancelReason, setCancelReason] = useState("");
-  const [gateway, setGateway] = useState("paystack");
-  const [promo, setPromo] = useState("");
-  const [promoResult, setPromoResult] = useState(null);
-  const [promoLoading, setPromoLoading] = useState(false);
-
+  } = useSubscription(view === "plans" ? billingInterval : null);
   function showToast(message, type = "success") {
     setToast({ message, type });
     setTimeout(() => setToast({ message: null, type: "success" }), 5000);
@@ -349,7 +351,7 @@ export default function SubscriptionSettings({ styles }) {
                     Change Plan
                   </SecondaryButton>
                 )}
-                {isActive && (
+                {/* {isActive && (
                   <SecondaryButton
                     loading={busy === "pause"}
                     onClick={handlePause}
@@ -366,7 +368,7 @@ export default function SubscriptionSettings({ styles }) {
                   >
                     ▶ Resume
                   </SaveButton>
-                )}
+                )} */}
                 {isPastDue && (
                   <SaveButton onClick={() => setView("plans")}>
                     Update Payment
@@ -449,6 +451,21 @@ export default function SubscriptionSettings({ styles }) {
       {view === "plans" && (
         <>
           <Section title="Payment method">
+            <div className={sub.intervalToggle}>
+              {[
+                ["monthly", "Monthly"],
+                ["annual", "Annual (save 20%)"],
+              ].map(([v, l]) => (
+                <button
+                  key={v}
+                  onClick={() => setBillingInterval(v)}
+                  className={`${sub.intervalBtn} ${billingInterval === v ? sub.intervalBtnActive : ""}`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+
             <div className={sub.gatewayRow}>
               {GATEWAYS.map((g) => (
                 <button

@@ -775,3 +775,139 @@
     font-size: 28px;
   }
 }
+
+/* ── Multi-currency additions ─────────────────────────────────── */
+.ov_curTabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  margin-bottom: 14px;
+}
+.ov_curTabs::-webkit-scrollbar {
+  display: none;
+}
+
+.ov_curTab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 14px;
+  border: 1.5px solid rgb(228, 228, 228);
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: all 140ms;
+  min-width: 70px;
+}
+.ov_curTab:hover {
+  border-color: rgb(19, 19, 103);
+}
+.ov_curTabActive {
+  border-color: rgb(19, 19, 103);
+  background: rgb(240, 240, 255);
+}
+.ov_curTabSymbol {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgb(19, 19, 103);
+}
+.ov_curTabCode {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgb(100, 100, 100);
+  text-transform: uppercase;
+}
+.ov_curTabBal {
+  font-size: 10px;
+  color: rgb(10, 107, 46);
+  font-weight: 700;
+}
+
+.ov_card_curBadge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ov_pendingNote {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 8px 0 0;
+  font-style: italic;
+}
+
+.ov_allCur {
+  background: rgb(245, 245, 248);
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.ov_allCurTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgb(100, 100, 100);
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.ov_allCurRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgb(240, 240, 240);
+  gap: 12px;
+}
+.ov_allCurRow:last-child {
+  border-bottom: none;
+}
+.ov_allCurCode {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgb(19, 19, 103);
+  width: 50px;
+  flex-shrink: 0;
+}
+.ov_allCurBals {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: rgb(100, 100, 100);
+  flex-wrap: wrap;
+}
+.ov_allCurPending {
+  color: rgb(133, 100, 4);
+}
+
+.ov_wdCurBadge {
+  font-size: 10px;
+  background: rgb(240, 240, 255);
+  color: rgb(19, 19, 103);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.ov_txRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.ov_txCur {
+  font-size: 10px;
+  color: rgb(160, 160, 160);
+}
