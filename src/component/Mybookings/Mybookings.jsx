@@ -167,7 +167,10 @@ export default function MyBookings() {
         </button>
         <div className={styles.topBarRight}>
           <NotificationBell token={token} />
-          {/* <div className={styles.userChip}>
+          <div
+            onClick={() => navigate("/settings")}
+            className={styles.userChip}
+          >
             {user?.avatar ? (
               <img
                 src={user.avatar}
@@ -180,7 +183,7 @@ export default function MyBookings() {
               </div>
             )}
             <span className={styles.userName}>{user?.name?.split(" ")[0]}</span>
-          </div> */}
+          </div>
           <button className={styles.logoutBtn} onClick={handleLogout}>
             Logout
           </button>
