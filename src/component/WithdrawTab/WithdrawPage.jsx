@@ -480,9 +480,10 @@ export function WalletOverview({ token, onWithdraw }) {
 // WithdrawPage — full-page overlay, same pattern as MaidChat
 // ══════════════════════════════════════════════════════════════════════
 export default function WithdrawPage({ token, onClose }) {
-  const [wallet, setWallet] = useState(null);
+  // REPLACE these lines at the top of WithdrawPage (default export):
+  const [wallets, setWallets] = useState([]); // ← was `wallet`
   const [banks, setBanks] = useState([]);
-  const [step, setStep] = useState("method"); // method → form → pin → done
+  const [step, setStep] = useState("method");
   const [method, setMethod] = useState(null);
   const [fields, setFields] = useState({});
   const [amount, setAmount] = useState("");
@@ -491,14 +492,19 @@ export default function WithdrawPage({ token, onClose }) {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState({ type: "", text: "" });
   const [manualAccName, setManualAccName] = useState(false);
+  const [selCurrency, setSelCurrency] = useState("NGN");
 
   useEffect(() => {
-    fetch(`${API}/withdrawals/wallet`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(`${API}/wallet`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((d) => {
-        if (d.wallet) setWallet(d.wallet);
+        const list = d.wallets || (d.wallet ? [d.wallet] : []);
+        const withBal = list.filter(
+          (w) => Number(w.available_balance || 0) > 0,
+        );
+        const final = withBal.length ? withBal : list;
+        setWallets(final);
+        if (final.length) setSelCurrency(final[0].currency);
       })
       .catch(() => {});
     fetch(`${API}/withdrawals/ng-banks`)
@@ -507,7 +513,25 @@ export default function WithdrawPage({ token, onClose }) {
       .catch(() => {});
   }, [token]);
 
-  const available = Number(wallet?.available || wallet?.available_balance || 0);
+  const CURRENCY_SYMBOLS = {
+    NGN: "₦",
+    USD: "$",
+    GBP: "£",
+    EUR: "€",
+    GHS: "₵",
+    KES: "KSh",
+    ZAR: "R",
+    UGX: "USh",
+    CAD: "CA$",
+    AUD: "A$",
+  };
+  function sym(c) {
+    return CURRENCY_SYMBOLS[c] || c + " ";
+  }
+
+  const activeWallet =
+    wallets.find((w) => w.currency === selCurrency) || wallets[0];
+  const available = Number(activeWallet?.available_balance || 0);
   const m = METHODS.find((x) => x.id === method);
 
   function setField(k, v) {
@@ -660,7 +684,7 @@ export default function WithdrawPage({ token, onClose }) {
     try {
       const payload = {
         amount: amt,
-        currency: fields.currency || "NGN",
+        currency: fields.currency || selCurrency,
         method,
         transaction_pin: pin,
         ...fields,
@@ -1054,11 +1078,38 @@ export default function WithdrawPage({ token, onClose }) {
             ← Back
           </button>
           <h1 className={styles.pageTitle}>Withdraw Funds</h1>
-          <div className={styles.balancePill}>₦{fmt(available)} available</div>
+          <div className={styles.balancePill}>
+            {sym(selCurrency)}
+            {fmt(available)} available
+          </div>
         </div>
 
         <div className={styles.pageBody}>
           <p className={styles.stepLabel}>Choose how to receive your money</p>
+          {/* ADD this currency selector just before <div className={styles.methodGrid}> */}
+          {wallets.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <p className={styles.stepLabel}>Withdraw from</p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {wallets.map((w) => (
+                  <button
+                    key={w.currency}
+                    onClick={() => setSelCurrency(w.currency)}
+                    className={
+                      selCurrency === w.currency
+                        ? styles.verifyBtn
+                        : styles.maxBtn
+                    }
+                    style={{ height: 44 }}
+                  >
+                    {sym(w.currency)}
+                    {Number(w.available_balance || 0).toLocaleString()}{" "}
+                    {w.currency}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className={styles.methodGrid}>
             {METHODS.map((m) => (
               <button
@@ -1105,7 +1156,10 @@ export default function WithdrawPage({ token, onClose }) {
           <h1 className={styles.pageTitle}>
             {m?.icon} {m?.label}
           </h1>
-          <div className={styles.balancePill}>₦{fmt(available)}</div>
+          <div className={styles.balancePill}>
+            {sym(selCurrency)}
+            {fmt(available)}
+          </div>
         </div>
 
         <div className={styles.pageBody}>
@@ -1133,7 +1187,7 @@ export default function WithdrawPage({ token, onClose }) {
           <div className={styles.formCard} style={{ marginTop: 12 }}>
             <p className={styles.formCardTitle}>Amount</p>
             <div className={styles.field}>
-              <label>Amount ({fields.currency || "NGN"})</label>
+              <label>Amount ({fields.currency || selCurrency})</label>
               <div className={styles.inlineRow}>
                 <input
                   type="number"
@@ -1144,7 +1198,10 @@ export default function WithdrawPage({ token, onClose }) {
                 />
                 <button
                   className={styles.maxBtn}
-                  onClick={() => setAmount(String(available))}
+                  onClick={() => {
+                    setAmount(String(available));
+                    setField("currency", selCurrency);
+                  }}
                 >
                   Max
                 </button>
@@ -1184,7 +1241,11 @@ export default function WithdrawPage({ token, onClose }) {
         <div className={styles.pageBody}>
           <div className={styles.pinCard}>
             <div className={styles.pinSummary}>
-              <p className={styles.pinAmt}>₦{fmt(Number(amount))}</p>
+              <p className={styles.pinAmt}>
+                {sym(selCurrency)}
+                {fmt(Number(amount))}
+              </p>
+
               <p className={styles.pinMethod}>
                 {m?.icon} {m?.label}
               </p>
@@ -1264,7 +1325,11 @@ export default function WithdrawPage({ token, onClose }) {
             <div className={styles.doneIcon}>🎉</div>
             <h2>Request Submitted!</h2>
             <p>
-              Your withdrawal of <strong>₦{fmt(Number(amount))}</strong> via{" "}
+              Your withdrawal of{" "}
+              <strong>
+                {sym(selCurrency)}
+                {fmt(Number(amount))}
+              </strong>
               <strong>{m?.label}</strong> has been submitted and is under
               review.
             </p>
