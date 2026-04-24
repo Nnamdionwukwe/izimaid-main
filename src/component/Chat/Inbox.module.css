@@ -420,6 +420,7 @@
 }
 
 /* ── Mobile ─────────────────────────────────────────────────── */
+/* REPLACE WITH: */
 @media (max-width: 480px) {
   .convRow {
     padding: 10px 12px;
@@ -433,7 +434,17 @@
   .filterTabs::-webkit-scrollbar {
     display: none;
   }
+  .convBottom {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
   .convTags {
-    display: none;
+    flex-shrink: 0;
+  }
+  .tagInquiry,
+  .tagBooking,
+  .tagStatus {
+    font-size: 8px;
+    padding: 2px 5px;
   }
 }
