@@ -5,6 +5,7 @@ import styles from "./Mybookings.module.css";
 import Chat from "../Chat/Chat";
 import NotificationBell from "../Notifications/NotificationBell";
 import { useAuth } from "../../context/AuthContext";
+import Inbox from "../Chat/Inbox";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -84,6 +85,9 @@ export default function MyBookings() {
   const [filter, setFilter] = useState("all");
   const [chatBooking, setChatBooking] = useState(null);
 
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [showInbox, setShowInbox] = useState(false);
+
   const isMaid = user?.role === "maid";
 
   // ── Fetch bookings ──────────────────────────────────────────────────
@@ -125,6 +129,22 @@ export default function MyBookings() {
     return () => clearInterval(id);
   }, [filter, token]);
 
+  useEffect(() => {
+    if (!token) return;
+    async function fetchUnread() {
+      try {
+        const res = await fetch(`${API_URL}/api/chat/unread`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const d = await res.json();
+        setUnreadMessages(d.unread || 0);
+      } catch {}
+    }
+    fetchUnread();
+    const id = setInterval(fetchUnread, 15000);
+    return () => clearInterval(id);
+  }, [token]);
+
   function handleLogout() {
     logout();
     navigate("/login", { replace: true });
@@ -158,6 +178,9 @@ export default function MyBookings() {
     );
   }
 
+  if (showInbox)
+    return <Inbox embedded={false} onClose={() => setShowInbox(false)} />;
+
   return (
     <div className={styles.page}>
       {/* ── Top bar ────────────────────────────────────────────── */}
@@ -167,6 +190,21 @@ export default function MyBookings() {
         </button>
         <div className={styles.topBarRight}>
           <NotificationBell token={token} />
+
+          {/* ── Messages icon ── */}
+          <button
+            onClick={() => setShowInbox(true)}
+            className={styles.msgIconBtn}
+            title="Messages"
+          >
+            💬
+            {unreadMessages > 0 && (
+              <span className={styles.msgBadge}>
+                {unreadMessages > 99 ? "99+" : unreadMessages}
+              </span>
+            )}
+          </button>
+
           <div
             onClick={() => navigate("/settings")}
             className={styles.userChip}

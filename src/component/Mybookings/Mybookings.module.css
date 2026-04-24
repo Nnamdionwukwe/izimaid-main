@@ -512,3 +512,42 @@
     padding-right: 24px;
   }
 }
+
+/* ── Messages icon button ─────────────────────────────────────────── */
+.msgIconBtn {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  color: white;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.msgIconBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.msgBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: rgb(187, 19, 47);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 99px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  border: 2px solid rgb(19, 19, 103);
+  font-family: inherit;
+}
