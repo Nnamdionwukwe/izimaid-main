@@ -113,32 +113,48 @@ export const ALL_LANGUAGES = [
 
 export function applyGoogleTranslate(langCode) {
   if (langCode === "en") {
-    // Set combo to original language first, then clear cookie and reload
-    const combo = document.querySelector(".goog-te-combo");
-    if (combo) {
-      combo.value = "en";
-      combo.dispatchEvent(new Event("change"));
-    }
+    // Clear every possible variation of the cookie
     const expiry = "Thu, 01 Jan 1970 00:00:00 UTC";
-    document.cookie = `googtrans=; expires=${expiry}; path=/`;
-    document.cookie = `googtrans=; expires=${expiry}; path=/; domain=${location.hostname}`;
-    document.cookie = `googtrans=; expires=${expiry}; path=/; domain=.${location.hostname}`;
-    setTimeout(() => window.location.reload(), 200);
+    const host = location.hostname;
+    const domains = [
+      host,
+      `.${host}`,
+      host.replace(/^www\./, ""),
+      `.${host.replace(/^www\./, "")}`,
+    ];
+
+    domains.forEach((domain) => {
+      document.cookie = `googtrans=; expires=${expiry}; path=/; domain=${domain}`;
+      document.cookie = `googtrans=; expires=${expiry}; path=/`;
+    });
+
+    // Use Google's own restore function if available
+    try {
+      const el = document.querySelector(".goog-te-combo");
+      if (el) {
+        el.value = "en";
+        el.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    } catch {}
+
+    // Hard reload with cache bust to prevent stale cookie being re-read
+    setTimeout(() => {
+      location.replace(
+        location.href.split("?")[0] + "?notranslate=" + Date.now(),
+      );
+    }, 250);
     return;
   }
 
-  // Set the googtrans cookie — this is what Google Translate reads
   document.cookie = `googtrans=/en/${langCode}; path=/`;
   document.cookie = `googtrans=/en/${langCode}; path=/; domain=${location.hostname}`;
   document.cookie = `googtrans=/en/${langCode}; path=/; domain=.${location.hostname}`;
 
-  // Try to use the hidden combo box first (no reload needed)
   const combo = document.querySelector(".goog-te-combo");
   if (combo) {
     combo.value = langCode;
-    combo.dispatchEvent(new Event("change"));
+    combo.dispatchEvent(new Event("change", { bubbles: true }));
   } else {
-    // Fallback: reload so the cookie is picked up
     window.location.reload();
   }
 }
