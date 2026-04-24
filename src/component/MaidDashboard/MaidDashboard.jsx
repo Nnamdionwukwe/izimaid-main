@@ -9,6 +9,7 @@ import NotificationBell from "../Notifications/NotificationBell";
 import WithdrawTab, { WalletOverview } from "../WithdrawTab/WithdrawPage";
 import WithdrawPage from "../WithdrawTab/WithdrawPage";
 import EarningsTab from "../EarningsTab/EarningsTab";
+import Inbox from "../Chat/Inbox";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 // At the top of ProfileTab (or at the top of MaidDashboard.jsx alongside API_URL), add:
@@ -1591,6 +1592,9 @@ export default function MaidDashboard({ onLogout }) {
   const [supportOpenCount, setSupportOpenCount] = useState(0);
   const [showWithdraw, setShowWithdraw] = useState(false);
 
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [showInbox, setShowInbox] = useState(false);
+
   useEffect(() => {
     if (!token || user.role !== "maid") {
       navigate("/login");
@@ -1603,6 +1607,18 @@ export default function MaidDashboard({ onLogout }) {
         if (res.ok && data.maid) setAvailable(data.maid.is_available);
       } catch {}
     }
+
+    // Add inside the main useEffect, after loadSupportCount():
+    async function loadUnreadCount() {
+      try {
+        const res = await fetch(`${API}/chat/unread`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const d = await res.json();
+        setUnreadMessages(d.unread || 0);
+      } catch {}
+    }
+    loadUnreadCount();
 
     async function loadStats() {
       try {
@@ -1745,6 +1761,13 @@ export default function MaidDashboard({ onLogout }) {
           st.filter((t) => t.status === "open" || t.status === "in_progress")
             .length,
         );
+      } catch {} // Add at the end of the interval, after the support count try/catch:
+      try {
+        const ur = await fetch(`${API}/chat/unread`, {
+          headers: { Authorization: `Bearer ${token_val}` },
+        });
+        const ud = await ur.json();
+        setUnreadMessages(ud.unread || 0);
       } catch {}
     }, 30000);
     return () => clearInterval(id);
@@ -1803,6 +1826,9 @@ export default function MaidDashboard({ onLogout }) {
     );
   }
 
+  if (showInbox)
+    return <Inbox embedded={false} onClose={() => setShowInbox(false)} />;
+
   if (showWithdraw)
     return (
       <WithdrawPage token={token} onClose={() => setShowWithdraw(false)} />
@@ -1834,8 +1860,55 @@ export default function MaidDashboard({ onLogout }) {
               <p className={styles.headerRole}>Maid · Deusizi Sparkle</p>
             </div>
           </div>
+          {/* REPLACE: */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <NotificationBell token={token} />
+
+            {/* ── Messages icon ── */}
+            <button
+              onClick={() => setShowInbox(true)}
+              style={{
+                position: "relative",
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                borderRadius: 8,
+                width: 36,
+                height: 36,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: 16,
+                color: "white",
+              }}
+              title="Messages"
+            >
+              💬
+              {unreadMessages > 0 && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: -4,
+                    right: -4,
+                    background: "rgb(187,19,47)",
+                    color: "white",
+                    fontSize: 9,
+                    fontWeight: "bold",
+                    minWidth: 16,
+                    height: 16,
+                    borderRadius: 99,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0 3px",
+                    border: "2px solid rgb(19,19,103)",
+                  }}
+                >
+                  {unreadMessages > 99 ? "99+" : unreadMessages}
+                </span>
+              )}
+            </button>
+
             <button className={styles.logoutBtn} onClick={handleLogout}>
               Logout
             </button>

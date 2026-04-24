@@ -74,6 +74,7 @@ import ResetPassword from "./component/ResetPassword/ResetPassword.jsx";
 import WithdrawTab from "./component/WithdrawTab/WithdrawPage.jsx";
 import SubscriptionVerify from "./pages/subscription/SubscriptionVerify.jsx";
 import InquiryChat from "./component/AdminDashboard/InquiryChat/InquiryChat.jsx";
+import Inbox from "./component/Chat/Inbox.jsx";
 
 function App() {
   return (
@@ -226,6 +227,8 @@ function AppRoutes() {
       />
 
       <Route path="/chat/inquiry/:maidId" element={<InquiryChat />} />
+
+      <Route path="/messages" element={<Inbox />} />
 
       <Route path="/terms-of-service" element={<TermsOfService />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
