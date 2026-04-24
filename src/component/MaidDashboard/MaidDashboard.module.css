@@ -1164,3 +1164,222 @@
 .customChipRemove:hover {
   color: rgb(130, 10, 10);
 }
+
+/* Add to MaidDashboard.module.css */
+@media (max-width: 480px) {
+  .statsGrid > div[style*="span 2"] {
+    grid-column: span 2;
+  }
+}
+
+/* ── Modern Stats ────────────────────────────────────────────────────── */
+.statsWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* ── Top row: 3 count pills ─────────────────────────────────────────── */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.statPill {
+  background: white;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.statPillIcon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.statPillLabel {
+  font-size: 10px;
+  font-weight: bold;
+  color: gray;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 2px;
+}
+.statPillVal {
+  font-size: 20px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 0;
+  line-height: 1;
+}
+
+/* ── Earnings card ──────────────────────────────────────────────────── */
+.earningsCard {
+  background: white;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.earningsCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.earningsCurBadge {
+  font-size: 10px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  background: rgb(235, 235, 255);
+  border-radius: 6px;
+  padding: 2px 8px;
+  display: inline-block;
+  margin: 0 0 6px;
+  letter-spacing: 0.05em;
+}
+.earningsAvail {
+  font-size: 26px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 0;
+  line-height: 1;
+}
+.earningsAvailSub {
+  font-size: 12px;
+  font-weight: normal;
+  color: gray;
+}
+.earningsTotalBox {
+  text-align: right;
+  flex-shrink: 0;
+}
+.earningsTotalLabel {
+  font-size: 10px;
+  color: gray;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 2px;
+}
+.earningsTotalVal {
+  font-size: 13px;
+  font-weight: bold;
+  color: rgb(47, 47, 47);
+  margin: 0;
+}
+
+/* ── Progress bar ───────────────────────────────────────────────────── */
+.earningsBar {
+  height: 6px;
+  background: rgb(240, 240, 245);
+  border-radius: 99px;
+  overflow: hidden;
+  display: flex;
+}
+.earningsBarAvail {
+  background: rgb(10, 107, 46);
+  height: 100%;
+  transition: width 0.5s ease;
+}
+.earningsBarPend {
+  background: rgb(255, 195, 0);
+  height: 100%;
+  transition: width 0.5s ease;
+}
+.earningsBarEscrow {
+  background: rgb(21, 101, 192);
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+/* ── Chips row ──────────────────────────────────────────────────────── */
+.earningsChips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.chipDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+.chipAvail,
+.chipPend,
+.chipEscrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 3px 9px 3px 7px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+.chipAvail {
+  background: rgb(232, 245, 233);
+  color: rgb(10, 107, 46);
+}
+.chipPend {
+  background: rgb(255, 248, 225);
+  color: rgb(133, 100, 4);
+}
+.chipEscrow {
+  background: rgb(227, 242, 253);
+  color: rgb(21, 101, 192);
+}
+
+/* ── Empty state ────────────────────────────────────────────────────── */
+.earningsEmpty {
+  background: white;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 14px;
+  padding: 20px 16px;
+}
+.earningsEmptyLabel {
+  font-size: 10px;
+  font-weight: bold;
+  color: gray;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 4px;
+}
+.earningsEmptyVal {
+  font-size: 26px;
+  font-weight: bold;
+  color: rgb(19, 19, 103);
+  margin: 0 0 4px;
+}
+.earningsEmptyHint {
+  font-size: 12px;
+  color: gray;
+  margin: 0;
+}
+
+/* ── Mobile tweaks ──────────────────────────────────────────────────── */
+@media (max-width: 380px) {
+  .statPill {
+    padding: 10px 10px;
+    gap: 7px;
+  }
+  .statPillVal {
+    font-size: 17px;
+  }
+  .earningsAvail {
+    font-size: 22px;
+  }
+  .earningsChips {
+    gap: 4px;
+  }
+  .chipAvail,
+  .chipPend,
+  .chipEscrow {
+    font-size: 10px;
+    padding: 3px 7px 3px 5px;
+  }
+}

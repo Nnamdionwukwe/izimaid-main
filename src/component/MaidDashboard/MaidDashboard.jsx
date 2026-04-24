@@ -1578,8 +1578,9 @@ export default function MaidDashboard({ onLogout }) {
     total: 0,
     pending: 0,
     completed: 0,
-    earnings: 0,
+    earningsByCurrency: [], // [{currency, available, escrow, total_earned}]
   });
+
   const [toast, setToast] = useState({
     visible: false,
     message: "",
@@ -1602,23 +1603,64 @@ export default function MaidDashboard({ onLogout }) {
         if (res.ok && data.maid) setAvailable(data.maid.is_available);
       } catch {}
     }
+
     async function loadStats() {
       try {
-        const res = await fetch(`${API_URL}/api/bookings?limit=200`, {
+        // Bookings count
+        const bRes = await fetch(`${API}/bookings?limit=200`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await res.json();
-        const b = data.bookings || [];
+        const bData = await bRes.json();
+        const b = bData.bookings || [];
+
+        // Multi-currency wallet
+        const wRes = await fetch(`${API}/wallet`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const wData = await wRes.json();
+        const wallets = wData.wallets || (wData.wallet ? [wData.wallet] : []);
+
+        // Escrow from maid_payouts
+        const eRes = await fetch(`${API}/payments/maid/earnings`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const eData = await eRes.json();
+        const escrowRows = eData.earnings || [];
+
+        // Merge wallet + escrow per currency
+        const allCurrencies = [
+          ...new Set([
+            ...wallets.map((w) => w.currency),
+            ...escrowRows.map((e) => e.currency),
+          ]),
+        ];
+
+        const earningsByCurrency = allCurrencies
+          .map((cur) => {
+            const w = wallets.find((x) => x.currency === cur) || {};
+            const e = escrowRows.find((x) => x.currency === cur) || {};
+            return {
+              currency: cur,
+              available: Number(w.available_balance || 0),
+              pending: Number(w.pending_balance || 0),
+              total_earned: Number(w.total_earned || 0),
+              escrow: Number(e.in_escrow || 0),
+              escrow_count: Number(e.in_escrow_count || 0),
+            };
+          })
+          .filter((x) => x.total_earned > 0 || x.escrow > 0 || x.available > 0);
+
         setStats({
           total: b.length,
           pending: b.filter((x) => x.status === "pending").length,
           completed: b.filter((x) => x.status === "completed").length,
-          earnings: b
-            .filter((x) => x.status === "completed")
-            .reduce((s, x) => s + Number(x.total_amount), 0),
+          earningsByCurrency,
         });
-      } catch {}
+      } catch (err) {
+        console.error("loadStats error:", err);
+      }
     }
+
     async function loadSupportCount() {
       try {
         const res = await fetch(`${API_URL}/api/maid-support?limit=50`, {
@@ -1642,23 +1684,57 @@ export default function MaidDashboard({ onLogout }) {
     const token_val = localStorage.getItem("token");
     if (!token_val) return;
     const id = setInterval(async () => {
+      // ── REPLACE this entire try block ──────────────────────────
       try {
-        const res = await fetch(`${API_URL}/api/bookings?limit=200`, {
+        const bRes2 = await fetch(`${API}/bookings?limit=200`, {
           headers: { Authorization: `Bearer ${token_val}` },
         });
-        const data = await res.json();
-        const b = data.bookings || [];
+        const bData2 = await bRes2.json();
+        const b2 = bData2.bookings || [];
+
+        const wRes2 = await fetch(`${API}/wallet`, {
+          headers: { Authorization: `Bearer ${token_val}` },
+        });
+        const wData2 = await wRes2.json();
+        const wallets2 = wData2.wallets || [];
+
+        const eRes2 = await fetch(`${API}/payments/maid/earnings`, {
+          headers: { Authorization: `Bearer ${token_val}` },
+        });
+        const eData2 = await eRes2.json();
+        const escrow2 = eData2.earnings || [];
+
+        const allCur2 = [
+          ...new Set([
+            ...wallets2.map((w) => w.currency),
+            ...escrow2.map((e) => e.currency),
+          ]),
+        ];
+        const earningsByCurrency2 = allCur2
+          .map((cur) => {
+            const w = wallets2.find((x) => x.currency === cur) || {};
+            const e = escrow2.find((x) => x.currency === cur) || {};
+            return {
+              currency: cur,
+              available: Number(w.available_balance || 0),
+              pending: Number(w.pending_balance || 0),
+              total_earned: Number(w.total_earned || 0),
+              escrow: Number(e.in_escrow || 0),
+              escrow_count: Number(e.in_escrow_count || 0),
+            };
+          })
+          .filter((x) => x.total_earned > 0 || x.escrow > 0 || x.available > 0);
+
         setStats({
-          total: b.length,
-          pending: b.filter((x) => x.status === "pending").length,
-          completed: b.filter((x) => x.status === "completed").length,
-          earnings: b
-            .filter((x) => x.status === "completed")
-            .reduce((s, x) => s + Number(x.total_amount), 0),
+          total: b2.length,
+          pending: b2.filter((x) => x.status === "pending").length,
+          completed: b2.filter((x) => x.status === "completed").length,
+          earningsByCurrency: earningsByCurrency2,
         });
       } catch (err) {
         console.error("Background refresh error:", err);
       }
+      // ── Support count (unchanged) ───────────────────────────────
       try {
         const sr = await fetch(`${API_URL}/api/maid-support?limit=50`, {
           headers: { Authorization: `Bearer ${token_val}` },
@@ -1788,27 +1864,137 @@ export default function MaidDashboard({ onLogout }) {
         </div>
 
         {/* Stats */}
-        <div className={styles.content}>
-          <div className={styles.statsGrid}>
-            <div className={styles.statCard}>
-              <p className={styles.statLabel}>Total Bookings</p>
-              <p className={styles.statValue}>{stats.total}</p>
+        <div className={styles.statsWrap}>
+          {/* Top row: booking counts */}
+          <div className={styles.statsRow}>
+            <div className={styles.statPill}>
+              <span className={styles.statPillIcon}>📋</span>
+              <div>
+                <p className={styles.statPillLabel}>Total</p>
+                <p className={styles.statPillVal}>{stats.total}</p>
+              </div>
             </div>
-            <div className={styles.statCard}>
-              <p className={styles.statLabel}>Pending</p>
-              <p className={styles.statValue}>{stats.pending}</p>
+            <div className={styles.statPill}>
+              <span className={styles.statPillIcon}>⏳</span>
+              <div>
+                <p className={styles.statPillLabel}>Pending</p>
+                <p className={styles.statPillVal}>{stats.pending}</p>
+              </div>
             </div>
-            <div className={styles.statCard}>
-              <p className={styles.statLabel}>Completed</p>
-              <p className={styles.statValue}>{stats.completed}</p>
-            </div>
-            <div className={styles.statCard}>
-              <p className={styles.statLabel}>Earnings</p>
-              <p className={styles.statValue} style={{ fontSize: 18 }}>
-                ₦{stats.earnings.toLocaleString()}
-              </p>
+            <div className={styles.statPill}>
+              <span className={styles.statPillIcon}>✅</span>
+              <div>
+                <p className={styles.statPillLabel}>Done</p>
+                <p className={styles.statPillVal}>{stats.completed}</p>
+              </div>
             </div>
           </div>
+
+          {/* Earnings per currency */}
+          {stats.earningsByCurrency.length === 0 ? (
+            <div className={styles.earningsEmpty}>
+              <p className={styles.earningsEmptyLabel}>Wallet</p>
+              <p className={styles.earningsEmptyVal}>₦0.00</p>
+              <p className={styles.earningsEmptyHint}>
+                Complete bookings to start earning
+              </p>
+            </div>
+          ) : (
+            stats.earningsByCurrency.map((e) => {
+              const sym = CURRENCY_SYMBOLS[e.currency] || e.currency + " ";
+              const total = e.available + e.pending + e.escrow;
+              const availPct = total > 0 ? (e.available / total) * 100 : 0;
+              const pendPct = total > 0 ? (e.pending / total) * 100 : 0;
+              const escrowPct = total > 0 ? (e.escrow / total) * 100 : 0;
+              return (
+                <div key={e.currency} className={styles.earningsCard}>
+                  <div className={styles.earningsCardTop}>
+                    <div>
+                      <p className={styles.earningsCurBadge}>{e.currency}</p>
+                      <p className={styles.earningsAvail}>
+                        {sym}
+                        {Number(e.available).toLocaleString()}
+                        <span className={styles.earningsAvailSub}>
+                          {" "}
+                          available
+                        </span>
+                      </p>
+                    </div>
+                    {e.total_earned > 0 && (
+                      <div className={styles.earningsTotalBox}>
+                        <p className={styles.earningsTotalLabel}>
+                          Total earned
+                        </p>
+                        <p className={styles.earningsTotalVal}>
+                          {sym}
+                          {Number(e.total_earned).toLocaleString()}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Progress bar */}
+                  {total > 0 && (
+                    <div className={styles.earningsBar}>
+                      {availPct > 0 && (
+                        <div
+                          className={styles.earningsBarAvail}
+                          style={{ width: `${availPct}%` }}
+                        />
+                      )}
+                      {pendPct > 0 && (
+                        <div
+                          className={styles.earningsBarPend}
+                          style={{ width: `${pendPct}%` }}
+                        />
+                      )}
+                      {escrowPct > 0 && (
+                        <div
+                          className={styles.earningsBarEscrow}
+                          style={{ width: `${escrowPct}%` }}
+                        />
+                      )}
+                    </div>
+                  )}
+
+                  {/* Legend chips */}
+                  <div className={styles.earningsChips}>
+                    {e.available > 0 && (
+                      <span className={styles.chipAvail}>
+                        <span
+                          className={styles.chipDot}
+                          style={{ background: "rgb(10,107,46)" }}
+                        />
+                        {sym}
+                        {Number(e.available).toLocaleString()} ready
+                      </span>
+                    )}
+                    {e.pending > 0 && (
+                      <span className={styles.chipPend}>
+                        <span
+                          className={styles.chipDot}
+                          style={{ background: "rgb(181,123,0)" }}
+                        />
+                        {sym}
+                        {Number(e.pending).toLocaleString()} releasing
+                      </span>
+                    )}
+                    {e.escrow > 0 && (
+                      <span className={styles.chipEscrow}>
+                        <span
+                          className={styles.chipDot}
+                          style={{ background: "rgb(21,101,192)" }}
+                        />
+                        {sym}
+                        {Number(e.escrow).toLocaleString()} escrow
+                        {e.escrow_count > 0 ? ` ×${e.escrow_count}` : ""}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
 
         {/* Tabs */}
