@@ -1,12 +1,12 @@
-// src/pages/settings/components/AppearanceSettings.jsx
 import { useState, useEffect } from "react";
 import styles from "../../pages/settings/Settings.module.css";
 import { Section, Field, Select, SaveButton, Toast } from "./SettingsUI";
+import { useSettings, useCurrencies } from "../../pages/hooks/useSettings";
 import {
-  useSettings,
-  useLanguages,
-  useCurrencies,
-} from "../../pages/hooks/useSettings";
+  ALL_LANGUAGES,
+  applyGoogleTranslate,
+  getCurrentTranslateLang,
+} from "../../utils/translate";
 
 const THEMES = [
   { value: "light", label: "Light", icon: "☀️" },
@@ -16,7 +16,6 @@ const THEMES = [
 
 export default function AppearanceSettings() {
   const { settings, loading, update } = useSettings();
-  const languages = useLanguages();
   const currencies = useCurrencies();
 
   const [form, setForm] = useState({
@@ -28,11 +27,12 @@ export default function AppearanceSettings() {
   const [toast, setToast] = useState(null);
   const [init, setInit] = useState(false);
 
+  // On mount, read the active Google Translate language from cookie
   useEffect(() => {
     if (settings && !init) {
       setForm({
         theme: settings.theme || "system",
-        language: settings.language || "en",
+        language: getCurrentTranslateLang(),
         currency: settings.currency || "NGN",
       });
       setInit(true);
@@ -54,6 +54,13 @@ export default function AppearanceSettings() {
   function handleThemeChange(theme) {
     setForm((f) => ({ ...f, theme }));
     applyTheme(theme);
+  }
+
+  function handleLanguageChange(e) {
+    const lang = e.target.value;
+    setForm((f) => ({ ...f, language: lang }));
+    // Apply immediately — no need to save first
+    applyGoogleTranslate(lang);
   }
 
   async function handleSubmit(e) {
@@ -90,7 +97,6 @@ export default function AppearanceSettings() {
         type={toast?.type}
         onClose={() => setToast(null)}
       />
-
       <form onSubmit={handleSubmit}>
         {/* Theme */}
         <Section
@@ -118,24 +124,21 @@ export default function AppearanceSettings() {
         {/* Language */}
         <Section
           title="Language"
-          description="Choose your preferred language. The interface will update immediately."
+          description="Choose your language. The page translates immediately — all 133 languages are supported."
         >
           <Field label="Display language">
-            <Select
-              value={form.language}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, language: e.target.value }))
-              }
-            >
-              {languages.length === 0 && <option value="en">English</option>}
-              {languages.map((l) => (
+            <Select value={form.language} onChange={handleLanguageChange}>
+              {ALL_LANGUAGES.map((l) => (
                 <option key={l.code} value={l.code}>
-                  {l.native_name ? `${l.native_name} (${l.name})` : l.name}
-                  {l.rtl ? " ← RTL" : ""}
+                  {l.name}
                 </option>
               ))}
             </Select>
           </Field>
+          <p className={styles.hint} style={{ marginTop: 8 }}>
+            Powered by Google Translate. Selecting a language applies it
+            instantly.
+          </p>
         </Section>
 
         {/* Currency */}
