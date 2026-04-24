@@ -182,7 +182,7 @@ export default function MyBookings() {
                 {initials(user?.name)}
               </div>
             )}
-            <span className={styles.userName}>{user?.name?.split(" ")[0]}</span>
+            {/* <span className={styles.userName}>{user?.name?.split(" ")[0]}</span> */}
           </div>
           <button className={styles.logoutBtn} onClick={handleLogout}>
             Logout
