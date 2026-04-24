@@ -113,12 +113,17 @@ export const ALL_LANGUAGES = [
 
 export function applyGoogleTranslate(langCode) {
   if (langCode === "en") {
-    // Reset to English — clear cookie and reload
+    // Set combo to original language first, then clear cookie and reload
+    const combo = document.querySelector(".goog-te-combo");
+    if (combo) {
+      combo.value = "en";
+      combo.dispatchEvent(new Event("change"));
+    }
     const expiry = "Thu, 01 Jan 1970 00:00:00 UTC";
     document.cookie = `googtrans=; expires=${expiry}; path=/`;
     document.cookie = `googtrans=; expires=${expiry}; path=/; domain=${location.hostname}`;
     document.cookie = `googtrans=; expires=${expiry}; path=/; domain=.${location.hostname}`;
-    window.location.reload();
+    setTimeout(() => window.location.reload(), 200);
     return;
   }
 
