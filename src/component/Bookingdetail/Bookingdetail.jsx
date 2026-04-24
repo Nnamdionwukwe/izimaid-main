@@ -365,7 +365,7 @@ export default function BookingDetail() {
 
   const canSOS = ["confirmed", "in_progress"].includes(booking.status);
   const canVideo = ["confirmed", "in_progress"].includes(booking.status);
-  const showMap = booking.status === "in_progress" && location;
+  const showMap = !!location;
 
   return (
     <div className={styles.page}>

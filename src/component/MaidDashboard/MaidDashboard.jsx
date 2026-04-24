@@ -1408,39 +1408,74 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                   <>
                     <button
                       className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
-                      onClick={() => updateStatus(b.id, "confirmed")}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateStatus(b.id, "confirmed");
+                      }}
                     >
-                      Accept
+                      ✅ Accept
                     </button>
                     <button
                       className={styles.actionBtn}
-                      onClick={() => setDeclineModal(b)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeclineModal(b);
+                      }}
                     >
                       Decline
                     </button>
                   </>
                 )}
+
+                {/* confirmed — must check in with GPS, so navigate to detail */}
                 {b.status === "confirmed" && (
                   <button
                     className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
-                    onClick={() => updateStatus(b.id, "in_progress")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/bookings/${b.id}`, { state: { booking: b } });
+                    }}
                   >
-                    Start Cleaning
+                    📍 Check In & Start Job
                   </button>
                 )}
+
+                {/* in_progress — check out or mark complete, both need detail page */}
                 {b.status === "in_progress" && (
-                  <button
-                    className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
-                    onClick={() => updateStatus(b.id, "completed")}
-                  >
-                    Mark Complete
-                  </button>
+                  <>
+                    <button
+                      className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/bookings/${b.id}`, {
+                          state: { booking: b },
+                        });
+                      }}
+                    >
+                      📍 Check Out
+                    </button>
+                    <button
+                      className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
+                      style={{
+                        background: "rgb(10,107,46)",
+                        borderColor: "rgb(10,107,46)",
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateStatus(b.id, "completed");
+                      }}
+                    >
+                      ✅ Mark Complete
+                    </button>
+                  </>
                 )}
+
                 {b.status === "declined" && (
                   <p style={{ fontSize: 12, color: "gray", margin: 0 }}>
                     Declined on {formatDate(b.updated_at)}
                   </p>
                 )}
+
                 {["pending", "confirmed", "in_progress", "completed"].includes(
                   b.status,
                 ) && (
@@ -1463,6 +1498,7 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                     💬 Chat Customer
                   </button>
                 )}
+
                 <button
                   className={styles.actionBtn}
                   style={{
