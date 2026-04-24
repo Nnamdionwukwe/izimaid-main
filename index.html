@@ -13,6 +13,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+
     <style>
       html,
       body {
@@ -20,18 +21,87 @@
         margin: 0;
         padding: 0;
       }
-
-      /* Prevent iOS Safari from zooming the page when any input or textarea
-         is focused. Safari only zooms when font-size is below 16px. */
       input,
       textarea,
       select {
         font-size: 16px !important;
       }
+
+      /* ── Google Translate widget styling ── */
+      #google_translate_element {
+        position: fixed;
+        bottom: 16px;
+        left: 16px;
+        z-index: 99999;
+      }
+      /* Hide the Google branding bar that appears at top */
+      .goog-te-banner-frame,
+      .skiptranslate > iframe {
+        display: none !important;
+      }
+      body {
+        top: 0 !important;
+      }
+      /* Style the select dropdown to match the platform */
+      .goog-te-gadget-simple {
+        background: rgb(19, 19, 103) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 8px !important;
+        padding: 6px 10px !important;
+        cursor: pointer;
+      }
+      .goog-te-gadget-simple .goog-te-menu-value span {
+        color: white !important;
+        font-size: 12px !important;
+        font-weight: bold !important;
+        font-family: Arial, sans-serif !important;
+      }
+      .goog-te-gadget-simple .goog-te-menu-value span:last-child {
+        color: rgba(255, 255, 255, 0.6) !important;
+      }
+      .goog-te-gadget-simple img {
+        display: none !important;
+      }
+      /* Hide "Powered by Google" text */
+      .goog-te-gadget {
+        font-size: 0 !important;
+      }
+      .goog-te-gadget > span > a {
+        display: none !important;
+      }
+      /* Mobile: move to bottom-right so it doesn't cover nav */
+      @media (max-width: 480px) {
+        #google_translate_element {
+          bottom: 12px;
+          left: 12px;
+        }
+      }
     </style>
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- Google Translate widget container -->
+    <div id="google_translate_element"></div>
+
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            includedLanguages: "", // empty = all languages
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false,
+          },
+          "google_translate_element",
+        );
+      }
+    </script>
+    <script
+      type="text/javascript"
+      src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+    ></script>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
