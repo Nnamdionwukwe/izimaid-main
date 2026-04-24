@@ -256,7 +256,14 @@ function MediaStrip({ files, onRemove }) {
 //   otherName   — display name of the other party
 //   otherAvatar — avatar url (optional)
 //   onClose     — called when user taps ← back
-export default function Chat({ bookingId, otherName, otherAvatar, onClose }) {
+
+export default function Chat({
+  bookingId,
+  conversationId: directConvId,
+  otherName,
+  otherAvatar,
+  onClose,
+}) {
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -274,20 +281,38 @@ export default function Chat({ bookingId, otherName, otherAvatar, onClose }) {
   const me = JSON.parse(localStorage.getItem("user") || "{}");
 
   // ── Load conversation ──
+  // Chat.jsx — update props and load logic:
+
   const load = useCallback(
     async (silent = false) => {
       if (!silent) setLoading(true);
       try {
-        const res = await fetch(`${CHAT_URL}/booking/${bookingId}`, {
-          headers: authH(),
-        });
-        if (!res.ok) throw new Error("Failed to load chat");
-        const data = await res.json();
-        setConversation(data.conversation);
-        setMessages(data.messages || []);
+        let data;
+        if (directConvId) {
+          // Direct conversation ID — used for inquiry chats
+          const token = localStorage.getItem("token");
+          const res = await fetch(`${CHAT_URL}/${directConvId}/messages`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          // If you don't have this endpoint, fall back to re-fetching via booking
+          // For now just re-use the booking endpoint pattern
+          data = await res.json();
+          setConversation({ id: directConvId });
+          setMessages(data.messages || []);
+        } else {
+          // Original booking-based load
+          const res = await fetch(`${CHAT_URL}/booking/${bookingId}`, {
+            headers: authH(),
+          });
+          if (!res.ok) throw new Error("Failed to load chat");
+          data = await res.json();
+          setConversation(data.conversation);
+          setMessages(data.messages || []);
+        }
         // Mark read
-        if (data.conversation?.id) {
-          fetch(`${CHAT_URL}/${data.conversation.id}/read`, {
+        const convId = directConvId || data?.conversation?.id;
+        if (convId) {
+          fetch(`${CHAT_URL}/${convId}/read`, {
             method: "PATCH",
             headers: authH(),
           }).catch(() => {});
@@ -298,7 +323,7 @@ export default function Chat({ bookingId, otherName, otherAvatar, onClose }) {
         if (!silent) setLoading(false);
       }
     },
-    [bookingId],
+    [bookingId, directConvId],
   );
 
   useEffect(() => {

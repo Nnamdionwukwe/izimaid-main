@@ -73,6 +73,7 @@ import VerifyEmail from "./component/VerifyEmail/VerifyEmail.jsx";
 import ResetPassword from "./component/ResetPassword/ResetPassword.jsx";
 import WithdrawTab from "./component/WithdrawTab/WithdrawPage.jsx";
 import SubscriptionVerify from "./pages/subscription/SubscriptionVerify.jsx";
+import InquiryChat from "./component/AdminDashboard/InquiryChat/InquiryChat.jsx";
 
 function App() {
   return (
@@ -223,6 +224,8 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      <Route path="/chat/inquiry/:maidId" element={<InquiryChat />} />
 
       <Route path="/terms-of-service" element={<TermsOfService />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />

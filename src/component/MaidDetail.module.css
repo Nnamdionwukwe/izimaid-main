@@ -9,10 +9,10 @@
 }
 
 .backBtn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   border: none;
   background: transparent;
   color: rgb(19, 19, 103);
@@ -26,91 +26,91 @@
   opacity: 0.7;
 }
 
-/* ── Header ─────────────────────────────────────────────────── */
+/* ── Header card ─────────────────────────────────────────── */
 .header {
   display: flex;
-  gap: 24px;
+  gap: 20px;
   align-items: flex-start;
-  background: linear-gradient(135deg, rgb(245, 245, 255) 0%, white 100%);
+  background: rgb(248, 248, 255);
+  border: 1px solid rgb(228, 228, 240);
+  border-radius: 16px;
   padding: 24px;
-  border-radius: 12px;
   margin-bottom: 32px;
-  border: 1px solid rgb(240, 240, 245);
-  flex-wrap: wrap;
 }
 
 .headerAvatarWrap {
-  position: relative;
   flex-shrink: 0;
 }
 
 .avatar {
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   border-radius: 12px;
   object-fit: cover;
+  display: block;
 }
 .avatarPlaceholder {
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   border-radius: 12px;
-  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
+  font-size: 36px;
   font-weight: bold;
-  background: linear-gradient(135deg, rgb(200, 200, 220), rgb(150, 150, 180));
+  background: rgb(200, 200, 230);
   color: white;
 }
 
 .headerInfo {
   flex: 1;
-  min-width: 200px;
+  min-width: 0;
 }
 
 .headerNameRow {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: 8px;
   flex-wrap: wrap;
+  margin-bottom: 6px;
 }
 .name {
   margin: 0;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: bold;
   color: rgb(19, 19, 103);
+  line-height: 1.2;
 }
 .badges {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   flex-wrap: wrap;
-  padding-top: 4px;
+  padding-top: 3px;
 }
 .badge {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  padding: 3px 10px;
+  padding: 3px 8px;
   border-radius: 20px;
+  white-space: nowrap;
 }
 
 .location {
-  margin: 0 0 10px;
-  font-size: 14px;
+  margin: 0 0 8px;
+  font-size: 13px;
   color: gray;
 }
 
 .rating {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 6px;
   flex-wrap: wrap;
+  margin-bottom: 8px;
 }
 .ratingNumber {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
-  color: rgb(255, 165, 0);
+  color: rgb(200, 140, 0);
 }
 .ratingCount {
   font-size: 12px;
@@ -120,81 +120,133 @@
   font-size: 11px;
   font-weight: 700;
   color: rgb(19, 19, 103);
-  background: rgb(240, 240, 255);
-  padding: 2px 10px;
+  background: rgb(235, 235, 255);
+  padding: 2px 8px;
   border-radius: 20px;
 }
 
 .headerRate {
   display: flex;
   align-items: baseline;
-  gap: 10px;
-  margin-bottom: 6px;
+  gap: 8px;
   flex-wrap: wrap;
+  margin-bottom: 6px;
 }
 .primaryRate {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   color: rgb(19, 19, 103);
 }
 .rateUnit {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 400;
   color: gray;
 }
 .altRate {
-  font-size: 13px;
+  font-size: 12px;
   color: gray;
 }
 
 .pricingNote {
   font-size: 12px;
   color: gray;
-  margin: 0;
+  margin: 0 0 12px;
   font-style: italic;
 }
 
+/* ── Contact chips ──────────────────────────────────────── */
+.contactRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.contactChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid rgb(220, 220, 235);
+  border-radius: 99px;
+  text-decoration: none;
+  color: rgb(47, 47, 47);
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+  max-width: 100%;
+  overflow: hidden;
+}
+.contactChip:hover {
+  background: rgb(240, 240, 255);
+  border-color: rgb(19, 19, 103);
+  color: rgb(19, 19, 103);
+}
+.contactChipIcon {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.contactChipText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Action buttons ─────────────────────────────────────── */
+.actionRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 .bookBtn {
-  padding: 12px 24px;
+  padding: 10px 22px;
   background: rgb(19, 19, 103);
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   cursor: pointer;
   transition: background 0.2s;
   white-space: nowrap;
-  align-self: flex-start;
 }
 .bookBtn:hover {
   background: rgb(15, 15, 80);
 }
 
-/* ── Content layout ─────────────────────────────────────────── */
+.chatBtn {
+  padding: 10px 18px;
+  background: white;
+  color: rgb(19, 19, 103);
+  border: 1.5px solid rgb(19, 19, 103);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.chatBtn:hover {
+  background: rgb(19, 19, 103);
+  color: white;
+}
+
+/* ── Content layout ─────────────────────────────────────── */
 .content {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 32px;
 }
 
-@media (max-width: 768px) {
-  .content {
-    grid-template-columns: 1fr;
-  }
-  .header {
-    flex-direction: column;
-    gap: 16px;
-  }
-}
-
-/* ── Sections ───────────────────────────────────────────────── */
+/* ── Sections ───────────────────────────────────────────── */
 .section {
   margin-bottom: 24px;
 }
 .sectionTitle {
-  margin: 0 0 14px;
-  font-size: 16px;
+  margin: 0 0 12px;
+  font-size: 15px;
   font-weight: bold;
   color: rgb(19, 19, 103);
 }
@@ -205,11 +257,11 @@
   color: rgb(70, 70, 70);
 }
 
-/* ── Pricing grid ───────────────────────────────────────────── */
+/* ── Pricing grid ───────────────────────────────────────── */
 .priceGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 .priceCard {
   background: rgb(245, 245, 255);
@@ -221,36 +273,35 @@
   gap: 4px;
 }
 .priceLabel {
-  font-size: 11px;
+  font-size: 10px;
   color: gray;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-weight: 600;
+  font-weight: 700;
 }
 .priceValue {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 800;
   color: rgb(19, 19, 103);
 }
 
-/* Custom rates */
 .customRates {
   margin-top: 12px;
   border-top: 1px solid rgb(228, 228, 228);
   padding-top: 12px;
 }
 .customRatesTitle {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: gray;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
 }
 .customRateRow {
   display: flex;
   justify-content: space-between;
-  padding: 7px 0;
+  padding: 6px 0;
   border-bottom: 1px solid rgb(240, 240, 240);
   font-size: 13px;
   color: rgb(47, 47, 47);
@@ -263,14 +314,14 @@
   color: rgb(19, 19, 103);
 }
 
-/* ── Services ───────────────────────────────────────────────── */
+/* ── Services ───────────────────────────────────────────── */
 .services {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 .serviceTag {
-  padding: 6px 12px;
+  padding: 5px 12px;
   background: rgb(240, 240, 255);
   color: rgb(19, 19, 103);
   border-radius: 20px;
@@ -279,17 +330,17 @@
   border: 1px solid rgb(200, 210, 240);
 }
 
-/* ── Availability ───────────────────────────────────────────── */
+/* ── Availability ───────────────────────────────────────── */
 .availGrid {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 .availRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: 7px 11px;
   border-radius: 8px;
   font-size: 13px;
 }
@@ -304,7 +355,7 @@
 .availDay {
   font-weight: 700;
   color: rgb(47, 47, 47);
-  width: 36px;
+  width: 34px;
 }
 .availTime {
   font-weight: 600;
@@ -313,29 +364,30 @@
 .availOff {
   color: #bbb;
   font-style: italic;
+  font-size: 12px;
 }
 
-/* ── Experience box ─────────────────────────────────────────── */
+/* ── Details box ────────────────────────────────────────── */
 .experienceBox {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 .experienceItem {
-  padding: 12px;
+  padding: 11px 12px;
   background: rgb(248, 248, 255);
   border-radius: 8px;
   border: 1px solid rgb(240, 240, 245);
 }
 .experienceLabel {
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   color: gray;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 .experienceValue {
   display: block;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   color: rgb(19, 19, 103);
 }
@@ -346,20 +398,14 @@
   color: rgb(178, 34, 34) !important;
 }
 
-/* ── Reviews ────────────────────────────────────────────────── */
+/* ── Reviews ────────────────────────────────────────────── */
 .right {
   border-left: 1px solid rgb(240, 240, 245);
-  padding-left: 32px;
-}
-@media (max-width: 768px) {
-  .right {
-    border-left: none;
-    padding-left: 0;
-  }
+  padding-left: 28px;
 }
 
 .noReviews {
-  padding: 40px 20px;
+  padding: 36px 20px;
   text-align: center;
   background: rgb(248, 248, 255);
   border-radius: 8px;
@@ -372,11 +418,11 @@
 .reviewsList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 .reviewCard {
-  padding: 14px;
+  padding: 13px;
   background: rgb(248, 248, 255);
   border-radius: 8px;
   border: 1px solid rgb(240, 240, 245);
@@ -385,21 +431,21 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .reviewerInfo {
   display: flex;
-  gap: 10px;
+  gap: 9px;
   align-items: flex-start;
 }
 .reviewerAvatar {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgb(200, 200, 220), rgb(150, 150, 180));
+  background: rgb(180, 180, 210);
   color: white;
   font-size: 12px;
   font-weight: bold;
@@ -418,7 +464,7 @@
 }
 .reviewRating {
   font-size: 12px;
-  color: rgb(255, 165, 0);
+  color: rgb(200, 140, 0);
   white-space: nowrap;
 }
 .reviewComment {
@@ -428,19 +474,19 @@
   color: rgb(70, 70, 70);
 }
 
-/* ── Pagination ─────────────────────────────────────────────── */
+/* ── Pagination ─────────────────────────────────────────── */
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 12px;
-  padding: 16px;
+  padding: 14px;
   background: rgb(248, 248, 255);
   border-radius: 8px;
 }
 .pageBtn {
-  padding: 8px 12px;
-  border: 1px solid rgb(240, 240, 245);
+  padding: 7px 12px;
+  border: 1px solid rgb(228, 228, 240);
   background: white;
   border-radius: 6px;
   font-size: 12px;
@@ -460,6 +506,147 @@
 .pageInfo {
   font-size: 12px;
   color: gray;
-  min-width: 50px;
+  min-width: 44px;
   text-align: center;
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+  .right {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgb(240, 240, 245);
+    padding-top: 24px;
+  }
+  .header {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+  }
+  .avatar,
+  .avatarPlaceholder {
+    width: 80px;
+    height: 80px;
+    font-size: 26px;
+  }
+  .name {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 12px;
+  }
+  .header {
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px;
+  }
+  .avatar,
+  .avatarPlaceholder {
+    width: 72px;
+    height: 72px;
+  }
+  .actionRow {
+    flex-direction: column;
+  }
+  .bookBtn,
+  .chatBtn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    padding: 12px;
+  }
+  .contactChip {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+  .priceGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .experienceBox {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Contact & Chat ─────────────────────────────────────────── */
+.contactRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  align-items: center;
+}
+
+.contactBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid rgb(220, 220, 235);
+  border-radius: 8px;
+  background: rgb(248, 248, 255);
+  color: rgb(19, 19, 103);
+  font-size: 13px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.contactBtn:hover {
+  background: rgb(235, 235, 255);
+}
+
+.contactIcon {
+  font-size: 14px;
+}
+
+.chatBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: rgb(19, 19, 103);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.chatBtn:hover {
+  background: rgb(15, 15, 80);
+}
+
+.chatBtnDisabled {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: rgb(228, 228, 228);
+  color: rgb(140, 140, 140);
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .contactRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .contactBtn,
+  .chatBtn,
+  .chatBtnDisabled {
+    width: 100%;
+    justify-content: center;
+  }
 }

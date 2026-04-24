@@ -103,6 +103,13 @@ export default function MaidDetail() {
 
   const totalPages = Math.ceil(totalReviews / REVIEWS_PER_PAGE);
 
+  // Remove the booking lookup useEffect and latestBookingId state.
+  // Replace with just:
+  const token = localStorage.getItem("token");
+  const userStr = localStorage.getItem("user");
+  const currentUser = userStr ? JSON.parse(userStr) : null;
+  const isCustomer = currentUser?.role === "customer";
+
   if (loading)
     return (
       <div className={styles.page}>
@@ -159,6 +166,7 @@ export default function MaidDetail() {
 
       {/* ── Header ─────────────────────────────────────────────── */}
       <div className={styles.header}>
+        {/* Avatar */}
         <div className={styles.headerAvatarWrap}>
           {maid.avatar ? (
             <img
@@ -179,6 +187,7 @@ export default function MaidDetail() {
           </div>
         </div>
 
+        {/* Info */}
         <div className={styles.headerInfo}>
           <div className={styles.headerNameRow}>
             <h1 className={styles.name}>{maid.name}</h1>
@@ -191,7 +200,7 @@ export default function MaidDetail() {
                     color: "rgb(27,94,32)",
                   }}
                 >
-                  🪪 ID Verified
+                  🪪 Verified
                 </span>
               )}
               {maid.background_checked && (
@@ -202,7 +211,7 @@ export default function MaidDetail() {
                     color: "rgb(13,71,161)",
                   }}
                 >
-                  🔍 Background Checked
+                  🔍 Checked
                 </span>
               )}
             </div>
@@ -245,14 +254,51 @@ export default function MaidDetail() {
           {maid.pricing_note && (
             <p className={styles.pricingNote}>💬 {maid.pricing_note}</p>
           )}
-        </div>
 
-        <button
-          className={styles.bookBtn}
-          onClick={() => navigate(`/book/${maid.id}`, { state: { maid } })}
-        >
-          Book Now
-        </button>
+          {/* ── Contact row ──────────────────────────────────────── */}
+          <div className={styles.contactRow}>
+            {maid.phone && (
+              <a href={`tel:${maid.phone}`} className={styles.contactChip}>
+                <span className={styles.contactChipIcon}>📞</span>
+                <span className={styles.contactChipText}>{maid.phone}</span>
+              </a>
+            )}
+            {maid.email && (
+              <a href={`mailto:${maid.email}`} className={styles.contactChip}>
+                <span className={styles.contactChipIcon}>✉️</span>
+                <span className={styles.contactChipText}>{maid.email}</span>
+              </a>
+            )}
+          </div>
+
+          {/* ── Action buttons ───────────────────────────────────── */}
+          <div className={styles.actionRow}>
+            <button
+              className={styles.bookBtn}
+              onClick={() => navigate(`/book/${maid.id}`, { state: { maid } })}
+            >
+              Book Now
+            </button>
+
+            {token && isCustomer ? (
+              <button
+                className={styles.chatBtn}
+                onClick={() =>
+                  navigate(`/chat/inquiry/${maid.id}`, { state: { maid } })
+                }
+              >
+                💬 Message
+              </button>
+            ) : !token ? (
+              <button
+                className={styles.chatBtn}
+                onClick={() => navigate("/login")}
+              >
+                💬 Login to Message
+              </button>
+            ) : null}
+          </div>
+        </div>
       </div>
 
       {/* ── Content grid ───────────────────────────────────────── */}
