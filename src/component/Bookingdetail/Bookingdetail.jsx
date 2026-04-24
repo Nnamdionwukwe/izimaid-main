@@ -48,23 +48,29 @@ function formatDate(d) {
   });
 }
 
-function LiveMap({ lat, lng }) {
+// Replace the LiveMap component:
+function LiveMap({ lat, lng, updatedAt }) {
   if (!lat || !lng) return null;
-  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.005},${lat - 0.005},${lng + 0.005},${lat + 0.005}&layer=mapnik&marker=${lat},${lng}`;
-  const googleUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+
+  // Google Maps embed — no API key needed for basic embed
+  const googleEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
+  const googleDirectUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+
   return (
     <div className={styles.mapWrap}>
       <iframe
-        title="Live Location"
-        src={mapUrl}
+        title="Maid Live Location"
+        src={googleEmbedUrl}
         className={styles.mapIframe}
         frameBorder="0"
-        scrolling="no"
+        allowFullScreen
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
       />
       <div className={styles.mapOverlay}>
-        <span className={styles.mapLiveTag}>🔴 LIVE</span>
+        <span className={styles.mapLiveTag}>📍 LIVE</span>
         <a
-          href={googleUrl}
+          href={googleDirectUrl}
           target="_blank"
           rel="noopener noreferrer"
           className={styles.mapGoogleLink}
@@ -72,6 +78,11 @@ function LiveMap({ lat, lng }) {
           Open in Google Maps ↗
         </a>
       </div>
+      {updatedAt && (
+        <p className={styles.mapUpdatedAt}>
+          🕐 Last updated: {new Date(updatedAt).toLocaleTimeString()}
+        </p>
+      )}
     </div>
   );
 }
@@ -140,20 +151,22 @@ export default function BookingDetail() {
     fetchPayment();
   }, [id]);
 
+  // Replace the location polling useEffect:
   useEffect(() => {
-    if (booking?.status !== "in_progress") return;
+    // Poll when confirmed or in_progress (covers checkin → checkout window)
+    if (!["confirmed", "in_progress"].includes(booking?.status)) return;
+
     async function pollLocation() {
       try {
         const res = await fetch(`${API_URL}/api/bookings/${id}/location`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        if (res.ok && data.tracking && data.location)
-          setLocation(data.location);
+        if (res.ok && data.location) setLocation(data.location);
       } catch {}
     }
     pollLocation();
-    pollRef.current = setInterval(pollLocation, 20000);
+    pollRef.current = setInterval(pollLocation, 15000); // every 15s
     return () => clearInterval(pollRef.current);
   }, [booking?.status, id]);
 
@@ -208,7 +221,7 @@ export default function BookingDetail() {
           setLocation({
             lat: coords.latitude,
             lng: coords.longitude,
-            recorded_at: new Date(),
+            recorded_at: new Date().toISOString(),
           });
         } catch (err) {
           setError(err.message);
@@ -247,6 +260,10 @@ export default function BookingDetail() {
           const data = await res.json();
           if (!res.ok) throw new Error(data.error);
           setBooking((prev) => ({ ...prev, ...data.booking }));
+          setLocation((prev) => ({
+            ...prev,
+            recorded_at: new Date().toISOString(),
+          }));
           clearInterval(pollRef.current);
         } catch (err) {
           setError(err.message);
@@ -355,14 +372,12 @@ export default function BookingDetail() {
       <button className={styles.backBtn} onClick={() => navigate(-1)}>
         ← Back
       </button>
-
       {activeSOS.length > 0 && (
         <div className={styles.sosBanner}>
           🚨 <strong>SOS ACTIVE</strong> — Emergency services notified.
           Triggered by: {activeSOS[0]?.triggered_by_name}
         </div>
       )}
-
       <div className={styles.header}>
         <h1 className={styles.headerTitle}>Booking Details</h1>
         <span
@@ -376,15 +391,44 @@ export default function BookingDetail() {
 
       {showMap && (
         <div className={styles.section}>
-          <p className={styles.sectionTitle}>📍 Live Location</p>
-          <LiveMap lat={location.lat} lng={location.lng} />
-          <p className={styles.liveLocText}>
-            🧹 {booking.maid_name} is on the job · Updated{" "}
-            {new Date(location.recorded_at).toLocaleTimeString()}
+          <p className={styles.sectionTitle}>
+            📍{" "}
+            {booking.status === "in_progress"
+              ? "Live Location"
+              : booking.status === "completed"
+                ? "Final Check-Out Location"
+                : "Check-In Location"}
           </p>
+          <LiveMap
+            lat={location.lat}
+            lng={location.lng}
+            updatedAt={location.recorded_at}
+          />
+          <div className={styles.locationMeta}>
+            <span
+              className={`${styles.locationStatus} ${
+                booking.status === "in_progress"
+                  ? styles.locationLive
+                  : styles.locationStatic
+              }`}
+            >
+              {booking.status === "in_progress"
+                ? "🟢 Tracking active"
+                : "⚪ Last known location"}
+            </span>
+            {!isMaid && booking.status === "in_progress" && (
+              <span className={styles.locationHint}>
+                🧹 {booking.maid_name} is currently on your job
+              </span>
+            )}
+            {isMaid && booking.status === "in_progress" && (
+              <span className={styles.locationHint}>
+                Your location is visible to the customer
+              </span>
+            )}
+          </div>
         </div>
       )}
-
       {(canSOS || canVideo) && (
         <div className={styles.quickActions}>
           {canVideo && (
@@ -412,7 +456,6 @@ export default function BookingDetail() {
           )}
         </div>
       )}
-
       {canSOS && !sosSent && (
         <div className={styles.sosInputWrap}>
           <input
@@ -424,7 +467,6 @@ export default function BookingDetail() {
           />
         </div>
       )}
-
       <div className={styles.section}>
         <p className={styles.sectionTitle}>{isMaid ? "Customer" : "Maid"}</p>
         <div className={styles.row}>
@@ -434,7 +476,6 @@ export default function BookingDetail() {
           </span>
         </div>
       </div>
-
       <div className={styles.section}>
         <p className={styles.sectionTitle}>Booking Info</p>
         <div className={styles.row}>
@@ -480,7 +521,6 @@ export default function BookingDetail() {
           <span>{fmtAmt(booking.total_amount, currency)}</span>
         </div>
       </div>
-
       {(booking.payment_status || payment) && (
         <div className={styles.section}>
           <p className={styles.sectionTitle}>Payment</p>
@@ -525,7 +565,6 @@ export default function BookingDetail() {
           )}
         </div>
       )}
-
       {emergency.length > 0 && (
         <div className={styles.section}>
           <p className={styles.sectionTitle}>
@@ -560,9 +599,7 @@ export default function BookingDetail() {
           ))}
         </div>
       )}
-
       {error && <p className={styles.error}>{error}</p>}
-
       <div className={styles.actions}>
         {isCustomer && booking.status === "awaiting_payment" && (
           <button
@@ -634,7 +671,6 @@ export default function BookingDetail() {
           </>
         )}
       </div>
-
       {isCustomer && booking.status === "completed" && !reviewed && (
         <div className={styles.section} style={{ marginTop: 16 }}>
           <p className={styles.sectionTitle}>Leave a Review</p>
@@ -666,7 +702,6 @@ export default function BookingDetail() {
           </div>
         </div>
       )}
-
       {reviewed && (
         <div
           className={styles.section}
