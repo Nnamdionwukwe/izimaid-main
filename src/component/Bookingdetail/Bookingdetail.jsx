@@ -661,13 +661,18 @@ export default function BookingDetail() {
         )}
         {isMaid && booking.status === "in_progress" && (
           <>
-            <button
-              className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
-              disabled={actionLoading === "checkout"}
-              onClick={handleCheckOut}
-            >
-              {actionLoading === "checkout" ? "Checking out…" : "📍 Check Out"}
-            </button>
+            {/* ── Only show Check Out if not yet checked out ── */}
+            {!booking.checkout_at && (
+              <button
+                className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
+                disabled={actionLoading === "checkout"}
+                onClick={handleCheckOut}
+              >
+                {actionLoading === "checkout"
+                  ? "📍 Getting location…"
+                  : "📍 Check Out"}
+              </button>
+            )}
             <button
               className={`${styles.actionBtn} ${styles.actionBtnSecondary}`}
               disabled={actionLoading === "completed"}
