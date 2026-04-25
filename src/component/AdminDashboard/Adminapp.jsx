@@ -9,6 +9,7 @@ import AdminChats from "./AdminChats.jsx";
 import AdminSupportChats from "./AdminSupportChats.jsx";
 import AdminMaidSupportChats from "./AdminMaidSupportChats.jsx";
 import AdminPayments from "./Adminpayments.jsx";
+import AdminDocuments from "./AdminDocuments.jsx";
 
 export default function AdminApp({ onLogout }) {
   const [view, setView] = useState("leads");
@@ -45,8 +46,14 @@ export default function AdminApp({ onLogout }) {
     return <AdminMaidSupportChats onBack={() => setView("leads")} />;
   }
 
-  if (view === "payments")
+  if (view === "payments") {
     return <AdminPayments onBack={() => setView("leads")} />;
+  }
+
+  // ── NEW ────────────────────────────────────────────────────────────────────
+  if (view === "documents") {
+    return <AdminDocuments onBack={() => setView("leads")} />;
+  }
 
   return <AdminDashboard onLogout={onLogout} onNavigate={setView} />;
 }
