@@ -609,3 +609,308 @@
   margin: 0;
   line-height: 1.5;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   APPEND these classes to the bottom of AdminBookings.module.css
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Tab bar ─────────────────────────────────────────────────────────────── */
+.tabBar {
+  display: flex;
+  gap: 0;
+  padding: 0 16px;
+  border-bottom: 2px solid #e8e6e0;
+  margin-bottom: 0;
+}
+
+.tabBtn {
+  padding: 12px 18px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: #888;
+  cursor: pointer;
+  font-family: "DM Sans", sans-serif;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s;
+}
+
+.tabBtn:hover {
+  color: #1a1a2e;
+}
+
+.tabBtnActive {
+  color: #1a1a2e;
+  border-bottom-color: #1a1a2e;
+  font-weight: 600;
+}
+
+.tabBadge {
+  background: rgb(187, 19, 47);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* ── SOS card ─────────────────────────────────────────────────────────────── */
+.sosCard {
+  border-color: rgb(220, 38, 38);
+  border-left: 3px solid rgb(220, 38, 38);
+}
+
+.sosActiveBadge {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgb(254, 226, 226);
+  color: rgb(187, 19, 47);
+}
+
+.sosMessage {
+  padding: 8px 12px;
+  background: rgb(255, 243, 205);
+  border-left: 3px solid rgb(245, 158, 11);
+  border-radius: 0 6px 6px 0;
+  font-size: 12px;
+  color: rgb(92, 70, 0);
+  margin: 0 16px 10px;
+  line-height: 1.5;
+}
+
+.sosResolved {
+  padding: 6px 16px 10px;
+  font-size: 11px;
+  color: rgb(22, 163, 74);
+  font-style: italic;
+}
+
+.sosResolveWrap {
+  border-top: 1px solid #f0ede6;
+}
+
+.sosNotesInput {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-top: 1px solid #f0ede6;
+  font-size: 13px;
+  font-family: "DM Sans", sans-serif;
+  color: #333;
+  outline: none;
+  background: #fafaf8;
+}
+
+.sosNotesInput::placeholder {
+  color: #bbb;
+}
+
+.actionBtnSuccess {
+  background: rgb(22, 163, 74);
+  color: #fff;
+  border-color: rgb(22, 163, 74);
+}
+
+.actionBtnSuccess:hover {
+  background: rgb(18, 130, 58);
+}
+
+/* ── SOS banner (in modal) ───────────────────────────────────────────────── */
+.sosBanner {
+  background: rgb(254, 226, 226);
+  border: 1px solid rgb(220, 38, 38);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.sosBannerTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgb(187, 19, 47);
+  margin: 0 0 4px;
+}
+
+.sosBannerBody {
+  font-size: 12px;
+  color: rgb(120, 20, 20);
+  margin: 0 0 6px;
+}
+
+.sosBannerLink {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(187, 19, 47);
+  text-decoration: none;
+}
+
+.sosBannerLink:hover {
+  text-decoration: underline;
+}
+
+/* ── Payment approval banner ─────────────────────────────────────────────── */
+.approvalBanner {
+  background: rgb(209, 250, 229);
+  border: 1px solid rgb(22, 163, 74);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.approvalBannerTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgb(10, 107, 46);
+  margin: 0 0 4px;
+}
+
+.approvalBannerBody {
+  font-size: 12px;
+  color: rgb(10, 80, 40);
+  margin: 0;
+}
+
+.approveBtn {
+  flex: 1;
+  height: 36px;
+  border-radius: 6px;
+  border: none;
+  background: rgb(22, 163, 74);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.approveBtn:hover {
+  background: rgb(18, 130, 58);
+}
+
+.approveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.rejectBtn {
+  flex: 1;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid rgb(220, 38, 38);
+  background: #fff;
+  color: rgb(187, 19, 47);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.rejectBtn:hover {
+  background: rgb(254, 226, 226);
+}
+
+/* ── Location row (in modal) ─────────────────────────────────────────────── */
+.locationRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f5f4f0;
+  gap: 16px;
+}
+
+.locationLink {
+  font-size: 13px;
+  color: rgb(30, 58, 138);
+  font-weight: 500;
+  text-decoration: none;
+  text-align: right;
+}
+
+.locationLink:hover {
+  text-decoration: underline;
+}
+
+/* ── Meta tag alert variant ──────────────────────────────────────────────── */
+.metaTagAlert {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgb(22, 163, 74);
+  background: rgb(209, 250, 229);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* ── Declined status badge ───────────────────────────────────────────────── */
+.statusDeclined {
+  background: rgba(196, 122, 26, 0.15);
+  color: #c47a1a;
+}
+
+/* ── Decline reason on card ──────────────────────────────────────────────── */
+.declineReason {
+  padding: 8px 12px;
+  background: rgba(196, 122, 26, 0.08);
+  border-left: 3px solid #c47a1a;
+  border-radius: 0 6px 6px 0;
+  font-size: 12px;
+  color: rgb(120, 80, 10);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.declineReasonLabel {
+  font-weight: 700;
+}
+
+/* ── Decline banner in modal ─────────────────────────────────────────────── */
+.declineBanner {
+  background: rgba(196, 122, 26, 0.1);
+  border: 1px solid rgba(196, 122, 26, 0.3);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.declineBannerTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #c47a1a;
+  margin: 0 0 6px;
+}
+
+.declineBannerReason {
+  font-size: 13px;
+  color: rgb(100, 70, 10);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media screen and (min-width: 768px) {
+  .tabBar {
+    padding: 0 24px;
+  }
+  .tabBtn {
+    padding: 12px 22px;
+    font-size: 14px;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .tabBar {
+    padding: 0 32px;
+  }
+}
