@@ -109,6 +109,8 @@ export default function BookingDetail() {
   const [sosSent, setSosSent] = useState(false);
   const [videoLoading, setVideoLoading] = useState(false);
 
+  const [review, setReview] = useState(null);
+
   const pollRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -130,6 +132,7 @@ export default function BookingDetail() {
         setBooking(data.booking);
         setEmergency(data.emergency_contacts || []);
         setActiveSOS(data.active_sos || []);
+        setReview(data.review || null);
         if (data.latest_location) setLocation(data.latest_location);
       } catch (err) {
         setError(err.message);
@@ -151,7 +154,6 @@ export default function BookingDetail() {
     fetchPayment();
   }, [id]);
 
-  // Replace the location polling useEffect:
   useEffect(() => {
     // Poll when confirmed or in_progress (covers checkin → checkout window)
     if (!["confirmed", "in_progress"].includes(booking?.status)) return;
@@ -346,6 +348,13 @@ export default function BookingDetail() {
       if (!res.ok) throw new Error(data.error);
       setReviewed(true);
       setError("");
+      // Show review immediately for both parties
+      setReview({
+        rating,
+        comment,
+        created_at: new Date().toISOString(),
+        customer_name: user.name,
+      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -671,7 +680,7 @@ export default function BookingDetail() {
           </>
         )}
       </div>
-      {isCustomer && booking.status === "completed" && !reviewed && (
+      {/* {isCustomer && booking.status === "completed" && !reviewed && (
         <div className={styles.section} style={{ marginTop: 16 }}>
           <p className={styles.sectionTitle}>Leave a Review</p>
           <div className={styles.reviewForm}>
@@ -703,6 +712,97 @@ export default function BookingDetail() {
         </div>
       )}
       {reviewed && (
+        <div
+          className={styles.section}
+          style={{ textAlign: "center", marginTop: 16 }}
+        >
+          <p
+            style={{
+              color: "rgb(10,107,46)",
+              fontWeight: "bold",
+              fontSize: 14,
+            }}
+          >
+            ✓ Review submitted. Thank you!
+          </p>
+        </div>
+      )} */}
+
+      {/* ── Customer Review ── show to both maid and customer once submitted */}
+      {booking.status === "completed" && review && (
+        <div className={styles.section} style={{ marginTop: 16 }}>
+          <p className={styles.sectionTitle}>Customer Review</p>
+          <div className={styles.reviewDisplay}>
+            <div className={styles.reviewDisplayHeader}>
+              <div className={styles.reviewDisplayStars}>
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <span
+                    key={n}
+                    style={{
+                      fontSize: 20,
+                      color:
+                        n <= review.rating
+                          ? "rgb(255,165,0)"
+                          : "rgb(220,220,220)",
+                    }}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+              <span className={styles.reviewDisplayRating}>
+                {review.rating}/5
+              </span>
+            </div>
+            {review.comment && (
+              <p className={styles.reviewDisplayComment}>"{review.comment}"</p>
+            )}
+            <p className={styles.reviewDisplayMeta}>
+              — {review.customer_name} ·{" "}
+              {new Date(review.created_at).toLocaleDateString("en-NG", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Hide the form once review exists */}
+      {isCustomer && booking.status === "completed" && !reviewed && !review && (
+        <div className={styles.section} style={{ marginTop: 16 }}>
+          <p className={styles.sectionTitle}>Leave a Review</p>
+          <div className={styles.reviewForm}>
+            <div className={styles.stars}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <span
+                  key={n}
+                  className={`${styles.star} ${n <= rating ? styles.starActive : ""}`}
+                  onClick={() => setRating(n)}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+            <textarea
+              className={styles.reviewTextarea}
+              placeholder="Share your experience (optional)…"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+            <button
+              className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
+              onClick={submitReview}
+              disabled={reviewLoading}
+            >
+              {reviewLoading ? "Submitting…" : "Submit Review"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {reviewed && !review && (
         <div
           className={styles.section}
           style={{ textAlign: "center", marginTop: 16 }}
