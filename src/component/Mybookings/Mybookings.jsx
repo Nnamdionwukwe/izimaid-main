@@ -245,6 +245,12 @@ export default function MyBookings() {
               🎫 Support
             </button>
             <button
+              className={styles.ghostBtn}
+              onClick={() => navigate("/payments")}
+            >
+              💳 My Payments
+            </button>
+            <button
               className={styles.newBookingBtn}
               onClick={() => navigate("/maids")}
             >

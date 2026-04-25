@@ -75,6 +75,7 @@ import WithdrawTab from "./component/WithdrawTab/WithdrawPage.jsx";
 import SubscriptionVerify from "./pages/subscription/SubscriptionVerify.jsx";
 import InquiryChat from "./component/AdminDashboard/InquiryChat/InquiryChat.jsx";
 import Inbox from "./component/Chat/Inbox.jsx";
+import CustomerPayments from "./component/CustomerPayments/CustomerPayments.jsx";
 
 function App() {
   return (
@@ -147,6 +148,7 @@ function AppRoutes() {
       <Route path="/bookings/:id" element={<BookingDetail />} />
       <Route path="/withdrawal" element={<WithdrawTab />} />
       <Route path="/payment" element={<Payment />} />
+      <Route path="/payments" element={<CustomerPayments />} />
       <Route path="/payment/verify" element={<Payment />} />
       <Route path="/recurring-cleaning" element={<RecurringCleaning />} />
       <Route path="/one-time-cleaning" element={<OneTimeCleaning />} />
