@@ -571,6 +571,396 @@
     font-size: 13px;
     color: #888;
   }
+
+  /* ═══════════════════════════════════════════════════════════════
+     PAYMENTS — new classes added below, nothing above changed
+     ═══════════════════════════════════════════════════════════════ */
+
+  /* ─── Payments page root ──────────────────── */
+  .page {
+    min-height: 100vh;
+    background: #f5f4f0;
+    font-family: "DM Sans", sans-serif;
+  }
+
+  /* ─── Header variants for payments ───────── */
+  .headerTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .backBtn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: "DM Sans", sans-serif;
+  }
+
+  .backBtn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  /* ─── Tab bar ─────────────────────────────── */
+  .tabBar {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: -2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tabBar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tabBtn {
+    flex-shrink: 0;
+    padding: 9px 18px;
+    border: none;
+    background: transparent;
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s;
+    white-space: nowrap;
+  }
+
+  .tabBtn:hover {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .tabBtnActive {
+    color: #fff;
+    border-bottom-color: #fff;
+    font-weight: 600;
+  }
+
+  .tabBadge {
+    background: rgb(187, 19, 47);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+  }
+
+  /* ─── Content area ────────────────────────── */
+  .content {
+    padding: 16px;
+  }
+
+  /* ─── Status bar (escrow / paid toggle) ───── */
+  .statusBar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  /* ─── Card list ───────────────────────────── */
+  .cardList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* ─── Payment card ────────────────────────── */
+  .payCard {
+    background: #fff;
+    border: 1px solid #e8e6e0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+
+  .payCard:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+  }
+
+  .payCardAccentBank {
+    border-left: 3px solid rgb(133, 100, 4);
+  }
+
+  .payCardAccentEscrow {
+    border-left: 3px solid #1a1a2e;
+  }
+
+  .payCardAccentPaid {
+    border-left: 3px solid rgb(22, 163, 74);
+  }
+
+  .payCardTop {
+    padding: 14px 16px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .payCardName {
+    font-size: 15px;
+    font-weight: 500;
+    color: #1a1a2e;
+    margin: 0 0 2px;
+  }
+
+  .payCardEmail {
+    font-size: 12px;
+    color: #888;
+    margin: 0;
+  }
+
+  /* ─── Badge row ───────────────────────────── */
+  .badgeRow {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .badge {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .badgePaid {
+    background: rgb(209, 247, 224);
+    color: rgb(10, 107, 46);
+  }
+
+  .badgeGateway {
+    background: #e8f0fe;
+    color: #1a56c4;
+  }
+
+  .badgeProof {
+    background: rgb(255, 243, 205);
+    color: rgb(133, 100, 4);
+  }
+
+  .badgeAwaiting {
+    background: #f5f4f0;
+    color: #888;
+  }
+
+  /* ─── Meta grid ───────────────────────────── */
+  .metaGrid {
+    padding: 0 16px 10px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .metaItem {
+    font-size: 12px;
+    color: #888;
+  }
+
+  .metaVal {
+    font-weight: 600;
+    color: #1a1a2e;
+  }
+
+  .addressRow {
+    padding: 0 16px 10px;
+    font-size: 12px;
+    color: #888;
+  }
+
+  /* ─── Bank transfer proof ─────────────────── */
+  .proofWrap {
+    padding: 0 16px 12px;
+  }
+
+  .proofLabel {
+    font-size: 11px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 6px;
+  }
+
+  .proofImg {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 6px;
+    border: 1px solid #e0ddd6;
+    object-fit: contain;
+    display: block;
+  }
+
+  .proofLink {
+    font-size: 12px;
+    color: #1a1a2e;
+    display: block;
+    margin-top: 4px;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .proofLink:hover {
+    text-decoration: underline;
+  }
+
+  /* ─── Payout amount display ───────────────── */
+  .payoutAmount {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .payoutAmountValue {
+    font-family: "Syne", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+  }
+
+  .payoutAmountValue.escrow {
+    color: #1a1a2e;
+  }
+
+  .payoutAmountValue.paid {
+    color: rgb(22, 163, 74);
+  }
+
+  .payoutCurrency {
+    font-size: 11px;
+    color: #888;
+    margin: 0;
+  }
+
+  /* ─── Warning banner ──────────────────────── */
+  .warnBanner {
+    background: rgb(255, 243, 205);
+    color: rgb(133, 100, 4);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    margin: 0 16px 10px;
+    line-height: 1.5;
+  }
+
+  /* ─── Input fields ────────────────────────── */
+  .inputWrap {
+    padding: 0 16px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .fieldInput {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #e0ddd6;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: "DM Sans", sans-serif;
+    color: #333;
+    outline: none;
+    background: #fff;
+    transition: border-color 0.15s;
+  }
+
+  .fieldInput:focus {
+    border-color: #1a1a2e;
+  }
+
+  .fieldInput::placeholder {
+    color: #bbb;
+  }
+
+  /* ─── Feedback / toast ────────────────────── */
+  .feedback {
+    margin: 0 16px 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .feedbackSuccess {
+    background: rgb(209, 247, 224);
+    color: rgb(10, 107, 46);
+  }
+
+  .feedbackError {
+    background: rgb(255, 228, 228);
+    color: rgb(168, 28, 28);
+  }
+
+  /* ─── Action row ──────────────────────────── */
+  .actionRow {
+    border-top: 1px solid #f0ede6;
+    padding: 10px 16px;
+    display: flex;
+    gap: 8px;
+  }
+
+  /* ─── Buttons ─────────────────────────────── */
+  .btn {
+    flex: 1;
+    height: 38px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: "DM Sans", sans-serif;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .btnApprove {
+    background: rgb(10, 107, 46);
+    color: #fff;
+  }
+
+  .btnApprove:hover:not(:disabled) {
+    background: rgb(8, 90, 38);
+  }
+
+  .btnReject {
+    background: #fff;
+    color: rgb(187, 19, 47);
+    border: 1px solid rgb(255, 200, 200);
+  }
+
+  .btnReject:hover:not(:disabled) {
+    background: rgb(255, 228, 228);
+  }
+
+  .btnProcess {
+    background: #1a1a2e;
+    color: #fff;
+  }
+
+  .btnProcess:hover:not(:disabled) {
+    background: #121220;
+  }
 }
 
 @media screen and (min-width: 768px) {
@@ -595,6 +985,17 @@
   }
   .headerTitle {
     font-size: 20px;
+  }
+
+  /* ── Payments responsive ── */
+  .content {
+    padding: 20px 24px;
+  }
+
+  .cardList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
   }
 }
 
@@ -626,5 +1027,14 @@
     max-width: 520px;
     margin: 0 auto;
     max-height: 80vh;
+  }
+
+  /* ── Payments responsive ── */
+  .content {
+    padding: 24px 32px;
+  }
+
+  .cardList {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

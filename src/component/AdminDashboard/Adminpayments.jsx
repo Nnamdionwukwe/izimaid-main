@@ -4,7 +4,31 @@ import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+const CURRENCY_SYMBOLS = {
+  NGN: "₦",
+  USD: "$",
+  GBP: "£",
+  EUR: "€",
+  GHS: "₵",
+  KES: "KSh",
+  ZAR: "R",
+  UGX: "USh",
+  TZS: "TSh",
+  EGP: "E£",
+  CAD: "CA$",
+  AUD: "A$",
+  INR: "₹",
+  AED: "د.إ",
+  SAR: "﷼",
+};
+
+function fmtMoney(amount, currency) {
+  const sym = CURRENCY_SYMBOLS[currency] || (currency ? `${currency} ` : "₦");
+  return `${sym}${Number(amount || 0).toLocaleString()}`;
+}
+
 function formatDate(d) {
+  if (!d) return "—";
   return new Date(d).toLocaleDateString("en-NG", {
     day: "numeric",
     month: "short",
@@ -14,18 +38,27 @@ function formatDate(d) {
   });
 }
 
-export default function AdminPayments() {
+const GATEWAY_LABELS = {
+  paystack: "Paystack",
+  stripe: "Stripe",
+  bank_transfer: "Bank Transfer",
+  crypto: "Crypto",
+};
+
+// ── Tab: Pending Approvals ────────────────────────────────────────────────────
+function PendingApprovals() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState({});
   const [msg, setMsg] = useState({});
-  const navigate = useNavigate();
+  const [gateway, setGateway] = useState("");
 
   const fetchPending = useCallback(async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${API_URL}/api/payments/pending`, {
+      const params = gateway ? `?gateway=${gateway}` : "";
+      const res = await fetch(`${API_URL}/api/payments/pending${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -35,7 +68,7 @@ export default function AdminPayments() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [gateway]);
 
   useEffect(() => {
     fetchPending();
@@ -69,13 +102,13 @@ export default function AdminPayments() {
           text:
             action === "approve"
               ? "✓ Approved — maid notified"
-              : "✗ Rejected — refund required",
+              : "✗ Rejected — refund initiated",
         },
       }));
-      // Remove from list after 2s
-      setTimeout(() => {
-        setBookings((b) => b.filter((x) => x.booking_id !== booking_id));
-      }, 2000);
+      setTimeout(
+        () => setBookings((b) => b.filter((x) => x.booking_id !== booking_id)),
+        2000,
+      );
     } catch (err) {
       setMsg((m) => ({
         ...m,
@@ -87,217 +120,98 @@ export default function AdminPayments() {
   }
 
   return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
-        <p
-          className={styles.sectionTitle || ""}
-          style={{
-            fontSize: 16,
-            fontWeight: "bold",
-            color: "rgb(19,19,103)",
-            margin: 0,
-          }}
-          onClick={() => navigate("/admin")}
-        >
-          &larr; Dashboard
-        </p>
-        <p
-          className={styles.sectionTitle || ""}
-          style={{
-            fontSize: 16,
-            fontWeight: "bold",
-            color: "rgb(19,19,103)",
-            margin: 0,
-          }}
-        >
-          Pending Payment Approvals
-        </p>
-        <span
-          style={{
-            background: "rgb(255,243,205)",
-            color: "rgb(133,100,4)",
-            fontSize: 11,
-            fontWeight: "bold",
-            padding: "3px 10px",
-            borderRadius: 20,
-          }}
-        >
-          {bookings.length} pending
-        </span>
+    <>
+      {/* Gateway filter */}
+      <div className={styles.filterBar}>
+        {["", "paystack", "stripe", "bank_transfer", "crypto"].map((g) => (
+          <button
+            key={g}
+            className={`${styles.filterBtn} ${gateway === g ? styles.filterBtnActive : ""}`}
+            onClick={() => setGateway(g)}
+          >
+            {g ? GATEWAY_LABELS[g] : "All"}
+          </button>
+        ))}
       </div>
 
       {loading ? (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "40px 20px",
-            color: "gray",
-            fontSize: 14,
-          }}
-        >
-          Loading...
-        </div>
+        <div className={styles.loading}>Loading...</div>
       ) : bookings.length === 0 ? (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "40px 20px",
-            color: "gray",
-            fontSize: 14,
-          }}
-        >
-          <div style={{ fontSize: 32, marginBottom: 10 }}>✅</div>
-          No pending bookings to review
+        <div className={styles.empty}>
+          <div className={styles.emptyIcon}>✅</div>
+          <p className={styles.emptyText}>No pending bookings to review</p>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div className={styles.cardList}>
           {bookings.map((b) => (
-            <div
-              key={b.booking_id}
-              style={{
-                background: "white",
-                border: "1px solid rgb(228,228,228)",
-                borderRadius: 10,
-                padding: 16,
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  marginBottom: 10,
-                  flexWrap: "wrap",
-                  gap: 8,
-                }}
-              >
+            <div key={b.booking_id} className={styles.payCard}>
+              <div className={styles.payCardTop}>
                 <div>
-                  <p
-                    style={{
-                      fontSize: 15,
-                      fontWeight: "bold",
-                      color: "rgb(30,30,30)",
-                      margin: "0 0 2px",
-                    }}
-                  >
-                    {b.customer_name}
-                  </p>
-                  <p style={{ fontSize: 12, color: "gray", margin: 0 }}>
-                    {b.customer_email}
-                  </p>
+                  <p className={styles.payCardName}>{b.customer_name}</p>
+                  <p className={styles.payCardEmail}>{b.customer_email}</p>
                 </div>
-                <span
-                  style={{
-                    background: "rgb(209,247,224)",
-                    color: "rgb(10,107,46)",
-                    fontSize: 11,
-                    fontWeight: "bold",
-                    padding: "4px 10px",
-                    borderRadius: 20,
-                  }}
-                >
-                  Paid ✓
-                </span>
+                <div className={styles.badgeRow}>
+                  <span className={`${styles.badge} ${styles.badgePaid}`}>
+                    Paid ✓
+                  </span>
+                  {b.gateway && (
+                    <span className={`${styles.badge} ${styles.badgeGateway}`}>
+                      {GATEWAY_LABELS[b.gateway] || b.gateway}
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  gap: 16,
-                  flexWrap: "wrap",
-                  marginBottom: 10,
-                }}
-              >
+              <div className={styles.metaGrid}>
                 {[
                   ["Maid", b.maid_name],
                   ["Date", formatDate(b.service_date)],
                   ["Duration", `${b.duration_hours}h`],
-                  ["Amount", `₦${Number(b.total_amount).toLocaleString()}`],
+                  ["Amount", fmtMoney(b.total_amount, b.currency || "NGN")],
+                  [
+                    "Platform fee",
+                    fmtMoney(b.platform_fee, b.currency || "NGN"),
+                  ],
+                  ["Maid gets", fmtMoney(b.maid_payout, b.currency || "NGN")],
                   ["Paid at", b.paid_at ? formatDate(b.paid_at) : "—"],
-                  ["Ref", b.paystack_reference?.slice(-8)],
+                  [
+                    "Ref",
+                    b.paystack_reference?.slice(-8) ||
+                      b.stripe_payment_id?.slice(-8) ||
+                      b.bank_transfer_ref?.slice(-8) ||
+                      "—",
+                  ],
                 ].map(([k, v]) => (
-                  <div key={k} style={{ fontSize: 12, color: "gray" }}>
-                    {k}:{" "}
-                    <span
-                      style={{ fontWeight: "bold", color: "rgb(47,47,47)" }}
-                    >
-                      {v}
-                    </span>
+                  <div key={k} className={styles.metaItem}>
+                    {k}: <span className={styles.metaVal}>{v}</span>
                   </div>
                 ))}
               </div>
 
-              <div style={{ fontSize: 12, color: "gray", marginBottom: 12 }}>
-                📍 {b.address}
-              </div>
+              <p className={styles.addressRow}>📍 {b.address}</p>
 
               {msg[b.booking_id] && (
-                <p
-                  style={{
-                    fontSize: 13,
-                    fontWeight: "bold",
-                    marginBottom: 10,
-                    padding: "8px 12px",
-                    borderRadius: 6,
-                    background:
-                      msg[b.booking_id].type === "success"
-                        ? "rgb(209,247,224)"
-                        : "rgb(255,228,228)",
-                    color:
-                      msg[b.booking_id].type === "success"
-                        ? "rgb(10,107,46)"
-                        : "rgb(168,28,28)",
-                  }}
+                <div
+                  className={`${styles.feedback} ${msg[b.booking_id].type === "success" ? styles.feedbackSuccess : styles.feedbackError}`}
                 >
                   {msg[b.booking_id].text}
-                </p>
+                </div>
               )}
 
-              <div style={{ display: "flex", gap: 8 }}>
+              <div className={styles.actionRow}>
                 <button
+                  className={`${styles.btn} ${styles.btnApprove}`}
                   onClick={() => handleAction(b.booking_id, "approve")}
                   disabled={!!processing[b.booking_id]}
-                  style={{
-                    flex: 1,
-                    height: 38,
-                    background: "rgb(10,107,46)",
-                    color: "white",
-                    border: "none",
-                    borderRadius: 8,
-                    fontSize: 13,
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                    opacity: processing[b.booking_id] ? 0.6 : 1,
-                  }}
                 >
                   {processing[b.booking_id] === "approve"
                     ? "Approving..."
                     : "✓ Approve"}
                 </button>
                 <button
+                  className={`${styles.btn} ${styles.btnReject}`}
                   onClick={() => handleAction(b.booking_id, "reject")}
                   disabled={!!processing[b.booking_id]}
-                  style={{
-                    flex: 1,
-                    height: 38,
-                    background: "white",
-                    color: "rgb(187,19,47)",
-                    border: "1px solid rgb(255,200,200)",
-                    borderRadius: 8,
-                    fontSize: 13,
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                    opacity: processing[b.booking_id] ? 0.6 : 1,
-                  }}
                 >
                   {processing[b.booking_id] === "reject"
                     ? "Rejecting..."
@@ -308,6 +222,476 @@ export default function AdminPayments() {
           ))}
         </div>
       )}
+    </>
+  );
+}
+
+// ── Tab: Bank Transfer Verification ──────────────────────────────────────────
+function BankTransfers() {
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState({});
+  const [msg, setMsg] = useState({});
+  const [notes, setNotes] = useState({});
+
+  const fetchBankTransfers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `${API_URL}/api/payments/pending?gateway=bank_transfer`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const data = await res.json();
+      setPayments(data.bookings || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBankTransfers();
+  }, [fetchBankTransfers]);
+
+  async function handleVerify(payment_id, approved) {
+    setProcessing((p) => ({
+      ...p,
+      [payment_id]: approved ? "approve" : "reject",
+    }));
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `${API_URL}/api/payments/bank-transfer/${payment_id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ approved, notes: notes[payment_id] || null }),
+        },
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setMsg((m) => ({
+        ...m,
+        [payment_id]: {
+          type: "success",
+          text: approved
+            ? "✓ Transfer verified — booking pending approval"
+            : "✗ Transfer rejected",
+        },
+      }));
+      setTimeout(
+        () => setPayments((p) => p.filter((x) => x.payment_id !== payment_id)),
+        2000,
+      );
+    } catch (err) {
+      setMsg((m) => ({
+        ...m,
+        [payment_id]: { type: "error", text: err.message },
+      }));
+    } finally {
+      setProcessing((p) => ({ ...p, [payment_id]: null }));
+    }
+  }
+
+  if (loading)
+    return <div className={styles.loading}>Loading bank transfers...</div>;
+
+  if (payments.length === 0)
+    return (
+      <div className={styles.empty}>
+        <div className={styles.emptyIcon}>🏦</div>
+        <p className={styles.emptyText}>
+          No bank transfers awaiting verification
+        </p>
+      </div>
+    );
+
+  return (
+    <div className={styles.cardList}>
+      {payments.map((b) => (
+        <div
+          key={b.payment_id}
+          className={`${styles.payCard} ${b.bank_transfer_proof ? styles.payCardAccentBank : ""}`}
+        >
+          <div className={styles.payCardTop}>
+            <div>
+              <p className={styles.payCardName}>{b.customer_name}</p>
+              <p className={styles.payCardEmail}>{b.customer_email}</p>
+            </div>
+            <span
+              className={`${styles.badge} ${b.bank_transfer_proof ? styles.badgeProof : styles.badgeAwaiting}`}
+            >
+              {b.bank_transfer_proof ? "⏳ Proof submitted" : "Awaiting proof"}
+            </span>
+          </div>
+
+          <div className={styles.metaGrid}>
+            {[
+              ["Maid", b.maid_name],
+              ["Amount", fmtMoney(b.total_amount, b.currency || "NGN")],
+              ["Ref", b.bank_transfer_ref || "—"],
+              ["Date", formatDate(b.service_date)],
+              ["Paid at", b.paid_at ? formatDate(b.paid_at) : "—"],
+            ].map(([k, v]) => (
+              <div key={k} className={styles.metaItem}>
+                {k}: <span className={styles.metaVal}>{v}</span>
+              </div>
+            ))}
+          </div>
+
+          {b.bank_transfer_proof && (
+            <div className={styles.proofWrap}>
+              <p className={styles.proofLabel}>Payment Proof</p>
+              <a
+                href={b.bank_transfer_proof}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src={b.bank_transfer_proof}
+                  alt="Payment proof"
+                  className={styles.proofImg}
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                  }}
+                />
+                <span className={styles.proofLink}>🔗 Open full proof →</span>
+              </a>
+            </div>
+          )}
+
+          <div className={styles.inputWrap}>
+            <input
+              className={styles.fieldInput}
+              placeholder="Admin notes (optional)..."
+              value={notes[b.payment_id] || ""}
+              onChange={(e) =>
+                setNotes((n) => ({ ...n, [b.payment_id]: e.target.value }))
+              }
+            />
+          </div>
+
+          {msg[b.payment_id] && (
+            <div
+              className={`${styles.feedback} ${msg[b.payment_id].type === "success" ? styles.feedbackSuccess : styles.feedbackError}`}
+            >
+              {msg[b.payment_id].text}
+            </div>
+          )}
+
+          <div className={styles.actionRow}>
+            <button
+              className={`${styles.btn} ${styles.btnApprove}`}
+              onClick={() => handleVerify(b.payment_id, true)}
+              disabled={!!processing[b.payment_id]}
+            >
+              {processing[b.payment_id] === "approve"
+                ? "Verifying..."
+                : "✓ Verify Transfer"}
+            </button>
+            <button
+              className={`${styles.btn} ${styles.btnReject}`}
+              onClick={() => handleVerify(b.payment_id, false)}
+              disabled={!!processing[b.payment_id]}
+            >
+              {processing[b.payment_id] === "reject"
+                ? "Rejecting..."
+                : "✗ Reject"}
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Tab: Payouts ──────────────────────────────────────────────────────────────
+function Payouts() {
+  const [payouts, setPayouts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState("escrow");
+  const [processing, setProcessing] = useState({});
+  const [msg, setMsg] = useState({});
+  const [refs, setRefs] = useState({});
+  const [notes, setNotes] = useState({});
+
+  const fetchPayouts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `${API_URL}/api/payments/payouts?status=${statusFilter}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const data = await res.json();
+      setPayouts(data.payouts || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [statusFilter]);
+
+  useEffect(() => {
+    fetchPayouts();
+  }, [fetchPayouts]);
+
+  async function handleProcess(payout_id) {
+    setProcessing((p) => ({ ...p, [payout_id]: true }));
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `${API_URL}/api/payments/payouts/${payout_id}/process`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            payout_ref: refs[payout_id] || null,
+            notes: notes[payout_id] || null,
+          }),
+        },
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setMsg((m) => ({
+        ...m,
+        [payout_id]: {
+          type: "success",
+          text: "✓ Payout processed successfully",
+        },
+      }));
+      setTimeout(() => {
+        setPayouts((p) => p.filter((x) => x.id !== payout_id));
+        setMsg((m) => {
+          const n = { ...m };
+          delete n[payout_id];
+          return n;
+        });
+      }, 2500);
+    } catch (err) {
+      setMsg((m) => ({
+        ...m,
+        [payout_id]: { type: "error", text: err.message },
+      }));
+    } finally {
+      setProcessing((p) => ({ ...p, [payout_id]: false }));
+    }
+  }
+
+  return (
+    <>
+      <div className={styles.statusBar}>
+        {["escrow", "paid"].map((s) => (
+          <button
+            key={s}
+            className={`${styles.filterBtn} ${statusFilter === s ? styles.filterBtnActive : ""}`}
+            onClick={() => setStatusFilter(s)}
+          >
+            {s === "escrow" ? "In Escrow" : "Paid Out"}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div className={styles.loading}>Loading payouts...</div>
+      ) : payouts.length === 0 ? (
+        <div className={styles.empty}>
+          <div className={styles.emptyIcon}>💸</div>
+          <p className={styles.emptyText}>No {statusFilter} payouts</p>
+        </div>
+      ) : (
+        <div className={styles.cardList}>
+          {payouts.map((p) => (
+            <div
+              key={p.id}
+              className={`${styles.payCard} ${p.status === "escrow" ? styles.payCardAccentEscrow : styles.payCardAccentPaid}`}
+            >
+              <div className={styles.payCardTop}>
+                <div>
+                  <p className={styles.payCardName}>{p.maid_name}</p>
+                  <p className={styles.payCardEmail}>{p.maid_email}</p>
+                </div>
+                <div className={styles.payoutAmount}>
+                  <p
+                    className={`${styles.payoutAmountValue} ${p.status === "escrow" ? styles.escrow : styles.paid}`}
+                  >
+                    {fmtMoney(p.amount, p.currency)}
+                  </p>
+                  <p className={styles.payoutCurrency}>{p.currency}</p>
+                </div>
+              </div>
+
+              <div className={styles.metaGrid}>
+                {[
+                  ["Status", p.status],
+                  ["Service date", formatDate(p.service_date)],
+                  ["Address", p.address?.split(",")[0] || "—"],
+                  ["Bank", p.bank_name || "—"],
+                  ["Account", p.account_number || "—"],
+                  ["Account name", p.account_name || "—"],
+                  p.payout_ref && ["Payout ref", p.payout_ref],
+                ]
+                  .filter(Boolean)
+                  .map(([k, v]) => (
+                    <div key={k} className={styles.metaItem}>
+                      {k}: <span className={styles.metaVal}>{v}</span>
+                    </div>
+                  ))}
+              </div>
+
+              {p.booking_status !== "completed" && p.status === "escrow" && (
+                <div className={styles.warnBanner}>
+                  ⚠️ Booking not yet completed — payout cannot be processed
+                  until the job is done
+                </div>
+              )}
+
+              {p.status === "escrow" && p.booking_status === "completed" && (
+                <div className={styles.inputWrap}>
+                  <input
+                    className={styles.fieldInput}
+                    placeholder="Payment reference (e.g. bank transfer ref)..."
+                    value={refs[p.id] || ""}
+                    onChange={(e) =>
+                      setRefs((r) => ({ ...r, [p.id]: e.target.value }))
+                    }
+                  />
+                  <input
+                    className={styles.fieldInput}
+                    placeholder="Notes (optional)..."
+                    value={notes[p.id] || ""}
+                    onChange={(e) =>
+                      setNotes((n) => ({ ...n, [p.id]: e.target.value }))
+                    }
+                  />
+                </div>
+              )}
+
+              {msg[p.id] && (
+                <div
+                  className={`${styles.feedback} ${msg[p.id].type === "success" ? styles.feedbackSuccess : styles.feedbackError}`}
+                >
+                  {msg[p.id].text}
+                </div>
+              )}
+
+              {p.status === "escrow" && p.booking_status === "completed" && (
+                <div className={styles.actionRow}>
+                  <button
+                    className={`${styles.btn} ${styles.btnProcess}`}
+                    onClick={() => handleProcess(p.id)}
+                    disabled={processing[p.id]}
+                  >
+                    {processing[p.id]
+                      ? "Processing..."
+                      : `💸 Process Payout ${fmtMoney(p.amount, p.currency)}`}
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+// ── Main AdminPayments ────────────────────────────────────────────────────────
+export default function AdminPayments({ onBack }) {
+  const [activeTab, setActiveTab] = useState("approvals");
+  const [pendingCount, setPendingCount] = useState(0);
+  const [bankCount, setBankCount] = useState(0);
+  const [escrowCount, setEscrowCount] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    async function loadCounts() {
+      try {
+        const [pRes, bRes, eRes] = await Promise.all([
+          fetch(`${API_URL}/api/payments/pending`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${API_URL}/api/payments/pending?gateway=bank_transfer`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${API_URL}/api/payments/payouts?status=escrow`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+        const [pData, bData, eData] = await Promise.all([
+          pRes.json(),
+          bRes.json(),
+          eRes.json(),
+        ]);
+        setPendingCount((pData.bookings || []).length);
+        setBankCount(
+          (bData.bookings || []).filter((b) => b.bank_transfer_proof).length,
+        );
+        setEscrowCount(
+          (eData.payouts || []).filter((p) => p.booking_status === "completed")
+            .length,
+        );
+      } catch {}
+    }
+    loadCounts();
+  }, []);
+
+  const tabs = [
+    { id: "approvals", label: "Approvals", badge: pendingCount },
+    { id: "bank", label: "Bank Transfers", badge: bankCount },
+    { id: "payouts", label: "Payouts", badge: escrowCount },
+  ];
+
+  return (
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <div className={styles.headerTop}>
+          <div className={styles.headerLeft}>
+            <h1 className={styles.headerTitle}>Payments</h1>
+          </div>
+          <button
+            className={styles.backBtn}
+            onClick={() => (onBack ? onBack() : navigate("/admin"))}
+          >
+            ← Back
+          </button>
+        </div>
+
+        <div className={styles.tabBar}>
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              className={`${styles.tabBtn} ${activeTab === t.id ? styles.tabBtnActive : ""}`}
+              onClick={() => setActiveTab(t.id)}
+            >
+              {t.label}
+              {t.badge > 0 && (
+                <span className={styles.tabBadge}>{t.badge}</span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.content}>
+        {activeTab === "approvals" && <PendingApprovals />}
+        {activeTab === "bank" && <BankTransfers />}
+        {activeTab === "payouts" && <Payouts />}
+      </div>
     </div>
   );
 }

@@ -28,6 +28,44 @@ const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+const CURRENCY_SYMBOLS = {
+  NGN: "₦",
+  USD: "$",
+  GBP: "£",
+  EUR: "€",
+  GHS: "₵",
+  KES: "KSh",
+  ZAR: "R",
+  UGX: "USh",
+  TZS: "TSh",
+  RWF: "FRw",
+  ETB: "Br",
+  XOF: "CFA",
+  MAD: "MAD",
+  EGP: "E£",
+  CAD: "CA$",
+  AUD: "A$",
+  INR: "₹",
+  AED: "د.إ",
+  SAR: "﷼",
+  QAR: "QR",
+  SGD: "S$",
+  MYR: "RM",
+  BRL: "R$",
+  MXN: "MX$",
+  JPY: "¥",
+  CNY: "¥",
+};
+
+function getCurrencySymbol(currency) {
+  return CURRENCY_SYMBOLS[currency] || (currency ? `${currency} ` : "₦");
+}
+
+function fmtMoney(value, currency) {
+  const sym = getCurrencySymbol(currency);
+  return `${sym}${toNum(value).toLocaleString()}`;
+}
+
 const DOC_TYPE_LABELS = {
   national_id: "National ID",
   passport: "Passport",
@@ -491,6 +529,26 @@ export default function AdminMaidDashboard() {
         services: editing.services,
         location: editing.location,
         is_available: editing.is_available,
+        // ── Extended rates ──────────────────────────────────
+        rate_hourly: editing.rate_hourly
+          ? toNum(editing.rate_hourly)
+          : undefined,
+        rate_daily: editing.rate_daily ? toNum(editing.rate_daily) : undefined,
+        rate_weekly: editing.rate_weekly
+          ? toNum(editing.rate_weekly)
+          : undefined,
+        rate_monthly: editing.rate_monthly
+          ? toNum(editing.rate_monthly)
+          : undefined,
+        pricing_note: editing.pricing_note || undefined,
+        currency: editing.currency || undefined,
+        // Custom rates — convert [{label,price}] array → { label: price } object
+        rate_custom: editing.customRates?.length
+          ? editing.customRates.reduce((acc, r) => {
+              if (r.label?.trim()) acc[r.label.trim()] = toNum(r.price);
+              return acc;
+            }, {})
+          : undefined,
       };
       const res = await fetch(`${API}/api/maids/admin/${editing.id}`, {
         method: "PATCH",
@@ -781,7 +839,10 @@ export default function AdminMaidDashboard() {
                             </td>
                             <td>
                               <span className={s.rate}>
-                                ₦{toNum(maid.hourly_rate).toLocaleString()}
+                                {fmtMoney(
+                                  maid.rate_hourly || maid.hourly_rate,
+                                  maid.currency,
+                                )}
                               </span>
                             </td>
                             <td>
@@ -999,7 +1060,10 @@ export default function AdminMaidDashboard() {
               <div className={s.statTile}>
                 <p className={s.statTileLabel}>Hourly Rate</p>
                 <p className={`${s.statTileValue} ${s.green}`}>
-                  ₦{toNum(selected.hourly_rate).toLocaleString()}
+                  {fmtMoney(
+                    selected.rate_hourly || selected.hourly_rate,
+                    selected.currency,
+                  )}
                 </p>
               </div>
               <div className={s.statTile}>
@@ -1030,6 +1094,199 @@ export default function AdminMaidDashboard() {
                     <span className={s.bioText}>None listed</span>
                   )}
                 </div>
+              </div>
+
+              {/* ── Pricing rates ── */}
+              <div className={`${s.detailCard} ${s.fullWidth}`}>
+                <p className={s.detailCardLabel}>
+                  Pricing Rates
+                  {/* Always show the maid's preferred currency — updates live when they change it */}
+                  <span
+                    style={{
+                      marginLeft: 8,
+                      background: "var(--c-accent-lo)",
+                      border: "1px solid rgba(99,102,241,0.3)",
+                      color: "var(--c-accent)",
+                      fontFamily: "var(--ff-mono)",
+                      fontSize: "0.7rem",
+                      padding: "0.15rem 0.5rem",
+                      borderRadius: 20,
+                    }}
+                  >
+                    {selected.currency || "NGN"} ·{" "}
+                    {getCurrencySymbol(selected.currency)}
+                  </span>
+                </p>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "repeat(auto-fill, minmax(150px, 1fr))",
+                    gap: "0.625rem",
+                  }}
+                >
+                  {[
+                    {
+                      label: "Hourly",
+                      value: selected.rate_hourly || selected.hourly_rate,
+                      unit: "/ hr",
+                    },
+                    {
+                      label: "Daily",
+                      value: selected.rate_daily,
+                      unit: "/ day",
+                    },
+                    {
+                      label: "Weekly",
+                      value: selected.rate_weekly,
+                      unit: "/ week",
+                    },
+                    {
+                      label: "Monthly",
+                      value: selected.rate_monthly,
+                      unit: "/ month",
+                    },
+                  ].map(({ label, value, unit }) => {
+                    const hasValue = toNum(value) > 0;
+                    return (
+                      <div
+                        key={label}
+                        style={{
+                          background: "var(--c-raised)",
+                          border: `1px solid ${hasValue ? "rgba(52,211,153,0.2)" : "var(--c-border)"}`,
+                          borderRadius: "var(--radius)",
+                          padding: "0.875rem",
+                          opacity: hasValue ? 1 : 0.4,
+                          transition: "var(--transition)",
+                        }}
+                      >
+                        <p
+                          style={{
+                            margin: "0 0 6px",
+                            fontSize: "0.68rem",
+                            color: "var(--c-muted)",
+                            fontFamily: "var(--ff-mono)",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.6px",
+                          }}
+                        >
+                          {label}
+                        </p>
+                        <p style={{ margin: 0, lineHeight: 1 }}>
+                          <span
+                            style={{
+                              fontSize: "1.2rem",
+                              fontFamily: "var(--ff-head)",
+                              fontWeight: 700,
+                              color: hasValue
+                                ? "var(--c-green)"
+                                : "var(--c-muted)",
+                            }}
+                          >
+                            {hasValue
+                              ? fmtMoney(value, selected.currency)
+                              : "—"}
+                          </span>
+                          {hasValue && (
+                            <span
+                              style={{
+                                fontSize: "0.68rem",
+                                fontFamily: "var(--ff-mono)",
+                                color: "var(--c-muted)",
+                                marginLeft: 5,
+                              }}
+                            >
+                              {unit}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Custom rates — each with the maid's currency */}
+                {(() => {
+                  const rc = selected.rate_custom;
+                  const entries =
+                    rc && typeof rc === "object" ? Object.entries(rc) : [];
+                  if (!entries.length) return null;
+                  return (
+                    <div style={{ marginTop: "1rem" }}>
+                      <p
+                        style={{
+                          margin: "0 0 0.5rem",
+                          fontSize: "0.68rem",
+                          color: "var(--c-muted)",
+                          fontFamily: "var(--ff-mono)",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.6px",
+                        }}
+                      >
+                        Custom / Package Rates
+                      </p>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "0.5rem",
+                        }}
+                      >
+                        {entries.map(([label, price]) => (
+                          <div
+                            key={label}
+                            style={{
+                              background: "var(--c-accent-lo)",
+                              border: "1px solid rgba(99,102,241,0.25)",
+                              borderRadius: "var(--radius)",
+                              padding: "0.5rem 0.875rem",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.625rem",
+                            }}
+                          >
+                            <span
+                              style={{
+                                color: "var(--c-muted)",
+                                fontFamily: "var(--ff-mono)",
+                                fontSize: "0.78rem",
+                              }}
+                            >
+                              {label}
+                            </span>
+                            <span
+                              style={{
+                                color: "var(--c-green)",
+                                fontWeight: 700,
+                                fontSize: "0.9rem",
+                              }}
+                            >
+                              {fmtMoney(price, selected.currency)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Pricing note */}
+                {selected.pricing_note && (
+                  <p
+                    style={{
+                      margin: "0.875rem 0 0",
+                      fontSize: "0.82rem",
+                      color: "var(--c-muted)",
+                      fontStyle: "italic",
+                      borderTop: "1px solid var(--c-border)",
+                      paddingTop: "0.75rem",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    💬 {selected.pricing_note}
+                  </p>
+                )}
               </div>
             </div>
 
