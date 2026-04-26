@@ -76,6 +76,8 @@ import SubscriptionVerify from "./pages/subscription/SubscriptionVerify.jsx";
 import InquiryChat from "./component/AdminDashboard/InquiryChat/InquiryChat.jsx";
 import Inbox from "./component/Chat/Inbox.jsx";
 import CustomerPayments from "./component/CustomerPayments/CustomerPayments.jsx";
+import AdminCustomerPayments from "./component/AdminDashboard/Adminpayments.jsx";
+import AdminMaidWallet from "./component/AdminDashboard/AdminMaidWallet.jsx";
 
 function App() {
   return (

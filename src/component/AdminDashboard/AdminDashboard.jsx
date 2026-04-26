@@ -292,6 +292,18 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
           </button>
           <button
             className={styles.logoutBtn}
+            onClick={() => onNavigate("customer-payments")}
+          >
+            💳 Customer Payments
+          </button>
+          <button
+            className={styles.logoutBtn}
+            onClick={() => onNavigate("maid-wallets")}
+          >
+            💳 Maid Wallets
+          </button>
+          <button
+            className={styles.logoutBtn}
             onClick={() => onNavigate("documents")}
           >
             📄 Document Review
