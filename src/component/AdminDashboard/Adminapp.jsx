@@ -10,8 +10,8 @@ import AdminSupportChats from "./AdminSupportChats.jsx";
 import AdminMaidSupportChats from "./AdminMaidSupportChats.jsx";
 import AdminPayments from "./Adminpayments.jsx";
 import AdminDocuments from "./AdminDocuments.jsx";
-import AdminMaidWallet from "./AdminMaidWallet.jsx";
-import AdminCustomerPayments from "./AdminCustomerPayments.jsx";
+import AdminWallet from "./AdminMaidWallet.jsx";
+import AdminWithdrawals from "./AdminWithdrawals.jsx";
 
 export default function AdminApp({ onLogout }) {
   const [view, setView] = useState("leads");
@@ -51,12 +51,12 @@ export default function AdminApp({ onLogout }) {
   if (view === "payments") {
     return <AdminPayments onBack={() => setView("leads")} />;
   }
-  if (view === "maid-wallets") {
-    return <AdminMaidWallet onBack={() => setView("leads")} />;
+  if (view === "admin-wallets") {
+    return <AdminWallet onBack={() => setView("leads")} />;
   }
-  if (view === "customer-payments") {
-    return <AdminCustomerPayments onBack={() => setView("leads")} />;
-  }
+
+  if (view === "withdrawals")
+    return <AdminWithdrawals onBack={() => setView("leads")} />;
 
   // ── NEW ────────────────────────────────────────────────────────────────────
   if (view === "documents") {

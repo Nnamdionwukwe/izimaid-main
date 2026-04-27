@@ -51,13 +51,33 @@ function formatDateTime(dateStr) {
   });
 }
 
-function formatCurrency(amount) {
+const CURRENCY_SYMBOLS = {
+  NGN: "₦",
+  USD: "$",
+  GBP: "£",
+  EUR: "€",
+  GHS: "₵",
+  KES: "KSh",
+  ZAR: "R",
+  UGX: "USh",
+  TZS: "TSh",
+  EGP: "E£",
+  CAD: "CA$",
+  AUD: "A$",
+  INR: "₹",
+  AED: "د.إ",
+  SAR: "﷼",
+  QAR: "QR",
+  SGD: "S$",
+  MYR: "RM",
+  BRL: "R$",
+  JPY: "¥",
+};
+
+function formatCurrency(amount, currency) {
   if (amount == null) return "—";
-  return new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    minimumFractionDigits: 0,
-  }).format(amount);
+  const sym = CURRENCY_SYMBOLS[currency] || (currency ? `${currency} ` : "₦");
+  return `${sym}${Number(amount).toLocaleString()}`;
 }
 
 function StatCard({ label, value, color }) {
@@ -378,7 +398,10 @@ function BookingDetailModal({ booking, onClose, onStatusUpdate }) {
     ["Duration", b.duration_hours ? `${b.duration_hours} hrs` : "—"],
     ["Address", b.address],
     b.notes && ["Notes", b.notes],
-    ["Total", formatCurrency(b.total_amount)],
+    [
+      "Total",
+      formatCurrency(b.total_amount, b.payment_currency || b.maid_currency),
+    ],
     ["Payment", b.payment_status || "unpaid"],
     ["Gateway", b.gateway || "—"],
     b.paystack_reference && ["Paystack ref", b.paystack_reference],
@@ -441,8 +464,11 @@ function BookingDetailModal({ booking, onClose, onStatusUpdate }) {
               💳 Payment received — awaiting approval
             </p>
             <p className={styles.approvalBannerBody}>
-              {formatCurrency(b.payment_amount || b.total_amount)} via{" "}
-              {b.gateway || "card"}
+              {formatCurrency(
+                b.payment_amount || b.total_amount,
+                b.payment_currency || b.maid_currency,
+              )}{" "}
+              via {b.gateway || "card"}
             </p>
             <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
               <button
@@ -791,7 +817,11 @@ export default function AdminBookings({ onNavigate }) {
                       ⏱ {booking.duration_hours}h
                     </span>
                     <span className={styles.metaTag}>
-                      💰 {formatCurrency(booking.total_amount)}
+                      💰{" "}
+                      {formatCurrency(
+                        booking.total_amount,
+                        booking.payment_currency || booking.maid_currency,
+                      )}
                     </span>
                     {booking.address && (
                       <span className={styles.metaTag}>
