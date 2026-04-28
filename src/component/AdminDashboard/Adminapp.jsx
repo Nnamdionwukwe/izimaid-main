@@ -16,6 +16,7 @@ import AdminNotifications from "./AdminNotifications.jsx";
 import AdminStats from "./AdminStats.jsx";
 import AdminSettings from "./AdminSettings.jsx";
 import AdminAuditLog from "./AdminAuditLog.jsx";
+import AdminSubscriptions from "./AdminSubscriptions.jsx";
 
 export default function AdminApp({ onLogout }) {
   const [view, setView] = useState("leads");
@@ -77,6 +78,9 @@ export default function AdminApp({ onLogout }) {
 
   if (view === "notifications")
     return <AdminNotifications onBack={() => setView("leads")} />;
+
+  if (view === "subscriptions")
+    return <AdminSubscriptions onBack={() => setView("leads")} />;
 
   return <AdminDashboard onLogout={onLogout} onNavigate={setView} />;
 }

@@ -332,6 +332,12 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
           >
             🔍 Audit Log
           </button>
+          <button
+            className={styles.logoutBtn}
+            onClick={() => onNavigate("subscriptions")}
+          >
+            💳 Subscriptions
+          </button>
           <button className={styles.logoutBtn} onClick={onLogout}>
             Logout
           </button>
