@@ -252,7 +252,7 @@ tbody tr:hover {
 }
 
 td {
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   vertical-align: middle;
 }
 
@@ -1087,51 +1087,33 @@ td {
   }
 }
 
-/* ── Mobile bottom sheet actions ─────────────────────────── */
-/* ══════════════════════════════════════════════════════════════════
-   REPLACE the existing @media (max-width: 640px) block at the 
-   bottom of AdminMaidDashboard.module.css with this entire block.
-   Also find the bare `td` rule and change padding: 1rem → padding: 0.75rem 1rem
-   ══════════════════════════════════════════════════════════════════ */
-
-/* 1. Find this rule and update it: */
-/*
-td {
-  padding: 1rem;           ← CHANGE TO: padding: 0.625rem 1rem;
-  vertical-align: middle;
-}
-*/
-
-/* 2. Replace the entire @media (max-width: 640px) block with this: */
+/* ══════════════════════════════════════════════════════
+   REPLACE your entire @media (max-width: 640px) block
+   with this one
+   ══════════════════════════════════════════════════════ */
 
 @media (max-width: 640px) {
   .heroActions {
     width: 100%;
   }
-
   .heroActions .btn {
     flex: 1;
     justify-content: center;
     font-size: 0.8rem;
     padding: 0.6rem 0.75rem;
   }
-
   .statsStrip {
     grid-template-columns: 1fr 1fr;
   }
-
   .detailGrid {
     grid-template-columns: 1fr;
   }
-
   .formRow {
     grid-template-columns: 1fr;
   }
-
   .topbarStats {
     display: none;
   }
-
   .toolbar {
     gap: 0.5rem;
   }
@@ -1139,59 +1121,14 @@ td {
     min-width: unset;
     flex: 1;
   }
-
   .pagination {
     flex-direction: column;
     align-items: stretch;
     text-align: center;
   }
-
   .pageButtons {
     justify-content: center;
   }
-
-  /* ── TABLE: compact rows on mobile ── */
-  .tableWrap table {
-    min-width: 0; /* allow table to shrink on mobile */
-  }
-
-  /* Hide less important columns on mobile */
-  .tableWrap table th:nth-child(3),
-  .tableWrap table td:nth-child(3),
-  .tableWrap table th:nth-child(4),
-  .tableWrap table td:nth-child(4),
-  .tableWrap table th:nth-child(5),
-  .tableWrap table td:nth-child(5),
-  .tableWrap table th:nth-child(6),
-  .tableWrap table td:nth-child(6) {
-    display: none;
-  }
-
-  /* Tight padding — use high specificity so it wins */
-  .tableWrap table td,
-  .tableWrap table th {
-    padding: 0.5rem 0.625rem;
-  }
-
-  /* Keep avatar small */
-  .avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-  }
-
-  .maidName {
-    font-size: 0.82rem;
-  }
-
-  .nameCell {
-    gap: 0.5rem;
-  }
-
-  .locCell {
-    font-size: 0.78rem;
-  }
-
   .formFooter {
     flex-direction: column-reverse;
   }
@@ -1199,9 +1136,39 @@ td {
     width: 100%;
     justify-content: center;
   }
-
   .modalActions {
     flex-direction: column-reverse;
+  }
+
+  /* ── Table fix: remove min-width so table fits the screen ── */
+  table {
+    min-width: 0 !important;
+  }
+
+  /* Hide Rating, Exp, Verified columns — keep Maid, Location, Status, Actions */
+  th:nth-child(3),
+  td:nth-child(3),
+  th:nth-child(4),
+  td:nth-child(4),
+  th:nth-child(5),
+  td:nth-child(5),
+  th:nth-child(6),
+  td:nth-child(6) {
+    display: none;
+  }
+
+  /* Tight padding */
+  .tableWrap table th,
+  .tableWrap table td {
+    padding: 0.5rem 0.5rem;
+  }
+
+  /* Status badge — force it to stay on one line */
+  .tableWrap table td:nth-child(7) span {
+    white-space: nowrap !important;
+    overflow: hidden;
+    max-width: 90px;
+    display: inline-flex !important;
   }
 }
 
@@ -1217,15 +1184,18 @@ td {
     width: 64px;
     height: 64px;
   }
+}
 
-  /* On very small screens hide actions column too */
-  .tableWrap table th:nth-child(7),
-  .tableWrap table td:nth-child(7) {
-    display: none;
+@media (max-width: 480px) {
+  .detailHero {
+    flex-direction: column;
   }
-
-  .tableWrap table th:nth-child(2),
-  .tableWrap table td:nth-child(2) {
-    display: none;
+  .heroLeft {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .heroAvatar {
+    width: 64px;
+    height: 64px;
   }
 }
