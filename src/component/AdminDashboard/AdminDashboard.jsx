@@ -308,6 +308,30 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
           >
             📄 Document Review
           </button>
+          <button
+            className={styles.logoutBtn}
+            onClick={() => onNavigate("notifications")}
+          >
+            🔔 Notifications
+          </button>
+          <button
+            className={styles.logoutBtn}
+            onClick={() => onNavigate("stats")}
+          >
+            📊 Analytics
+          </button>
+          <button
+            className={styles.logoutBtn}
+            onClick={() => onNavigate("settings")}
+          >
+            ⚙️ Settings
+          </button>
+          <button
+            className={styles.logoutBtn}
+            onClick={() => onNavigate("audit")}
+          >
+            🔍 Audit Log
+          </button>
           <button className={styles.logoutBtn} onClick={onLogout}>
             Logout
           </button>
