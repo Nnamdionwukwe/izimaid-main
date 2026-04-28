@@ -3,10 +3,41 @@ import styles from "./AdminSettings.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-const SYM = { NGN: "₦", USD: "$", GBP: "£", EUR: "€", GHS: "₵", KES: "KSh" };
-function fmt(n, cur) {
-  const s = SYM[cur] || "₦";
-  return `${s}${Number(n || 0).toLocaleString()}`;
+const CURRENCY_SYMBOLS = {
+  NGN: "₦",
+  USD: "$",
+  GBP: "£",
+  EUR: "€",
+  GHS: "₵",
+  KES: "KSh",
+  ZAR: "R",
+  UGX: "USh",
+  TZS: "TSh",
+  EGP: "E£",
+  CAD: "CA$",
+  AUD: "A$",
+  INR: "₹",
+  AED: "د.إ",
+  SAR: "﷼",
+  QAR: "QR",
+  SGD: "S$",
+  MYR: "RM",
+  BRL: "R$",
+  JPY: "¥",
+};
+
+function sym(c) {
+  return CURRENCY_SYMBOLS[c] || (c ? `${c} ` : "₦");
+}
+function fmt(amount, cur) {
+  return `${sym(cur)}${Number(amount || 0).toLocaleString()}`;
+}
+function fmtDate(d) {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString("en-NG", {
+    day: "numeric",
+    month: "short",
+  });
 }
 function initials(name) {
   return (
@@ -18,15 +49,56 @@ function initials(name) {
       .toUpperCase() || "?"
   );
 }
-function fmtDate(d) {
-  if (!d) return "—";
-  return new Date(d).toLocaleDateString("en-NG", {
-    day: "numeric",
-    month: "short",
-  });
+
+// ── Reusable: table where every row has a currency column ─────────────
+function CurrencyTable({ rows, columns }) {
+  if (!rows?.length)
+    return (
+      <p style={{ color: "#aaa", fontSize: 13, padding: "12px 0" }}>No data</p>
+    );
+  return (
+    <div className={styles.tableWrap}>
+      <table>
+        <thead>
+          <tr>
+            <th>Currency</th>
+            {columns.map((c) => (
+              <th key={c.key}>{c.label}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={i}>
+              <td>
+                <span
+                  style={{
+                    fontFamily: "Syne,sans-serif",
+                    fontWeight: 700,
+                    fontSize: 13,
+                    color: "#1a1a2e",
+                  }}
+                >
+                  {r.currency}
+                </span>
+                <span style={{ marginLeft: 4, fontSize: 11, color: "#aaa" }}>
+                  {sym(r.currency)}
+                </span>
+              </td>
+              {columns.map((c) => (
+                <td key={c.key} className={c.bold ? styles.tdBold : ""}>
+                  {c.fmt ? c.fmt(r[c.key], r.currency) : r[c.key]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
-// ── Overview Tab ──────────────────────────────────────────────────────────────
+// ── Overview Tab ──────────────────────────────────────────────────────
 function OverviewTab() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -57,7 +129,6 @@ function OverviewTab() {
     top_maids,
   } = stats;
 
-  // Booking bar chart
   const bookingStatuses = [
     "pending",
     "confirmed",
@@ -71,139 +142,106 @@ function OverviewTab() {
     1,
   );
 
-  // Withdrawal summary
-  const withdrawalMap = Object.fromEntries(
-    (withdrawals || []).map((w) => [
-      w.status,
-      { count: w.count, total: w.total },
-    ]),
-  );
-
-  // Recent 7-day sparkline text
-  const maxRev = Math.max(
-    ...(recent_bookings || []).map((r) => Number(r.revenue)),
-    1,
-  );
+  // Group withdrawals { currency → { status → { count, total } } }
+  const wdByCurrency = {};
+  for (const w of withdrawals || []) {
+    if (!wdByCurrency[w.currency]) wdByCurrency[w.currency] = {};
+    wdByCurrency[w.currency][w.status] = { count: w.count, total: w.total };
+  }
 
   return (
     <>
       {/* Alert tiles */}
-      {(pending_approvals > 0 || active_sos > 0 || pending_docs > 0) && (
+      {(Number(pending_approvals) > 0 ||
+        Number(active_sos) > 0 ||
+        Number(pending_docs) > 0) && (
         <div className={styles.statGrid} style={{ marginBottom: 20 }}>
-          {pending_approvals > 0 && (
+          {Number(pending_approvals) > 0 && (
             <div className={`${styles.statCard} ${styles.dark}`}>
               <p className={styles.statLabel}>⏳ Pending Approvals</p>
-              <p className={`${styles.statValue}`}>{pending_approvals}</p>
+              <p className={styles.statValue}>{pending_approvals}</p>
               <p
                 className={styles.statSub}
                 style={{ color: "rgba(255,255,255,0.4)" }}
               >
-                Bookings awaiting you
+                Awaiting review
               </p>
             </div>
           )}
-          {active_sos > 0 && (
+          {Number(active_sos) > 0 && (
             <div
-              className={`${styles.statCard}`}
+              className={styles.statCard}
               style={{ borderLeft: "3px solid rgb(187,19,47)" }}
             >
               <p className={styles.statLabel}>🚨 Active SOS</p>
               <p className={`${styles.statValue} ${styles.red}`}>
                 {active_sos}
               </p>
-              <p className={styles.statSub}>Needs immediate attention</p>
             </div>
           )}
-          {pending_docs > 0 && (
+          {Number(pending_docs) > 0 && (
             <div className={styles.statCard}>
               <p className={styles.statLabel}>📄 Pending Docs</p>
               <p className={`${styles.statValue} ${styles.amber}`}>
                 {pending_docs}
               </p>
-              <p className={styles.statSub}>Maid documents to review</p>
             </div>
           )}
         </div>
       )}
 
-      {/* Revenue */}
-      <p className={styles.sectionTitle}>Revenue</p>
-      <div className={styles.statGrid}>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Gross Revenue</p>
-          <p className={`${styles.statValue} ${styles.green}`}>
-            {fmt(revenue?.total_gross)}
-          </p>
-        </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Platform Fees</p>
-          <p className={`${styles.statValue} ${styles.blue}`}>
-            {fmt(revenue?.total_platform_fee)}
-          </p>
-        </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Maid Payouts</p>
-          <p className={styles.statValue}>{fmt(revenue?.total_maid_payout)}</p>
-        </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Paid Transactions</p>
-          <p className={styles.statValue}>
-            {Number(revenue?.paid_count || 0).toLocaleString()}
-          </p>
-          <p className={styles.statSub}>
-            {Number(revenue?.refunded_count || 0)} refunded
-          </p>
-        </div>
-      </div>
+      {/* Revenue per currency */}
+      <p className={styles.sectionTitle}>Revenue by Currency</p>
+      <CurrencyTable
+        rows={revenue}
+        columns={[
+          { key: "total_gross", label: "Gross Revenue", fmt: fmt, bold: true },
+          { key: "total_platform_fee", label: "Platform Fees", fmt: fmt },
+          { key: "total_maid_payout", label: "Maid Payouts", fmt: fmt },
+          { key: "paid_count", label: "Paid Txns" },
+          { key: "refunded_count", label: "Refunded" },
+        ]}
+      />
 
       {/* Users */}
-      <p className={styles.sectionTitle}>Users</p>
+      <p className={styles.sectionTitle} style={{ marginTop: 20 }}>
+        Users
+      </p>
       <div className={styles.statGrid}>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Customers</p>
-          <p className={styles.statValue}>{users?.customer?.total || 0}</p>
-          <p className={styles.statSub}>
-            {users?.customer?.active || 0} active
-          </p>
-        </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Maids</p>
-          <p className={`${styles.statValue} ${styles.blue}`}>
-            {users?.maid?.total || 0}
-          </p>
-          <p className={styles.statSub}>{users?.maid?.active || 0} active</p>
-        </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Admins</p>
-          <p className={styles.statValue}>{users?.admin?.total || 0}</p>
-        </div>
+        {["customer", "maid", "admin"].map((role) => (
+          <div key={role} className={styles.statCard}>
+            <p className={styles.statLabel}>
+              {role.charAt(0).toUpperCase() + role.slice(1)}s
+            </p>
+            <p className={styles.statValue}>{users?.[role]?.total || 0}</p>
+            <p className={styles.statSub}>
+              {users?.[role]?.active || 0} active
+            </p>
+          </div>
+        ))}
         <div className={styles.statCard}>
           <p className={styles.statLabel}>Total Users</p>
           <p className={styles.statValue}>
-            {(
-              (users?.customer?.total || 0) +
-              (users?.maid?.total || 0) +
-              (users?.admin?.total || 0)
-            ).toLocaleString()}
+            {Object.values(users || {})
+              .reduce((a, v) => a + (v.total || 0), 0)
+              .toLocaleString()}
           </p>
         </div>
       </div>
 
-      {/* Bookings by status */}
+      {/* Bookings bar chart */}
       <p className={styles.sectionTitle}>Bookings by Status</p>
       <div className={styles.card}>
         <div className={styles.cardBody}>
           <div className={styles.barChart}>
             {bookingStatuses.map((s) => {
               const count = Number(bookings[s] || 0);
-              const pct = maxBookings > 0 ? (count / maxBookings) * 100 : 0;
+              const pct = (count / maxBookings) * 100;
               const colorMap = {
                 pending: "amber",
                 confirmed: "blue",
                 in_progress: "purple",
                 completed: "green",
-                cancelled: "",
-                declined: "",
               };
               return (
                 <div key={s} className={styles.barRow}>
@@ -227,15 +265,16 @@ function OverviewTab() {
       {/* 7-day activity */}
       {recent_bookings?.length > 0 && (
         <>
-          <p className={styles.sectionTitle}>Last 7 Days</p>
+          <p className={styles.sectionTitle} style={{ marginTop: 20 }}>
+            Last 7 Days
+          </p>
           <div className={styles.tableWrap}>
             <table>
               <thead>
                 <tr>
                   <th>Date</th>
                   <th>Bookings</th>
-                  <th>Revenue</th>
-                  <th>Bar</th>
+                  <th>Revenue (base currency)</th>
                 </tr>
               </thead>
               <tbody>
@@ -243,20 +282,7 @@ function OverviewTab() {
                   <tr key={r.date}>
                     <td className={styles.tdBold}>{fmtDate(r.date)}</td>
                     <td>{Number(r.count).toLocaleString()}</td>
-                    <td className={styles.tdBold}>{fmt(r.revenue)}</td>
-                    <td>
-                      <div
-                        className={styles.barTrack}
-                        style={{ height: 10, width: 80 }}
-                      >
-                        <div
-                          className={`${styles.barFill} ${styles.green}`}
-                          style={{
-                            width: `${(Number(r.revenue) / maxRev) * 100}%`,
-                          }}
-                        />
-                      </div>
-                    </td>
+                    <td>{Number(r.revenue).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -265,77 +291,145 @@ function OverviewTab() {
         </>
       )}
 
-      {/* Top maids */}
+      {/* Top maids — earnings per currency */}
       {top_maids?.length > 0 && (
         <>
           <p className={styles.sectionTitle} style={{ marginTop: 20 }}>
-            Top 5 Maids by Earnings
+            Top 5 Maids
           </p>
           <div className={styles.card}>
             <div className={styles.cardBody}>
-              {top_maids.map((m, i) => (
-                <div key={m.id} className={styles.maidRow}>
-                  <span
-                    className={`${styles.maidRank} ${i < 3 ? styles.top : ""}`}
-                  >
-                    {i + 1}
-                  </span>
-                  {m.avatar ? (
-                    <img
-                      src={m.avatar}
-                      alt={m.name}
-                      className={styles.maidAvatar}
-                    />
-                  ) : (
-                    <div className={styles.maidAvatarPlaceholder}>
-                      {initials(m.name)}
+              {top_maids.map((m, i) => {
+                // Deduplicate by currency (safety net for any backend duplicates)
+                const earningMap = {};
+                for (const e of m.earnings || []) {
+                  if (e.currency && Number(e.total_earned) > 0) {
+                    earningMap[e.currency] = Number(e.total_earned);
+                  }
+                }
+                const earningsList = Object.entries(earningMap);
+                return (
+                  <div key={m.id} className={styles.maidRow}>
+                    <span
+                      className={`${styles.maidRank} ${i < 3 ? styles.top : ""}`}
+                    >
+                      {i + 1}
+                    </span>
+                    {m.avatar ? (
+                      <img
+                        src={m.avatar}
+                        alt={m.name}
+                        className={styles.maidAvatar}
+                      />
+                    ) : (
+                      <div className={styles.maidAvatarPlaceholder}>
+                        {initials(m.name)}
+                      </div>
+                    )}
+                    <div className={styles.maidInfo}>
+                      <p className={styles.maidName}>{m.name}</p>
+                      <p className={styles.maidSub}>
+                        ⭐ {Number(m.rating || 0).toFixed(1)} ·{" "}
+                        {m.completed_bookings} jobs
+                      </p>
+                      {/* Earnings pills inline under name */}
+                      {earningsList.length > 0 && (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 4,
+                            marginTop: 5,
+                          }}
+                        >
+                          {earningsList.map(([cur, total]) => (
+                            <span
+                              key={cur}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 3,
+                                background: "rgb(209,247,224)",
+                                color: "rgb(10,107,46)",
+                                borderRadius: 20,
+                                padding: "2px 8px",
+                                fontSize: 11,
+                                fontWeight: 600,
+                                fontFamily: "DM Sans,sans-serif",
+                              }}
+                            >
+                              <span style={{ opacity: 0.7, fontSize: 10 }}>
+                                {cur}
+                              </span>
+                              {fmt(total, cur)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
-                  <div className={styles.maidInfo}>
-                    <p className={styles.maidName}>{m.name}</p>
-                    <p className={styles.maidSub}>
-                      ⭐ {Number(m.rating || 0).toFixed(1)} ·{" "}
-                      {m.completed_bookings} jobs
-                    </p>
                   </div>
-                  <span className={styles.maidEarning}>
-                    {fmt(m.total_earned)}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </>
       )}
 
-      {/* Withdrawals */}
-      <p className={styles.sectionTitle} style={{ marginTop: 20 }}>
-        Withdrawals
-      </p>
-      <div className={styles.statGrid}>
-        {["pending", "processing", "paid", "rejected", "failed"].map((s) => (
-          <div key={s} className={styles.statCard}>
-            <p className={styles.statLabel}>{s}</p>
-            <p className={styles.statValue}>
-              {Number(withdrawalMap[s]?.count || 0)}
-            </p>
-            <p className={styles.statSub}>
-              {fmt(withdrawalMap[s]?.total || 0)}
-            </p>
+      {/* Withdrawals per currency */}
+      {Object.keys(wdByCurrency).length > 0 && (
+        <>
+          <p className={styles.sectionTitle} style={{ marginTop: 20 }}>
+            Withdrawals by Currency
+          </p>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Currency</th>
+                  <th>Status</th>
+                  <th>Count</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(wdByCurrency).flatMap(([cur, statuses]) =>
+                  Object.entries(statuses).map(([status, d]) => (
+                    <tr key={`${cur}-${status}`}>
+                      <td className={styles.tdBold}>
+                        {cur}{" "}
+                        <span style={{ color: "#aaa", fontWeight: 400 }}>
+                          {sym(cur)}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`${styles.badge} ${status === "paid" ? styles.badgeGreen : status === "pending" ? styles.badgeAmber : styles.badgeGray}`}
+                        >
+                          {status}
+                        </span>
+                      </td>
+                      <td>{Number(d.count).toLocaleString()}</td>
+                      <td className={styles.tdBold}>{fmt(d.total, cur)}</td>
+                    </tr>
+                  )),
+                )}
+              </tbody>
+            </table>
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </>
   );
 }
 
-// ── Revenue Tab ───────────────────────────────────────────────────────────────
+// ── Revenue Tab ───────────────────────────────────────────────────────
 function RevenueTab() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState("monthly");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [curFilter, setCurFilter] = useState("");
 
   const fetchRevenue = useCallback(async () => {
     setLoading(true);
@@ -359,10 +453,13 @@ function RevenueTab() {
     fetchRevenue();
   }, []);
 
-  const maxGross = Math.max(
-    ...(data?.data || []).map((r) => Number(r.gross_revenue)),
-    1,
-  );
+  const allCurrencies = [...new Set((data?.data || []).map((r) => r.currency))];
+  const filtered = curFilter
+    ? (data?.data || []).filter((r) => r.currency === curFilter)
+    : data?.data || [];
+  const totals = curFilter
+    ? (data?.totals || []).filter((t) => t.currency === curFilter)
+    : data?.totals || [];
 
   return (
     <>
@@ -370,11 +467,17 @@ function RevenueTab() {
         {["daily", "weekly", "monthly"].map((p) => (
           <button
             key={p}
-            className={styles.applyBtn}
             style={{
+              height: 38,
+              padding: "0 14px",
               background: period === p ? "#1a1a2e" : "#fff",
               color: period === p ? "#fff" : "#444",
               border: "1px solid #e0ddd6",
+              borderRadius: 8,
+              fontFamily: "DM Sans,sans-serif",
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: "pointer",
             }}
             onClick={() => setPeriod(p)}
           >
@@ -386,94 +489,63 @@ function RevenueTab() {
           type="date"
           value={from}
           onChange={(e) => setFrom(e.target.value)}
-          placeholder="From"
         />
         <input
           className={styles.dateInput}
           type="date"
           value={to}
           onChange={(e) => setTo(e.target.value)}
-          placeholder="To"
         />
         <button className={styles.applyBtn} onClick={fetchRevenue}>
           Apply
         </button>
+        <select
+          className={styles.selectFilter}
+          value={curFilter}
+          onChange={(e) => setCurFilter(e.target.value)}
+        >
+          <option value="">All currencies</option>
+          {allCurrencies.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {data?.totals && (
-        <div className={styles.statGrid}>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Gross Revenue</p>
-            <p className={`${styles.statValue} ${styles.green}`}>
-              {fmt(data.totals.gross)}
-            </p>
-          </div>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Platform Fees</p>
-            <p className={`${styles.statValue} ${styles.blue}`}>
-              {fmt(data.totals.fee)}
-            </p>
-          </div>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Maid Payouts</p>
-            <p className={styles.statValue}>{fmt(data.totals.payouts)}</p>
-          </div>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Periods</p>
-            <p className={styles.statValue}>{data.data?.length || 0}</p>
-          </div>
-        </div>
+      {totals.length > 0 && (
+        <>
+          <p className={styles.sectionTitle}>Totals</p>
+          <CurrencyTable
+            rows={totals}
+            columns={[
+              { key: "gross", label: "Gross Revenue", fmt: fmt, bold: true },
+              { key: "fee", label: "Platform Fees", fmt: fmt },
+              { key: "payouts", label: "Maid Payouts", fmt: fmt },
+            ]}
+          />
+        </>
       )}
 
       {loading ? (
         <div className={styles.loading}>Loading revenue...</div>
-      ) : !data?.data?.length ? (
+      ) : filtered.length === 0 ? (
         <div className={styles.empty}>
           <div className={styles.emptyIcon}>📊</div>
-          <p className={styles.emptyText}>No revenue data for this period</p>
+          <p className={styles.emptyText}>No revenue data</p>
         </div>
       ) : (
         <>
-          {/* Bar chart */}
-          <p className={styles.sectionTitle}>Revenue by Period</p>
-          <div className={styles.card}>
-            <div className={styles.cardBody}>
-              <div className={styles.barChart}>
-                {data.data.map((r, i) => {
-                  const pct = (Number(r.gross_revenue) / maxGross) * 100;
-                  const label =
-                    period === "daily"
-                      ? fmtDate(r.period)
-                      : new Date(r.period).toLocaleDateString("en-NG", {
-                          month: "short",
-                          year: period === "monthly" ? "numeric" : undefined,
-                        });
-                  return (
-                    <div key={i} className={styles.barRow}>
-                      <span className={styles.barLabel}>{label}</span>
-                      <div className={styles.barTrack}>
-                        <div
-                          className={`${styles.barFill} ${styles.green}`}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                      <span className={styles.barVal}>
-                        {fmt(r.gross_revenue)}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Table */}
-          <div className={styles.tableWrap} style={{ marginTop: 16 }}>
+          <p className={styles.sectionTitle} style={{ marginTop: 20 }}>
+            Period Breakdown
+          </p>
+          <div className={styles.tableWrap}>
             <table>
               <thead>
                 <tr>
                   <th>Period</th>
-                  <th>Transactions</th>
+                  <th>Currency</th>
+                  <th>Txns</th>
                   <th>Gross</th>
                   <th>Fee</th>
                   <th>Payouts</th>
@@ -484,7 +556,7 @@ function RevenueTab() {
                 </tr>
               </thead>
               <tbody>
-                {data.data.map((r, i) => (
+                {filtered.map((r, i) => (
                   <tr key={i}>
                     <td className={styles.tdBold}>
                       {new Date(r.period).toLocaleDateString("en-NG", {
@@ -493,10 +565,22 @@ function RevenueTab() {
                         year: "numeric",
                       })}
                     </td>
+                    <td>
+                      <span style={{ fontWeight: 700, color: "#1a1a2e" }}>
+                        {r.currency}
+                      </span>
+                      <span
+                        style={{ marginLeft: 4, color: "#aaa", fontSize: 11 }}
+                      >
+                        {sym(r.currency)}
+                      </span>
+                    </td>
                     <td>{Number(r.transactions).toLocaleString()}</td>
-                    <td className={styles.tdBold}>{fmt(r.gross_revenue)}</td>
-                    <td>{fmt(r.platform_fee)}</td>
-                    <td>{fmt(r.maid_payouts)}</td>
+                    <td className={styles.tdBold}>
+                      {fmt(r.gross_revenue, r.currency)}
+                    </td>
+                    <td>{fmt(r.platform_fee, r.currency)}</td>
+                    <td>{fmt(r.maid_payouts, r.currency)}</td>
                     <td>{r.paystack_count}</td>
                     <td>{r.stripe_count}</td>
                     <td>{r.bank_count}</td>
@@ -512,7 +596,7 @@ function RevenueTab() {
   );
 }
 
-// ── Financial Tab ─────────────────────────────────────────────────────────────
+// ── Financial Tab ─────────────────────────────────────────────────────
 function FinancialTab() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -528,47 +612,31 @@ function FinancialTab() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading)
-    return <div className={styles.loading}>Loading financial overview...</div>;
+  if (loading) return <div className={styles.loading}>Loading...</div>;
   if (!data) return <div className={styles.loading}>No data</div>;
 
   return (
     <>
-      {/* Wallet totals */}
-      <p className={styles.sectionTitle}>Platform Wallet Totals</p>
-      <div className={styles.statGrid}>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Available Balance</p>
-          <p className={`${styles.statValue} ${styles.green}`}>
-            {fmt(data.wallet_totals?.total_available)}
-          </p>
-        </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Pending Balance</p>
-          <p className={`${styles.statValue} ${styles.amber}`}>
-            {fmt(data.wallet_totals?.total_pending)}
-          </p>
-        </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Total Earned (all maids)</p>
-          <p className={`${styles.statValue} ${styles.blue}`}>
-            {fmt(data.wallet_totals?.total_earned)}
-          </p>
-        </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Total Withdrawn</p>
-          <p className={styles.statValue}>
-            {fmt(data.wallet_totals?.total_withdrawn)}
-          </p>
-        </div>
-      </div>
+      <p className={styles.sectionTitle}>Wallet Totals by Currency</p>
+      <CurrencyTable
+        rows={data.wallet_totals}
+        columns={[
+          { key: "total_available", label: "Available", fmt: fmt, bold: true },
+          { key: "total_pending", label: "Pending", fmt: fmt },
+          { key: "total_earned", label: "Total Earned", fmt: fmt },
+          { key: "total_withdrawn", label: "Withdrawn", fmt: fmt },
+          { key: "maid_count", label: "Maids" },
+        ]}
+      />
 
-      {/* Payments by gateway */}
-      <p className={styles.sectionTitle}>Payments by Gateway & Status</p>
+      <p className={styles.sectionTitle} style={{ marginTop: 20 }}>
+        Payments by Currency & Gateway
+      </p>
       <div className={styles.tableWrap}>
         <table>
           <thead>
             <tr>
+              <th>Currency</th>
               <th>Gateway</th>
               <th>Status</th>
               <th>Count</th>
@@ -578,7 +646,15 @@ function FinancialTab() {
           <tbody>
             {data.payments?.map((r, i) => (
               <tr key={i}>
-                <td className={styles.tdBold}>{r.gateway}</td>
+                <td className={styles.tdBold}>
+                  {r.currency}{" "}
+                  <span
+                    style={{ color: "#aaa", fontWeight: 400, fontSize: 11 }}
+                  >
+                    {sym(r.currency)}
+                  </span>
+                </td>
+                <td>{r.gateway}</td>
                 <td>
                   <span
                     className={`${styles.badge} ${r.status === "success" ? styles.badgeGreen : r.status === "refunded" ? styles.badgePurple : styles.badgeGray}`}
@@ -587,21 +663,21 @@ function FinancialTab() {
                   </span>
                 </td>
                 <td>{Number(r.count).toLocaleString()}</td>
-                <td className={styles.tdBold}>{fmt(r.total)}</td>
+                <td className={styles.tdBold}>{fmt(r.total, r.currency)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Payouts */}
       <p className={styles.sectionTitle} style={{ marginTop: 20 }}>
-        Maid Payouts
+        Maid Payouts by Currency
       </p>
       <div className={styles.tableWrap}>
         <table>
           <thead>
             <tr>
+              <th>Currency</th>
               <th>Status</th>
               <th>Count</th>
               <th>Total</th>
@@ -610,6 +686,14 @@ function FinancialTab() {
           <tbody>
             {data.payouts?.map((r, i) => (
               <tr key={i}>
+                <td className={styles.tdBold}>
+                  {r.currency}{" "}
+                  <span
+                    style={{ color: "#aaa", fontWeight: 400, fontSize: 11 }}
+                  >
+                    {sym(r.currency)}
+                  </span>
+                </td>
                 <td>
                   <span
                     className={`${styles.badge} ${r.status === "paid" ? styles.badgeGreen : r.status === "escrow" ? styles.badgeAmber : styles.badgeGray}`}
@@ -618,21 +702,21 @@ function FinancialTab() {
                   </span>
                 </td>
                 <td>{Number(r.count).toLocaleString()}</td>
-                <td className={styles.tdBold}>{fmt(r.total)}</td>
+                <td className={styles.tdBold}>{fmt(r.total, r.currency)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Withdrawals */}
       <p className={styles.sectionTitle} style={{ marginTop: 20 }}>
-        Withdrawals by Method
+        Withdrawals by Currency & Method
       </p>
       <div className={styles.tableWrap}>
         <table>
           <thead>
             <tr>
+              <th>Currency</th>
               <th>Method</th>
               <th>Status</th>
               <th>Count</th>
@@ -643,8 +727,14 @@ function FinancialTab() {
             {data.withdrawals?.map((r, i) => (
               <tr key={i}>
                 <td className={styles.tdBold}>
-                  {r.method?.replace(/_/g, " ")}
+                  {r.currency}{" "}
+                  <span
+                    style={{ color: "#aaa", fontWeight: 400, fontSize: 11 }}
+                  >
+                    {sym(r.currency)}
+                  </span>
                 </td>
+                <td>{r.method?.replace(/_/g, " ")}</td>
                 <td>
                   <span
                     className={`${styles.badge} ${r.status === "paid" ? styles.badgeGreen : r.status === "pending" ? styles.badgeAmber : styles.badgeGray}`}
@@ -653,7 +743,7 @@ function FinancialTab() {
                   </span>
                 </td>
                 <td>{Number(r.count).toLocaleString()}</td>
-                <td>{fmt(r.total)}</td>
+                <td>{fmt(r.total, r.currency)}</td>
               </tr>
             ))}
           </tbody>
@@ -663,15 +753,9 @@ function FinancialTab() {
   );
 }
 
-// ── Main AdminStats ───────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────
 export default function AdminStats({ onBack }) {
   const [activeTab, setActiveTab] = useState("overview");
-
-  const tabs = [
-    { id: "overview", label: "📊 Overview" },
-    { id: "revenue", label: "💰 Revenue" },
-    { id: "financial", label: "🏦 Financial" },
-  ];
 
   return (
     <div className={styles.page}>
@@ -687,7 +771,11 @@ export default function AdminStats({ onBack }) {
           )}
         </div>
         <div className={styles.tabBar}>
-          {tabs.map((t) => (
+          {[
+            { id: "overview", label: "📊 Overview" },
+            { id: "revenue", label: "💰 Revenue" },
+            { id: "financial", label: "🏦 Financial" },
+          ].map((t) => (
             <button
               key={t.id}
               className={`${styles.tabBtn} ${activeTab === t.id ? styles.tabBtnActive : ""}`}
@@ -698,7 +786,6 @@ export default function AdminStats({ onBack }) {
           ))}
         </div>
       </div>
-
       <div className={styles.content}>
         {activeTab === "overview" && <OverviewTab />}
         {activeTab === "revenue" && <RevenueTab />}
