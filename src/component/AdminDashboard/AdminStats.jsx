@@ -98,7 +98,7 @@ function OverviewTab() {
                 className={styles.statSub}
                 style={{ color: "rgba(255,255,255,0.4)" }}
               >
-                Bookings awaiting you
+                Bookings awaiting youu
               </p>
             </div>
           )}
