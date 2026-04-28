@@ -12,6 +12,54 @@ const STATUS_COLORS = {
   lost: styles.statusLost,
 };
 
+const NAV_GROUPS = [
+  {
+    label: "People",
+    items: [
+      { key: "maids", icon: "👩‍🔧", label: "Maids" },
+      { key: "users", icon: "👥", label: "Users" },
+    ],
+  },
+  {
+    label: "Operations",
+    items: [
+      { key: "bookings", icon: "📅", label: "Bookings" },
+      { key: "documents", icon: "📄", label: "Document Review" },
+    ],
+  },
+  {
+    label: "Finance",
+    items: [
+      { key: "payments", icon: "💳", label: "Payments" },
+      { key: "admin-wallets", icon: "👛", label: "Maid Wallets" },
+      { key: "withdrawals", icon: "🏦", label: "Withdrawals" },
+      { key: "subscriptions", icon: "⭐", label: "Subscriptions" },
+    ],
+  },
+  {
+    label: "Support & Chat",
+    items: [
+      { key: "support", icon: "🎫", label: "Customer Support" },
+      { key: "maid-support", icon: "🧹", label: "Maid Support" },
+      { key: "chats", icon: "💬", label: "All Live Chats" },
+      { key: "support-chat", icon: "🛎️", label: "Customer Live Chat" },
+      { key: "maid-support-chat", icon: "🫧", label: "Maid Live Chat" },
+    ],
+  },
+  {
+    label: "Insights",
+    items: [
+      { key: "stats", icon: "📊", label: "Analytics" },
+      { key: "notifications", icon: "🔔", label: "Notifications" },
+      { key: "audit", icon: "🔍", label: "Audit Log" },
+    ],
+  },
+  {
+    label: "System",
+    items: [{ key: "settings", icon: "⚙️", label: "Settings" }],
+  },
+];
+
 function formatDate(dateStr) {
   const d = new Date(dateStr);
   return d.toLocaleDateString("en-NG", {
@@ -76,18 +124,14 @@ function LeadDetailModal({ lead, onClose, onStatusUpdate }) {
     ["Cleaning type", lead.cleaning_type?.replace("_", " ")],
     ["Frequency", lead.frequency?.replace("_", " ")],
     lead.residential_sqft && ["Sq ft (home)", lead.residential_sqft],
-    lead.bedrooms !== null &&
-      lead.bedrooms !== undefined && ["Bedrooms", lead.bedrooms],
-    lead.bathrooms !== null &&
-      lead.bathrooms !== undefined && ["Bathrooms", lead.bathrooms],
+    lead.bedrooms != null && ["Bedrooms", lead.bedrooms],
+    lead.bathrooms != null && ["Bathrooms", lead.bathrooms],
     lead.commercial_sqft && ["Sq ft (office)", lead.commercial_sqft],
-    lead.offices !== null &&
-      lead.offices !== undefined && ["Offices", lead.offices],
-    lead.commercial_bathrooms !== null &&
-      lead.commercial_bathrooms !== undefined && [
-        "Office bathrooms",
-        lead.commercial_bathrooms,
-      ],
+    lead.offices != null && ["Offices", lead.offices],
+    lead.commercial_bathrooms != null && [
+      "Office bathrooms",
+      lead.commercial_bathrooms,
+    ],
     lead.recurring_plan && ["Recurring plan", lead.recurring_plan],
     ["SMS opt-in", lead.text_me_messages ? "Yes" : "No"],
     ["Submitted", formatDate(lead.created_at)],
@@ -143,7 +187,64 @@ function LeadDetailModal({ lead, onClose, onStatusUpdate }) {
   );
 }
 
-export default function AdminDashboard({ onLogout, onNavigate }) {
+// ── Sidebar ────────────────────────────────────────────────────────────
+function Sidebar({ activeView, onNavigate, onLogout, mobileOpen, onClose }) {
+  return (
+    <>
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div className={styles.sidebarBackdrop} onClick={onClose} />
+      )}
+
+      <aside
+        className={`${styles.sidebar} ${mobileOpen ? styles.sidebarOpen : ""}`}
+      >
+        {/* Logo / brand */}
+        <div className={styles.sidebarBrand}>
+          <span className={styles.sidebarBrandTitle}>Deusizi</span>
+          <span className={styles.sidebarBrandSub}>Admin</span>
+        </div>
+
+        {/* Nav groups */}
+        <nav className={styles.sidebarNav}>
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label} className={styles.navGroup}>
+              <span className={styles.navGroupLabel}>{group.label}</span>
+              {group.items.map(({ key, icon, label }) => (
+                <button
+                  key={key}
+                  className={`${styles.navBtn} ${activeView === key ? styles.navBtnActive : ""}`}
+                  onClick={() => {
+                    onNavigate(key);
+                    onClose();
+                  }}
+                >
+                  <span className={styles.navIcon}>{icon}</span>
+                  <span className={styles.navLabel}>{label}</span>
+                </button>
+              ))}
+            </div>
+          ))}
+        </nav>
+
+        {/* Logout pinned to bottom */}
+        <div className={styles.sidebarFooter}>
+          <button className={styles.logoutBtn} onClick={onLogout}>
+            <span className={styles.navIcon}>🚪</span>
+            <span className={styles.navLabel}>Logout</span>
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+}
+
+// ── Main component ─────────────────────────────────────────────────────
+export default function AdminDashboard({
+  onLogout,
+  onNavigate,
+  activeView = "dashboard",
+}) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -151,6 +252,7 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [selectedLead, setSelectedLead] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const LIMIT = 20;
 
   const fetchLeads = useCallback(async () => {
@@ -175,18 +277,15 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
   useEffect(() => {
     fetchLeads();
   }, [fetchLeads]);
-
-  // Reset to page 1 when filter changes
   useEffect(() => {
     setPage(1);
   }, [filter]);
 
-  // ✅ Silent background refresh every 30 seconds
+  // Background refresh every 30s
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-
-    const refreshInterval = setInterval(async () => {
+    const id = setInterval(async () => {
       try {
         const params = new URLSearchParams({ page, limit: LIMIT });
         if (filter !== "all") params.set("status", filter);
@@ -196,12 +295,9 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
         const data = await res.json();
         setLeads(data.leads || []);
         setTotal(data.total || 0);
-      } catch (err) {
-        console.error("Background refresh error:", err);
-      }
+      } catch {}
     }, 30000);
-
-    return () => clearInterval(refreshInterval);
+    return () => clearInterval(id);
   }, [filter, page]);
 
   const filtered = leads.filter((l) => {
@@ -227,258 +323,179 @@ export default function AdminDashboard({ onLogout, onNavigate }) {
 
   const totalPages = Math.ceil(total / LIMIT);
 
+  // Find active nav label for topbar breadcrumb
+  const allItems = NAV_GROUPS.flatMap((g) => g.items);
+  const activeItem = allItems.find((i) => i.key === activeView);
+  const pageTitle = activeItem
+    ? `${activeItem.icon} ${activeItem.label}`
+    : "Dashboard";
+
   return (
-    <div className={styles.dashboard}>
-      {/* Header */}
-      <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <h1 className={styles.headerTitle}>Deusizi Sparkle Admin</h1>
+    <div className={styles.shell}>
+      <Sidebar
+        activeView={activeView}
+        onNavigate={onNavigate}
+        onLogout={onLogout}
+        mobileOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      <div className={styles.mainArea}>
+        {/* Top bar */}
+        <div className={styles.topBar}>
+          <div className={styles.topBarLeft}>
+            {/* Hamburger — mobile only */}
+            <button
+              className={styles.hamburger}
+              onClick={() => setSidebarOpen((s) => !s)}
+              aria-label="Open menu"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+            <h1 className={styles.topBarTitle}>{pageTitle}</h1>
+          </div>
           <span className={styles.headerBadge}>{total} leads</span>
         </div>
-        <div className={styles.headerNav}>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("maids")}
-          >
-            👩‍🔧 Maids
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("bookings")}
-          >
-            📅 Bookings
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("users")}
-          >
-            👥 Users
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("support")}
-          >
-            🎫 Customer Support
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("maid-support")}
-          >
-            🧹 Maid Support
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("chats")}
-          >
-            🎫 Customer and Maid Live Chat
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("support-chat")}
-          >
-            🛎️ Customer Live Chat
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("maid-support-chat")}
-          >
-            🧹 Maid Live Chat
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("payments")}
-          >
-            💳 Payments
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("admin-wallets")}
-          >
-            💳 Maid Wallets
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("withdrawals")}
-          >
-            💳 Withdrawals
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("documents")}
-          >
-            📄 Document Review
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("notifications")}
-          >
-            🔔 Notifications
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("stats")}
-          >
-            📊 Analytics
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("settings")}
-          >
-            ⚙️ Settings
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("audit")}
-          >
-            🔍 Audit Log
-          </button>
-          <button
-            className={styles.logoutBtn}
-            onClick={() => onNavigate("subscriptions")}
-          >
-            💳 Subscriptions
-          </button>
-          <button className={styles.logoutBtn} onClick={onLogout}>
-            Logout
-          </button>
-        </div>
-      </div>
 
-      {/* Stats */}
-      <div className={styles.statsBar}>
-        <StatCard label="Total" value={total} />
-        <StatCard label="New" value={counts.new || 0} color="#1a56c4" />
-        <StatCard
-          label="Contacted"
-          value={counts.contacted || 0}
-          color="#856404"
-        />
-        <StatCard
-          label="Converted"
-          value={counts.converted || 0}
-          color="#0a6b2e"
-        />
-      </div>
+        {/* Dashboard content */}
+        <div className={styles.dashboard}>
+          {/* Stats */}
+          <div className={styles.statsBar}>
+            <StatCard label="Total" value={total} />
+            <StatCard label="New" value={counts.new || 0} color="#1a56c4" />
+            <StatCard
+              label="Contacted"
+              value={counts.contacted || 0}
+              color="#856404"
+            />
+            <StatCard
+              label="Converted"
+              value={counts.converted || 0}
+              color="#0a6b2e"
+            />
+          </div>
 
-      {/* Filters */}
-      <div className={styles.filterBar}>
-        {STATUS_FILTERS.map((f) => (
-          <button
-            key={f}
-            className={`${styles.filterBtn} ${filter === f ? styles.filterBtnActive : ""}`}
-            onClick={() => setFilter(f)}
-          >
-            {f.charAt(0).toUpperCase() + f.slice(1)}
-          </button>
-        ))}
-      </div>
+          {/* Filters */}
+          <div className={styles.filterBar}>
+            {STATUS_FILTERS.map((f) => (
+              <button
+                key={f}
+                className={`${styles.filterBtn} ${filter === f ? styles.filterBtnActive : ""}`}
+                onClick={() => setFilter(f)}
+              >
+                {f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
+          </div>
 
-      {/* Search */}
-      <div className={styles.searchWrap}>
-        <svg
-          className={styles.searchIcon}
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.35-4.35" />
-        </svg>
-        <input
-          className={styles.searchInput}
-          placeholder="Search by name, email, phone, address..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
+          {/* Search */}
+          <div className={styles.searchWrap}>
+            <svg
+              className={styles.searchIcon}
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+              className={styles.searchInput}
+              placeholder="Search by name, email, phone, address..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
 
-      {/* Leads */}
-      {loading ? (
-        <div className={styles.loading}>Loading leads...</div>
-      ) : filtered.length === 0 ? (
-        <div className={styles.empty}>
-          <div className={styles.emptyIcon}>📋</div>
-          <p className={styles.emptyText}>No leads found</p>
-        </div>
-      ) : (
-        <div className={styles.leadsList}>
-          {filtered.map((lead) => (
-            <div key={lead.id} className={styles.leadCard}>
-              <div className={styles.leadCardTop}>
-                <div>
-                  <p className={styles.leadName}>
-                    {lead.first_name} {lead.last_name}
-                  </p>
-                  <p className={styles.leadEmail}>{lead.email}</p>
-                </div>
-                <span
-                  className={`${styles.statusBadge} ${STATUS_COLORS[lead.status] || styles.statusNew}`}
-                >
-                  {lead.status}
-                </span>
-              </div>
-              <div className={styles.leadCardMeta}>
-                <span className={styles.metaTag}>
-                  {lead.cleaning_type?.replace("_", " ")}
-                </span>
-                <span className={styles.metaTag}>
-                  {lead.frequency?.replace("_", " ")}
-                </span>
-                {lead.service_address && (
-                  <span className={styles.metaTag}>
-                    {lead.service_address.split(",")[0]}
-                  </span>
-                )}
-              </div>
-              <div className={styles.leadCardActions}>
-                <button
-                  className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
-                  onClick={() => setSelectedLead(lead)}
-                >
-                  View details
-                </button>
-                <button
-                  className={styles.actionBtn}
-                  onClick={() => {
-                    setSelectedLead(lead);
-                  }}
-                >
-                  Update
-                </button>
-                <span className={styles.leadDate}>
-                  {formatDate(lead.created_at)}
-                </span>
-              </div>
+          {/* Leads */}
+          {loading ? (
+            <div className={styles.loading}>Loading leads...</div>
+          ) : filtered.length === 0 ? (
+            <div className={styles.empty}>
+              <div className={styles.emptyIcon}>📋</div>
+              <p className={styles.emptyText}>No leads found</p>
             </div>
-          ))}
-        </div>
-      )}
+          ) : (
+            <div className={styles.leadsList}>
+              {filtered.map((lead) => (
+                <div key={lead.id} className={styles.leadCard}>
+                  <div className={styles.leadCardTop}>
+                    <div>
+                      <p className={styles.leadName}>
+                        {lead.first_name} {lead.last_name}
+                      </p>
+                      <p className={styles.leadEmail}>{lead.email}</p>
+                    </div>
+                    <span
+                      className={`${styles.statusBadge} ${STATUS_COLORS[lead.status] || styles.statusNew}`}
+                    >
+                      {lead.status}
+                    </span>
+                  </div>
+                  <div className={styles.leadCardMeta}>
+                    <span className={styles.metaTag}>
+                      {lead.cleaning_type?.replace("_", " ")}
+                    </span>
+                    <span className={styles.metaTag}>
+                      {lead.frequency?.replace("_", " ")}
+                    </span>
+                    {lead.service_address && (
+                      <span className={styles.metaTag}>
+                        {lead.service_address.split(",")[0]}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles.leadCardActions}>
+                    <button
+                      className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
+                      onClick={() => setSelectedLead(lead)}
+                    >
+                      View details
+                    </button>
+                    <button
+                      className={styles.actionBtn}
+                      onClick={() => setSelectedLead(lead)}
+                    >
+                      Update
+                    </button>
+                    <span className={styles.leadDate}>
+                      {formatDate(lead.created_at)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className={styles.pagination}>
-          <button
-            className={styles.pageBtn}
-            disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            ← Prev
-          </button>
-          <span className={styles.pageInfo}>
-            {page} / {totalPages}
-          </span>
-          <button
-            className={styles.pageBtn}
-            disabled={page === totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Next →
-          </button>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className={styles.pagination}>
+              <button
+                className={styles.pageBtn}
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                ← Prev
+              </button>
+              <span className={styles.pageInfo}>
+                {page} / {totalPages}
+              </span>
+              <button
+                className={styles.pageBtn}
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next →
+              </button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Detail modal */}
       {selectedLead && (
