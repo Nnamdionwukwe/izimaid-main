@@ -12,7 +12,7 @@ import {
 } from "./SettingsUI";
 import { useProfile } from "../../pages/hooks/useSettings";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+const API = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const COUNTRIES = [
   { code: "NG", name: "Nigeria" },
@@ -71,18 +71,20 @@ export default function ProfileSettings() {
     setSaving(true);
     try {
       const res = await fetch(`${API}/auth/update-profile`, {
-        method: "PATCH",
+        // ← this is correct now
+        method: "PATCH", // ← was POST, change to PATCH
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           name: form.name,
-          phone: form.phone,
+          phone: form.phone || null,
           country: form.country,
         }),
       });
-      if (!res.ok) throw new Error("Failed to update profile");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update profile");
       setToast({ message: "Profile updated successfully", type: "success" });
     } catch (err) {
       setToast({ message: err.message, type: "error" });
