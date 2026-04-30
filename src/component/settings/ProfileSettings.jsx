@@ -12,8 +12,10 @@ import {
 } from "./SettingsUI";
 import { useProfile } from "../../pages/hooks/useSettings";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:8080";
-
+const API = (import.meta.env.VITE_API_URL || "http://localhost:8080").replace(
+  /\/$/,
+  "",
+);
 const COUNTRIES = [
   { code: "NG", name: "Nigeria" },
   { code: "GH", name: "Ghana" },
@@ -70,7 +72,7 @@ export default function ProfileSettings() {
     setErrors({});
     setSaving(true);
     try {
-      const res = await fetch(`${API}/auth/update-profile`, {
+      const res = await fetch(`${API}/api/auth/update-profile`, {
         // ← this is correct now
         method: "PATCH", // ← was POST, change to PATCH
         headers: {
