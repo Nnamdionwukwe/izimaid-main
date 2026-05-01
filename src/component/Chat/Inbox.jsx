@@ -214,7 +214,7 @@ export default function Inbox({ embedded = false, onClose }) {
       {!embedded && (
         <div className={styles.header}>
           <div className={styles.headerLeft}>
-            <button className={styles.backBtn} onClick={() => navigate(-1)}>
+            <button className={styles.backBtn} onClick={onClose}>
               ←
             </button>
             <div>
