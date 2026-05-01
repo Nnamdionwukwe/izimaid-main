@@ -120,7 +120,7 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const DOC_TYPES = [
   { value: "national_id", label: "National ID", icon: "🪪" },
-  { value: "passport", label: "Passport", icon: "📘" },
+  { value: "passport", label: "International Passport", icon: "📘" },
   { value: "drivers_license", label: "Driver's License", icon: "🚗" },
   { value: "utility_bill", label: "Utility Bill", icon: "🏠" },
 ];
@@ -1006,8 +1006,9 @@ function ProfileTab({ token }) {
         <div className={styles.profileSection}>
           <p className={styles.profileSectionTitle}>🪪 Identity Verification</p>
           <p className={styles.profileSectionDesc}>
-            Upload a valid document to get your profile verified. Verified maids
-            appear higher in search results.
+            Upload a valid document to get your profile verified, which ever ID
+            you choose to upload you must upload a Utility Bill for proof of
+            address. Verified maids appear higher in search results.
           </p>
 
           {docMsg.text && (
@@ -1075,7 +1076,9 @@ function ProfileTab({ token }) {
 
           <p className={styles.docHint}>
             Accepted formats: JPG, PNG, PDF · Max 10 MB per file. Processing
-            usually takes 1–2 business days.
+            usually takes 1–2 business days. Accepted Utility Bills include
+            electricity, water, bank statements or internet bills with your name
+            and address clearly visible.
           </p>
         </div>
       </div>
