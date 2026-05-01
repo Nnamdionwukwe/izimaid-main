@@ -71,7 +71,9 @@ import PoweredByGestech from "./component/PoweredByGestech/PoweredByGestech.jsx"
 import SettingsPage from "./pages/settings/SettingsPage.jsx";
 import VerifyEmail from "./component/VerifyEmail/VerifyEmail.jsx";
 import ResetPassword from "./component/ResetPassword/ResetPassword.jsx";
-import WithdrawTab from "./component/WithdrawTab/WithdrawPage.jsx";
+import WithdrawTab, {
+  WalletOverview,
+} from "./component/WithdrawTab/WithdrawPage.jsx";
 import SubscriptionVerify from "./pages/subscription/SubscriptionVerify.jsx";
 import InquiryChat from "./component/AdminDashboard/InquiryChat/InquiryChat.jsx";
 import Inbox from "./component/Chat/Inbox.jsx";
@@ -149,6 +151,7 @@ function AppRoutes() {
       <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="/bookings/:id" element={<BookingDetail />} />
       <Route path="/withdrawal" element={<WithdrawTab />} />
+      <Route path="/maid/wallet" element={<WalletOverview />} />
       <Route path="/payment" element={<Payment />} />
       <Route path="/payments" element={<CustomerPayments />} />
       <Route path="/payment/verify" element={<Payment />} />
