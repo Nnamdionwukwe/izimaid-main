@@ -172,8 +172,8 @@ export default function Maids() {
 
   return (
     <div className={styles.page}>
-      <button className={styles.backLink} onClick={() => navigate("/")}>
-        ← Back to Home
+      <button className={styles.backLink} onClick={() => navigate(-1)}>
+        ← Back
       </button>
       <h1 className={styles.pageTitle}>Find a Maid</h1>
       <p className={styles.pageSubtitle}>
