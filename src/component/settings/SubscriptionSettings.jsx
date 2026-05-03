@@ -137,7 +137,14 @@ export default function SubscriptionSettings({ styles }) {
   async function handleChangePlan(plan) {
     setBusy("chg_" + plan.id);
     try {
-      await changePlan(plan.id);
+      const d = await changePlan(plan.id);
+      // If backend returns a payment URL, redirect to it
+      const url = d.authorization_url || d.url || d.checkout_url;
+      if (url) {
+        window.location.href = url;
+        return;
+      }
+      // Free plan switch — no redirect needed
       showToast(`✅ Switched to ${plan.display_name || plan.name}!`);
       setView("overview");
     } catch (err) {

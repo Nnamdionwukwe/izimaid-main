@@ -227,6 +227,7 @@ export function useSubscription(interval = null) {
         headers: authHeaders(),
         body: JSON.stringify({
           plan_id: planId,
+          currency: gateway === "stripe" ? "USD" : "NGN", // ← add this
           promo_code: promoCode || undefined,
         }),
       });
@@ -242,14 +243,18 @@ export function useSubscription(interval = null) {
       const res = await fetch(`${BASE}/subscriptions/change-plan`, {
         method: "POST",
         headers: authHeaders(),
-        body: JSON.stringify({ new_plan_id: planId }),
+        body: JSON.stringify({
+          new_plan_id: planId,
+          gateway: "paystack", // ← add this
+          currency: "NGN", // ← add this
+        }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
-      await fetch_();
+      // Don't refetch here — redirect will happen instead
       return json;
     },
-    [fetch_],
+    [], // remove fetch_ dependency since we redirect
   );
 
   const validatePromo = useCallback(async (code, planId) => {
