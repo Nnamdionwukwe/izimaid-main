@@ -254,7 +254,7 @@ export default function Login({ onSuccess }) {
         if (data.code === "EMAIL_NOT_VERIFIED") {
           setError(null);
           setSuccess(
-            "Your email isn't verified yet. Check your inbox for the verification link.",
+            "Your email isn't verified yet. Check your inbox or spam for the verification link.",
           );
           setLoading(false);
           return;
@@ -329,7 +329,7 @@ export default function Login({ onSuccess }) {
       }
 
       setSuccess(
-        "Account created! Check your email to verify before signing in.",
+        "Account created! Check your email inbox or spam to verify before signing in.",
       );
       setView("signin");
     } catch (err) {
