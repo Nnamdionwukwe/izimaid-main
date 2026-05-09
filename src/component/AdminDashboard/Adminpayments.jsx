@@ -143,8 +143,11 @@ function PendingApprovals() {
         </div>
       ) : (
         <div className={styles.cardList}>
-          {bookings.map((b) => (
-            <div key={b.booking_id} className={styles.payCard}>
+          {bookings.map((b, i) => (
+            <div
+              key={`approval-${b.booking_id}-${i}`}
+              className={styles.payCard}
+            >
               <div className={styles.payCardTop}>
                 <div>
                   <p className={styles.payCardName}>{b.customer_name}</p>
