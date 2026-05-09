@@ -888,38 +888,29 @@ export default function AdminPayments({ onBack }) {
     if (!token) return;
     async function loadCounts() {
       try {
-        const [pRes, bRes, eRes, cRes] = await Promise.all([
+        const [pRes, bRes, eRes] = await Promise.all([
           fetch(`${API_URL}/api/payments/pending`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(`${API_URL}/api/payments/bank-transfers`, {
+          fetch(`${API_URL}/api/payments/pending?gateway=bank_transfer`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${API_URL}/api/payments/payouts?status=escrow`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(`${API_URL}/api/payments/crypto`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
         ]);
-        const [pData, bData, eData, cData] = await Promise.all([
+        const [pData, bData, eData] = await Promise.all([
           pRes.json(),
           bRes.json(),
           eRes.json(),
-          cRes.json(),
         ]);
         setPendingCount((pData.bookings || []).length);
         setBankCount(
-          (bData.payments || []).filter(
-            (b) => b.bank_transfer_status === "proof_submitted",
-          ).length,
+          (bData.bookings || []).filter((b) => b.bank_transfer_proof).length,
         );
         setEscrowCount(
           (eData.payouts || []).filter((p) => p.booking_status === "completed")
             .length,
-        );
-        setCryptoCount(
-          (cData.payments || []).filter((p) => p.status === "pending").length,
         );
       } catch {}
     }
@@ -929,7 +920,6 @@ export default function AdminPayments({ onBack }) {
   const tabs = [
     { id: "approvals", label: "Approvals", badge: pendingCount },
     { id: "bank", label: "Bank Transfers", badge: bankCount },
-    { id: "crypto", label: "Crypto", badge: cryptoCount },
     { id: "payouts", label: "Payouts", badge: escrowCount },
   ];
 
@@ -967,7 +957,6 @@ export default function AdminPayments({ onBack }) {
       <div className={styles.content}>
         {activeTab === "approvals" && <PendingApprovals />}
         {activeTab === "bank" && <BankTransfers />}
-        {activeTab === "crypto" && <CryptoPayments />}
         {activeTab === "payouts" && <Payouts />}
       </div>
     </div>
