@@ -227,25 +227,24 @@ function PendingApprovals() {
 }
 
 // ── Tab: Bank Transfer Verification ──────────────────────────────────────────
+// ── Tab: Bank Transfer Verification ──────────────────────────────────────────
 function BankTransfers() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState({});
   const [msg, setMsg] = useState({});
   const [notes, setNotes] = useState({});
+  const [filter, setFilter] = useState("all"); // all | awaiting_proof | proof_submitted
 
   const fetchBankTransfers = useCallback(async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(
-        `${API_URL}/api/payments/pending?gateway=bank_transfer`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${API_URL}/api/payments/bank-transfers`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
-      setPayments(data.bookings || []);
+      setPayments(data.payments || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -256,6 +255,11 @@ function BankTransfers() {
   useEffect(() => {
     fetchBankTransfers();
   }, [fetchBankTransfers]);
+
+  const filtered =
+    filter === "all"
+      ? payments
+      : payments.filter((p) => p.bank_transfer_status === filter);
 
   async function handleVerify(payment_id, approved) {
     setProcessing((p) => ({
@@ -282,7 +286,7 @@ function BankTransfers() {
         [payment_id]: {
           type: "success",
           text: approved
-            ? "✓ Transfer verified — booking pending approval"
+            ? "✓ Transfer verified — booking moved to pending"
             : "✗ Transfer rejected",
         },
       }));
@@ -303,112 +307,375 @@ function BankTransfers() {
   if (loading)
     return <div className={styles.loading}>Loading bank transfers...</div>;
 
-  if (payments.length === 0)
-    return (
-      <div className={styles.empty}>
-        <div className={styles.emptyIcon}>🏦</div>
-        <p className={styles.emptyText}>
-          No bank transfers awaiting verification
-        </p>
+  return (
+    <>
+      <div className={styles.filterBar}>
+        {[
+          { key: "all", label: `All (${payments.length})` },
+          {
+            key: "awaiting_proof",
+            label: `Awaiting Proof (${payments.filter((p) => p.bank_transfer_status === "awaiting_proof").length})`,
+          },
+          {
+            key: "proof_submitted",
+            label: `Proof Submitted (${payments.filter((p) => p.bank_transfer_status === "proof_submitted").length})`,
+          },
+        ].map((f) => (
+          <button
+            key={f.key}
+            className={`${styles.filterBtn} ${filter === f.key ? styles.filterBtnActive : ""}`}
+            onClick={() => setFilter(f.key)}
+          >
+            {f.label}
+          </button>
+        ))}
       </div>
-    );
+
+      {filtered.length === 0 ? (
+        <div className={styles.empty}>
+          <div className={styles.emptyIcon}>🏦</div>
+          <p className={styles.emptyText}>No bank transfers to review</p>
+        </div>
+      ) : (
+        <div className={styles.cardList}>
+          {filtered.map((b) => (
+            <div
+              key={b.payment_id}
+              className={`${styles.payCard} ${b.bank_transfer_proof ? styles.payCardAccentBank : ""}`}
+            >
+              <div className={styles.payCardTop}>
+                <div>
+                  <p className={styles.payCardName}>{b.customer_name}</p>
+                  <p className={styles.payCardEmail}>{b.customer_email}</p>
+                </div>
+                <span
+                  className={`${styles.badge} ${
+                    b.bank_transfer_status === "proof_submitted"
+                      ? styles.badgeProof
+                      : styles.badgeAwaiting
+                  }`}
+                >
+                  {b.bank_transfer_status === "proof_submitted"
+                    ? "⏳ Proof submitted"
+                    : "⏸ Awaiting proof"}
+                </span>
+              </div>
+
+              <div className={styles.metaGrid}>
+                {[
+                  ["Maid", b.maid_name],
+                  ["Amount", fmtMoney(b.total_amount, b.currency || "NGN")],
+                  ["Duration", `${b.duration_hours}h`],
+                  ["Ref", b.bank_transfer_ref || "—"],
+                  ["Service date", formatDate(b.service_date)],
+                  ["Submitted", formatDate(b.created_at)],
+                ].map(([k, v]) => (
+                  <div key={k} className={styles.metaItem}>
+                    {k}: <span className={styles.metaVal}>{v}</span>
+                  </div>
+                ))}
+              </div>
+
+              <p className={styles.addressRow}>📍 {b.address}</p>
+
+              {b.bank_transfer_proof ? (
+                <div className={styles.proofWrap}>
+                  <p className={styles.proofLabel}>Payment Proof</p>
+                  <a
+                    href={b.bank_transfer_proof}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={b.bank_transfer_proof}
+                      alt="Payment proof"
+                      className={styles.proofImg}
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                    <span className={styles.proofLink}>
+                      🔗 Open full proof →
+                    </span>
+                  </a>
+                </div>
+              ) : (
+                <div className={styles.warnBanner}>
+                  ⏸ Customer has not uploaded proof yet. You can reject if
+                  overdue.
+                </div>
+              )}
+
+              <div className={styles.inputWrap}>
+                <input
+                  className={styles.fieldInput}
+                  placeholder="Admin notes (optional)..."
+                  value={notes[b.payment_id] || ""}
+                  onChange={(e) =>
+                    setNotes((n) => ({ ...n, [b.payment_id]: e.target.value }))
+                  }
+                />
+              </div>
+
+              {msg[b.payment_id] && (
+                <div
+                  className={`${styles.feedback} ${
+                    msg[b.payment_id].type === "success"
+                      ? styles.feedbackSuccess
+                      : styles.feedbackError
+                  }`}
+                >
+                  {msg[b.payment_id].text}
+                </div>
+              )}
+
+              <div className={styles.actionRow}>
+                <button
+                  className={`${styles.btn} ${styles.btnApprove}`}
+                  onClick={() => handleVerify(b.payment_id, true)}
+                  disabled={
+                    !!processing[b.payment_id] || !b.bank_transfer_proof
+                  }
+                  title={
+                    !b.bank_transfer_proof
+                      ? "Cannot verify — no proof uploaded"
+                      : ""
+                  }
+                >
+                  {processing[b.payment_id] === "approve"
+                    ? "Verifying..."
+                    : "✓ Verify Transfer"}
+                </button>
+                <button
+                  className={`${styles.btn} ${styles.btnReject}`}
+                  onClick={() => handleVerify(b.payment_id, false)}
+                  disabled={!!processing[b.payment_id]}
+                >
+                  {processing[b.payment_id] === "reject"
+                    ? "Rejecting..."
+                    : "✗ Reject"}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+// ── Tab: Crypto Payments ──────────────────────────────────────────────────────
+function CryptoPayments() {
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState({});
+  const [msg, setMsg] = useState({});
+  const [filter, setFilter] = useState("all");
+
+  const fetchCrypto = useCallback(async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/payments/crypto`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setPayments(data.payments || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCrypto();
+  }, [fetchCrypto]);
+
+  const filtered =
+    filter === "all" ? payments : payments.filter((p) => p.status === filter);
+
+  async function handleAction(booking_id, action) {
+    setProcessing((p) => ({ ...p, [booking_id]: action }));
+    setMsg((m) => ({ ...m, [booking_id]: null }));
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `${API_URL}/api/payments/${action}/${booking_id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body:
+            action === "reject"
+              ? JSON.stringify({ reason: "Admin rejected crypto payment" })
+              : undefined,
+        },
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setMsg((m) => ({
+        ...m,
+        [booking_id]: {
+          type: "success",
+          text:
+            action === "approve" ? "✓ Approved — maid notified" : "✗ Rejected",
+        },
+      }));
+      setTimeout(
+        () => setPayments((p) => p.filter((x) => x.booking_id !== booking_id)),
+        2000,
+      );
+    } catch (err) {
+      setMsg((m) => ({
+        ...m,
+        [booking_id]: { type: "error", text: err.message },
+      }));
+    } finally {
+      setProcessing((p) => ({ ...p, [booking_id]: null }));
+    }
+  }
+
+  const STATUS_COLORS = {
+    success: { badge: styles.badgePaid, label: "Confirmed" },
+    pending: { badge: styles.badgeAwaiting, label: "Pending" },
+    failed: { badge: styles.badgePastDue, label: "Failed" },
+  };
+
+  if (loading)
+    return <div className={styles.loading}>Loading crypto payments...</div>;
 
   return (
-    <div className={styles.cardList}>
-      {payments.map((b) => (
-        <div
-          key={b.payment_id}
-          className={`${styles.payCard} ${b.bank_transfer_proof ? styles.payCardAccentBank : ""}`}
-        >
-          <div className={styles.payCardTop}>
-            <div>
-              <p className={styles.payCardName}>{b.customer_name}</p>
-              <p className={styles.payCardEmail}>{b.customer_email}</p>
-            </div>
-            <span
-              className={`${styles.badge} ${b.bank_transfer_proof ? styles.badgeProof : styles.badgeAwaiting}`}
-            >
-              {b.bank_transfer_proof ? "⏳ Proof submitted" : "Awaiting proof"}
-            </span>
-          </div>
+    <>
+      <div className={styles.filterBar}>
+        {[
+          { key: "all", label: `All (${payments.length})` },
+          {
+            key: "pending",
+            label: `Pending (${payments.filter((p) => p.status === "pending").length})`,
+          },
+          {
+            key: "success",
+            label: `Confirmed (${payments.filter((p) => p.status === "success").length})`,
+          },
+          {
+            key: "failed",
+            label: `Failed (${payments.filter((p) => p.status === "failed").length})`,
+          },
+        ].map((f) => (
+          <button
+            key={f.key}
+            className={`${styles.filterBtn} ${filter === f.key ? styles.filterBtnActive : ""}`}
+            onClick={() => setFilter(f.key)}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
 
-          <div className={styles.metaGrid}>
-            {[
-              ["Maid", b.maid_name],
-              ["Amount", fmtMoney(b.total_amount, b.currency || "NGN")],
-              ["Ref", b.bank_transfer_ref || "—"],
-              ["Date", formatDate(b.service_date)],
-              ["Paid at", b.paid_at ? formatDate(b.paid_at) : "—"],
-            ].map(([k, v]) => (
-              <div key={k} className={styles.metaItem}>
-                {k}: <span className={styles.metaVal}>{v}</span>
-              </div>
-            ))}
-          </div>
-
-          {b.bank_transfer_proof && (
-            <div className={styles.proofWrap}>
-              <p className={styles.proofLabel}>Payment Proof</p>
-              <a
-                href={b.bank_transfer_proof}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img
-                  src={b.bank_transfer_proof}
-                  alt="Payment proof"
-                  className={styles.proofImg}
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
-                />
-                <span className={styles.proofLink}>🔗 Open full proof →</span>
-              </a>
-            </div>
-          )}
-
-          <div className={styles.inputWrap}>
-            <input
-              className={styles.fieldInput}
-              placeholder="Admin notes (optional)..."
-              value={notes[b.payment_id] || ""}
-              onChange={(e) =>
-                setNotes((n) => ({ ...n, [b.payment_id]: e.target.value }))
-              }
-            />
-          </div>
-
-          {msg[b.payment_id] && (
-            <div
-              className={`${styles.feedback} ${msg[b.payment_id].type === "success" ? styles.feedbackSuccess : styles.feedbackError}`}
-            >
-              {msg[b.payment_id].text}
-            </div>
-          )}
-
-          <div className={styles.actionRow}>
-            <button
-              className={`${styles.btn} ${styles.btnApprove}`}
-              onClick={() => handleVerify(b.payment_id, true)}
-              disabled={!!processing[b.payment_id]}
-            >
-              {processing[b.payment_id] === "approve"
-                ? "Verifying..."
-                : "✓ Verify Transfer"}
-            </button>
-            <button
-              className={`${styles.btn} ${styles.btnReject}`}
-              onClick={() => handleVerify(b.payment_id, false)}
-              disabled={!!processing[b.payment_id]}
-            >
-              {processing[b.payment_id] === "reject"
-                ? "Rejecting..."
-                : "✗ Reject"}
-            </button>
-          </div>
+      {filtered.length === 0 ? (
+        <div className={styles.empty}>
+          <div className={styles.emptyIcon}>₿</div>
+          <p className={styles.emptyText}>No crypto payments found</p>
         </div>
-      ))}
-    </div>
+      ) : (
+        <div className={styles.cardList}>
+          {filtered.map((p) => {
+            const sc = STATUS_COLORS[p.status] || STATUS_COLORS.pending;
+            let chargeInfo = {};
+            try {
+              chargeInfo = JSON.parse(p.notes || "{}");
+            } catch {}
+
+            return (
+              <div key={p.payment_id} className={styles.payCard}>
+                <div className={styles.payCardTop}>
+                  <div>
+                    <p className={styles.payCardName}>{p.customer_name}</p>
+                    <p className={styles.payCardEmail}>{p.customer_email}</p>
+                  </div>
+                  <div className={styles.badgeRow}>
+                    <span className={`${styles.badge} ${sc.badge}`}>
+                      {sc.label}
+                    </span>
+                    <span className={`${styles.badge} ${styles.badgeGateway}`}>
+                      ₿ Crypto
+                    </span>
+                  </div>
+                </div>
+
+                <div className={styles.metaGrid}>
+                  {[
+                    ["Maid", p.maid_name],
+                    ["Amount", fmtMoney(p.total_amount, p.currency || "USD")],
+                    ["Duration", `${p.duration_hours}h`],
+                    ["Service date", formatDate(p.service_date)],
+                    ["Submitted", formatDate(p.created_at)],
+                    chargeInfo.charge_code && [
+                      "Charge code",
+                      chargeInfo.charge_code,
+                    ],
+                    chargeInfo.charge_id && [
+                      "Charge ID",
+                      chargeInfo.charge_id.slice(0, 12) + "…",
+                    ],
+                    chargeInfo.expires_at && [
+                      "Expires",
+                      formatDate(chargeInfo.expires_at),
+                    ],
+                  ]
+                    .filter(Boolean)
+                    .map(([k, v]) => (
+                      <div key={k} className={styles.metaItem}>
+                        {k}: <span className={styles.metaVal}>{v}</span>
+                      </div>
+                    ))}
+                </div>
+
+                <p className={styles.addressRow}>📍 {p.address}</p>
+
+                {msg[p.booking_id] && (
+                  <div
+                    className={`${styles.feedback} ${
+                      msg[p.booking_id].type === "success"
+                        ? styles.feedbackSuccess
+                        : styles.feedbackError
+                    }`}
+                  >
+                    {msg[p.booking_id].text}
+                  </div>
+                )}
+
+                {p.status === "pending" && (
+                  <div className={styles.actionRow}>
+                    <button
+                      className={`${styles.btn} ${styles.btnApprove}`}
+                      onClick={() => handleAction(p.booking_id, "approve")}
+                      disabled={!!processing[p.booking_id]}
+                    >
+                      {processing[p.booking_id] === "approve"
+                        ? "Approving..."
+                        : "✓ Approve"}
+                    </button>
+                    <button
+                      className={`${styles.btn} ${styles.btnReject}`}
+                      onClick={() => handleAction(p.booking_id, "reject")}
+                      disabled={!!processing[p.booking_id]}
+                    >
+                      {processing[p.booking_id] === "reject"
+                        ? "Rejecting..."
+                        : "✗ Reject"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -621,29 +888,38 @@ export default function AdminPayments({ onBack }) {
     if (!token) return;
     async function loadCounts() {
       try {
-        const [pRes, bRes, eRes] = await Promise.all([
+        const [pRes, bRes, eRes, cRes] = await Promise.all([
           fetch(`${API_URL}/api/payments/pending`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(`${API_URL}/api/payments/pending?gateway=bank_transfer`, {
+          fetch(`${API_URL}/api/payments/bank-transfers`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${API_URL}/api/payments/payouts?status=escrow`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
+          fetch(`${API_URL}/api/payments/crypto`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
         ]);
-        const [pData, bData, eData] = await Promise.all([
+        const [pData, bData, eData, cData] = await Promise.all([
           pRes.json(),
           bRes.json(),
           eRes.json(),
+          cRes.json(),
         ]);
         setPendingCount((pData.bookings || []).length);
         setBankCount(
-          (bData.bookings || []).filter((b) => b.bank_transfer_proof).length,
+          (bData.payments || []).filter(
+            (b) => b.bank_transfer_status === "proof_submitted",
+          ).length,
         );
         setEscrowCount(
           (eData.payouts || []).filter((p) => p.booking_status === "completed")
             .length,
+        );
+        setCryptoCount(
+          (cData.payments || []).filter((p) => p.status === "pending").length,
         );
       } catch {}
     }
@@ -653,6 +929,7 @@ export default function AdminPayments({ onBack }) {
   const tabs = [
     { id: "approvals", label: "Approvals", badge: pendingCount },
     { id: "bank", label: "Bank Transfers", badge: bankCount },
+    { id: "crypto", label: "Crypto", badge: cryptoCount },
     { id: "payouts", label: "Payouts", badge: escrowCount },
   ];
 
@@ -690,6 +967,7 @@ export default function AdminPayments({ onBack }) {
       <div className={styles.content}>
         {activeTab === "approvals" && <PendingApprovals />}
         {activeTab === "bank" && <BankTransfers />}
+        {activeTab === "crypto" && <CryptoPayments />}
         {activeTab === "payouts" && <Payouts />}
       </div>
     </div>
