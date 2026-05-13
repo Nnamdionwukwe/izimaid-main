@@ -39,12 +39,14 @@ export function AuthProvider({ children }) {
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("token", authToken);
     setUser(userData);
+    window.dispatchEvent(new Event("auth-change"));
   }
 
   function logout() {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     setUser({});
+    window.dispatchEvent(new Event("auth-change"));
   }
 
   return (
