@@ -2,33 +2,47 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import MaidSupportChat from "./MaidSupportChat";
 import styles from "./FloatingMaidSupportChat.module.css";
 
+const MARGIN = 10;
+function clamp(v, min, max) {
+  return Math.max(min, Math.min(max, v));
+}
+
 export default function FloatingMaidSupportChat() {
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
   const [visible, setVisible] = useState(false);
 
-  // Drag state
-  const [pos, setPos] = useState({ x: 24, y: 24 }); // distance from bottom-right
-  const [dragging, setDragging] = useState(false);
-  const dragStart = useRef(null); // { mouseX, mouseY, posX, posY }
-  const hasDragged = useRef(false);
+  const FAB_SIZE = 56;
+  const CHAT_W = 370;
+  const CHAT_H = 560;
+
+  const [fabPos, setFabPos] = useState({
+    x: window.innerWidth - FAB_SIZE - 24,
+    y: window.innerHeight - FAB_SIZE - 24,
+  });
+  const [chatPos, setChatPos] = useState({
+    x: window.innerWidth - CHAT_W - 20,
+    y: window.innerHeight - CHAT_H - 90,
+  });
+
   const fabRef = useRef(null);
   const chatRef = useRef(null);
+  const dragging = useRef(false);
+  const dragTarget = useRef(null); // "fab" | "chat"
+  const dragStart = useRef({ px: 0, py: 0, ox: 0, oy: 0 });
+  const didDrag = useRef(false);
 
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-  // Check maid auth
+  // ── Auth detection ─────────────────────────────────────────────────
   function checkAuth() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const token = localStorage.getItem("token");
     setVisible(!!(token && user.role === "maid"));
   }
-
   useEffect(() => {
     checkAuth();
-    // Catches login/logout in the same tab via custom event
     window.addEventListener("auth-change", checkAuth);
-    // Catches cross-tab storage changes
     window.addEventListener("storage", checkAuth);
     return () => {
       window.removeEventListener("auth-change", checkAuth);
@@ -36,7 +50,7 @@ export default function FloatingMaidSupportChat() {
     };
   }, []);
 
-  // Poll unread when chat closed
+  // ── Unread polling ─────────────────────────────────────────────────
   useEffect(() => {
     if (!visible || open) return;
     async function fetchUnread() {
@@ -44,10 +58,7 @@ export default function FloatingMaidSupportChat() {
         const res = await fetch(`${API_URL}/api/maid-support-chat/unread`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
-        if (res.ok) {
-          const data = await res.json();
-          setUnread(data.unread || 0);
-        }
+        if (res.ok) setUnread((await res.json()).unread || 0);
       } catch {}
     }
     fetchUnread();
@@ -55,171 +66,149 @@ export default function FloatingMaidSupportChat() {
     return () => clearInterval(id);
   }, [visible, open, API_URL]);
 
-  // ── Click outside to close ─────────────────────────────────────────────────
+  // ── Click outside to close ─────────────────────────────────────────
   useEffect(() => {
     if (!open) return;
-
-    function handleClickOutside(e) {
-      // If click is outside both the chat window and the FAB → close
+    function onDown(e) {
       if (
         chatRef.current &&
         !chatRef.current.contains(e.target) &&
         fabRef.current &&
         !fabRef.current.contains(e.target)
-      ) {
+      )
         setOpen(false);
-      }
     }
-
-    // Use mousedown so it fires before any child onClick
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
   }, [open]);
 
-  // ── Drag logic ─────────────────────────────────────────────────────────────
-  const onMouseDown = useCallback(
-    (e) => {
-      // Only drag on the button itself, not child elements like the badge
-      if (e.button !== 0) return;
-      e.preventDefault();
-      hasDragged.current = false;
-      dragStart.current = {
-        mouseX: e.clientX,
-        mouseY: e.clientY,
-        posX: pos.x,
-        posY: pos.y,
-      };
-      setDragging(true);
-    },
-    [pos],
-  );
-
-  useEffect(() => {
-    if (!dragging) return;
-
-    function onMouseMove(e) {
-      const dx = e.clientX - dragStart.current.mouseX;
-      const dy = e.clientY - dragStart.current.mouseY;
-
-      // Only mark as drag if moved more than 4px (avoids eating click events)
-      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) hasDragged.current = true;
-
-      // FAB uses bottom-right positioning — dx subtracts, dy subtracts
-      const newX = Math.max(8, dragStart.current.posX - dx);
-      const newY = Math.max(8, dragStart.current.posY - dy);
-
-      // Clamp to viewport
-      const fabW = fabRef.current?.offsetWidth || 160;
-      const fabH = fabRef.current?.offsetHeight || 52;
-      const maxX = window.innerWidth - fabW - 8;
-      const maxY = window.innerHeight - fabH - 8;
-
-      setPos({
-        x: Math.min(newX, maxX),
-        y: Math.min(newY, maxY),
-      });
-    }
-
-    function onMouseUp() {
-      setDragging(false);
-    }
-
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseup", onMouseUp);
-    return () => {
-      document.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseup", onMouseUp);
+  // ── Pointer drag (FAB) ─────────────────────────────────────────────
+  function onFabPointerDown(e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    e.preventDefault();
+    didDrag.current = false;
+    dragging.current = true;
+    dragTarget.current = "fab";
+    dragStart.current = {
+      px: e.clientX,
+      py: e.clientY,
+      ox: fabPos.x,
+      oy: fabPos.y,
     };
-  }, [dragging]);
+    fabRef.current?.setPointerCapture(e.pointerId);
+  }
 
-  // Touch support
-  const onTouchStart = useCallback(
-    (e) => {
-      const touch = e.touches[0];
-      hasDragged.current = false;
-      dragStart.current = {
-        mouseX: touch.clientX,
-        mouseY: touch.clientY,
-        posX: pos.x,
-        posY: pos.y,
-      };
-    },
-    [pos],
-  );
+  function onFabPointerMove(e) {
+    if (!dragging.current || dragTarget.current !== "fab") return;
+    const dx = e.clientX - dragStart.current.px;
+    const dy = e.clientY - dragStart.current.py;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) didDrag.current = true;
+    setFabPos({
+      x: clamp(
+        dragStart.current.ox + dx,
+        MARGIN,
+        window.innerWidth - FAB_SIZE - MARGIN,
+      ),
+      y: clamp(
+        dragStart.current.oy + dy,
+        MARGIN,
+        window.innerHeight - FAB_SIZE - MARGIN,
+      ),
+    });
+  }
 
-  const onTouchMove = useCallback((e) => {
-    const touch = e.touches[0];
-    const dx = touch.clientX - dragStart.current.mouseX;
-    const dy = touch.clientY - dragStart.current.mouseY;
-    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) hasDragged.current = true;
+  function onFabPointerUp() {
+    dragging.current = false;
+  }
 
-    const newX = Math.max(8, dragStart.current.posX - dx);
-    const newY = Math.max(8, dragStart.current.posY - dy);
-    const fabW = fabRef.current?.offsetWidth || 160;
-    const fabH = fabRef.current?.offsetHeight || 52;
-    const maxX = window.innerWidth - fabW - 8;
-    const maxY = window.innerHeight - fabH - 8;
-
-    setPos({ x: Math.min(newX, maxX), y: Math.min(newY, maxY) });
-    e.preventDefault(); // prevent page scroll while dragging
-  }, []);
-
-  // ── Handle click vs drag ───────────────────────────────────────────────────
   function handleFabClick() {
-    if (hasDragged.current) return; // was a drag, not a click
+    if (didDrag.current) return;
     if (open) {
       setOpen(false);
     } else {
+      // Anchor chat above/beside FAB
+      setChatPos({
+        x: clamp(
+          fabPos.x - CHAT_W + FAB_SIZE,
+          MARGIN,
+          window.innerWidth - CHAT_W - MARGIN,
+        ),
+        y: clamp(
+          fabPos.y - CHAT_H - 10,
+          MARGIN,
+          window.innerHeight - CHAT_H - MARGIN,
+        ),
+      });
       setOpen(true);
       setUnread(0);
     }
   }
 
-  // ── Chat window position (anchors near FAB) ────────────────────────────────
-  // Position the chat window just above the FAB
-  const fabH = 52;
-  const chatW = 370;
-  const chatH = 560;
-  const chatRight = pos.x;
-  const chatBottom = pos.y + fabH + 10;
+  // ── Pointer drag (chat window handle) ─────────────────────────────
+  function onChatHandlePointerDown(e) {
+    e.preventDefault();
+    dragging.current = true;
+    dragTarget.current = "chat";
+    dragStart.current = {
+      px: e.clientX,
+      py: e.clientY,
+      ox: chatPos.x,
+      oy: chatPos.y,
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
 
-  // Clamp chat window so it doesn't go off-screen top/left
-  const clampedChatRight = Math.min(chatRight, window.innerWidth - chatW - 8);
-  const clampedChatBottom = Math.min(
-    chatBottom,
-    window.innerHeight - chatH - 8,
-  );
+  function onChatHandlePointerMove(e) {
+    if (!dragging.current || dragTarget.current !== "chat") return;
+    const dx = e.clientX - dragStart.current.px;
+    const dy = e.clientY - dragStart.current.py;
+    setChatPos({
+      x: clamp(
+        dragStart.current.ox + dx,
+        MARGIN,
+        window.innerWidth - CHAT_W - MARGIN,
+      ),
+      y: clamp(
+        dragStart.current.oy + dy,
+        MARGIN,
+        window.innerHeight - CHAT_H - MARGIN,
+      ),
+    });
+  }
+
+  function onChatHandlePointerUp() {
+    dragging.current = false;
+  }
 
   if (!visible) return null;
 
   return (
     <>
-      {/* ── Chat window ── */}
       {open && (
         <div
           ref={chatRef}
           className={styles.chatWindow}
-          style={{
-            bottom: clampedChatBottom,
-            right: clampedChatRight,
-          }}
+          style={{ left: chatPos.x, top: chatPos.y }}
         >
+          <div
+            className={styles.chatDragHandle}
+            onPointerDown={onChatHandlePointerDown}
+            onPointerMove={onChatHandlePointerMove}
+            onPointerUp={onChatHandlePointerUp}
+          >
+            <div className={styles.chatDragPill} />
+          </div>
           <MaidSupportChat onClose={() => setOpen(false)} />
         </div>
       )}
 
-      {/* ── FAB ── */}
       <button
         ref={fabRef}
-        className={`${styles.fab} ${dragging ? styles.fabDragging : ""}`}
-        style={{
-          bottom: pos.y,
-          right: pos.x,
-          cursor: dragging ? "grabbing" : "grab",
-        }}
-        onMouseDown={onMouseDown}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
+        className={`${styles.fab} ${dragging.current ? styles.fabDragging : ""}`}
+        style={{ left: fabPos.x, top: fabPos.y, bottom: "auto", right: "auto" }}
+        onPointerDown={onFabPointerDown}
+        onPointerMove={onFabPointerMove}
+        onPointerUp={onFabPointerUp}
         onClick={handleFabClick}
         aria-label={open ? "Close support chat" : "Open support chat"}
       >
@@ -253,7 +242,6 @@ export default function FloatingMaidSupportChat() {
             </svg>
           )}
         </span>
-
         {!open && unread > 0 && (
           <span className={styles.badge}>{unread > 99 ? "99+" : unread}</span>
         )}
