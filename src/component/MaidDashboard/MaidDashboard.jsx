@@ -52,13 +52,48 @@ const CURRENCY_SYMBOLS = {
   USD: "$",
   GBP: "£",
   EUR: "€",
-  KES: "KSh",
   GHS: "₵",
+  KES: "KSh",
   ZAR: "R",
   UGX: "USh",
+  TZS: "TSh",
+  RWF: "FRw",
+  ETB: "Br",
+  XOF: "CFA",
+  MAD: "MAD",
+  EGP: "E£",
   CAD: "CA$",
   AUD: "A$",
+  INR: "₹",
+  AED: "د.إ",
+  SAR: "﷼",
+  QAR: "QR",
+  SGD: "S$",
+  MYR: "RM",
+  BRL: "R$",
+  MXN: "MX$",
+  JPY: "¥",
+  CNY: "¥",
+  CHF: "CHF",
+  SEK: "kr",
+  NOK: "kr",
+  DKK: "kr",
+  NZD: "NZ$",
+  HKD: "HK$",
+  PHP: "₱",
+  THB: "฿",
+  IDR: "Rp",
+  PKR: "₨",
+  BDT: "৳",
+  VND: "₫",
+  CZK: "Kč",
+  PLN: "zł",
+  HUF: "Ft",
+  RON: "lei",
+  TRY: "₺",
+  ILS: "₪",
 };
+
 function fmtBookingAmt(b) {
   const c = b.payment_currency || b.maid_currency || "NGN";
   return `${CURRENCY_SYMBOLS[c] || c + " "}${Number(b.total_amount || 0).toLocaleString()}`;
@@ -76,17 +111,6 @@ function initials(name) {
 }
 
 // ─── Profile Tab ──────────────────────────────────────────────
-// ─── Profile Tab ──────────────────────────────────────────────
-// Drop-in replacement for the ProfileTab function inside MaidDashboard.jsx
-// Uses existing MaidDashboard.module.css classes — no inline style overload
-
-// ─── Profile Tab ──────────────────────────────────────────────
-// Full version — covers all controller endpoints:
-//   updateProfile  (bio, rates, currency, location, services, availability)
-//   getMaidAvailability / setMaidAvailability
-//   uploadMaidDocument / getMaidDocuments
-// Drop-in replacement inside MaidDashboard.jsx
-
 const WORLD_CURRENCIES = [
   { code: "NGN", name: "Nigerian Naira", symbol: "₦" },
   { code: "USD", name: "US Dollar", symbol: "$" },
@@ -1211,6 +1235,16 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
 
   const navigate = useNavigate();
 
+  const BOOKING_ORDER = {
+    pending: 0,
+    confirmed: 1,
+    in_progress: 2,
+    completed: 3,
+    cancelled: 4,
+    declined: 5,
+    awaiting_payment: 6,
+  };
+
   const fetchBookings = useCallback(async () => {
     setLoading(true);
     try {
@@ -1226,7 +1260,15 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
         seen.add(b.id);
         return true;
       });
-      setBookings(unique);
+      const sorted = unique.slice().sort((a, b) => {
+        const diff =
+          (BOOKING_ORDER[a.status] ?? 9) - (BOOKING_ORDER[b.status] ?? 9);
+        if (diff !== 0) return diff;
+        return (
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      });
+      setBookings(sorted);
     } catch (err) {
       console.error("Error fetching bookings:", err);
     }
@@ -1248,7 +1290,15 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
           headers: { Authorization: `Bearer ${token_val}` },
         });
         const data = await res.json();
-        setBookings(data.bookings || []);
+        const sorted = (data.bookings || []).slice().sort((a, b) => {
+          const diff =
+            (BOOKING_ORDER[a.status] ?? 9) - (BOOKING_ORDER[b.status] ?? 9);
+          if (diff !== 0) return diff;
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        });
+        setBookings(sorted);
       } catch (err) {
         console.error("Background refresh error:", err);
       }
@@ -1683,10 +1733,13 @@ export default function MaidDashboard({ onLogout }) {
         const escrowRows = eData.earnings || [];
 
         // Merge wallet + escrow per currency
+        const escrowByCurrency = wData.escrow_by_currency || {};
+
         const allCurrencies = [
           ...new Set([
             ...wallets.map((w) => w.currency),
             ...escrowRows.map((e) => e.currency),
+            ...Object.keys(escrowByCurrency), // ← currencies with ONLY escrow (no wallet row)
           ]),
         ];
 
@@ -1694,17 +1747,25 @@ export default function MaidDashboard({ onLogout }) {
           .map((cur) => {
             const w = wallets.find((x) => x.currency === cur) || {};
             const e = escrowRows.find((x) => x.currency === cur) || {};
+            const escrowFromWallet = Number(w.escrow_pending || 0);
+            const escrowFromMap = Number(escrowByCurrency[cur] || 0);
+            const escrowFromEarnings = Number(e.in_escrow || 0);
             return {
               currency: cur,
               available: Number(w.available_balance || 0),
               pending: Number(w.pending_balance || 0),
               total_earned: Number(w.total_earned || 0),
-              escrow: Number(e.in_escrow || 0),
+              escrow: escrowFromWallet || escrowFromMap || escrowFromEarnings,
               escrow_count: Number(e.in_escrow_count || 0),
             };
           })
-          .filter((x) => x.total_earned > 0 || x.escrow > 0 || x.available > 0);
-
+          .filter(
+            (x) =>
+              Number(x.available) > 0 ||
+              Number(x.pending) > 0 ||
+              Number(x.escrow) > 0 ||
+              Number(x.total_earned) > 0,
+          );
         setStats({
           total: b.length,
           pending: b.filter((x) => x.status === "pending").length,
@@ -1738,69 +1799,88 @@ export default function MaidDashboard({ onLogout }) {
   useEffect(() => {
     const token_val = localStorage.getItem("token");
     if (!token_val) return;
+
     const id = setInterval(async () => {
-      // ── REPLACE this entire try block ──────────────────────────
+      // ── Bookings + wallet + escrow ────────────────────────────
       try {
-        const bRes2 = await fetch(`${API}/bookings?limit=200`, {
-          headers: { Authorization: `Bearer ${token_val}` },
-        });
-        const bData2 = await bRes2.json();
-        const b2 = bData2.bookings || [];
+        const [bRes, wRes, eRes] = await Promise.all([
+          fetch(`${API}/bookings?limit=200`, {
+            headers: { Authorization: `Bearer ${token_val}` },
+          }),
+          fetch(`${API}/wallet`, {
+            headers: { Authorization: `Bearer ${token_val}` },
+          }),
+          fetch(`${API}/payments/maid/earnings`, {
+            headers: { Authorization: `Bearer ${token_val}` },
+          }),
+        ]);
 
-        const wRes2 = await fetch(`${API}/wallet`, {
-          headers: { Authorization: `Bearer ${token_val}` },
-        });
-        const wData2 = await wRes2.json();
-        const wallets2 = wData2.wallets || [];
+        const bData = await bRes.json();
+        const wData = await wRes.json();
+        const eData = await eRes.json();
 
-        const eRes2 = await fetch(`${API}/payments/maid/earnings`, {
-          headers: { Authorization: `Bearer ${token_val}` },
-        });
-        const eData2 = await eRes2.json();
-        const escrow2 = eData2.earnings || [];
+        const bookings = bData.bookings || [];
+        const wallets = wData.wallets || (wData.wallet ? [wData.wallet] : []);
+        const escrowRows = eData.earnings || [];
+        const escrowByCurrency = wData.escrow_by_currency || {};
 
-        const allCur2 = [
+        const allCurrencies = [
           ...new Set([
-            ...wallets2.map((w) => w.currency),
-            ...escrow2.map((e) => e.currency),
+            ...wallets.map((w) => w.currency),
+            ...escrowRows.map((e) => e.currency),
+            ...Object.keys(escrowByCurrency),
           ]),
         ];
-        const earningsByCurrency2 = allCur2
+
+        const earningsByCurrency = allCurrencies
           .map((cur) => {
-            const w = wallets2.find((x) => x.currency === cur) || {};
-            const e = escrow2.find((x) => x.currency === cur) || {};
+            const w = wallets.find((x) => x.currency === cur) || {};
+            const e = escrowRows.find((x) => x.currency === cur) || {};
+            const escrowFromWallet = Number(w.escrow_pending || 0);
+            const escrowFromMap = Number(escrowByCurrency[cur] || 0);
+            const escrowFromEarnings = Number(e.in_escrow || 0);
             return {
               currency: cur,
               available: Number(w.available_balance || 0),
               pending: Number(w.pending_balance || 0),
               total_earned: Number(w.total_earned || 0),
-              escrow: Number(e.in_escrow || 0),
+              escrow: escrowFromWallet || escrowFromMap || escrowFromEarnings,
               escrow_count: Number(e.in_escrow_count || 0),
             };
           })
-          .filter((x) => x.total_earned > 0 || x.escrow > 0 || x.available > 0);
+          .filter(
+            (x) =>
+              Number(x.available) > 0 ||
+              Number(x.pending) > 0 ||
+              Number(x.escrow) > 0 ||
+              Number(x.total_earned) > 0,
+          );
 
         setStats({
-          total: b2.length,
-          pending: b2.filter((x) => x.status === "pending").length,
-          completed: b2.filter((x) => x.status === "completed").length,
-          earningsByCurrency: earningsByCurrency2,
+          total: bookings.length,
+          pending: bookings.filter((x) => x.status === "pending").length,
+          completed: bookings.filter((x) => x.status === "completed").length,
+          earningsByCurrency,
         });
       } catch (err) {
         console.error("Background refresh error:", err);
       }
-      // ── Support count (unchanged) ───────────────────────────────
+
+      // ── Support count ─────────────────────────────────────────
       try {
         const sr = await fetch(`${API_URL}/api/maid-support?limit=50`, {
           headers: { Authorization: `Bearer ${token_val}` },
         });
         const sd = await sr.json();
-        const st = sd.tickets || [];
+        const tickets = sd.tickets || [];
         setSupportOpenCount(
-          st.filter((t) => t.status === "open" || t.status === "in_progress")
-            .length,
+          tickets.filter(
+            (t) => t.status === "open" || t.status === "in_progress",
+          ).length,
         );
-      } catch {} // Add at the end of the interval, after the support count try/catch:
+      } catch {}
+
+      // ── Unread messages ───────────────────────────────────────
       try {
         const ur = await fetch(`${API}/chat/unread`, {
           headers: { Authorization: `Bearer ${token_val}` },
@@ -1809,6 +1889,7 @@ export default function MaidDashboard({ onLogout }) {
         setUnreadMessages(ud.unread || 0);
       } catch {}
     }, 30000);
+
     return () => clearInterval(id);
   }, []);
 
@@ -2098,8 +2179,10 @@ export default function MaidDashboard({ onLogout }) {
                           style={{ background: "rgb(21,101,192)" }}
                         />
                         {sym}
-                        {Number(e.escrow).toLocaleString()} escrow
-                        {e.escrow_count > 0 ? ` ×${e.escrow_count}` : ""}
+                        {Number(e.escrow).toLocaleString()} held in escrow
+                        {e.escrow_count > 0
+                          ? ` (${e.escrow_count} completed job${e.escrow_count > 1 ? "s" : ""} awaiting customer release)`
+                          : " — awaiting customer release"}
                       </span>
                     )}
                   </div>

@@ -51,7 +51,13 @@
   .heroMeta {
     font-size: 12px;
     color: rgba(255, 255, 255, 0.55);
+    margin: 0 0 6px;
+  }
+  .heroCompliance {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.35);
     margin: 0;
+    letter-spacing: 0.04em;
   }
   .heroDivider {
     width: 36px;

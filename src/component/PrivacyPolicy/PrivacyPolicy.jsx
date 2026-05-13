@@ -9,20 +9,32 @@ const SECTIONS = [
     content: (
       <>
         <p>
-          Deusizi Sparkle ("we", "our", or "us") is committed to protecting your
-          personal information. This Privacy Policy explains how we collect,
-          use, store, share, and protect your data when you use our platform at{" "}
-          <strong>deusizisparkle.com</strong>.
+          Deusizi Sparkle ("we", "our", or "us") is a <strong>global</strong>{" "}
+          home and commercial cleaning marketplace operated from Abuja, Federal
+          Capital Territory, Nigeria. We are committed to protecting your
+          personal information wherever you are in the world.
+        </p>
+        <p>
+          This Privacy Policy explains how we collect, use, store, share, and
+          protect your data when you use our platform at{" "}
+          <strong>deusizisparkle.com</strong>, our mobile applications (iOS and
+          Android), and all related services.
         </p>
         <div className={styles.highlight}>
           We will never sell your personal data to third parties. Your
           information is used solely to provide and improve our services, and to
-          connect you with cleaning professionals in your area.
+          connect you with cleaning professionals.
         </div>
         <p>
+          We comply with the{" "}
+          <strong>Nigeria Data Protection Act 2023 (NDPA)</strong>, the{" "}
+          <strong>General Data Protection Regulation (GDPR)</strong> for users
+          in the United Kingdom and European Union, and applicable data
+          protection laws in all countries where we operate.
+        </p>
+        <p>
           By using our platform, you consent to the data practices described in
-          this policy. If you do not agree, please discontinue use of our
-          services.
+          this policy.
         </p>
       </>
     ),
@@ -35,9 +47,10 @@ const SECTIONS = [
       <>
         <p>We collect the following categories of information:</p>
         <p>
-          <strong>Account Information</strong> — when you sign in via Google, we
-          receive your name, email address, and profile photo from your Google
-          account.
+          <strong>Account Information</strong> — when you register, we collect
+          your name, email address, phone number, and country. If you use Google
+          Sign-In, we receive your name, email, and profile photo from your
+          Google account.
         </p>
         <p>
           <strong>Booking Information</strong> — when you make a booking, we
@@ -45,19 +58,45 @@ const SECTIONS = [
           instructions, and payment records.
         </p>
         <p>
-          <strong>Profile Information</strong> — for maids, we collect
-          additional details including bio, hourly rate, services offered,
-          location, and availability.
+          <strong>Profile Information</strong> — for cleaning professionals, we
+          collect bio, rates, services offered, location, availability, and
+          identity documents submitted for verification.
         </p>
         <p>
-          <strong>Usage Data</strong> — we automatically collect information
-          about how you use our platform, including pages visited, actions
-          taken, device type, browser, and IP address.
+          <strong>Location Data</strong> — with your explicit permission, we
+          collect precise GPS coordinates during active bookings. This includes
+          check-in location, checkout location, and periodic location pings
+          during the job for live tracking purposes. Location data is shared
+          between the customer and assigned cleaning professional during an
+          active booking and retained for dispute resolution purposes. Location
+          is never collected in the background outside of active bookings.
         </p>
         <p>
-          <strong>Communications</strong> — if you contact our support team, we
-          retain records of those communications to resolve disputes and improve
-          our service.
+          <strong>Camera and Photos</strong> — with your permission, we access
+          your device camera or photo library solely to allow you to upload a
+          profile avatar or identity verification documents.
+        </p>
+        <p>
+          <strong>Payment Information</strong> — payment transactions are
+          processed by Paystack (African currencies) and Stripe (international
+          currencies). We store payment references and amounts but do not store
+          full card numbers, CVV codes, or bank credentials.
+        </p>
+        <p>
+          <strong>Push Notification Tokens</strong> — with your permission, we
+          collect device tokens to send booking alerts, payment notifications,
+          SOS alerts, and service updates via Expo push notification
+          infrastructure.
+        </p>
+        <p>
+          <strong>Communications</strong> — messages sent through our in-app
+          chat, support tickets, and video calls may be stored for safety,
+          moderation, and dispute resolution purposes.
+        </p>
+        <p>
+          <strong>Usage Data</strong> — we automatically collect device type,
+          browser, operating system, app version, IP address, and general usage
+          analytics.
         </p>
       </>
     ),
@@ -71,18 +110,32 @@ const SECTIONS = [
         <p>We use the information we collect to:</p>
         <ul>
           <li>Create and manage your account on our platform</li>
-          <li>Process bookings and facilitate payments through Paystack</li>
-          <li>Connect customers with suitable cleaning professionals</li>
-          <li>Send booking confirmations, reminders, and service updates</li>
+          <li>
+            Process bookings and facilitate payments in all supported currencies
+            globally
+          </li>
+          <li>Connect customers with cleaning professionals worldwide</li>
+          <li>Provide live GPS tracking during active bookings</li>
+          <li>
+            Send booking confirmations, reminders, and service updates via email
+            and push notification
+          </li>
           <li>Handle customer support requests and resolve disputes</li>
-          <li>Improve our platform, detect fraud, and maintain security</li>
-          <li>Send promotional communications (only with your consent)</li>
-          <li>Comply with our legal obligations under Nigerian law</li>
+          <li>Verify identity of cleaning professionals</li>
+          <li>Detect and prevent fraud, abuse, and platform misuse</li>
+          <li>Improve our platform, features, and user experience</li>
+          <li>
+            Send promotional communications (only with your explicit consent)
+          </li>
+          <li>
+            Comply with our legal obligations in all operating jurisdictions
+          </li>
         </ul>
         <p>
           We process your data on the legal basis of contractual necessity (to
           provide the service), legitimate interest (to improve and protect our
-          platform), and consent (for marketing communications).
+          platform), and consent (for marketing communications and location
+          access).
         </p>
       </>
     ),
@@ -97,24 +150,38 @@ const SECTIONS = [
           We share your information only in the following limited circumstances:
         </p>
         <p>
-          <strong>With Maids</strong> — when you make a booking, your name,
-          address, and booking details are shared with the assigned cleaning
-          professional. This is necessary to deliver the service.
+          <strong>With Cleaning Professionals</strong> — when you make a
+          booking, your name, service address, and booking details are shared
+          with the assigned professional to deliver the service.
         </p>
         <p>
-          <strong>With Payment Processors</strong> — your payment information is
-          handled by Paystack in accordance with their Privacy Policy. We do not
-          store your full card details.
+          <strong>With Payment Processors</strong> — Paystack handles African
+          currency payments (NGN, GHS, KES, ZAR, and more) and Stripe handles
+          international currency payments (USD, GBP, EUR, CAD, AUD, and all
+          other global currencies), each under their own Privacy Policies. We do
+          not store your full card details.
         </p>
         <p>
-          <strong>With Service Providers</strong> — we may share data with
-          trusted third-party providers (e.g., cloud hosting, analytics) who
-          process data on our behalf under strict data protection agreements.
+          <strong>With Media Services</strong> — Cloudinary stores profile
+          avatars and identity documents securely.
         </p>
         <p>
-          <strong>Legal Requirements</strong> — we may disclose information if
-          required by Nigerian law, court order, or to protect the rights,
-          property, or safety of our users.
+          <strong>With Video Infrastructure</strong> — Agora provides our
+          real-time video call feature. Call metadata may be processed by Agora
+          per their Privacy Policy.
+        </p>
+        <p>
+          <strong>With Push Notification Services</strong> — Expo's push
+          infrastructure delivers notifications to your device.
+        </p>
+        <p>
+          <strong>With Service Providers</strong> — trusted third-party
+          providers process data on our behalf under strict data processing
+          agreements.
+        </p>
+        <p>
+          <strong>With Law Enforcement</strong> — we may disclose data when
+          required by law, court order, or to protect the safety of our users.
         </p>
         <div className={styles.warning}>
           <strong>We never sell your personal data.</strong> We do not share
@@ -126,33 +193,79 @@ const SECTIONS = [
   },
   {
     num: "05",
-    id: "storage",
-    title: "Data Storage & Security",
+    id: "location",
+    title: "Location Data",
     content: (
       <>
         <p>
-          Your data is stored on secure servers hosted by Railway
-          (infrastructure) and protected using industry-standard security
-          measures including:
+          Location access is used exclusively during active bookings for the
+          following purposes:
         </p>
         <ul>
-          <li>Encryption in transit (HTTPS/TLS) and at rest</li>
-          <li>JWT-based authentication with secure token expiry</li>
-          <li>Redis caching with no persistent storage of sensitive data</li>
-          <li>Regular security reviews and access controls</li>
-          <li>Staff access to personal data limited to those who need it</li>
+          <li>
+            <strong>Check-in location</strong> — recorded when a cleaning
+            professional marks arrival at the job address
+          </li>
+          <li>
+            <strong>Checkout location</strong> — recorded when a cleaning
+            professional marks job completion
+          </li>
+          <li>
+            <strong>Live tracking</strong> — periodic GPS pings sent during the
+            job so customers can monitor the cleaning professional's presence
+          </li>
+          <li>
+            <strong>SOS alerts</strong> — your location at the time of an
+            emergency alert is shared with administrators and registered
+            emergency contacts
+          </li>
         </ul>
         <p>
-          While we take significant steps to protect your data, no internet
-          transmission is 100% secure. We encourage you to use a strong password
-          and to notify us immediately if you suspect unauthorized access to
-          your account.
+          Location data is never collected in the background when you are not in
+          an active booking session. You may deny location permission at any
+          time through your device settings; check-in and checkout features will
+          continue to function without GPS coordinates.
+        </p>
+        <p>
+          Location data is retained for up to 90 days after booking completion
+          and then permanently deleted.
         </p>
       </>
     ),
   },
   {
     num: "06",
+    id: "storage",
+    title: "Data Storage & Security",
+    content: (
+      <>
+        <p>
+          Your data is stored on secure servers and protected using
+          industry-standard security measures including:
+        </p>
+        <ul>
+          <li>Encryption in transit (HTTPS/TLS 1.2+) and at rest (AES-256)</li>
+          <li>JWT-based authentication with secure token expiry</li>
+          <li>Regular security reviews and access controls</li>
+          <li>
+            Role-based access controls — staff access to personal data is
+            limited to those who need it
+          </li>
+          <li>
+            Secure credential management — API keys and secrets are never stored
+            in client applications
+          </li>
+        </ul>
+        <p>
+          We will notify you promptly in the event of a data breach that affects
+          your personal information, in accordance with applicable notification
+          requirements.
+        </p>
+      </>
+    ),
+  },
+  {
+    num: "07",
     id: "retention",
     title: "Data Retention",
     content: (
@@ -164,15 +277,15 @@ const SECTIONS = [
         <ul>
           <li>
             <strong>Account data</strong> — retained while your account is
-            active and for 2 years after closure
+            active and permanently deleted within 90 days of account closure
           </li>
           <li>
-            <strong>Booking records</strong> — retained for 5 years for
-            financial and legal compliance
+            <strong>Booking and financial records</strong> — retained for up to
+            7 years for financial and legal compliance
           </li>
           <li>
-            <strong>Payment data</strong> — handled and retained by Paystack per
-            their policy
+            <strong>Location data</strong> — deleted 90 days after booking
+            completion
           </li>
           <li>
             <strong>Support communications</strong> — retained for 2 years
@@ -183,31 +296,63 @@ const SECTIONS = [
           </li>
         </ul>
         <p>
-          You may request deletion of your personal data at any time, subject to
-          our legal retention obligations. See Section 8 for your rights.
+          You may request deletion of your personal data at any time (see
+          Section 10). Certain data may be retained where required by law.
         </p>
       </>
     ),
   },
   {
-    num: "07",
-    id: "cookies",
-    title: "Cookies & Tracking",
+    num: "08",
+    id: "international",
+    title: "International Data Transfers",
     content: (
       <>
-        <p>We use minimal cookies and local storage to provide our services:</p>
+        <p>
+          Deusizi Sparkle is a global platform serving users across Africa,
+          Europe, the Americas, Asia, and beyond. Your data may be transferred
+          to and processed in countries other than your country of residence.
+        </p>
+        <p>
+          Where we transfer personal data from the UK or European Economic Area
+          to countries without an adequacy decision, we rely on Standard
+          Contractual Clauses approved by the relevant data protection
+          authorities to ensure an equivalent level of protection.
+        </p>
+        <p>
+          All international transfers are conducted with appropriate safeguards
+          in place to protect your personal information in accordance with the
+          GDPR and applicable national laws.
+        </p>
+      </>
+    ),
+  },
+  {
+    num: "09",
+    id: "cookies",
+    title: "Cookies & Local Storage",
+    content: (
+      <>
+        <p>
+          Our website uses cookies and local storage to provide our services:
+        </p>
         <ul>
           <li>
-            <strong>Authentication tokens</strong> — stored in your browser's
-            localStorage to keep you logged in securely
+            <strong>Authentication tokens</strong> — stored in localStorage to
+            keep you securely logged in
           </li>
           <li>
             <strong>Session preferences</strong> — stored in sessionStorage for
-            temporary data like your selected booking role
+            temporary session data
           </li>
           <li>
-            <strong>Analytics</strong> — we may use anonymous analytics tools to
-            understand how our platform is used
+            <strong>Language preference</strong> — stored via Google Translate
+            cookie to remember your selected language
+          </li>
+          <li>
+            <strong>Analytics</strong> — we may use anonymous analytics to
+            understand how our platform is used. No personally identifiable data
+            is shared with analytics providers.
           </li>
         </ul>
         <p>
@@ -219,14 +364,14 @@ const SECTIONS = [
     ),
   },
   {
-    num: "08",
+    num: "10",
     id: "rights",
     title: "Your Rights",
     content: (
       <>
         <p>
-          Under applicable Nigerian data protection law (NDPR) and general
-          privacy principles, you have the right to:
+          Under the Nigeria Data Protection Act 2023 (NDPA) and the GDPR (for
+          UK/EU users), you have the right to:
         </p>
         <ul>
           <li>
@@ -238,8 +383,8 @@ const SECTIONS = [
             incomplete data
           </li>
           <li>
-            <strong>Deletion</strong> — request deletion of your personal data
-            ("right to be forgotten")
+            <strong>Deletion</strong> — request permanent deletion of your
+            personal data ("right to be forgotten")
           </li>
           <li>
             <strong>Portability</strong> — receive your data in a structured,
@@ -250,20 +395,26 @@ const SECTIONS = [
             including direct marketing
           </li>
           <li>
+            <strong>Restriction</strong> — ask us to limit how we process your
+            data in certain circumstances
+          </li>
+          <li>
             <strong>Withdrawal of consent</strong> — withdraw consent for
-            marketing communications at any time
+            marketing at any time without affecting prior processing
           </li>
         </ul>
         <p>
           To exercise any of these rights, contact us at{" "}
           <strong>hello@deusizisparkle.com</strong>. We will respond within 30
-          days. We may need to verify your identity before processing requests.
+          days. You also have the right to lodge a complaint with your national
+          data protection authority — in Nigeria, this is the Nigeria Data
+          Protection Commission (NDPC).
         </p>
       </>
     ),
   },
   {
-    num: "09",
+    num: "11",
     id: "children",
     title: "Children's Privacy",
     content: (
@@ -274,23 +425,23 @@ const SECTIONS = [
         </p>
         <p>
           If you believe a child has provided us with personal information
-          without parental consent, please contact us immediately at{" "}
-          <strong>hello@deusizisparkle.com</strong> and we will take steps to
-          remove that information from our systems.
+          without parental or guardian consent, please contact us immediately at{" "}
+          <strong>hello@deusizisparkle.com</strong> and we will promptly remove
+          that information from our systems.
         </p>
       </>
     ),
   },
   {
-    num: "10",
+    num: "12",
     id: "changes",
     title: "Changes to This Policy",
     content: (
       <>
         <p>
           We may update this Privacy Policy periodically to reflect changes in
-          our practices, technology, or legal requirements. When we make
-          material changes, we will:
+          our practices, technology, legal requirements, or business operations.
+          When we make material changes, we will:
         </p>
         <ul>
           <li>Update the "Last updated" date at the top of this page</li>
@@ -298,9 +449,8 @@ const SECTIONS = [
           <li>Display a prominent notice on our platform</li>
         </ul>
         <p>
-          We encourage you to review this policy regularly. Your continued use
-          of our platform after changes take effect constitutes your acceptance
-          of the updated policy.
+          Your continued use of our platform after changes take effect
+          constitutes your acceptance of the updated policy.
         </p>
       </>
     ),
@@ -320,8 +470,11 @@ export default function PrivacyPolicy() {
         <p className={styles.heroEyebrow}>Legal</p>
         <h1 className={styles.heroTitle}>Privacy Policy</h1>
         <p className={styles.heroMeta}>
-          Last updated: March 2026{" "}
+          Last updated: May 2026{" "}
           <span className={styles.updatedBadge}>Current</span>
+        </p>
+        <p className={styles.heroCompliance}>
+          Nigeria NDPA 2023 · GDPR · Global Data Protection Laws
         </p>
         <div className={styles.heroDivider} />
       </div>
@@ -359,14 +512,14 @@ export default function PrivacyPolicy() {
             </div>
           ))}
 
-          {/* Contact */}
           <div className={styles.contactCard}>
             <h3 className={styles.contactTitle}>
               Privacy questions or requests?
             </h3>
             <p className={styles.contactText}>
-              Contact our team to exercise your rights, request data deletion,
-              or ask any privacy-related questions.
+              Contact our Data Protection team to exercise your rights, request
+              data deletion, or ask any privacy-related questions. We respond
+              within 30 days.
             </p>
             <div className={styles.contactItems}>
               <div className={styles.contactItem}>
@@ -379,6 +532,10 @@ export default function PrivacyPolicy() {
               <div className={styles.contactItem}>
                 <span className={styles.contactIcon}>📍</span> Abuja, FCT,
                 Nigeria
+              </div>
+              <div className={styles.contactItem}>
+                <span className={styles.contactIcon}>🌐</span>{" "}
+                deusizisparkle.com
               </div>
             </div>
           </div>

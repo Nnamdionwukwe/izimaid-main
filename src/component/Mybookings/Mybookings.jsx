@@ -30,6 +30,16 @@ const STATUS_CLASS = {
   declined: styles.statusDeclined,
 };
 
+const BOOKING_ORDER = {
+  awaiting_payment: 0,
+  pending: 1,
+  confirmed: 2,
+  in_progress: 3,
+  completed: 4,
+  cancelled: 5,
+  declined: 6,
+};
+
 function formatDate(d) {
   return new Date(d).toLocaleDateString("en-NG", {
     day: "numeric",
@@ -45,13 +55,48 @@ const CURRENCY_SYMBOLS = {
   USD: "$",
   GBP: "£",
   EUR: "€",
-  KES: "KSh",
   GHS: "₵",
+  KES: "KSh",
   ZAR: "R",
   UGX: "USh",
+  TZS: "TSh",
+  RWF: "FRw",
+  ETB: "Br",
+  XOF: "CFA",
+  MAD: "MAD",
+  EGP: "E£",
   CAD: "CA$",
   AUD: "A$",
+  INR: "₹",
+  AED: "د.إ",
+  SAR: "﷼",
+  QAR: "QR",
+  SGD: "S$",
+  MYR: "RM",
+  BRL: "R$",
+  MXN: "MX$",
+  JPY: "¥",
+  CNY: "¥",
+  CHF: "CHF",
+  SEK: "kr",
+  NOK: "kr",
+  DKK: "kr",
+  NZD: "NZ$",
+  HKD: "HK$",
+  PHP: "₱",
+  THB: "฿",
+  IDR: "Rp",
+  PKR: "₨",
+  BDT: "৳",
+  VND: "₫",
+  CZK: "Kč",
+  PLN: "zł",
+  HUF: "Ft",
+  RON: "lei",
+  TRY: "₺",
+  ILS: "₪",
 };
+
 function fmtBookingAmt(b) {
   const c = b.payment_currency || b.maid_currency || "NGN";
   return `${CURRENCY_SYMBOLS[c] || c + " "}${Number(b.total_amount || 0).toLocaleString()}`;
@@ -102,7 +147,15 @@ export default function MyBookings() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        setBookings(data.bookings || []);
+        const sorted = (data.bookings || []).slice().sort((a, b) => {
+          const diff =
+            (BOOKING_ORDER[a.status] ?? 9) - (BOOKING_ORDER[b.status] ?? 9);
+          if (diff !== 0) return diff;
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        });
+        setBookings(sorted);
       } catch (err) {
         console.error(err);
       } finally {
@@ -123,7 +176,15 @@ export default function MyBookings() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        setBookings(data.bookings || []);
+        const sorted = (data.bookings || []).slice().sort((a, b) => {
+          const diff =
+            (BOOKING_ORDER[a.status] ?? 9) - (BOOKING_ORDER[b.status] ?? 9);
+          if (diff !== 0) return diff;
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        });
+        setBookings(sorted);
       } catch {}
     }, 30000);
     return () => clearInterval(id);

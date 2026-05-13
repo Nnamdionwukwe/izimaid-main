@@ -109,6 +109,12 @@ export default function BookingDetail() {
   const [sosSent, setSosSent] = useState(false);
   const [videoLoading, setVideoLoading] = useState(false);
 
+  const [releaseLoading, setReleaseLoading] = useState(false);
+  const [released, setReleased] = useState(false);
+  const [cancelModal, setCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelLoading, setCancelLoading] = useState(false);
+
   const [review, setReview] = useState(null);
 
   const pollRef = useRef(null);
@@ -359,6 +365,55 @@ export default function BookingDetail() {
       setError(err.message);
     } finally {
       setReviewLoading(false);
+    }
+  }
+
+  async function handleReleaseFunds() {
+    setReleaseLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${API_URL}/api/bookings/${id}/release-funds`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setReleased(true);
+      setBooking((prev) => ({ ...prev, escrow_status: "released" }));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setReleaseLoading(false);
+    }
+  }
+
+  async function handleCancelWithReason() {
+    setCancelLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${API_URL}/api/bookings/${id}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status: "cancelled",
+          reason: cancelReason || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setBooking((prev) => ({ ...prev, status: "cancelled" }));
+      setCancelModal(false);
+      setCancelReason("");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setCancelLoading(false);
     }
   }
 
@@ -630,6 +685,63 @@ export default function BookingDetail() {
               {actionLoading === "cancelled" ? "Cancelling…" : "Cancel Booking"}
             </button>
           )}
+
+        {isCustomer &&
+          booking.status === "completed" &&
+          booking.escrow_status === "pending_release" &&
+          !released && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div
+                style={{
+                  padding: "12px 14px",
+                  background: "rgb(255,248,225)",
+                  border: "1px solid rgb(255,214,100)",
+                  borderRadius: 8,
+                  fontSize: 13,
+                  color: "rgb(100,70,0)",
+                  lineHeight: 1.6,
+                }}
+              >
+                <p
+                  style={{
+                    margin: "0 0 6px",
+                    fontWeight: "bold",
+                    fontSize: 14,
+                  }}
+                >
+                  💰 Your payment is held securely in escrow
+                </p>
+                <p style={{ margin: 0 }}>
+                  The maid has marked this job as complete. By tapping{" "}
+                  <strong>Release Funds</strong>, you confirm you are satisfied
+                  with the service and authorise payment of{" "}
+                  <strong>{fmtAmt(booking.total_amount, currency)}</strong> to
+                  the maid. This action cannot be undone.
+                </p>
+                <p
+                  style={{
+                    margin: "8px 0 0",
+                    fontSize: 12,
+                    color: "rgb(133,90,0)",
+                  }}
+                >
+                  If you have any concerns about the service, please contact
+                  support before releasing.
+                </p>
+              </div>
+              <button
+                className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
+                disabled={releaseLoading}
+                onClick={handleReleaseFunds}
+                style={{
+                  background: "rgb(10,107,46)",
+                  borderColor: "rgb(10,107,46)",
+                }}
+              >
+                {releaseLoading ? "Releasing…" : "💰 Release Funds to Maid"}
+              </button>
+            </div>
+          )}
         {isMaid && booking.status === "pending" && (
           <>
             <button
@@ -685,53 +797,6 @@ export default function BookingDetail() {
           </>
         )}
       </div>
-      {/* {isCustomer && booking.status === "completed" && !reviewed && (
-        <div className={styles.section} style={{ marginTop: 16 }}>
-          <p className={styles.sectionTitle}>Leave a Review</p>
-          <div className={styles.reviewForm}>
-            <div className={styles.stars}>
-              {[1, 2, 3, 4, 5].map((n) => (
-                <span
-                  key={n}
-                  className={`${styles.star} ${n <= rating ? styles.starActive : ""}`}
-                  onClick={() => setRating(n)}
-                >
-                  ★
-                </span>
-              ))}
-            </div>
-            <textarea
-              className={styles.reviewTextarea}
-              placeholder="Share your experience (optional)…"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-            <button
-              className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
-              onClick={submitReview}
-              disabled={reviewLoading}
-            >
-              {reviewLoading ? "Submitting…" : "Submit Review"}
-            </button>
-          </div>
-        </div>
-      )}
-      {reviewed && (
-        <div
-          className={styles.section}
-          style={{ textAlign: "center", marginTop: 16 }}
-        >
-          <p
-            style={{
-              color: "rgb(10,107,46)",
-              fontWeight: "bold",
-              fontSize: 14,
-            }}
-          >
-            ✓ Review submitted. Thank you!
-          </p>
-        </div>
-      )} */}
 
       {/* ── Customer Review ── show to both maid and customer once submitted */}
       {booking.status === "completed" && review && (
