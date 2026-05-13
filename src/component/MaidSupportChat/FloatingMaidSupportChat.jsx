@@ -18,10 +18,22 @@ export default function FloatingMaidSupportChat() {
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
   // Check maid auth
-  useEffect(() => {
+  function checkAuth() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const token = localStorage.getItem("token");
-    if (token && user.role === "maid") setVisible(true);
+    setVisible(!!(token && user.role === "maid"));
+  }
+
+  useEffect(() => {
+    checkAuth();
+    // Catches login/logout in the same tab via custom event
+    window.addEventListener("auth-change", checkAuth);
+    // Catches cross-tab storage changes
+    window.addEventListener("storage", checkAuth);
+    return () => {
+      window.removeEventListener("auth-change", checkAuth);
+      window.removeEventListener("storage", checkAuth);
+    };
   }, []);
 
   // Poll unread when chat closed
@@ -211,8 +223,36 @@ export default function FloatingMaidSupportChat() {
         onClick={handleFabClick}
         aria-label={open ? "Close support chat" : "Open support chat"}
       >
-        <span className={styles.fabIcon}>{open ? "✕" : "💬"}</span>
-        {/* <span className={styles.fabLabel}>{open ? "Close" : "Support"}</span> */}
+        <span className={styles.fabIcon}>
+          {open ? (
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          ) : (
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+          )}
+        </span>
 
         {!open && unread > 0 && (
           <span className={styles.badge}>{unread > 99 ? "99+" : unread}</span>
