@@ -97,10 +97,20 @@ export default function FloatingSupportChat() {
   const fabDragStart = useRef({ x: 0, y: 0 });
 
   // Detect auth state
-  useEffect(() => {
+  function checkAuth() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const token = localStorage.getItem("token");
-    if (token && user.role === "customer") setVisible(true);
+    setVisible(!!(token && user.role === "customer"));
+  }
+
+  useEffect(() => {
+    checkAuth();
+    window.addEventListener("auth-change", checkAuth);
+    window.addEventListener("storage", checkAuth);
+    return () => {
+      window.removeEventListener("auth-change", checkAuth);
+      window.removeEventListener("storage", checkAuth);
+    };
   }, []);
 
   // Poll unread when chat is closed
@@ -203,7 +213,20 @@ export default function FloatingSupportChat() {
           onClick={handleFabClick}
           aria-label="Open support chat"
         >
-          <span className={styles.fabIcon}>💬</span>
+          <span className={styles.fabIcon}>
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+          </span>
           {unread > 0 && (
             <span className={styles.badge}>{unread > 99 ? "99+" : unread}</span>
           )}
