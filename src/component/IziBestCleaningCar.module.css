@@ -550,3 +550,265 @@
 }
 
 /* ... Keep existing modular definitions using these structural formatting patterns ... */
+
+/* ==========================================================================
+   Design Variables
+   ========================================================================== */
+:root {
+  --navy-primary: #0a1136;
+  --navy-hover: #050924;
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  --bg-input: #f9fafb;
+  --border-color: #e5e7eb;
+  --error-red: #dc2626;
+  --success-green: #065f46;
+  --success-bg: #ecfdf5;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --transition-fast: all 0.2s ease-in-out;
+}
+
+/* ==========================================================================
+   Overlay & Base Box Structure
+   ========================================================================== */
+.modalOverlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45); /* Elegant glass overlay */
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.modalBox {
+  background-color: #ffffff;
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 460px;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  padding: 2.5rem 2rem;
+  box-sizing: border-box;
+}
+
+/* Close Cross Styling */
+.modalClose {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: #f3f4f6;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.modalClose:hover {
+  background-color: #e5e7eb;
+  color: var(--text-main);
+}
+
+/* Header & Brand Layout */
+.modalLogoDiv {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.modalLogo {
+  height: 48px;
+  object-fit: contain;
+}
+
+.modalLocated {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  color: var(--navy-primary);
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* ==========================================================================
+   Modular Responsive Grid Search Input Elements
+   ========================================================================== */
+.modalInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.modalZipRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.modalInputElement {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 2.5rem 0.85rem 1rem;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.modalInputElement:focus {
+  border-color: var(--navy-primary);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(10, 17, 54, 0.08);
+}
+
+.modalClear {
+  position: absolute;
+  right: 1rem;
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.modalClear:hover {
+  color: var(--text-main);
+}
+
+/* Use Location GPS Button Trigger Layout */
+.modalUseLocation {
+  background-color: #f3f4f6;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  width: 100%;
+}
+
+.modalUseLocation:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+.modalUseLocation span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.isLocating {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* ==========================================================================
+   Status Messages & Address Blocks
+   ========================================================================== */
+.modalErrorText,
+.inlineContextError {
+  color: var(--error-red);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 0.5rem 0 0 0.25rem;
+}
+
+.addressDisplayCard {
+  background-color: var(--success-bg);
+  border: 1px solid rgba(6, 95, 70, 0.12);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-top: 1.25rem;
+  text-align: left;
+}
+
+.addressDisplayTitle {
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+  color: var(--success-green);
+  font-size: 0.85rem;
+}
+
+.addressLine {
+  margin: 0.25rem 0;
+  font-size: 0.87rem;
+  color: #064e3b;
+}
+
+/* ==========================================================================
+   Primary Action Button Footer
+   ========================================================================== */
+.modalFindBtn {
+  background-color: var(--navy-primary);
+  color: #ffffff;
+  border: none;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  margin-top: 1.5rem;
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition-fast);
+}
+
+.modalFindBtn:hover {
+  background-color: var(--navy-hover);
+  box-shadow: 0 4px 12px rgba(10, 17, 54, 0.15);
+}
+
+.modalFieldFooter {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.modalFieldFooter p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Desktop Layout Enhancements
+   ========================================================================== */
+@media screen and (min-width: 768px) {
+  .modalBox {
+    max-width: 520px;
+    padding: 3rem 2.5rem;
+  }
+
+  .modalInputGroup {
+    flex-direction: row;
+  }
+
+  .modalZipRow {
+    flex: 1.3;
+  }
+
+  .modalUseLocation {
+    flex: 1;
+  }
+}

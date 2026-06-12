@@ -39,98 +39,100 @@ function LocationModal({
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalBox}>
-        <div className={styles.modalInner}>
-          <div onClick={onClose} className={styles.modalClose}>
-            <h4>&times;</h4>
-          </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className={styles.modalClose}
+          aria-label="Close modal"
+        >
+          &times;
+        </button>
 
-          <div className={styles.modalLogoDiv}>
-            <img className={styles.modalLogo} alt="Logo" src="deusizi.jpg" />
-          </div>
+        <div className={styles.modalLogoDiv}>
+          <img
+            className={styles.modalLogo}
+            alt="Deusizi Logo"
+            src="deusizi.jpg"
+          />
+        </div>
 
-          <div className={styles.modalLocated}>
-            <h4>Tell us where you are located</h4>
-          </div>
+        <div className={styles.modalLocated}>
+          <h2 className={styles.modalTitle}>Tell us where you are located</h2>
+        </div>
 
+        {/* Improved Flex Search Container */}
+        <div className={styles.modalInputGroup}>
           <div className={styles.modalZipRow}>
             <input
               onChange={onInput}
               value={locationInput}
               type="text"
               placeholder="Enter ZIP Code, City, or Street"
+              className={styles.modalInputElement}
             />
             {clearInput && (
-              <h3 onClick={onClear} className={styles.modalClear}>
+              <span onClick={onClear} className={styles.modalClear}>
                 &times;
-              </h3>
-            )}
-            <div
-              onClick={onUseLocation}
-              className={styles.modalUseLocation}
-              style={{
-                cursor: locating ? "wait" : "pointer",
-                opacity: locating ? 0.5 : 1,
-              }}
-            >
-              <h5>
-                {locating ? "📍 Detecting location..." : "📍 Use My Location"}
-              </h5>
-            </div>
-            {locationError && (
-              <h5 style={{ color: "red", fontSize: 11, marginTop: 4 }}>
-                {locationError}
-              </h5>
+              </span>
             )}
           </div>
 
-          {detectedAddress && (
-            <div
-              style={{
-                background: "rgb(209,247,224)",
-                padding: "10px 12px",
-                borderRadius: "8px",
-                marginTop: 12,
-                fontSize: "12px",
-                color: "rgb(10,107,46)",
-                lineHeight: "1.6",
-              }}
-            >
-              <p style={{ margin: "0 0 6px 0", fontWeight: "bold" }}>
-                ✅ Location Detected:
+          <button
+            type="button"
+            onClick={onUseLocation}
+            disabled={locating}
+            className={`${styles.modalUseLocation} ${locating ? styles.isLocating : ""}`}
+          >
+            <span>
+              {locating ? "📍 Detecting location..." : "📍 Use My Location"}
+            </span>
+          </button>
+        </div>
+
+        {/* Global Error Space */}
+        {locationError && (
+          <p className={styles.inlineContextError}>{locationError}</p>
+        )}
+        {pleaseEnter && (
+          <p className={styles.modalErrorText}>Please enter a location</p>
+        )}
+        {invalidZip && (
+          <p className={styles.modalErrorText}>
+            Please enter at least 2 characters
+          </p>
+        )}
+
+        {/* Address Component Card Box */}
+        {detectedAddress && (
+          <div className={styles.addressDisplayCard}>
+            <p className={styles.addressDisplayTitle}>✅ Location Detected:</p>
+            {detectedAddress.street && (
+              <p className={styles.addressLine}>🏠 {detectedAddress.street}</p>
+            )}
+            {(detectedAddress.city || detectedAddress.state) && (
+              <p className={styles.addressLine}>
+                City:{" "}
+                {[detectedAddress.city, detectedAddress.state]
+                  .filter(Boolean)
+                  .join(", ")}
               </p>
-              {detectedAddress.street && (
-                <p style={{ margin: "2px 0" }}>🏠 {detectedAddress.street}</p>
-              )}
-              {(detectedAddress.city || detectedAddress.state) && (
-                <p style={{ margin: "2px 0" }}>
-                  🏙️{" "}
-                  {[detectedAddress.city, detectedAddress.state]
-                    .filter(Boolean)
-                    .join(", ")}
-                </p>
-              )}
-              {detectedAddress.country && (
-                <p style={{ margin: "2px 0" }}>🌍 {detectedAddress.country}</p>
-              )}
-            </div>
-          )}
-
-          {pleaseEnter && (
-            <h5 className={styles.modalError}>Please enter a location</h5>
-          )}
-          {invalidZip && (
-            <h5 className={styles.modalError}>
-              Please enter at least 2 characters
-            </h5>
-          )}
-
-          <div onClick={onSubmit} className={styles.modalFindBtn}>
-            <h4>Find Local Help</h4>
+            )}
+            {detectedAddress.country && (
+              <p className={styles.addressLine}>🌍 {detectedAddress.country}</p>
+            )}
           </div>
+        )}
 
-          <div className={styles.modalField}>
-            <p>*indicates a required field</p>
-          </div>
+        <button
+          type="button"
+          onClick={onSubmit}
+          className={styles.modalFindBtn}
+        >
+          Find Local Help
+        </button>
+
+        <div className={styles.modalFieldFooter}>
+          <p>*indicates a required field</p>
         </div>
       </div>
     </div>
