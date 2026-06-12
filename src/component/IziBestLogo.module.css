@@ -37,7 +37,7 @@
   .text {
     border: 0.12em solid rgb(235, 233, 233);
     height: 40px;
-    margin: 0px 15px;
+    margin: 0px -21px 0px 15px;
   }
 
   .logo1 {
