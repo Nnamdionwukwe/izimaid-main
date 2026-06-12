@@ -1,0 +1,139 @@
+/* ==========================================================================
+   Design Tokens
+   ========================================================================== */
+:root {
+  --navy-dark: #04042d;
+  --crimson-brand: #be0d21;
+  --crimson-hover: #9c0b1b;
+  --text-charcoal: #374151;
+  --text-slate: #6b7280;
+  --bg-warm-linen: #faf9f5;
+  --radius-interactive: 0.5rem;
+  --transition-bezier: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-subtle: 0 4px 20px -2px rgba(4, 4, 45, 0.02);
+}
+
+/* ==========================================================================
+   Base Structure & Adaptive Responsive Layout Layouts
+   ========================================================================== */
+.faqSectionWrapper {
+  box-sizing: border-box;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  padding: 3rem 1.25rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  margin-top: 20px;
+}
+
+.faqContainerCard {
+  width: 100%;
+  max-width: 800px;
+  background-color: var(--bg-warm-linen);
+  border: 1px solid rgba(190, 13, 33, 0.06);
+  border-radius: 1rem;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Typography Elements */
+.faqMainTitle {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: var(--navy-dark);
+  margin: 0 0 1rem 0;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.decorativeAccentLine {
+  width: 40px;
+  height: 2.5px;
+  background-color: var(--crimson-brand);
+  margin: 0 auto 1.5rem auto;
+  border-radius: 2px;
+}
+
+.faqDescriptionText {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-charcoal);
+  max-width: 600px;
+  margin: 0 0 2rem 0;
+}
+
+/* ==========================================================================
+   High-End Modern Button Framework Action Trigger
+   ========================================================================== */
+.faqCtaButton {
+  background-color: var(--navy-dark);
+  color: #ffffff;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.85rem 1.75rem;
+  border-radius: var(--radius-interactive);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: var(--transition-bezier);
+}
+
+.faqCtaButton i {
+  font-size: 0.85rem;
+  transition: var(--transition-bezier);
+}
+
+.faqCtaButton:hover {
+  background-color: var(--crimson-brand);
+  box-shadow: 0 6px 20px rgba(190, 13, 33, 0.18);
+}
+
+/* Micro-interaction animation link on hover */
+.faqCtaButton:hover i {
+  transform: translateX(4px);
+}
+
+/* ==========================================================================
+   Responsive Display Media Viewport Scaling
+   ========================================================================== */
+@media screen and (min-width: 640px) {
+  .faqCtaButton {
+    width: auto;
+    white-space: nowrap;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .faqSectionWrapper {
+    padding: 5rem 2rem;
+  }
+
+  .faqContainerCard {
+    padding: 4rem 3.5rem;
+  }
+
+  .faqMainTitle {
+    font-size: 2.25rem;
+    letter-spacing: -0.025em;
+  }
+
+  .faqDescriptionText {
+    font-size: 1.05rem;
+    line-height: 1.65;
+  }
+}
