@@ -1,85 +1,178 @@
-@media screen and (min-width: 20px) {
-  .main {
-    display: flex;
+/* ==========================================================================
+   Design System Tokens
+   ========================================================================== */
+:root {
+  --color-primary-navy: #04042d;
+  --color-accent-crimson: #be0d21;
+  --color-crimson-hover: #9c0b1b;
+  --color-text-main: #374151;
+  --color-text-muted: #4b5563;
+  --bg-card-linen: #faf9f5;
+  --border-light: #e5e7eb;
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius-interactive: 0.5rem;
+}
+
+/* ==========================================================================
+   Base Mobile-First Structural Layout Setup
+   ========================================================================== */
+.sectionWrapper {
+  box-sizing: border-box;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  padding: 3rem 1.25rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+}
+
+.containerBox {
+  width: 100%;
+  max-width: 900px;
+  background-color: var(--bg-card-linen);
+  padding: 2.5rem 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(190, 13, 33, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(4, 4, 45, 0.04);
+}
+
+/* Header Text Blocks */
+.textHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.mainTitle {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--color-accent-crimson);
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.subTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-primary-navy);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* Typographic Content Container Blocks */
+.contentBodyLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.leadParagraph {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-text-main);
+  margin: 0;
+}
+
+.secondaryParagraph {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Modern Marketplace Action Trigger Control Buttons
+   ========================================================================== */
+.actionControlsRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.primaryNavigateButton {
+  background-color: var(--color-primary-navy);
+  color: #ffffff;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.85rem 2rem;
+  border-radius: var(--radius-interactive);
+  width: 100%;
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition-smooth);
+}
+
+.primaryNavigateButton:hover {
+  background-color: var(--color-accent-crimson);
+  box-shadow: 0 4px 12px rgba(190, 13, 33, 0.15);
+}
+
+.secondaryTextButton {
+  background: transparent;
+  color: var(--color-primary-navy);
+  border: 1px solid var(--color-primary-navy);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.85rem 2rem;
+  border-radius: var(--radius-interactive);
+  width: 100%;
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition-smooth);
+}
+
+.secondaryTextButton:hover {
+  background-color: rgba(4, 4, 45, 0.04);
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   Responsive Scaling Viewports (Tablet & Desktop Layouts)
+   ========================================================================== */
+@media screen and (min-width: 640px) {
+  .actionControlsRow {
+    flex-direction: row;
     justify-content: center;
-    margin-top: 1em;
-    margin-bottom: 1em;
+    gap: 1.25rem;
   }
 
-  .mainDiv {
-    justify-content: center;
-  }
-
-  .h2 {
-    display: flex;
-    justify-content: center;
-    margin: 1.4em 0em 1em 0em;
-    color: rgb(4, 4, 45);
-  }
-
-  .h1 {
-    display: flex;
-    justify-content: center;
-    color: rgb(190, 13, 33);
-    margin-left: 10px;
-    margin-top: 5px;
-  }
-
-  .h222 {
-    display: flex;
-    justify-content: center;
-    color: rgb(190, 13, 33);
-    margin-left: 10px;
-    margin-right: 20px;
-    margin-top: 3.5em;
-    margin-bottom: 0.9em;
-    padding-bottom: 0.3em;
-    border-bottom: 1px solid rgb(204, 203, 203);
-  }
-
-  .h22 {
-    display: flex;
-    justify-content: center;
-    margin: 1.4em 0em 1em 0em;
-    color: rgb(4, 4, 45);
-  }
-
-  .p1 {
-    display: flex;
-    justify-content: center;
-    padding: 0em 0.5em;
-    font-size: 1em;
-    color: rgb(59, 59, 59);
-    margin-bottom: 2.7em;
-  }
-
-  .p1 {
-    display: flex;
-    justify-content: center;
-  }
-
-  .p2 {
-    padding: 0em 0.5em;
-    font-size: 1em;
-    color: rgb(59, 59, 59);
-  }
-
-  .p3 {
-    display: flex;
-    justify-content: center;
-    text-decoration: underline;
-    font-size: 1.1em;
-    cursor: pointer;
+  .primaryNavigateButton,
+  .secondaryTextButton {
+    width: auto;
+    white-space: nowrap;
   }
 }
 
 @media screen and (min-width: 992px) {
-  .main {
-    padding: 0em 3em;
-    margin-top: 1em;
+  .sectionWrapper {
+    padding: 5rem 3rem;
   }
-  .p1 {
-    display: flex;
-    justify-content: center;
+
+  .containerBox {
+    padding: 4rem 3.5rem;
+  }
+
+  .mainTitle {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .subTitle {
+    font-size: 1.25rem;
+  }
+
+  .leadParagraph,
+  .secondaryParagraph {
+    font-size: 1.05rem;
+    line-height: 1.75;
   }
 }
