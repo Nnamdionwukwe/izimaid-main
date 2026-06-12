@@ -331,3 +331,282 @@
     border-bottom-left-radius: 5px;
   }
 }
+
+/* ==========================================================================
+   Design Tokens
+   ========================================================================== */
+:root {
+  --navy-base: #0d0d52;
+  --navy-dark: #070736;
+  --crimson-accent: #cc1937;
+  --crimson-hover: #b0122b;
+  --text-primary: #1e293b;
+  --text-muted: #475569;
+  --card-bg: #f1f5f9;
+  --border-divider: #e2e8f0;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --transition-fast: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   Base Structure & Layout Containers
+   ========================================================================== */
+.footerWrapper {
+  box-sizing: border-box;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  background-color: #ffffff;
+  padding: 4rem 1.25rem 5rem 1.25rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid var(--border-divider);
+}
+
+.footerContainer {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ==========================================================================
+   Brand Logo Row Section Elements
+   ========================================================================== */
+.logoBrandingRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.logoLink {
+  display: inline-flex;
+  transition: var(--transition-fast);
+}
+
+.logoLink:hover {
+  opacity: 0.85;
+}
+
+.brandLogo {
+  width: 80px;
+  height: auto;
+  object-fit: contain;
+}
+
+.subsidiaryLogo {
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+}
+
+.brandVerticalDivider {
+  width: 1px;
+  height: 35px;
+  background-color: #cbd5e1;
+}
+
+/* Typography Blocks */
+.corporateContentBlock {
+  text-align: center;
+  max-width: 850px;
+  margin-bottom: 3.5rem;
+}
+
+.groupHeading {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.015em;
+}
+
+.groupDescription {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Action Dashboard Container Grid (Ecosystem Links & App Download Blocks)
+   ========================================================================== */
+.actionDashboardGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  width: 100%;
+}
+
+.dashboardCard {
+  background-color: var(--card-bg);
+  border-radius: var(--radius-md);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.cardHeading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Modular Merged CTA Layout Style */
+.corporateCtaButton {
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+  cursor: pointer;
+  color: #ffffff;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: var(--transition-fast);
+}
+
+.ctaLabelText {
+  background-color: var(--navy-base);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.85rem 1.25rem;
+  transition: var(--transition-fast);
+}
+
+.ctaArrowSymbol {
+  background-color: var(--crimson-accent);
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.corporateCtaButton:hover .ctaLabelText {
+  background-color: var(--navy-dark);
+}
+
+.corporateCtaButton:hover .ctaArrowSymbol {
+  background-color: var(--crimson-hover);
+}
+
+/* ==========================================================================
+   Dual Icon Native Store Button Wrappers 
+   ========================================================================== */
+.appStoresFlexRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 280px;
+}
+
+.appStoreButton {
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+  color: #ffffff;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  width: 100%;
+}
+
+.appStoreButton i {
+  background-color: var(--crimson-accent);
+  width: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  transition: var(--transition-fast);
+}
+
+.storeButtonText {
+  background-color: var(--navy-base);
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1rem;
+  transition: var(--transition-fast);
+  text-align: center;
+}
+
+.appStoreButton:hover i {
+  background-color: var(--crimson-hover);
+}
+
+.appStoreButton:hover .storeButtonText {
+  background-color: var(--navy-dark);
+}
+
+/* ==========================================================================
+   Responsive Breakpoints Scaling Enhancements
+   ========================================================================== */
+
+@media screen and (min-width: 577px) {
+  .brandLogo {
+    width: 95px;
+  }
+
+  .subsidiaryLogo {
+    width: 160px;
+  }
+
+  .groupHeading {
+    font-size: 1.65rem;
+  }
+}
+
+/* Desktop Grid Form Splitting Layout */
+@media screen and (min-width: 990px) {
+  .footerWrapper {
+    padding: 6rem 2rem;
+  }
+
+  .actionDashboardGrid {
+    grid-template-columns: repeat(
+      2,
+      1fr
+    ); /* Clean 50/50 dashboard column split format */
+    gap: 2.5rem;
+  }
+
+  .dashboardCard {
+    padding: 3rem 2rem;
+    height: 160px;
+  }
+
+  .appStoresFlexRow {
+    flex-direction: row;
+    max-width: 100%;
+    gap: 1rem;
+  }
+
+  .appStoreButton {
+    width: 180px;
+  }
+}

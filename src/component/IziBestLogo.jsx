@@ -1,74 +1,90 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styles from "./IziBestLogo.module.css";
 
 export default function IziBestLogo() {
   const navigate = useNavigate();
 
   return (
-    <div className={styles.container}>
-      <div>
-        <div className={styles.containerDiv}>
-          <a href="https://deusizisparkle.com">
-            <img className={styles.logo1} alt="Logo" src="deusizi.jpg" />
+    <footer className={styles.footerWrapper}>
+      <div className={styles.footerContainer}>
+        {/* Brand Logo Grid Header */}
+        <div className={styles.logoBrandingRow}>
+          <a href="https://deusizisparkle.com" className={styles.logoLink}>
+            <img
+              className={styles.brandLogo}
+              alt="Deusizi Sparkle Logo"
+              src="deusizi.jpg"
+            />
           </a>
-
-          <p className={styles.text}></p>
-          <a className={styles.headerP} href="http://deusiziinterior.com">
-            <img className={styles.logo} alt="Logo" src="izibest.jpg" />
+          <div className={styles.brandVerticalDivider} />
+          <a href="http://deusiziinterior.com" className={styles.logoLink}>
+            <img
+              className={styles.subsidiaryLogo}
+              alt="Deusizi Interior Logo"
+              src="izibest.jpg"
+            />
           </a>
         </div>
 
-        <h2 className={styles.containerh2}>
-          Deusizi Sparkle is part of the Deusizi Group of Companies, family of
-          home service providers.
-        </h2>
+        {/* Corporate Mission Text */}
+        <div className={styles.corporateContentBlock}>
+          <h2 className={styles.groupHeading}>
+            Deusizi is a premier multi-vertical home service marketplace and a
+            proud member of the Deusizi Group of Companies.
+          </h2>
+          <p className={styles.groupDescription}>
+            Searching through dozens of fragmented home service providers is a
+            thing of the past. Rely on Deusizi’s unified digital marketplace
+            platform to instantly hire trusted, local, and background-checked
+            professionals near you—covering specialized domestic care, skilled
+            trades, handymen, AC technicians, and estate facility management.
+          </p>
+        </div>
 
-        <p className={styles.containerp}>
-          Searching through dozens of home service providers is a thing of the
-          past. Rely on Deusizi's Group of Companies, national network of
-          trusted, local home service professionals for all your home service
-          needs.
-        </p>
-
-        <div className={styles.googleDivMain}>
-          <div className={styles.googleDiv}>
-            <div className={styles.download1}>
-              <h4>Deusizi Group is all you need to remember</h4>
-
-              <div
-                onClick={() => navigate("deusizi-group")}
-                className={styles.iziMaid}
-              >
-                <h4>Discover Deusizi Group</h4>
-
-                <h2>&rarr;</h2>
-              </div>
-            </div>
+        {/* Premium Functional Download Action Grid Layout */}
+        <div className={styles.actionDashboardGrid}>
+          {/* Ecosystem Discovery Card */}
+          <div className={styles.dashboardCard}>
+            <h3 className={styles.cardHeading}>
+              Deusizi Group is all you need to remember
+            </h3>
+            <button
+              type="button"
+              onClick={() => navigate("/deusizi-group")}
+              className={styles.corporateCtaButton}
+            >
+              <span className={styles.ctaLabelText}>
+                Discover Deusizi Group
+              </span>
+              <span className={styles.ctaArrowSymbol}>&rarr;</span>
+            </button>
           </div>
 
-          <p className={styles.app1}></p>
+          {/* App Store Download Card */}
+          <div className={styles.dashboardCard}>
+            <h3 className={styles.cardHeading}>Download the On-Demand App</h3>
+            <div className={styles.appStoresFlexRow}>
+              <button
+                type="button"
+                onClick={() => navigate("/app")}
+                className={styles.appStoreButton}
+              >
+                <i className="fa-brands fa-apple" aria-hidden="true" />
+                <span className={styles.storeButtonText}>App Store</span>
+              </button>
 
-          <div className={styles.download}>
-            <div>
-              <h4>Download the App</h4>
-
-              <div className={styles.google}>
-                <div onClick={() => navigate("app")} className={styles.store3}>
-                  <i class="fa-brands fa-apple"></i>
-                  <h4>App Store</h4>
-                </div>
-
-                <p className={styles.app2}></p>
-
-                <div onClick={() => navigate("app")} className={styles.store}>
-                  <i class="fa-brands fa-google-play"></i>
-                  <h4>Google Play Store</h4>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={() => navigate("/app")}
+                className={styles.appStoreButton}
+              >
+                <i className="fa-brands fa-google-play" aria-hidden="true" />
+                <span className={styles.storeButtonText}>Google Play</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </footer>
   );
 }
