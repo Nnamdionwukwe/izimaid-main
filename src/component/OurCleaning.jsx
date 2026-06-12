@@ -4,10 +4,7 @@ export default function OurCleaning() {
   return (
     <>
       <div className={styles.main}>
-        <img
-          alt="workers"
-          src="https://simpletaxes.co.uk/wp-content/uploads/2023/03/Cleaner-Self-Asessment-Tax-Returns-1024x805.jpg"
-        />
+        <img alt="workers" src="chefboldmart.JPG" />
 
         <div className={styles.hello}>
           <i class="fa-brands fa-facebook"></i>
@@ -19,12 +16,8 @@ export default function OurCleaning() {
 
         <div className={styles.main2Div}>
           <div className={styles.main2}>
-            <h1>Our Cleaning Services</h1>
-            <p>
-              Want a freshly cleaned home and your free time back? Call Deusizi
-              Sparkle today and take advantage of our expert home cleaning
-              services!
-            </p>
+            <h1>Our Services</h1>
+            <p>DEUSIZI HOME SERVICES One Platform. Complete Home Solutions.</p>
           </div>
         </div>
       </div>
