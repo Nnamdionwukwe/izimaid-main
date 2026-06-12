@@ -12,7 +12,7 @@ export default function FixedHeader() {
       <header className={styles.header1}>
         <div className={styles.header2}>
           <a className={styles.headerLink} href="http://deusiziinterior.com">
-            Deuseizi Group
+            Deusizi Group
           </a>
         </div>
 
