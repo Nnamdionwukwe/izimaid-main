@@ -18,7 +18,7 @@ export default function OurCleaning() {
           <div className={styles.main2}>
             <h1>Our Services</h1>
             <p>
-              DEUSIZI HOME SERVICES is a comprehensive digital platform that
+              DEUSIZI SPARKLE PLATFORM is a comprehensive digital platform that
               provides an all-in-one ecosystem for domestic care, professional
               property maintenance, and specialized interior solutions. By
               consolidating diverse home needs into a single network, the
@@ -30,7 +30,10 @@ export default function OurCleaning() {
 
       <div className={styles.izibest}>
         <div className={styles.cd}>
-          <h1>How Deusizi Sparkle Can Meet Your Cleaning Needs</h1>
+          <h1>
+            How Deusizi Sparkle Platform Can Meet All Your Personal and Home
+            Needs
+          </h1>
           <p>
             At Deusizi Sparkle, we take great pride in delivering the
             highest-quality residential cleaning services near you. We offer

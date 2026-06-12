@@ -52,7 +52,7 @@ export default function ThirdHeader() {
 
                 <div className={styles.spark}>
                   <p>
-                    Sparkling homes start with us - let us handle the cleaning!
+                    Skilled Trades & Repairs - let our proffessionals handle it!
                   </p>
                 </div>
 

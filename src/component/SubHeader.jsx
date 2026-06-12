@@ -8,6 +8,7 @@ import Practically from "./Practically";
 import Residential from "./Residential";
 import WhyHireUs from "./WhyHireUs";
 import styles from "./SubHeader.module.css";
+import DeusiziAcademy from "./DeusiziAcademy";
 
 function extractAddressDetails(data) {
   const address = data.address || {};
@@ -50,7 +51,7 @@ function LocationModal({
           </div>
 
           <div className={styles.logoDiv}>
-            <img className={styles.logo2} alt="Logo" src="izimaid.jpg" />
+            <img className={styles.logo2} alt="Logo" src="deusizi.jpg" />
           </div>
 
           <div className={styles.located}>
@@ -306,7 +307,7 @@ export default function SubHeader() {
           className={styles.thirdHeader}
         >
           <i className="fa fa-map-marker" aria-hidden="true" />
-          <p>Find My Local Deusizi Sparkle Proffessional</p>
+          <p>Find My Local Deusizi Sparkle Proffessionals</p>
         </div>
 
         {findLocalIzimaid && <LocationModal {...modalProps} />}
@@ -363,6 +364,7 @@ export default function SubHeader() {
             ["thirdMainDiv4", "About Us", <AboutUs />],
             ["thirdMainDiv5", "Cleaning Tip", <CleaningTips />],
             ["thirdMainDiv6", "Practically Spotless Blog", <Practically />],
+            ["thirdMainDiv6", "Deusizi Academy", <DeusiziAcademy />],
           ].map(([cls, label, component]) => (
             <div key={label} className={styles.residence}>
               <p className={styles[cls]}>{label}</p>
