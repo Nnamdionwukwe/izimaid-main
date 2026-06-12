@@ -8,6 +8,7 @@ import WhyHireUsSideBar from "./WhyHireUseSideBar";
 import AboutUsSideBar from "./AboutUsSideBar";
 import CleaningTipsSideBar from "./CleaningTipsSIdeBar";
 import PracticalSideBar from "./PracticalSideBar";
+import DeusiziAcademy from "./DeusiziAcademy";
 
 export default function SideBar({ isOpen, setIsOpen }) {
   const [isClose, setIsClose] = useState(false);
@@ -23,6 +24,8 @@ export default function SideBar({ isOpen, setIsOpen }) {
   const [isOpen66, setIsOpen66] = useState(false);
   const [isOpen7, setIsOpen7] = useState(true);
   const [isOpen77, setIsOpen77] = useState(false);
+  const [isOpen8, setIsOpen8] = useState(true);
+  const [isOpen88, setIsOpen88] = useState(false);
   const [openFAQ, setOpenFAQ] = useState(false);
   const [iziBest, setIziBest] = useState(true);
   const [iziBest2, setIziBest2] = useState(false);
@@ -74,6 +77,8 @@ export default function SideBar({ isOpen, setIsOpen }) {
     setIsOpen6(true);
     setIsOpen66(false);
     setIsOpen7(true);
+    setIsOpen8(true);
+    setIsOpen88(false);
     setIsOpen77(false);
     setIsOpenFotter(true);
     setIsAll(false);
@@ -88,6 +93,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
     setIsOpen5(false);
     setIsOpen6(false);
     setIsOpen7(false);
+    setIsOpen8(false);
     setIsOpenFotter(false);
   }
 
@@ -100,6 +106,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
     setIsOpen5(false);
     setIsOpen6(false);
     setIsOpen7(false);
+    setIsOpen8(false);
     setIsOpenFotter(false);
   }
 
@@ -112,6 +119,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
     setIsOpen5(false);
     setIsOpen6(false);
     setIsOpen7(false);
+    setIsOpen8(false);
     setIsOpenFotter(false);
   }
 
@@ -125,6 +133,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
     setIsOpen55(true);
     setIsOpen6(false);
     setIsOpen7(false);
+    setIsOpen8(false);
     setIsAll(true);
     setIsOpenFotter(false);
     setOpenFAQ(false);
@@ -142,6 +151,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
     setIsOpen6(true);
     setIsOpen66(true);
     setIsOpen7(false);
+    setIsOpen8(false);
     setIsOpenFotter(false);
   }
 
@@ -155,7 +165,24 @@ export default function SideBar({ isOpen, setIsOpen }) {
     setIsOpen55(true);
     setIsOpen6(false);
     setIsOpen7(true);
+    setIsOpen8(false);
+    setIsOpen88(false);
     setIsOpen77(true);
+    setIsOpenFotter(false);
+  }
+
+  function handleIsOpen8() {
+    setIsClose(true);
+    setIsOpen2(false);
+    setIsOpen3(false);
+    setIsOpen4(false);
+    setIsOpen44(true);
+    setIsOpen5(false);
+    setIsOpen55(true);
+    setIsOpen6(false);
+    setIsOpen7(false);
+    setIsOpen8(true);
+    setIsOpen88(true);
     setIsOpenFotter(false);
   }
 
@@ -417,6 +444,23 @@ export default function SideBar({ isOpen, setIsOpen }) {
                   {isOpen77 && (
                     <div>
                       <PracticalSideBar />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {isOpen8 && (
+              <div>
+                <div onClick={handleIsOpen8} className={styles.resident123}>
+                  <p>Deusizi Academy</p>
+                  <p className={styles.greater}>&darr;</p>
+                </div>
+
+                <div>
+                  {isOpen88 && (
+                    <div>
+                      <DeusiziAcademy />
                     </div>
                   )}
                 </div>
