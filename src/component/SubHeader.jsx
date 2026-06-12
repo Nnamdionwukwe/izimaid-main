@@ -306,7 +306,7 @@ export default function SubHeader() {
           className={styles.thirdHeader}
         >
           <i className="fa fa-map-marker" aria-hidden="true" />
-          <p>Find My Local Deusizi Sparkle Maid</p>
+          <p>Find My Local Deusizi Sparkle Proffessional</p>
         </div>
 
         {findLocalIzimaid && <LocationModal {...modalProps} />}
@@ -319,7 +319,7 @@ export default function SubHeader() {
             to="https://deausizisparkle.com"
             className={styles.secondMainLogo}
           >
-            <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
+            <img className={styles.logo3} alt="Logo" src="deusizi.jpg" />
           </Link>
 
           <div className={styles.secondMain}>

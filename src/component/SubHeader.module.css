@@ -311,6 +311,11 @@
     padding-left: 0;
     cursor: pointer;
   }
+  .logo3 {
+    width: 60px;
+    padding-left: 0;
+    cursor: pointer;
+  }
 
   .secondMainLogo::after {
     content: "";

@@ -8,7 +8,7 @@ export default function FreeEstimateHeader() {
     <>
       <div className={styles.SubHeader1}>
         <div onClick={() => navigate("/")}>
-          <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
+          <img className={styles.logo} alt="Logo" src="deusizi.jpg" />
         </div>
 
         <div className={styles.hamburger}>
