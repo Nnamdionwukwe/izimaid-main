@@ -1,275 +1,322 @@
-@media screen and (min-width: 20px) {
-  .main {
-    background: rgb(246, 245, 245);
-    margin-top: -30px;
-    margin-left: -5px;
-    margin-right: -5px;
-  }
-
-  .hearMain {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 3em;
-  }
-
-  .hearMainSub h1 {
-    color: rgb(190, 13, 33);
-  }
-
-  .hearMainSub h4 {
-    display: flex;
-    justify-content: center;
-    border: 1px solid rgb(156, 39, 53);
-    border-radius: 10px;
-    color: rgb(190, 13, 33);
-    padding: 0.9em 0em;
-    margin: 0px 15px;
-  }
-
-  .imageContainer i {
-    font-size: 6em;
-    color: rgb(190, 13, 33);
-    margin-top: -0.3em;
-    border: 5px solid #ffff;
-    border-radius: 100%;
-    background: #ffff;
-  }
-
-  .reviewContainer {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    /* animation: 1s left;
-    opacity: 1;
-    transition: opacity 1s; */
-    margin: 5em 0.5em 2em 0.6em;
-    background: #ffff;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 10em;
-    box-shadow: 11px 1px 14px 5px rgb(186, 185, 185);
-  }
-
-  .reviews {
-    padding: 1.5em 1.5em 2em 1.5em;
-    font-style: italic;
-    font-weight: bold;
-    color: rgb(57, 56, 56);
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  }
-
-  .reviewName {
-    font-style: italic;
-    font-weight: bold;
-    color: rgb(57, 56, 56);
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  }
-
-  .reviewFooterSub {
-    display: flex;
-    align-items: center;
-  }
-
-  .reviewFooterSub h2 {
-    margin-right: 0.3em;
-    color: rgb(57, 56, 56);
-  }
-
-  .reviewFooterSub i {
-    font-size: 0.7em;
-    margin-right: 0.3em;
-    color: rgb(255, 208, 0);
-  }
-
-  .greaterContainer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 2em;
-    margin: 2em 1em;
-    border-bottom: 0.15em solid rgb(198, 195, 195);
-  }
-
-  .h1 {
-    background: rgb(6, 6, 65);
-    padding: 0.4em 0.7em 0.4em 0.7em;
-    border-radius: 0.3em;
-    cursor: pointer;
-    color: #ffff;
-  }
-
-  .h2 {
-    background: rgb(6, 6, 65);
-    padding: 0.4em 0.7em 0.4em 0.7em;
-    border-radius: 0.3em;
-    cursor: pointer;
-    color: #ffff;
-    opacity: 0.5;
-  }
-
-  .circlesDiv {
-    display: flex;
-    align-items: center;
-  }
-
-  .circles1 {
-    background: rgb(6, 6, 65);
-    padding: 0.3em;
-    margin: 0em 0.2em;
-    border-radius: 100%;
-    opacity: 0.5;
-  }
-
-  .circles2 {
-    background: rgb(6, 6, 65);
-    padding: 0.3em;
-    margin: 0em 0.2em;
-    border-radius: 100%;
-  }
-
-  .logoDiv {
-    display: flex;
-    justify-content: center;
-    padding: 0em 1em 0em 1.3em;
-  }
-
-  .logoDiv1 {
-    display: flex;
-    justify-content: center;
-  }
-
-  .logoDiv2 {
-    display: flex;
-    justify-content: center;
-    /* max-width: 400px; */
-    color: rgb(88, 88, 88);
-  }
-
-  .logoDivDiv {
-    justify-content: center;
-    margin-bottom: 2em;
-  }
-
-  .logoDiv2 h2 .logoDiv3 h3 {
-    display: flex;
-    justify-items: center;
-  }
-
-  .logoDiv3 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 80%;
-    height: 3.8em;
-    color: #ffff;
-    background: rgb(6, 6, 65);
-    border-radius: 0.5em;
-    cursor: pointer;
-    margin-right: 5em;
-    margin-left: 5em;
-    font-size: 10px;
-    text-decoration: none;
-  }
-
-  .logoDiv3:hover {
-    background: rgb(2, 2, 36);
-  }
-
-  .logoDiv3 i {
-    display: flex;
-    justify-content: center;
-    margin-right: 0.6em;
-    font-size: 1.3em;
-  }
-
-  .logo1 {
-    width: 5em;
-    cursor: pointer;
-    border-radius: 5px;
-  }
+/* ==========================================================================
+   Design Tokens
+   ========================================================================== */
+:root {
+  --color-dark-navy: #060a24;
+  --color-slate-text: #334155;
+  --color-slate-light: #64748b;
+  --color-burgundy: #be0d21;
+  --color-gold: #f59e0b;
+  --card-bg: #ffffff;
+  --panel-bg: #f8fafc;
+  --radius-panel: 1rem;
+  --radius-card: 0.75rem;
+  --transition-cubic: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-luxe:
+    0 10px 25px -5px rgba(6, 10, 36, 0.03),
+    0 8px 10px -6px rgba(6, 10, 36, 0.03);
 }
 
-@media screen and (min-width: 577px) {
+/* ==========================================================================
+   Base Structure
+   ========================================================================== */
+.wrapper {
+  box-sizing: border-box;
+  background-color: #fafafa;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  padding: 4rem 1.25rem;
+  width: 100%;
 }
 
-@media screen and (min-width: 668px) {
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 3.5rem;
 }
 
-@media screen and (min-width: 992px) {
-  .main {
-    margin-top: 2em;
+.sectionTitle {
+  font-size: 2rem;
+  color: var(--color-dark-navy);
+  font-weight: 800;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.02.5em;
+}
+
+.titleUnderline {
+  width: 45px;
+  height: 3px;
+  background-color: var(--color-burgundy);
+  margin: 0 auto;
+  border-radius: 2px;
+}
+
+/* ==========================================================================
+   Testimonial Premium Card Treatment
+   ========================================================================== */
+.carouselFrame {
+  background-color: var(--card-bg);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-luxe);
+  border: 1px solid #f1f5f9;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 3rem 2rem 2.5rem 2rem;
+  position: relative;
+}
+
+.quoteGraphicWrapper {
+  font-size: 2rem;
+  color: rgba(190, 13, 33, 0.08);
+  position: absolute;
+  top: 1.5rem;
+  left: 2rem;
+}
+
+.testimonialContent {
+  margin: 0 0 2rem 0;
+}
+
+.reviewBody {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--color-slate-text);
+  margin: 0 0 1.25rem 0;
+  font-weight: 400;
+}
+
+.tagGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.serviceBadge {
+  background-color: #fff1f2;
+  color: var(--color-burgundy);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Card Footer Meta Metadata */
+.cardFooterLayout {
+  border-top: 1px solid #f1f5f9;
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.metaBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.clientName {
+  font-size: 1.05rem;
+  color: var(--color-dark-navy);
+  font-weight: 700;
+}
+
+.clientRole {
+  font-size: 0.85rem;
+  color: var(--color-slate-light);
+  margin-top: 0.15rem;
+}
+
+.ratingsBlock {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ratingNumeric {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-dark-navy);
+}
+
+.starsWrapper {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.starsWrapper i {
+  color: var(--color-gold);
+  font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   Navigation Controller Elements
+   ========================================================================== */
+.controlsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 320px;
+  margin: 2rem auto 4rem auto;
+}
+
+.arrowButton {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-dark-navy);
+  transition: var(--transition-cubic);
+}
+
+.arrowButton:hover:not(:disabled) {
+  background-color: var(--color-dark-navy);
+  color: #ffffff;
+  border-color: var(--color-dark-navy);
+}
+
+.arrowButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.paginationDotsRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.dot {
+  background-color: #cbd5e1;
+  border: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  transition: var(--transition-cubic);
+}
+
+.dotActive {
+  background-color: var(--color-burgundy);
+  transform: scale(1.25);
+}
+
+/* ==========================================================================
+   Trust Layout Footer & Call to Action Conversion
+   ========================================================================== */
+.trustBanner {
+  background-color: var(--panel-bg);
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-panel);
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.trustInnerLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+}
+
+.brandingBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.logoAnchor {
+  display: inline-block;
+  transition: var(--transition-cubic);
+}
+
+.logoAnchor:hover {
+  opacity: 0.9;
+}
+
+.brandLogoImage {
+  height: 44px;
+  object-fit: contain;
+}
+
+.brandPromiseText {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--color-slate-text);
+  margin: 0;
+  max-width: 500px;
+}
+
+.ctaLinkButton {
+  background-color: var(--color-dark-navy);
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  border-radius: var(--radius-card);
+  width: 100%;
+  box-sizing: border-box;
+  transition: var(--transition-cubic);
+}
+
+.ctaLinkButton:hover {
+  background-color: var(--color-burgundy);
+  box-shadow: 0 4px 12px rgba(190, 13, 33, 0.2);
+}
+
+/* ==========================================================================
+   Media Breakpoints (Desktop Alignments)
+   ========================================================================== */
+@media screen and (min-width: 768px) {
+  .wrapper {
+    padding: 6rem 2rem;
   }
 
-  .mainSub {
-    display: flex;
+  .sectionTitle {
+    font-size: 2.5rem;
   }
 
-  .list {
-    display: flex;
-    list-style: none;
-    padding: 0.8rem 0;
-    overflow-x: scroll;
+  .carouselFrame {
+    padding: 4rem 4rem 3.5rem 4rem;
   }
 
-  .reviewContainer {
-    display: flex;
-    align-items: center;
-    margin: 2em 0.5em 2em 0.6em;
-    background: #ffff;
-    box-shadow: 11px 1px 14px 5px rgb(186, 185, 185);
-  }
-
-  .reviews,
-  .reviewName {
-    font-size: 10px;
-  }
-
-  .reviewFooterSub h6 {
-    margin-right: 3px;
-  }
-
-  .reviewFooterSub i {
-    font-size: 0.2em;
-  }
-
-  .f {
-    display: flex;
-    justify-content: space-between;
+  .cardFooterLayout {
     flex-direction: row;
+    justify-content: space-between;
     align-items: center;
-    overflow: scroll;
   }
 
-  .mainFull {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-gap: 35px;
-    width: 100%;
-    padding: 0px 5em;
+  .trustInnerLayout {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 1rem;
   }
 
-  .logoDivDiv {
-    display: flex;
-    justify-items: center;
-    align-items: center;
-    margin-bottom: 3em;
+  .brandingBlock {
+    flex-direction: row;
+    text-align: left;
+    gap: 2rem;
   }
 
-  .logoDiv2 {
-    margin: 0em 4em;
-  }
-
-  .logoDiv3 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 300px;
-    color: #ffff;
-    background: rgb(6, 6, 65);
-    border-radius: 0.5em;
-    cursor: pointer;
-    height: 3.8em;
-    text-decoration: none;
+  .ctaLinkButton {
+    width: auto;
+    white-space: nowrap;
   }
 }

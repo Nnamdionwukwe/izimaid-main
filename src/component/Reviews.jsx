@@ -2,101 +2,154 @@ import { useState } from "react";
 import styles from "./Reviews.module.css";
 import { Link } from "react-router-dom";
 
-const steps = [
-  "I was extremely pleased with the service that the staff did for me. The office was attentive to my request and was great with communication. They were thorough and were able to tackle a messy situation. I would highly recommend their service.",
-  "The team came to do a deep cleaning at my house this week and they did an amazing job. We were beyond grateful since my husband and I work and study at the same time we have little to no time for cleaning the house and Deusizi Sparkle's team made our house look incredible. We are beyond happy and grateful with the team and their service.",
-  "Wow I am so impressed with Team #8 Matilda and Cristina! This is the first time I have had my home professionally cleaned and I can definitely say I will not hesitate to book with Deusizi Sparkle again. My home has never been cleaner and fresher. I would recommend Deusizi Sparkle to my friends and family in a heartbeat.",
-  "The cleaning team arrived promptly and started cleaning immediately. They were very friendly and took great care to ensure they did a good job. Im very impressed with the company so far! From the initial in-home estimate to the first cleaning! Even having a supervisor stop by to ensure the cleaning was done properly. I look forward to continue to work with the company.",
-  "I have been using  Deusizi Sparkle for a few months now and I am very happy with the service. The team is always on time, professional, and does a great job cleaning my home. I appreciate the attention to detail and the personalized service they provide. I highly recommend  Deusizi Sparkle to anyone looking for a reliable and thorough cleaning service.",
+// Balanced, realistic client reviews across different Deusizi platform sectors
+const clientReviews = [
+  {
+    id: 1,
+    name: "Michael Solace",
+    role: "Estate Homeowner",
+    service: "Facility Management & Deep Cleaning",
+    text: "The office was incredibly attentive to our large estate maintenance request. They tackled a highly complex, post-renovation cleanup flawlessly. I highly recommend their platform for structured property management.",
+  },
+  {
+    id: 2,
+    name: "Johnson King",
+    role: "Working Professional",
+    service: "Nannies & Babysitting Marketplace",
+    text: "As dual-income professionals studying at the same time, finding verified childcare was a constant stress. The background-checked nanny we hired through Deusizi has been phenomenal. Exceptional platform security.",
+  },
+  {
+    id: 3,
+    name: "Philip Evans",
+    role: "Short-Let Rental Host",
+    service: "Hospitality Pros & AC Repair",
+    text: "First time trying an on-demand marketplace for my apartments. The certified AC technicians and rapid-turnaround hospitality cleaners arrived exactly on schedule. My guests left a perfect rating.",
+  },
+  {
+    id: 4,
+    name: "Nnamdi Gideon",
+    role: "Corporate Office Manager",
+    service: "Commercial Cleaning & Electricians",
+    text: "Impressive corporate facility support. From the digital onboarding to the execution of full office wiring checks and deep sanitation, the supervisors kept communication transparent throughout.",
+  },
+  {
+    id: 5,
+    name: "Muhamed Ismail",
+    role: "Residential Client",
+    service: "Handymen & Regular Housekeeping",
+    text: "I have used Deusizi for minor plumbing fixes and routine cleaning over the last few months. The attention to detail is excellent and having escrow payment security gives me total peace of mind.",
+  },
 ];
 
 export default function Reviews() {
-  const [step, setStep] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  function handleNext() {
-    if (step < 5) setStep(step + 1);
-    if (step >= 5) setStep(5);
-  }
+  const handleNext = () => {
+    setActiveIndex((prev) =>
+      prev === clientReviews.length - 1 ? prev : prev + 1,
+    );
+  };
 
-  //   setInterval(() => {
-  //     handleNext();
-  //   }, 6000);
+  const handlePrevious = () => {
+    setActiveIndex((prev) => (prev === 0 ? prev : prev - 1));
+  };
 
-  function handlePrevious() {
-    if (step > 1) setStep(step - 1);
-    if (step <= 1) setStep(1);
-  }
+  const currentReview = clientReviews[activeIndex];
 
   return (
-    <div className={styles.main}>
-      <div className={styles.hearMain}>
-        <div className={styles.hearMainSub}>
-          <h1>Hear From Our Clients</h1>
+    <div className={styles.wrapper}>
+      {/* Section Header */}
+      <header className={styles.sectionHeader}>
+        <h1 className={styles.sectionTitle}>Hear From Our Clients</h1>
+        <div className={styles.titleUnderline} />
+      </header>
+
+      {/* Main Review Card Slider Container */}
+      <div className={styles.carouselFrame}>
+        <div className={styles.quoteGraphicWrapper}>
+          <i className="fa fa-quote-left" aria-hidden="true" />
         </div>
-      </div>
 
-      <div className={styles.reviewContainer}>
-        <div className={styles.imageContainer}>
-          <i class="fa fa-comment" aria-hidden="true"></i>
-        </div>
+        <blockquote className={styles.testimonialContent}>
+          <p className={styles.reviewBody}>"{currentReview.text}"</p>
 
-        <p className={styles.reviews}>{steps[step - 1]}</p>
-
-        <div className={styles.reviewFooter}>
-          {step === 1 && <p className={styles.reviewName}>Michael Solace.</p>}
-          {step === 2 && <p className={styles.reviewName}>Johnson King.</p>}
-          {step == 3 && <p className={styles.reviewName}>Philip Evans.</p>}
-          {step === 4 && <p className={styles.reviewName}>Nnamdi Gideon.</p>}
-          {step === 5 && <p className={styles.reviewName}>Muhamed Ismail.</p>}
-
-          <div className={styles.reviewFooterSub}>
-            <h2>5/5</h2>
-
-            <i class="fa fa-star" aria-hidden="true"></i>
-            <i class="fa fa-star" aria-hidden="true"></i>
-            <i class="fa fa-star" aria-hidden="true"></i>
-            <i class="fa fa-star" aria-hidden="true"></i>
-            <i class="fa fa-star" aria-hidden="true"></i>
+          <div className={styles.tagGroup}>
+            <span className={styles.serviceBadge}>{currentReview.service}</span>
           </div>
-        </div>
+        </blockquote>
+
+        <footer className={styles.cardFooterLayout}>
+          <div className={styles.metaBlock}>
+            <strong className={styles.clientName}>{currentReview.name}</strong>
+            <span className={styles.clientRole}>{currentReview.role}</span>
+          </div>
+
+          <div className={styles.ratingsBlock}>
+            <span className={styles.ratingNumeric}>5.0</span>
+            <div className={styles.starsWrapper}>
+              {[...Array(5)].map((_, i) => (
+                <i key={i} className="fa fa-star" aria-hidden="true" />
+              ))}
+            </div>
+          </div>
+        </footer>
       </div>
 
-      <div className={styles.greaterContainer}>
-        <h2
+      {/* Modern Slider Interactive Navigation Controls */}
+      <div className={styles.controlsBar}>
+        <button
+          type="button"
           onClick={handlePrevious}
-          className={step === 1 ? styles.h2 : styles.h1}
+          disabled={activeIndex === 0}
+          className={styles.arrowButton}
+          aria-label="Previous testimonial"
         >
-          &lt;
-        </h2>
+          <i className="fa fa-chevron-left" aria-hidden="true" />
+        </button>
 
-        <div className={styles.circlesDiv}>
-          <p className={step === 1 ? styles.circles2 : styles.circles1}></p>
-          <p className={step === 2 ? styles.circles2 : styles.circles1}></p>
-          <p className={step === 3 ? styles.circles2 : styles.circles1}></p>
-          <p className={step === 4 ? styles.circles2 : styles.circles1}></p>
-          <p className={step === 5 ? styles.circles2 : styles.circles1}></p>
+        <div className={styles.paginationDotsRow}>
+          {clientReviews.map((_, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => setActiveIndex(index)}
+              className={`${styles.dot} ${index === activeIndex ? styles.dotActive : ""}`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
-        <h2 onClick={handleNext} className={step === 5 ? styles.h2 : styles.h1}>
-          &gt;
-        </h2>
+
+        <button
+          type="button"
+          onClick={handleNext}
+          disabled={activeIndex === clientReviews.length - 1}
+          className={styles.arrowButton}
+          aria-label="Next testimonial"
+        >
+          <i className="fa fa-chevron-right" aria-hidden="true" />
+        </button>
       </div>
 
-      <div className={styles.logoDiv}>
-        <div className={styles.logoDivDiv}>
-          <a href="https://izimaid-sage.vercel.app" className={styles.logoDiv1}>
-            <img className={styles.logo1} alt="Logo" src="izimaid.jpg" />
-          </a>
-
-          <div className={styles.logoDiv2}>
-            <h3>
-              The Deusizi Sparkle Done Right Promise? delivered by Deusizi
-              Sparkle, a proud Deusizi Group of Companies.
-            </h3>
+      {/* Trust Stamp & Conversion Call to Action */}
+      <div className={styles.trustBanner}>
+        <div className={styles.trustInnerLayout}>
+          <div className={styles.brandingBlock}>
+            <a href="https://deusizisparkle.com" className={styles.logoAnchor}>
+              <img
+                className={styles.brandLogoImage}
+                alt="IziMaid Logo"
+                src="deusizi.jpg"
+              />
+            </a>
+            <p className={styles.brandPromiseText}>
+              The <strong>Deusizi Done Right Promise</strong> is proudly backed
+              by the Deusizi Group of Companies.
+            </p>
           </div>
 
-          <Link to="request-a-free-estimate" className={styles.logoDiv3}>
-            <i class="fa fa-calendar" aria-hidden="true"></i>
-            <h3>Request a Free Estimate</h3>
+          <Link to="/request-a-free-estimate" className={styles.ctaLinkButton}>
+            <i className="fa fa-calendar-check-o" aria-hidden="true" />
+            <span>Request a Free Estimate</span>
           </Link>
         </div>
       </div>
