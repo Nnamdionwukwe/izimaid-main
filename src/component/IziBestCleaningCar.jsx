@@ -45,7 +45,7 @@ function LocationModal({
           </div>
 
           <div className={styles.modalLogoDiv}>
-            <img className={styles.modalLogo} alt="Logo" src="izimaid.jpg" />
+            <img className={styles.modalLogo} alt="Logo" src="deusizi.jpg" />
           </div>
 
           <div className={styles.modalLocated}>
