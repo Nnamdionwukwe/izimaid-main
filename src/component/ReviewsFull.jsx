@@ -1,174 +1,114 @@
-import { useState } from "react";
-import styles from "./Reviews.module.css";
+import styles from "./ReviewsFull.module.css";
 import { Link } from "react-router-dom";
 
-const steps = [
-  "I was extremely pleased with the service that the staff did for me. The office was attentive to my request and was great with communication. They were thorough and were able to tackle a messy situation. I would highly recommend their service.",
-  "The team came to do a deep cleaning at my house this week and they did an amazing job. We were beyond grateful since my husband and I work and study at the same time we have little to no time for cleaning the house and Deusizi Sparkle's team made our house look incredible. We are beyond happy and grateful with the team and their service.",
-  "Wow I am so impressed with Team #8 Matilda and Cristina! This is the first time I have had my home professionally cleaned and I can definitely say I will not hesitate to book with Deusizi Sparkle again. My home has never been cleaner and fresher. I would recommend Deusizi Sparkle to my friends and family in a heartbeat.",
-  "The cleaning team arrived promptly and started cleaning immediately. They were very friendly and took great care to ensure they did a good job. Im very impressed with the company so far! From the initial in-home estimate to the first cleaning! Even having a supervisor stop by to ensure the cleaning was done properly. I look forward to continue to work with the company.",
-  "I have been using  Deusizi Sparkle for a few months now and I am very happy with the service. The team is always on time, professional, and does a great job cleaning my home. I appreciate the attention to detail and the personalized service they provide. I highly recommend  Deusizi Sparkle to anyone looking for a reliable and thorough cleaning service.",
+// Comprehensive marketplace review data layout object matching the entire platform ecosystem
+const marketplaceReviews = [
+  {
+    name: "Michael Solace",
+    role: "Estate Homeowner",
+    service: "Facility Management & Deep Cleaning",
+    text: "The office was incredibly attentive to our large estate maintenance request. They tackled a highly complex, post-renovation cleanup flawlessly. I highly recommend their platform for structured property management.",
+  },
+  {
+    name: "Johnson King",
+    role: "Working Professional",
+    service: "Nannies & Childcare Marketplace",
+    text: "As dual-income professionals studying at the same time, finding verified childcare was a constant stress. The background-checked nanny we hired through Deusizi has been phenomenal. Exceptional platform security.",
+  },
+  {
+    name: "Philip Evans",
+    role: "Short-Let Rental Host",
+    service: "Hospitality Pros & AC Repair",
+    text: "First time trying an on-demand marketplace for my apartments. The certified AC technicians and rapid-turnaround hospitality cleaners arrived exactly on schedule. My guests left a perfect rating.",
+  },
+  {
+    name: "Nnamdi Gideon",
+    role: "Corporate Office Manager",
+    service: "Commercial Cleaning & Electricians",
+    text: "Its impressive corporate facility support. From digital onboarding to the execution of full office wiring checks and deep sanitation, the supervisors kept communication transparent throughout.",
+  },
+  {
+    name: "Muhamed Ismail",
+    role: "Residential Client",
+    service: "Handymen & Regular Housekeeping",
+    text: "I have used Deusizi for minor plumbing fixes and routine cleaning over the last few months. The attention to detail is excellent and having escrow payment security gives me total peace of mind.",
+  },
 ];
 
 export default function ReviewsFull() {
-  const [step, setStep] = useState(1);
-
-  //   function handleNextpx() {
-  //     if (step < 5) setStep(step + 1);
-  //     if (step >= 5) setStep(5);
-  //   }
-
-  //   //   setInterval(() => {
-  //   //     handleNext();
-  //   //   }, 6000);
-
-  //   function handlePrevious() {
-  //     if (step > 1) setStep(step - 1);
-  //     if (step <= 1) setStep(1);
-  //   }
-
   return (
-    <div className={styles.main}>
-      <div className={styles.hearMain}>
-        <div className={styles.hearMainSub}>
-          <h1>Hear From Our Clients</h1>
-          {/* <h4>Read More Reviews</h4> */}
-        </div>
+    <div className={styles.wrapperContainer}>
+      {/* Section Header */}
+      <div className={styles.sectionHeader}>
+        <h1 className={styles.mainTitle}>Hear From Our Clients</h1>
+        <div className={styles.titleIndicatorBar} />
       </div>
 
-      <nav className={styles.mainSub}>
-        <ul className={styles.mainFull}>
-          <li className={styles.reviewContainer}>
-            <div className={styles.imageContainer}>
-              <i class="fa fa-comment" aria-hidden="true"></i>
-            </div>
-
-            <p className={styles.reviews}>{steps[step - 1]}</p>
-
-            <div className={styles.reviewFooter}>
-              <p className={styles.reviewName}>Michael Solace.</p>
-
-              <div className={styles.reviewFooterSub}>
-                <h6>5/5</h6>
-
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
+      {/* Grid Main Viewport Display Wrapper Layout */}
+      <main className={styles.gridContainerPane}>
+        <ul className={styles.reviewsFlexGrid}>
+          {marketplaceReviews.map((review, index) => (
+            <li key={index} className={styles.reviewCard}>
+              <div className={styles.quoteDecorativeIcon}>
+                <i className="fa fa-quote-left" aria-hidden="true"></i>
               </div>
-            </div>
-          </li>
 
-          <li className={styles.reviewContainer}>
-            <div className={styles.imageContainer}>
-              <i class="fa fa-comment" aria-hidden="true"></i>
-            </div>
+              <blockquote className={styles.quoteBlockContent}>
+                <p className={styles.reviewParagraphText}>"{review.text}"</p>
+                <span className={styles.serviceMetaBadge}>
+                  {review.service}
+                </span>
+              </blockquote>
 
-            <p className={styles.reviews}>{steps[step]}</p>
+              <div className={styles.cardFooterLayout}>
+                <div className={styles.clientMetaDetails}>
+                  <h4 className={styles.clientName}>{review.name}</h4>
+                  <span className={styles.clientSubtitle}>{review.role}</span>
+                </div>
 
-            <div className={styles.reviewFooter}>
-              <p className={styles.reviewName}>Johnson King.</p>
-
-              <div className={styles.reviewFooterSub}>
-                <h6>5/5</h6>
-
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
+                <div className={styles.starsScoringBlock}>
+                  <span className={styles.scoreNumber}>5.0</span>
+                  <div className={styles.starIconsRow}>
+                    {[...Array(5)].map((_, i) => (
+                      <i key={i} className="fa fa-star" aria-hidden="true" />
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          </li>
-
-          <li className={styles.reviewContainer}>
-            <div className={styles.imageContainer}>
-              <i class="fa fa-comment" aria-hidden="true"></i>
-            </div>
-
-            <p className={styles.reviews}>{steps[step + 1]}</p>
-
-            <div className={styles.reviewFooter}>
-              <p className={styles.reviewName}>Philip Evans.</p>
-
-              <div className={styles.reviewFooterSub}>
-                <h6>5/5</h6>
-
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-              </div>
-            </div>
-          </li>
-
-          <li className={styles.reviewContainer}>
-            <div className={styles.imageContainer}>
-              <i class="fa fa-comment" aria-hidden="true"></i>
-            </div>
-
-            <p className={styles.reviews}>{steps[step + 2]}</p>
-
-            <div className={styles.reviewFooter}>
-              <p className={styles.reviewName}>Nnamdi Gideon.</p>
-
-              <div className={styles.reviewFooterSub}>
-                <h6>5/5</h6>
-
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-              </div>
-            </div>
-          </li>
-
-          <li className={styles.reviewContainer}>
-            <div className={styles.imageContainer}>
-              <i class="fa fa-comment" aria-hidden="true"></i>
-            </div>
-
-            <p className={styles.reviews}>{steps[step + 3]}</p>
-
-            <div className={styles.reviewFooter}>
-              <p className={styles.reviewName}>Muhamed Ismail.</p>
-
-              <div className={styles.reviewFooterSub}>
-                <h6>5/5</h6>
-
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-              </div>
-            </div>
-          </li>
+            </li>
+          ))}
         </ul>
-      </nav>
+      </main>
 
-      <div className={styles.logoDiv}>
-        <div className={styles.logoDivDiv}>
-          <a href="https://izimaid-sage.vercel.app" className={styles.logoDiv1}>
-            <img className={styles.logo1} alt="Logo" src="izimaid.jpg" />
-          </a>
-
-          <div className={styles.logoDiv2}>
-            <h2>
-              The Deusizi Sparkle Done Right Promise? delivered by Deusizi
-              Sparkle, a proud Deusizi Group of Companies.
-            </h2>
+      {/* Corporate Promise Banner Container */}
+      <footer className={styles.trustBannerFooter}>
+        <div className={styles.trustInnerLayout}>
+          <div className={styles.brandingBlock}>
+            <a
+              href="https://izimaid-sage.vercel.app"
+              className={styles.logoAnchorLink}
+            >
+              <img
+                className={styles.companyBrandLogo}
+                alt="IziMaid Logo"
+                src="izimaid.jpg"
+              />
+            </a>
+            <p className={styles.promiseStatement}>
+              The <strong>Deusizi Done Right Promise</strong> is proudly
+              delivered by Deusizi, a member of the Deusizi Group of Companies.
+            </p>
           </div>
 
-          <Link to="request-a-free-estimate" className={styles.logoDiv3}>
-            <i class="fa fa-calendar" aria-hidden="true"></i>
-            <h3>Request a Free Estimate</h3>
+          <Link
+            to="/request-a-free-estimate"
+            className={styles.conversionCtaBtn}
+          >
+            <i className="fa fa-calendar-check-o" aria-hidden="true" />
+            <span>Request a Free Estimate</span>
           </Link>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }
