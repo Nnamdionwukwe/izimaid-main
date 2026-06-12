@@ -17,7 +17,13 @@ export default function OurCleaning() {
         <div className={styles.main2Div}>
           <div className={styles.main2}>
             <h1>Our Services</h1>
-            <p>DEUSIZI HOME SERVICES One Platform. Complete Home Solutions.</p>
+            <p>
+              DEUSIZI HOME SERVICES is a comprehensive digital platform that
+              provides an all-in-one ecosystem for domestic care, professional
+              property maintenance, and specialized interior solutions. By
+              consolidating diverse home needs into a single network, the
+              platform eliminates the stress of managing multiple vendors.
+            </p>
           </div>
         </div>
       </div>
