@@ -44,7 +44,7 @@ export default function WeProvide() {
         <div className={styles.actionControlsRow}>
           <button
             type="button"
-            onClick={() => navigate("/marketplace")}
+            onClick={() => navigate("/maids")}
             className={styles.primaryNavigateButton}
           >
             Explore Platform Services
