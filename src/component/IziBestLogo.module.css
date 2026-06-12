@@ -41,7 +41,7 @@
   }
 
   .logo {
-    width: 150px;
+    width: 80px;
     height: auto;
     cursor: pointer;
     object-fit: cover;
@@ -217,6 +217,9 @@
     margin: 0px 15px;
   }
 
+  .logo1 {
+    width: 100px;
+  }
   .logo {
     width: 220px;
   }

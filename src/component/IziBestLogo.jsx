@@ -9,7 +9,7 @@ export default function IziBestLogo() {
       <div>
         <div className={styles.containerDiv}>
           <a href="https://deusizisparkle.com">
-            <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
+            <img className={styles.logo1} alt="Logo" src="deusizi.jpg" />
           </a>
 
           <p className={styles.text}></p>
