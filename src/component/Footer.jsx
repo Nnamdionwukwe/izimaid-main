@@ -9,7 +9,7 @@ export default function Footer() {
       <div className={styles.footerDiv}>
         <div className={styles.footerDiv2}>
           <a href="https://deusizisparkle.com">
-            <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
+            <img className={styles.logo} alt="Logo" src="deusizi.jpg" />
           </a>
 
           <a href="tel:+2348030588774" className={styles.call}>
