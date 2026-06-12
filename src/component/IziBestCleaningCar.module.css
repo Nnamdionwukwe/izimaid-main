@@ -282,3 +282,271 @@
     width: 38em;
   }
 }
+/* ==========================================================================
+   Design Tokens
+   ========================================================================== */
+:root {
+  --navy-primary: #0a1136;
+  --navy-hover: #060a24;
+  --text-dark: #1f2937;
+  --text-light: #4b5563;
+  --accent-red: #bb132f;
+  --border-color: #d1d5db;
+  --card-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  --smooth-transit: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   Layout Base & Containers
+   ========================================================================== */
+.mainWrapper {
+  box-sizing: border-box;
+  background-color: #f3f4f6; /* Modern crisp background replaces harsh saturated blue purple */
+  padding: 2rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.cardContainer {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: var(--card-shadow);
+  width: 100%;
+  max-width: 1100px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Image Pane Styles */
+.imageLayoutPane {
+  width: 100%;
+}
+
+.bannerImage {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Content Pane Styles */
+.contentLayoutPane {
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Typography */
+.searchHeading {
+  font-size: 1.5rem;
+  color: var(--navy-primary);
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.searchSubheading {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  margin: 0 0 1.75rem 0;
+}
+
+/* ==========================================================================
+   Modern Modular Search Input Component 
+   ========================================================================== */
+.searchActionForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.inputIconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.inputIconWrapper i {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-light);
+  font-size: 1.1rem;
+}
+
+.geoInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem 0.85rem 2.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  transition: var(--smooth-transit);
+  outline: none;
+}
+
+.geoInput:focus {
+  border-color: var(--navy-primary);
+  box-shadow: 0 0 0 3px rgba(10, 17, 54, 0.12);
+}
+
+.geoInput::placeholder {
+  color: #9ca3af;
+}
+
+.submitSearchButton {
+  background-color: var(--navy-primary);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: var(--smooth-transit);
+  text-align: center;
+}
+
+.submitSearchButton:hover {
+  background-color: var(--navy-hover);
+}
+
+/* ==========================================================================
+   Interactive Utilities (Location Shortcuts & Phone Contact)
+   ========================================================================== */
+.useLocationTrigger {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--accent-red);
+  cursor: pointer;
+  transition: var(--smooth-transit);
+}
+
+.useLocationTrigger:hover span {
+  text-decoration: underline;
+}
+
+.phoneContactWrapper {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.callLabel {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.phoneLink {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--navy-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--smooth-transit);
+}
+
+.phoneLink:hover {
+  color: var(--accent-red);
+}
+
+/* ==========================================================================
+   Responsive Viewport Styling (Desktop Transformation)
+   ========================================================================== */
+@media screen and (min-width: 992px) {
+  .mainWrapper {
+    padding: 4rem 2rem;
+  }
+
+  .cardContainer {
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 380px;
+  }
+
+  .imageLayoutPane {
+    width: 40%;
+  }
+
+  .bannerImage {
+    height: 100%;
+  }
+
+  .contentLayoutPane {
+    width: 60%;
+    padding: 3rem;
+  }
+
+  .searchHeading {
+    font-size: 2rem;
+  }
+
+  /* Inline Merged Bar Design Treatment */
+  .searchActionForm {
+    flex-direction: row;
+    gap: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .geoInput {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+  }
+
+  .submitSearchButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    white-space: nowrap;
+    padding: 0 2rem;
+  }
+}
+
+/* ==========================================================================
+   Modals UI Layer Layout Structure
+   ========================================================================== */
+.modalOverlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6); /* Tinted dark blur modern treatment */
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+}
+
+.modalBox {
+  background: #ffffff;
+  height: auto;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  padding: 2rem;
+}
+
+/* ... Keep existing modular definitions using these structural formatting patterns ... */

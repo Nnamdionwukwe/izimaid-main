@@ -295,58 +295,63 @@ export default function IziBestCleaningCar() {
 
   return (
     <>
-      <div className={styles.main}>
-        <div className={styles.Submain}>
-          <div className={styles.SubmainDiv}>
-            <div className={styles.imgDiv}>
-              <img alt="iziBest Cleaning Car" src="chefboldmart.JPG" />
+      <div className={styles.mainWrapper}>
+        <div className={styles.cardContainer}>
+          <div className={styles.imageLayoutPane}>
+            <img
+              className={styles.bannerImage}
+              alt="Deusizi Pro Service Van"
+              src="chefboldmart.JPG"
+            />
+          </div>
+
+          <div className={styles.contentLayoutPane}>
+            <h1 className={styles.searchHeading}>
+              Find a Deusizi Sparkle Pro Near Me
+            </h1>
+            <p className={styles.searchSubheading}>
+              Let us know how we can help you today.
+            </p>
+
+            <div className={styles.searchActionForm}>
+              <div className={styles.inputIconWrapper}>
+                <i className="fa fa-map-marker" aria-hidden="true" />
+                <input
+                  className={styles.geoInput}
+                  type="text"
+                  placeholder="Enter Zip/Postal Code or City"
+                  value={inlineInput}
+                  onChange={(e) => setInlineInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleInlineFind()}
+                />
+              </div>
+
+              <button
+                type="button"
+                className={styles.submitSearchButton}
+                onClick={handleInlineFind}
+              >
+                Find My Pro
+              </button>
             </div>
 
-            <div className={styles.Submain}>
-              <div className={styles.SubDiv}>
-                <h1>Find a Deusizi Sparkle Pro Near Me</h1>
-                <p>Let us know how we can help you today.</p>
+            <div
+              className={styles.useLocationTrigger}
+              onClick={() => {
+                setModalOpen(true);
+                handleUseMyLocation();
+              }}
+            >
+              <i className="fa fa-crosshairs" aria-hidden="true" />
+              <span>Use my current location</span>
+            </div>
 
-                <div className={styles.SubmainFlex}>
-                  <div className={styles.Submain2}>
-                    <i className="fa fa-map-marker" aria-hidden="true"></i>
-                    <input
-                      type="text"
-                      placeholder="Enter Zip/Postal Code or City"
-                      value={inlineInput}
-                      onChange={(e) => setInlineInput(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleInlineFind()}
-                    />
-                  </div>
-                  <div
-                    className={styles.useLocation}
-                    onClick={() => {
-                      setModalOpen(true);
-                      handleUseMyLocation();
-                    }}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <i className="fa fa-crosshairs" aria-hidden="true" />
-                    <span>Use my current location</span>
-                  </div>
-
-                  <h4
-                    className={styles.find}
-                    onClick={handleInlineFind}
-                    style={{ cursor: "pointer" }}
-                  >
-                    Find My Deusizi Sparkle Proz
-                  </h4>
-                </div>
-
-                {/* Use My Location shortcut */}
-
-                <div className={styles.Submain}>
-                  <a href="tel:+2348030588774" className={styles.Submain3}>
-                    <h2>Call us at +2348030588774</h2>
-                  </a>
-                </div>
-              </div>
+            <div className={styles.phoneContactWrapper}>
+              <span className={styles.callLabel}>Or speak to an expert:</span>
+              <a href="tel:+2348030588774" className={styles.phoneLink}>
+                <i className="fa fa-phone" aria-hidden="true" /> +234 803 058
+                8774
+              </a>
             </div>
           </div>
         </div>
