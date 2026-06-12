@@ -184,7 +184,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
           </div>
 
           <a href="https://deusizisparkle.com">
-            <img className={styles.logo} alt="Logo" src="izimaid.jpg" />
+            <img className={styles.logo} alt="Logo" src="deusizi.jpg" />
           </a>
 
           <div className={styles.SubHeader2}>
