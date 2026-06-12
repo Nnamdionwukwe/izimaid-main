@@ -22,7 +22,7 @@ export default function Questions() {
         {/* Premium UX Action Control Button */}
         <button
           type="button"
-          onClick={() => navigate("/faq")}
+          onClick={() => navigate("/whats-included")}
           className={styles.faqCtaButton}
         >
           <span>Explore Our Full Knowledge Base</span>
