@@ -41,13 +41,13 @@
   }
 
   .logo1 {
-    width: 60px;
+    width: 90px;
     height: auto;
     cursor: pointer;
     object-fit: cover;
   }
   .logo {
-    width: 120px;
+    width: 170px;
     height: auto;
     cursor: pointer;
     object-fit: cover;
