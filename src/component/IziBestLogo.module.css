@@ -40,8 +40,14 @@
     margin: 0px 15px;
   }
 
+  .logo1 {
+    width: 60px;
+    height: auto;
+    cursor: pointer;
+    object-fit: cover;
+  }
   .logo {
-    width: 80px;
+    width: 120px;
     height: auto;
     cursor: pointer;
     object-fit: cover;
