@@ -299,15 +299,12 @@ export default function IziBestCleaningCar() {
         <div className={styles.Submain}>
           <div className={styles.SubmainDiv}>
             <div className={styles.imgDiv}>
-              <img
-                alt="iziBest Cleaning Car"
-                src="https://png.pngtree.com/png-clipart/20240616/original/pngtree-trends-in-car-wash-technology-png-image_15341820.png"
-              />
+              <img alt="iziBest Cleaning Car" src="chefboldmart.JPG" />
             </div>
 
             <div className={styles.Submain}>
               <div className={styles.SubDiv}>
-                <h1>Find a Deusizi Sparkle Maid Near Me</h1>
+                <h1>Find a Deusizi Sparkle Pro Near Me</h1>
                 <p>Let us know how we can help you today.</p>
 
                 <div className={styles.SubmainFlex}>
@@ -338,7 +335,7 @@ export default function IziBestCleaningCar() {
                     onClick={handleInlineFind}
                     style={{ cursor: "pointer" }}
                   >
-                    Find My Deusizi Sparkle Maid
+                    Find My Deusizi Sparkle Proz
                   </h4>
                 </div>
 
