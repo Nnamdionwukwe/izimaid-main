@@ -28,24 +28,28 @@ export default function OurCleaning() {
         </div>
       </div>
 
-      <div className={styles.izibest}>
-        <div className={styles.cd}>
-          <h1>
+      <section className={styles.heroSection}>
+        <div className={styles.contentCard}>
+          <h1 className={styles.headline}>
             How Deusizi Home Services Can Meet All Your Personal and Home Needs
           </h1>
-          <p>
+          <div className={styles.accentDivider} />
+          <p className={styles.bodyText}>
             At Deusizi Home Services, we take great pride in delivering the
             highest-quality professional home solutions tailored entirely to
             your lifestyle. We offer a comprehensive suite of domestic care,
             skilled trades, and property maintenance services with the help of
-            our well-trained, background-checked pros. From reliable childcare
-            and expert elder care to professional plumbing, custom interior
-            organization, and immaculate deep cleaning, Deusizi does everything
-            we can to ensure your home or commercial space is left flawlessly
-            functional and perfectly maintained after every single visit.
+            our well-trained, background-checked pros.
+          </p>
+          <p className={styles.bodyText}>
+            From reliable childcare and expert elder care to professional
+            plumbing, custom interior organization, and immaculate deep
+            cleaning, Deusizi does everything we can to ensure your home or
+            commercial space is left flawlessly functional and perfectly
+            maintained after every single visit.
           </p>
         </div>
-      </div>
+      </section>
     </>
   );
 }

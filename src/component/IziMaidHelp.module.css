@@ -334,3 +334,181 @@
     box-shadow: 2px 2px 19px 3px rgb(202, 200, 200);
   }
 }
+
+/* ==========================================================================
+   Design Variables & Tokens (Premium Dark Slate & Warm Gold Accent Aesthetic)
+   ========================================================================== */
+:root {
+  --color-primary: #121824; /* Deep luxurious slate */
+  --color-accent: #c5a880; /* Muted warm gold contrast */
+  --color-text-main: #333c4d; /* Charcoal text body */
+  --color-text-muted: #64748b; /* Midtone body gray */
+  --color-bg-light: #fdfbf7; /* Off-white warm editorial background */
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base Wrapper Container */
+.sectionContainer {
+  font-family: var(--font-sans);
+  color: var(--color-primary);
+  background-color: #ffffff;
+  padding: 4rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   Typography & Layout Text Blocks
+   ========================================================================== */
+.textBlockWrapper {
+  max-width: 800px;
+  margin: 0 auto 5rem auto;
+  text-align: center;
+}
+
+.primaryHeading {
+  font-family: var(--font-serif);
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-primary);
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.leadBodyText {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--color-primary);
+  font-weight: 500;
+  margin-bottom: 1.25rem;
+}
+
+.secondaryBodyText {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-text-main);
+  margin-bottom: 1.25rem;
+}
+
+/* ==========================================================================
+   "How It Works" Section Headers
+   ========================================================================== */
+.processContainer {
+  margin-top: 4rem;
+  background-color: var(--color-bg-light);
+  padding: 4rem 2rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(197, 168, 128, 0.15);
+}
+
+.processHeader {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 3.5rem auto;
+}
+
+.sectionHeading {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+
+.sectionSubheading {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   Step Card Component Grid (Desktop & Mobile Optimized Layouts)
+   ========================================================================== */
+.stepCardGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.stepCard {
+  background: #ffffff;
+  padding: 2.5rem 2rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px -2px rgba(18, 24, 36, 0.03);
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.stepCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -4px rgba(18, 24, 36, 0.07);
+  border-color: rgba(197, 168, 128, 0.4);
+}
+
+.stepBadge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.stepTitle {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0 0 0.75rem 0;
+}
+
+.stepDescription {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Responsive Screen Media Queries
+   ========================================================================== */
+
+/* Tablet Optimization */
+@media screen and (min-width: 768px) {
+  .primaryHeading {
+    font-size: 2.75rem;
+  }
+
+  .sectionHeading {
+    font-size: 2.25rem;
+  }
+
+  .stepCardGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Premium Desktop Scaling */
+@media screen and (min-width: 1024px) {
+  .sectionContainer {
+    padding: 6rem 2rem;
+  }
+
+  .primaryHeading {
+    font-size: 3.25rem;
+  }
+
+  .stepCardGrid {
+    gap: 2.5rem;
+  }
+
+  .stepCard {
+    padding: 3rem 2.5rem;
+  }
+}

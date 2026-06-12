@@ -366,3 +366,112 @@
     box-shadow: 2px 2px 19px 3px rgb(202, 200, 200);
   }
 }
+
+/* ==========================================================================
+   Design Tokens (Sleek Luxury Palette)
+   ========================================================================== */
+:root {
+  --text-dark: #111827; /* Ultra-dark slate gray */
+  --text-body: #374151; /* Highly readable off-black */
+  --brand-gold: #c5a880; /* Luxurious muted corporate gold accent */
+  --ui-bg: #faf9f6; /* Premium off-white linen background */
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+/* ==========================================================================
+   Mobile-First Standard Layout (Base Setup)
+   ========================================================================== */
+.heroSection {
+  box-sizing: border-box;
+  font-family: var(--font-sans);
+  background-color: #ffffff;
+  padding: 3rem 1.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.contentCard {
+  background-color: var(--ui-bg);
+  border: 1px solid rgba(197, 168, 128, 0.18);
+  border-radius: 1.25rem;
+  padding: 2.5rem 1.5rem;
+  max-width: 1000px;
+  width: 100%;
+  box-shadow: 0 10px 30px -10px rgba(17, 24, 39, 0.04);
+  text-align: center;
+}
+
+.headline {
+  font-family: var(--font-serif);
+  color: var(--text-dark);
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 1.25rem 0;
+  letter-spacing: -0.015em;
+}
+
+.accentDivider {
+  width: 50px;
+  height: 2px;
+  background-color: var(--brand-gold);
+  margin: 0 auto 1.75rem auto;
+  border-radius: 2px;
+}
+
+.bodyText {
+  color: var(--text-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  margin: 0 0 1.25rem 0;
+  font-weight: 400;
+}
+
+.bodyText:last-child {
+  margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Responsive Scaling (Tablet Breakpoint)
+   ========================================================================== */
+@media screen and (min-width: 668px) {
+  .heroSection {
+    padding: 5rem 2.5rem;
+  }
+
+  .contentCard {
+    padding: 4rem 3.5rem;
+  }
+
+  .headline {
+    font-size: 2.35rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* ==========================================================================
+   Responsive Scaling (Premium Desktop Breakpoint)
+   ========================================================================== */
+@media screen and (min-width: 992px) {
+  .heroSection {
+    padding: 7rem 4rem;
+  }
+
+  .contentCard {
+    padding: 5rem 6rem;
+  }
+
+  .headline {
+    font-size: 2.85rem;
+    line-height: 1.2;
+    margin-bottom: 1.75rem;
+  }
+
+  .bodyText {
+    font-size: 1.1rem;
+    line-height: 1.75;
+  }
+}
