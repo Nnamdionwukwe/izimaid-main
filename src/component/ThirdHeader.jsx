@@ -18,7 +18,7 @@ export default function ThirdHeader() {
 
                 <div className={styles.spark}>
                   <p>
-                    Skilled Trades & Repairs - let our proffessionals handle it!
+                    Skilled Trades & Repairs - let our professionals handle it!
                   </p>
                 </div>
               </div>

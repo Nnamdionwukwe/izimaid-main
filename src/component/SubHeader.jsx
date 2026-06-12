@@ -307,7 +307,7 @@ export default function SubHeader() {
           className={styles.thirdHeader}
         >
           <i className="fa fa-map-marker" aria-hidden="true" />
-          <p>Find My Local Deusizi Sparkle Proffessionals</p>
+          <p>Find My Local Deusizi Sparkle Professionals</p>
         </div>
 
         {findLocalIzimaid && <LocationModal {...modalProps} />}
