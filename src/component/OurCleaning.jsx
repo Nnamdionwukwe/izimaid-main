@@ -18,7 +18,7 @@ export default function OurCleaning() {
           <div className={styles.main2}>
             <h1>Our Services</h1>
             <p>
-              DEUSIZI SPARKLE PLATFORM is a comprehensive digital platform that
+              DEUSIZI HOME SERVICES is a comprehensive digital platform that
               provides an all-in-one ecosystem for domestic care, professional
               property maintenance, and specialized interior solutions. By
               consolidating diverse home needs into a single network, the
@@ -31,16 +31,18 @@ export default function OurCleaning() {
       <div className={styles.izibest}>
         <div className={styles.cd}>
           <h1>
-            How Deusizi Sparkle Platform Can Meet All Your Personal and Home
-            Needs
+            How Deusizi Home Services Can Meet All Your Personal and Home Needs
           </h1>
           <p>
-            At Deusizi Sparkle, we take great pride in delivering the
-            highest-quality residential cleaning services near you. We offer
-            cleaning services and home cleaning tips to homeowners with the help
-            of our well-trained home cleaning pros. Deusizi Sparkle does
-            everything we can to ensure that you are left with a spic-and-span
-            home after every cleaning visit.
+            At Deusizi Home Services, we take great pride in delivering the
+            highest-quality professional home solutions tailored entirely to
+            your lifestyle. We offer a comprehensive suite of domestic care,
+            skilled trades, and property maintenance services with the help of
+            our well-trained, background-checked pros. From reliable childcare
+            and expert elder care to professional plumbing, custom interior
+            organization, and immaculate deep cleaning, Deusizi does everything
+            we can to ensure your home or commercial space is left flawlessly
+            functional and perfectly maintained after every single visit.
           </p>
         </div>
       </div>
