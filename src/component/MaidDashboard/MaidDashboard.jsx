@@ -20,13 +20,33 @@ const API = (() => {
 
 const SERVICES_LIST = [
   "Cleaning",
+  "Nannies & Babysitting",
+  "Caregivers & Elderly Care",
+  "Housekeepers",
+  "Handymen & Odd Jobs",
+  "Electricians",
+  "Plumbers",
+  "Painters",
   "Laundry",
-  "Cooking",
+  "Cooks",
   "Ironing",
   "Organizing",
+  "AC Technicians",
+  "Facility Management",
+  "Estate Maintenance",
+  "Property Inspections",
+  "Short-Let Property Support",
   "Window Cleaning",
   "Carpet Cleaning",
   "Deep Cleaning",
+  "Space Planning",
+  "Home Furnishing",
+  "Lighting",
+  "Residential Cleaning",
+  "Commercial Cleaning",
+  "Post-Construction Cleaning",
+  "Move-In/Move-Out Cleaning",
+  "Domestic & Care Services",
 ];
 
 const STATUS_CLASS = {
@@ -432,7 +452,8 @@ function ProfileTab({ token }) {
 
           rate_custom: customRates.length
             ? customRates.reduce((acc, r) => {
-                if (r.label.trim()) acc[r.label.trim()] = Number(r.price) || 0;
+                const label = (r.label || "").trim();
+                if (label) acc[label] = Number(r.price) || 0;
                 return acc;
               }, {})
             : undefined,
@@ -853,7 +874,6 @@ function ProfileTab({ token }) {
           </div>
         </div>
 
-        {/* ══ SECTION: Services ═════════════════════════════════ */}
         {/* ══ SECTION: Services ═════════════════════════════════ */}
         <div className={styles.profileSection}>
           <p className={styles.profileSectionTitle}>
@@ -1430,10 +1450,7 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                 </div>
                 <div className={styles.metaItem}>
                   Earning:{" "}
-                  <span className={styles.metaValue}>
-                    Earning:{" "}
-                    <span className={styles.metaValue}>{fmtBookingAmt(b)}</span>
-                  </span>
+                  <span className={styles.metaValue}>{fmtBookingAmt(b)}</span>
                 </div>
                 <div className={styles.metaItem}>
                   Address: <span className={styles.metaValue}>{b.address}</span>
