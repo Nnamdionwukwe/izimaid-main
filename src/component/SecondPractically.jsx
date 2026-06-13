@@ -42,10 +42,7 @@ export default function SecondPractically() {
           </div>
         </div>
 
-        <img
-          alt="clean"
-          src="https://img.freepik.com/free-vector/smiling-woman-girl-cleaning-furniture-living-room-flat_1284-62344.jpg"
-        />
+        <img alt="clean" src="image1.JPG" />
 
         <div className={styles.mainSub}>
           <h3 className={styles.how}>
