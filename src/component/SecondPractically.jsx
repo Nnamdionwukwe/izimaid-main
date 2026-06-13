@@ -63,10 +63,7 @@ export default function SecondPractically() {
           </div>
         </div>
 
-        <img
-          alt="clean"
-          src="https://cdn.vectorstock.com/i/500p/57/04/elderly-woman-cleaning-her-home-cartoon-vector-55805704.jpg"
-        />
+        <img alt="clean" src="image2.JPG" />
 
         <div className={styles.mainSub}>
           <h3 className={styles.how}>
