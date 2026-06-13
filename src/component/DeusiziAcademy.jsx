@@ -9,7 +9,7 @@ export default function DeusiziAcademy() {
       <div className={styles.de}>
         <div className={styles.residentialDI}>
           <div
-            onClick={() => navigate("/blog")}
+            onClick={() => navigate("/deusizi-academy/cleaner-training")}
             className={styles.hoverMainDiv10}
           >
             <i class="fa fa-th-large" aria-hidden="true"></i>

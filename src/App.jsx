@@ -80,6 +80,7 @@ import Inbox from "./component/Chat/Inbox.jsx";
 import CustomerPayments from "./component/CustomerPayments/CustomerPayments.jsx";
 import AdminCustomerPayments from "./component/AdminDashboard/Adminpayments.jsx";
 import AdminMaidWallet from "./component/AdminDashboard/AdminMaidWallet.jsx";
+import CleanerTraining from "./component/DeusiziAcademy/CleanerTraining.jsx";
 
 function App() {
   return (
@@ -203,6 +204,10 @@ function AppRoutes() {
       <Route path="/blog/:id" element={<BlogPost />} />
       <Route path="/blog/seasonal" element={<Seasonal />} />
       <Route path="/blog/tips-and-tricks" element={<TipsAndTricks />} />
+      <Route
+        path="/deusizi-academy/cleaner-training"
+        element={<CleanerTraining />}
+      />
 
       {/* Admin Dashboard */}
       <Route
