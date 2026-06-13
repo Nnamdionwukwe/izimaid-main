@@ -16,10 +16,7 @@ export default function SecondPractically() {
           </div>
         </div>
 
-        <img
-          alt="clean"
-          src="https://img.freepik.com/premium-vector/man-cleaning-computer-table-with-duster-guy-wiping-workplace-desk-housework-concept-modern-living-room-interior-male-cartoon-character_48369-25689.jpg"
-        />
+        <img alt="clean" src="image7.JPG" />
 
         <div className={styles.mainSub}>
           <h3 className={styles.how}>
@@ -63,7 +60,7 @@ export default function SecondPractically() {
           </div>
         </div>
 
-        <img alt="clean" src="image2.JPG" />
+        <img alt="clean" src="image5.JPG" />
 
         <div className={styles.mainSub}>
           <h3 className={styles.how}>
@@ -97,10 +94,7 @@ export default function SecondPractically() {
           </div>
         </div>
 
-        <img
-          alt="clean"
-          src="https://media.istockphoto.com/id/1330190659/vector/allergy-reaction-medicine-and-healthcare-concept.jpg?s=612x612&w=0&k=20&c=309Ayr3NzjTcXMN9zXaqHFD3rEUbJi1yxxXgS3EduC0="
-        />
+        <img alt="clean" src="image9.JPG" />
 
         <div className={styles.mainSub}>
           <h3 className={styles.how}>
@@ -119,10 +113,7 @@ export default function SecondPractically() {
           </div>
         </div>
 
-        <img
-          alt="clean"
-          src="https://i.ytimg.com/vi/spOTnZTP_V8/maxresdefault.jpg"
-        />
+        <img alt="clean" src="image8.JPG" />
 
         <div className={styles.mainSub}>
           <h3 className={styles.how}>
