@@ -4,7 +4,7 @@ export default function OurCleaning() {
   return (
     <>
       <div className={styles.main}>
-        <img alt="workers" src="chefboldmart.JPG" />
+        <img alt="workers" src="image3.JPG" />
 
         <div className={styles.hello}>
           <i class="fa-brands fa-facebook"></i>
