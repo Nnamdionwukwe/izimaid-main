@@ -416,7 +416,7 @@ export default function GiftCertificates() {
             className={styles.ctaSecondary}
             onClick={() => navigate("/maids")}
           >
-            Browse Maids
+            Browse Professionals
           </button>
         </div>
       </div>

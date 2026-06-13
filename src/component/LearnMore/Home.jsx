@@ -212,7 +212,7 @@ export default function WhyHireUs() {
             className={styles.ctaPrimary}
             onClick={() => navigate("/maids")}
           >
-            Browse Maids Now
+            Browse Proz Now
           </button>
           <button
             className={styles.ctaSecondary}

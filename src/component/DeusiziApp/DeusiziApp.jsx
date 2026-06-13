@@ -291,7 +291,7 @@ export default function DeusiziApp() {
               className={styles.webFallbackBtn}
               onClick={() => navigate("/maids")}
             >
-              Browse Maids Now
+              Browse Professionals Now
             </button>
           </div>
         </div>

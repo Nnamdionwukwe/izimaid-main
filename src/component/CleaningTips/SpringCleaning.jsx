@@ -486,7 +486,7 @@ export default function SpringCleaning() {
             className={styles.ctaPrimary}
             onClick={() => navigate("/maids")}
           >
-            Browse Maids
+            Browse Professionals
           </button>
           <button
             className={styles.ctaSecondary}

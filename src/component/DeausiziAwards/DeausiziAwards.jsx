@@ -454,7 +454,7 @@ export default function DeausiziAwards() {
             className={styles.ctaPrimary}
             onClick={() => navigate("/apply-locally")}
           >
-            Join as a Maid
+            Join as a Professional
           </button>
           <button
             className={styles.ctaSecondary}
