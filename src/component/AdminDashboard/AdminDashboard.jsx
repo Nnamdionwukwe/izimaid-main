@@ -47,6 +47,20 @@ const NAV_GROUPS = [
     ],
   },
   {
+    label: "Deusizi Academy Forms",
+    items: [
+      {
+        key: "cleaner-applications",
+        icon: "🎫",
+        label: "Cleaner Training Forms",
+      },
+      // { key: "maid-support", icon: "🧹", label: "Maid Support" },
+      // { key: "chats", icon: "💬", label: "All Live Chats" },
+      // { key: "support-chat", icon: "🛎️", label: "Customer Live Chat" },
+      // { key: "maid-support-chat", icon: "🫧", label: "Maid Live Chat" },
+    ],
+  },
+  {
     label: "Insights",
     items: [
       { key: "stats", icon: "📊", label: "Analytics" },

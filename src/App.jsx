@@ -84,6 +84,7 @@ import CleanerTraining from "./component/DeusiziAcademy/CleanerTraining.jsx";
 import HousekeeperTraining from "./component/DeusiziAcademy/HousekeeperTraining.jsx";
 import CaregiverTraining from "./component/DeusiziAcademy/CaregiverTraining.jsx";
 import DomesticStaffCertification from "./component/DeusiziAcademy/DomesticStaffCertification.jsx";
+import AdminCleanerApplications from "./component/AdminDashboard/AdminCleanerApplications.jsx";
 
 function App() {
   return (
@@ -213,6 +214,11 @@ function AppRoutes() {
         path="/deusizi-academy/cleaner-training"
         element={<CleanerTraining />}
       />
+      <Route
+        path="/admin/cleaner-applications"
+        element={<AdminCleanerApplications />}
+      />
+
       <Route
         path="/deusizi-academy/housekeeper-training"
         element={<HousekeeperTraining />}

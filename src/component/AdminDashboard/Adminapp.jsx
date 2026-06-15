@@ -17,6 +17,7 @@ import AdminStats from "./AdminStats.jsx";
 import AdminSettings from "./AdminSettings.jsx";
 import AdminAuditLog from "./AdminAuditLog.jsx";
 import AdminSubscriptions from "./AdminSubscriptions.jsx";
+import AdminCleanerApplications from "./AdminCleanerApplications.jsx";
 
 export default function AdminApp({ onLogout }) {
   const [view, setView] = useState("leads");
@@ -78,6 +79,9 @@ export default function AdminApp({ onLogout }) {
 
   if (view === "notifications")
     return <AdminNotifications onBack={() => setView("leads")} />;
+
+  if (view === "cleaner-applications")
+    return <AdminCleanerApplications onBack={() => setView("leads")} />;
 
   if (view === "subscriptions")
     return <AdminSubscriptions onBack={() => setView("leads")} />;
