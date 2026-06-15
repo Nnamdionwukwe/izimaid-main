@@ -1,16 +1,16 @@
 // AdminCleanerApplications.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import styles from "./AdminCleanerApplications.module.css";
 import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const STATUS_OPTIONS = [
-  { value: "pending", label: "Pending", color: "#f0ad4e" },
-  { value: "reviewed", label: "Reviewed", color: "#5bc0de" },
-  { value: "accepted", label: "Accepted", color: "#5cb85c" },
-  { value: "rejected", label: "Rejected", color: "#d9534f" },
-  { value: "enrolled", label: "Enrolled", color: "#c9a84c" },
+  { value: "pending", label: "Pending", color: "#f0ad4e", icon: "⏳" },
+  { value: "reviewed", label: "Reviewed", color: "#5bc0de", icon: "👁️" },
+  { value: "accepted", label: "Accepted", color: "#5cb85c", icon: "✅" },
+  { value: "rejected", label: "Rejected", color: "#d9534f", icon: "❌" },
+  { value: "enrolled", label: "Enrolled", color: "#c9a84c", icon: "🎓" },
 ];
 
 const TRACK_OPTIONS = [
@@ -42,18 +42,21 @@ export default function AdminCleanerApplications() {
     total: 0,
     page: 1,
     limit: 20,
+    totalPages: 0,
   });
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState("view"); // view, edit, notes
+  const [modalMode, setModalMode] = useState("view");
   const [bulkAction, setBulkAction] = useState("");
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [notesInput, setNotesInput] = useState("");
   const [statusUpdate, setStatusUpdate] = useState("");
   const [updating, setUpdating] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [viewMode, setViewMode] = useState("table");
 
   // Fetch applications
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -77,6 +80,7 @@ export default function AdminCleanerApplications() {
           total: response.data.total,
           page: response.data.page,
           limit: response.data.limit,
+          totalPages: Math.ceil(response.data.total / response.data.limit),
         });
       }
     } catch (err) {
@@ -85,10 +89,10 @@ export default function AdminCleanerApplications() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
   // Fetch statistics
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
@@ -102,12 +106,12 @@ export default function AdminCleanerApplications() {
     } catch (err) {
       console.error("Error fetching stats:", err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchApplications();
     fetchStats();
-  }, [filters]);
+  }, [fetchApplications, fetchStats]);
 
   // Update application status
   const updateStatus = async (id, status, notes = null) => {
@@ -215,6 +219,7 @@ export default function AdminCleanerApplications() {
   const exportToCSV = () => {
     const headers = [
       "ID",
+      "Reference",
       "Full Name",
       "Email",
       "Phone",
@@ -223,11 +228,12 @@ export default function AdminCleanerApplications() {
       "Experience",
       "Status",
       "Application Date",
-      "Reference",
+      "Availability",
     ];
 
     const rows = applications.map((app) => [
       app.id,
+      app.reference_number,
       app.full_name,
       app.email,
       app.phone,
@@ -236,7 +242,7 @@ export default function AdminCleanerApplications() {
       app.experience_level || "N/A",
       app.status,
       new Date(app.application_date).toLocaleDateString(),
-      app.reference_number,
+      app.availability?.join(", ") || "None",
     ]);
 
     const csvContent = [
@@ -274,6 +280,11 @@ export default function AdminCleanerApplications() {
     return option?.color || "#666";
   };
 
+  const getStatusIcon = (status) => {
+    const option = STATUS_OPTIONS.find((opt) => opt.value === status);
+    return option?.icon || "📋";
+  };
+
   // Format date
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-NG", {
@@ -283,58 +294,182 @@ export default function AdminCleanerApplications() {
     });
   };
 
+  // Filter applications by search term
+  const filteredApplications = applications.filter((app) => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return (
+      app.full_name.toLowerCase().includes(search) ||
+      app.email.toLowerCase().includes(search) ||
+      app.phone.includes(search) ||
+      app.reference_number.toLowerCase().includes(search)
+    );
+  });
+
+  // Mobile card view
+  const MobileCardView = () => (
+    <div className={styles.mobileCards}>
+      {filteredApplications.map((app) => (
+        <div key={app.id} className={styles.mobileCard}>
+          <div className={styles.mobileCardHeader}>
+            <input
+              type="checkbox"
+              checked={selectedApps.includes(app.id)}
+              onChange={() => toggleSelect(app.id)}
+              className={styles.mobileCheckbox}
+            />
+            <span className={styles.mobileRef}>{app.reference_number}</span>
+            <span
+              className={styles.mobileStatus}
+              style={{ backgroundColor: getStatusColor(app.status) }}
+            >
+              {getStatusIcon(app.status)} {app.status}
+            </span>
+          </div>
+          <div className={styles.mobileCardBody}>
+            <div className={styles.mobileCardName}>{app.full_name}</div>
+            <div className={styles.mobileCardDetails}>
+              <div>📧 {app.email}</div>
+              <div>📞 {app.phone}</div>
+              <div>📍 {app.city}</div>
+              <div>📅 {formatDate(app.application_date)}</div>
+            </div>
+            <div className={styles.mobileCardTrack}>{app.preferred_track}</div>
+          </div>
+          <div className={styles.mobileCardActions}>
+            <button
+              className={styles.mobileActionBtn}
+              onClick={() => {
+                setSelectedApplication(app);
+                setModalMode("view");
+                setShowModal(true);
+              }}
+            >
+              👁️ View
+            </button>
+            <button
+              className={styles.mobileActionBtn}
+              onClick={() => {
+                setSelectedApplication(app);
+                setStatusUpdate(app.status);
+                setModalMode("edit");
+                setShowModal(true);
+              }}
+            >
+              📝 Status
+            </button>
+            <button
+              className={styles.mobileActionBtn}
+              onClick={() => {
+                setSelectedApplication(app);
+                setNotesInput(app.admin_notes || "");
+                setModalMode("notes");
+                setShowModal(true);
+              }}
+            >
+              📋 Notes
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className={styles.adminPage}>
       <div className={styles.container}>
         {/* Header */}
         <div className={styles.header}>
-          <h1 className={styles.title}>Cleaner Training Applications</h1>
-          <p className={styles.subtitle}>Manage and review all applications</p>
+          <div className={styles.headerLeft}>
+            <h1 className={styles.title}>Cleaner Training Applications</h1>
+            <p className={styles.subtitle}>
+              Manage and review all applications
+            </p>
+          </div>
+          <div className={styles.headerRight}>
+            <button
+              className={styles.viewToggleBtn}
+              onClick={() =>
+                setViewMode(viewMode === "table" ? "cards" : "table")
+              }
+            >
+              {viewMode === "table" ? "📱 Card View" : "📊 Table View"}
+            </button>
+          </div>
         </div>
 
         {/* Stats Cards */}
         {stats && (
           <div className={styles.statsGrid}>
             <div className={styles.statCard}>
-              <div className={styles.statValue}>{stats.total || 0}</div>
-              <div className={styles.statLabel}>Total Applications</div>
+              <div className={styles.statIcon}>📊</div>
+              <div className={styles.statInfo}>
+                <div className={styles.statValue}>{stats.total || 0}</div>
+                <div className={styles.statLabel}>Total</div>
+              </div>
             </div>
             <div className={styles.statCard}>
-              <div className={styles.statValue} style={{ color: "#f0ad4e" }}>
-                {stats.pending || 0}
+              <div className={styles.statIcon}>⏳</div>
+              <div className={styles.statInfo}>
+                <div className={styles.statValue} style={{ color: "#f0ad4e" }}>
+                  {stats.pending || 0}
+                </div>
+                <div className={styles.statLabel}>Pending</div>
               </div>
-              <div className={styles.statLabel}>Pending</div>
             </div>
             <div className={styles.statCard}>
-              <div className={styles.statValue} style={{ color: "#5bc0de" }}>
-                {stats.reviewed || 0}
+              <div className={styles.statIcon}>👁️</div>
+              <div className={styles.statInfo}>
+                <div className={styles.statValue} style={{ color: "#5bc0de" }}>
+                  {stats.reviewed || 0}
+                </div>
+                <div className={styles.statLabel}>Reviewed</div>
               </div>
-              <div className={styles.statLabel}>Reviewed</div>
             </div>
             <div className={styles.statCard}>
-              <div className={styles.statValue} style={{ color: "#5cb85c" }}>
-                {stats.accepted || 0}
+              <div className={styles.statIcon}>✅</div>
+              <div className={styles.statInfo}>
+                <div className={styles.statValue} style={{ color: "#5cb85c" }}>
+                  {stats.accepted || 0}
+                </div>
+                <div className={styles.statLabel}>Accepted</div>
               </div>
-              <div className={styles.statLabel}>Accepted</div>
             </div>
             <div className={styles.statCard}>
-              <div className={styles.statValue} style={{ color: "#c9a84c" }}>
-                {stats.enrolled || 0}
+              <div className={styles.statIcon}>🎓</div>
+              <div className={styles.statInfo}>
+                <div className={styles.statValue} style={{ color: "#c9a84c" }}>
+                  {stats.enrolled || 0}
+                </div>
+                <div className={styles.statLabel}>Enrolled</div>
               </div>
-              <div className={styles.statLabel}>Enrolled</div>
             </div>
             <div className={styles.statCard}>
-              <div className={styles.statValue} style={{ color: "#d9534f" }}>
-                {stats.rejected || 0}
+              <div className={styles.statIcon}>❌</div>
+              <div className={styles.statInfo}>
+                <div className={styles.statValue} style={{ color: "#d9534f" }}>
+                  {stats.rejected || 0}
+                </div>
+                <div className={styles.statLabel}>Rejected</div>
               </div>
-              <div className={styles.statLabel}>Rejected</div>
             </div>
           </div>
         )}
 
-        {/* Filters */}
+        {/* Search and Filters */}
         <div className={styles.filtersBar}>
-          <div className={styles.filtersLeft}>
+          <div className={styles.searchWrapper}>
+            <span className={styles.searchIcon}>🔍</span>
+            <input
+              type="text"
+              className={styles.searchInput}
+              placeholder="Search by name, email, phone or reference..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.filterGroup}>
             <select
               className={styles.filterSelect}
               value={filters.status}
@@ -345,7 +480,7 @@ export default function AdminCleanerApplications() {
               <option value="">All Statuses</option>
               {STATUS_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
-                  {opt.label}
+                  {opt.icon} {opt.label}
                 </option>
               ))}
             </select>
@@ -381,17 +516,17 @@ export default function AdminCleanerApplications() {
             </select>
           </div>
 
-          <div className={styles.filtersRight}>
+          <div className={styles.actionButtons}>
             {selectedApps.length > 0 && (
               <button
                 className={styles.bulkButton}
                 onClick={() => setShowBulkModal(true)}
               >
-                Bulk Actions ({selectedApps.length})
+                Bulk ({selectedApps.length})
               </button>
             )}
             <button className={styles.exportButton} onClick={exportToCSV}>
-              Export CSV
+              Export
             </button>
             <button
               className={styles.refreshButton}
@@ -402,164 +537,262 @@ export default function AdminCleanerApplications() {
           </div>
         </div>
 
-        {/* Applications Table */}
-        {loading ? (
+        {/* Results count */}
+        <div className={styles.resultsInfo}>
+          <span>
+            Showing {filteredApplications.length} of {pagination.total}{" "}
+            applications
+          </span>
+          {selectedApps.length > 0 && (
+            <span className={styles.selectedCount}>
+              {selectedApps.length} selected
+            </span>
+          )}
+        </div>
+
+        {/* Loading State */}
+        {loading && (
           <div className={styles.loadingState}>
             <div className={styles.spinner}></div>
             <p>Loading applications...</p>
           </div>
-        ) : error ? (
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
           <div className={styles.errorState}>
             <p>{error}</p>
             <button onClick={fetchApplications}>Try Again</button>
           </div>
-        ) : applications.length === 0 ? (
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && filteredApplications.length === 0 && (
           <div className={styles.emptyState}>
+            <div className={styles.emptyIcon}>📭</div>
             <p>No applications found</p>
+            {(filters.status ||
+              filters.city ||
+              filters.track ||
+              searchTerm) && (
+              <button
+                className={styles.clearFiltersBtn}
+                onClick={() => {
+                  setFilters({
+                    status: "",
+                    city: "",
+                    track: "",
+                    page: 1,
+                    limit: 20,
+                  });
+                  setSearchTerm("");
+                }}
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
-        ) : (
-          <>
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th className={styles.checkboxCell}>
-                      <input
-                        type="checkbox"
-                        checked={
-                          selectedApps.length === applications.length &&
-                          applications.length > 0
-                        }
-                        onChange={toggleSelectAll}
-                      />
-                    </th>
-                    <th>Ref #</th>
-                    <th>Full Name</th>
-                    <th>Contact</th>
-                    <th>City</th>
-                    <th>Track</th>
-                    <th>Experience</th>
-                    <th>Status</th>
-                    <th>Applied</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {applications.map((app) => (
-                    <tr key={app.id} className={styles.tableRow}>
-                      <td className={styles.checkboxCell}>
+        )}
+
+        {/* Table View (Desktop) */}
+        {!loading &&
+          !error &&
+          filteredApplications.length > 0 &&
+          viewMode === "table" && (
+            <>
+              <div className={styles.tableWrapper}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th className={styles.checkboxCell}>
                         <input
                           type="checkbox"
-                          checked={selectedApps.includes(app.id)}
-                          onChange={() => toggleSelect(app.id)}
+                          checked={
+                            selectedApps.length === applications.length &&
+                            applications.length > 0
+                          }
+                          onChange={toggleSelectAll}
                         />
-                      </td>
-                      <td className={styles.reference}>
-                        {app.reference_number}
-                      </td>
-                      <td className={styles.name}>{app.full_name}</td>
-                      <td>
-                        <div className={styles.contactInfo}>
-                          <div>{app.email}</div>
-                          <div className={styles.phone}>{app.phone}</div>
-                        </div>
-                      </td>
-                      <td>{app.city}</td>
-                      <td className={styles.track}>{app.preferred_track}</td>
-                      <td>{app.experience_level || "N/A"}</td>
-                      <td>
-                        <span
-                          className={styles.statusBadge}
-                          style={{
-                            backgroundColor: getStatusColor(app.status),
-                          }}
-                        >
-                          {app.status}
-                        </span>
-                      </td>
-                      <td>{formatDate(app.application_date)}</td>
-                      <td>
-                        <div className={styles.actionButtons}>
-                          <button
-                            className={styles.viewButton}
-                            onClick={() => {
-                              setSelectedApplication(app);
-                              setModalMode("view");
-                              setShowModal(true);
-                            }}
-                            title="View Details"
-                          >
-                            👁️
-                          </button>
-                          <button
-                            className={styles.editButton}
-                            onClick={() => {
-                              setSelectedApplication(app);
-                              setStatusUpdate(app.status);
-                              setModalMode("edit");
-                              setShowModal(true);
-                            }}
-                            title="Update Status"
-                          >
-                            📝
-                          </button>
-                          <button
-                            className={styles.notesButton}
-                            onClick={() => {
-                              setSelectedApplication(app);
-                              setNotesInput(app.admin_notes || "");
-                              setModalMode("notes");
-                              setShowModal(true);
-                            }}
-                            title="Admin Notes"
-                          >
-                            📋
-                          </button>
-                          <button
-                            className={styles.deleteButton}
-                            onClick={() => deleteApplication(app.id)}
-                            title="Delete"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </td>
+                      </th>
+                      <th>Ref</th>
+                      <th>Name</th>
+                      <th>Contact</th>
+                      <th>City</th>
+                      <th>Track</th>
+                      <th>Status</th>
+                      <th>Applied</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {filteredApplications.map((app) => (
+                      <tr key={app.id} className={styles.tableRow}>
+                        <td className={styles.checkboxCell}>
+                          <input
+                            type="checkbox"
+                            checked={selectedApps.includes(app.id)}
+                            onChange={() => toggleSelect(app.id)}
+                          />
+                        </td>
+                        <td className={styles.reference}>
+                          {app.reference_number}
+                        </td>
+                        <td className={styles.name}>{app.full_name}</td>
+                        <td>
+                          <div className={styles.contactInfo}>
+                            <div>{app.email}</div>
+                            <div className={styles.phone}>{app.phone}</div>
+                          </div>
+                        </td>
+                        <td>{app.city}</td>
+                        <td className={styles.track}>{app.preferred_track}</td>
+                        <td>
+                          <span
+                            className={styles.statusBadge}
+                            style={{
+                              backgroundColor: getStatusColor(app.status),
+                            }}
+                          >
+                            {getStatusIcon(app.status)} {app.status}
+                          </span>
+                        </td>
+                        <td>{formatDate(app.application_date)}</td>
+                        <td>
+                          <div className={styles.actionButtons}>
+                            <button
+                              className={styles.viewButton}
+                              onClick={() => {
+                                setSelectedApplication(app);
+                                setModalMode("view");
+                                setShowModal(true);
+                              }}
+                              title="View Details"
+                            >
+                              👁️
+                            </button>
+                            <button
+                              className={styles.editButton}
+                              onClick={() => {
+                                setSelectedApplication(app);
+                                setStatusUpdate(app.status);
+                                setModalMode("edit");
+                                setShowModal(true);
+                              }}
+                              title="Update Status"
+                            >
+                              📝
+                            </button>
+                            <button
+                              className={styles.notesButton}
+                              onClick={() => {
+                                setSelectedApplication(app);
+                                setNotesInput(app.admin_notes || "");
+                                setModalMode("notes");
+                                setShowModal(true);
+                              }}
+                              title="Admin Notes"
+                            >
+                              📋
+                            </button>
+                            <button
+                              className={styles.deleteButton}
+                              onClick={() => deleteApplication(app.id)}
+                              title="Delete"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-            {/* Pagination */}
-            <div className={styles.pagination}>
-              <button
-                className={styles.pageButton}
-                disabled={pagination.page === 1}
-                onClick={() =>
-                  setFilters({ ...filters, page: pagination.page - 1 })
-                }
-              >
-                Previous
-              </button>
-              <span className={styles.pageInfo}>
-                Page {pagination.page} of{" "}
-                {Math.ceil(pagination.total / pagination.limit)}
-              </span>
-              <button
-                className={styles.pageButton}
-                disabled={
-                  pagination.page >=
-                  Math.ceil(pagination.total / pagination.limit)
-                }
-                onClick={() =>
-                  setFilters({ ...filters, page: pagination.page + 1 })
-                }
-              >
-                Next
-              </button>
-            </div>
-          </>
-        )}
+              {/* Pagination */}
+              {pagination.totalPages > 1 && (
+                <div className={styles.pagination}>
+                  <button
+                    className={styles.pageButton}
+                    disabled={pagination.page === 1}
+                    onClick={() =>
+                      setFilters({ ...filters, page: pagination.page - 1 })
+                    }
+                  >
+                    ← Previous
+                  </button>
+                  <div className={styles.pageNumbers}>
+                    {[...Array(Math.min(5, pagination.totalPages))].map(
+                      (_, i) => {
+                        let pageNum = i + 1;
+                        if (pagination.totalPages > 5 && pagination.page > 3) {
+                          pageNum = pagination.page - 2 + i;
+                          if (pageNum > pagination.totalPages) return null;
+                        }
+                        return (
+                          <button
+                            key={pageNum}
+                            className={`${styles.pageNumber} ${pagination.page === pageNum ? styles.pageNumberActive : ""}`}
+                            onClick={() =>
+                              setFilters({ ...filters, page: pageNum })
+                            }
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      },
+                    )}
+                  </div>
+                  <button
+                    className={styles.pageButton}
+                    disabled={pagination.page >= pagination.totalPages}
+                    onClick={() =>
+                      setFilters({ ...filters, page: pagination.page + 1 })
+                    }
+                  >
+                    Next →
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+        {/* Mobile Card View */}
+        {!loading &&
+          !error &&
+          filteredApplications.length > 0 &&
+          viewMode === "cards" && (
+            <>
+              <MobileCardView />
+
+              {/* Pagination for mobile */}
+              {pagination.totalPages > 1 && (
+                <div className={styles.mobilePagination}>
+                  <button
+                    className={styles.mobilePageButton}
+                    disabled={pagination.page === 1}
+                    onClick={() =>
+                      setFilters({ ...filters, page: pagination.page - 1 })
+                    }
+                  >
+                    ← Prev
+                  </button>
+                  <span className={styles.mobilePageInfo}>
+                    Page {pagination.page} of {pagination.totalPages}
+                  </span>
+                  <button
+                    className={styles.mobilePageButton}
+                    disabled={pagination.page >= pagination.totalPages}
+                    onClick={() =>
+                      setFilters({ ...filters, page: pagination.page + 1 })
+                    }
+                  >
+                    Next →
+                  </button>
+                </div>
+              )}
+            </>
+          )}
       </div>
 
       {/* View/Edit Modal */}
@@ -588,7 +821,7 @@ export default function AdminCleanerApplications() {
                 <div className={styles.detailsSection}>
                   <div className={styles.detailsGrid}>
                     <div className={styles.detailItem}>
-                      <label>Reference Number</label>
+                      <label>Reference</label>
                       <p>{selectedApplication.reference_number}</p>
                     </div>
                     <div className={styles.detailItem}>
@@ -612,7 +845,7 @@ export default function AdminCleanerApplications() {
                       <p>{selectedApplication.preferred_track}</p>
                     </div>
                     <div className={styles.detailItem}>
-                      <label>Experience Level</label>
+                      <label>Experience</label>
                       <p>
                         {selectedApplication.experience_level ||
                           "Not specified"}
@@ -629,12 +862,13 @@ export default function AdminCleanerApplications() {
                             ),
                           }}
                         >
+                          {getStatusIcon(selectedApplication.status)}{" "}
                           {selectedApplication.status}
                         </span>
                       </p>
                     </div>
                     <div className={styles.detailItem}>
-                      <label>Application Date</label>
+                      <label>Applied</label>
                       <p>
                         {new Date(
                           selectedApplication.application_date,
@@ -667,7 +901,7 @@ export default function AdminCleanerApplications() {
                     )}
                     {selectedApplication.reviewed_at && (
                       <div className={styles.detailItem}>
-                        <label>Reviewed At</label>
+                        <label>Reviewed</label>
                         <p>
                           {new Date(
                             selectedApplication.reviewed_at,
@@ -690,7 +924,7 @@ export default function AdminCleanerApplications() {
                     >
                       {STATUS_OPTIONS.map((opt) => (
                         <option key={opt.value} value={opt.value}>
-                          {opt.label}
+                          {opt.icon} {opt.label}
                         </option>
                       ))}
                     </select>
@@ -780,7 +1014,7 @@ export default function AdminCleanerApplications() {
             </div>
 
             <div className={styles.modalBody}>
-              <p>
+              <p className={styles.bulkInfo}>
                 Update status for {selectedApps.length} selected applications
               </p>
               <div className={styles.formGroup}>
@@ -793,7 +1027,7 @@ export default function AdminCleanerApplications() {
                   <option value="">Select status...</option>
                   {STATUS_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
-                      {opt.label}
+                      {opt.icon} {opt.label}
                     </option>
                   ))}
                 </select>
