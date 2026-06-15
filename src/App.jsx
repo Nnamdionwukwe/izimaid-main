@@ -83,6 +83,7 @@ import AdminMaidWallet from "./component/AdminDashboard/AdminMaidWallet.jsx";
 import CleanerTraining from "./component/DeusiziAcademy/CleanerTraining.jsx";
 import HousekeeperTraining from "./component/DeusiziAcademy/HousekeeperTraining.jsx";
 import CaregiverTraining from "./component/DeusiziAcademy/CaregiverTraining.jsx";
+import DomesticStaffCertification from "./component/DeusiziAcademy/DomesticStaffCertification.jsx";
 
 function App() {
   return (
@@ -207,6 +208,7 @@ function AppRoutes() {
       <Route path="/blog/seasonal" element={<Seasonal />} />
       <Route path="/blog/tips-and-tricks" element={<TipsAndTricks />} />
 
+      {/* DEUSIZI ACADEMY */}
       <Route
         path="/deusizi-academy/cleaner-training"
         element={<CleanerTraining />}
@@ -218,6 +220,10 @@ function AppRoutes() {
       <Route
         path="/deusizi-academy/caregiver-training"
         element={<CaregiverTraining />}
+      />
+      <Route
+        path="/deusizi-academy/domestic-staff-certification"
+        element={<DomesticStaffCertification />}
       />
 
       {/* Admin Dashboard */}

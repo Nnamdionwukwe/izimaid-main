@@ -31,7 +31,9 @@ export default function DeusiziAcademy() {
             <p className={styles.para6}>Caregiver Training</p>
           </div>
           <div
-            onClick={() => navigate("/blog/tips-and-tricks")}
+            onClick={() =>
+              navigate("/deusizi-academy/domestic-staff-certification")
+            }
             className={styles.hoverMainDiv12}
           >
             <i class="fa fa-th-large" aria-hidden="true"></i>
