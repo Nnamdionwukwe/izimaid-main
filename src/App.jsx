@@ -81,6 +81,8 @@ import CustomerPayments from "./component/CustomerPayments/CustomerPayments.jsx"
 import AdminCustomerPayments from "./component/AdminDashboard/Adminpayments.jsx";
 import AdminMaidWallet from "./component/AdminDashboard/AdminMaidWallet.jsx";
 import CleanerTraining from "./component/DeusiziAcademy/CleanerTraining.jsx";
+import HousekeeperTraining from "./component/DeusiziAcademy/HousekeeperTraining.jsx";
+import CaregiverTraining from "./component/DeusiziAcademy/CaregiverTraining.jsx";
 
 function App() {
   return (
@@ -204,9 +206,18 @@ function AppRoutes() {
       <Route path="/blog/:id" element={<BlogPost />} />
       <Route path="/blog/seasonal" element={<Seasonal />} />
       <Route path="/blog/tips-and-tricks" element={<TipsAndTricks />} />
+
       <Route
         path="/deusizi-academy/cleaner-training"
         element={<CleanerTraining />}
+      />
+      <Route
+        path="/deusizi-academy/housekeeper-training"
+        element={<HousekeeperTraining />}
+      />
+      <Route
+        path="/deusizi-academy/caregiver-training"
+        element={<CaregiverTraining />}
       />
 
       {/* Admin Dashboard */}

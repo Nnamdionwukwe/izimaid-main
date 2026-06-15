@@ -1,3 +1,4 @@
+// CleanerTraining.jsx
 import { useState } from "react";
 import styles from "./CleanerTraining.module.css";
 import FixedHeader from "../FixedHeader";
@@ -239,7 +240,7 @@ export default function CleanerTraining() {
     <div className={styles.page}>
       <FixedHeader />
 
-      {/* ── Hero ── */}
+      {/* Hero Section */}
       <div className={styles.hero}>
         <p className={styles.heroEyebrow}>Deusizi Academy</p>
         <h1 className={styles.heroTitle}>
@@ -283,7 +284,7 @@ export default function CleanerTraining() {
         </div>
       </div>
 
-      {/* ── Stats ── */}
+      {/* Stats Bar */}
       <div className={styles.statsBar}>
         {[
           ["200+", "Graduates"],
@@ -298,7 +299,7 @@ export default function CleanerTraining() {
         ))}
       </div>
 
-      {/* ── Outcomes ── */}
+      {/* Outcomes Section */}
       <div className={styles.section}>
         <p className={styles.sectionEyebrow}>What you gain</p>
         <h2 className={styles.sectionTitle}>
@@ -315,7 +316,7 @@ export default function CleanerTraining() {
         </div>
       </div>
 
-      {/* ── Training Tracks ── */}
+      {/* Training Tracks Section */}
       <div className={styles.tracksSection} id="tracks">
         <p className={styles.sectionEyebrow}>Programmes</p>
         <h2 className={styles.sectionTitle}>Choose your training track</h2>
@@ -353,7 +354,7 @@ export default function CleanerTraining() {
         </div>
       </div>
 
-      {/* ── Schedule ── */}
+      {/* Schedule Section */}
       <div className={styles.scheduleSection}>
         <p
           className={styles.sectionEyebrow}
@@ -385,7 +386,7 @@ export default function CleanerTraining() {
         </div>
       </div>
 
-      {/* ── Application Form ── */}
+      {/* Application Form Section */}
       <div className={styles.formSection} id="apply">
         <div className={styles.formInner}>
           <p className={styles.sectionEyebrow}>Apply now</p>
@@ -629,7 +630,7 @@ export default function CleanerTraining() {
         </div>
       </div>
 
-      {/* ── FAQ ── */}
+      {/* FAQ Section */}
       <div className={styles.faqSection}>
         <p className={styles.sectionEyebrow}>Common questions</p>
         <h2 className={styles.sectionTitle}>Everything you need to know</h2>
@@ -653,7 +654,7 @@ export default function CleanerTraining() {
         </div>
       </div>
 
-      {/* ── CTA ── */}
+      {/* CTA Section */}
       <div className={styles.cta}>
         <h2 className={styles.ctaTitle}>
           Your cleaning career starts with one application.

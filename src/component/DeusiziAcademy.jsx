@@ -17,14 +17,14 @@ export default function DeusiziAcademy() {
           </div>
 
           <div
-            onClick={() => navigate("/blog/seasonal")}
+            onClick={() => navigate("/deusizi-academy/housekeeper-training")}
             className={styles.hoverMainDiv11}
           >
             <i class="fa fa-th-large" aria-hidden="true"></i>
             <p>Housekeeper Training</p>
           </div>
           <div
-            onClick={() => navigate("/blog/tips-and-tricks")}
+            onClick={() => navigate("/deusizi-academy/caregiver-training")}
             className={styles.hoverMainDiv12}
           >
             <i class="fa fa-th-large" aria-hidden="true"></i>
