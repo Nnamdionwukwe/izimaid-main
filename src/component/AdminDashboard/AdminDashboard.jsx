@@ -64,6 +64,11 @@ const NAV_GROUPS = [
         icon: "👩‍⚕️",
         label: "Caregiver Training Forms",
       },
+      {
+        key: "domestic-certification-applications",
+        icon: "📜",
+        label: "Domestic Certification Forms",
+      },
     ],
   },
   {

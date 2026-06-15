@@ -20,6 +20,7 @@ import AdminSubscriptions from "./AdminSubscriptions.jsx";
 import AdminCleanerApplications from "./AdminCleanerApplications.jsx";
 import AdminHousekeeperApplications from "./AdminHousekeeperApplications.jsx";
 import AdminCaregiverApplications from "./AdminCaregiverApplications.jsx";
+import AdminDomesticCertification from "./AdminDomesticCertification.jsx";
 
 export default function AdminApp({ onLogout }) {
   const [view, setView] = useState("leads");
@@ -90,6 +91,9 @@ export default function AdminApp({ onLogout }) {
 
   if (view === "caregiver-applications")
     return <AdminCaregiverApplications onBack={() => setView("leads")} />;
+
+  if (view === "domestic-certification-applications")
+    return <AdminDomesticCertification onBack={() => setView("leads")} />;
 
   if (view === "subscriptions")
     return <AdminSubscriptions onBack={() => setView("leads")} />;

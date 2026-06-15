@@ -1326,3 +1326,40 @@
     animation: none !important;
   }
 }
+
+/* Add to DomesticStaffCertification.module.css */
+
+/* API Error Box */
+.apiErrorBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(181, 41, 75, 0.1);
+  border: 1px solid #b5294b;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.apiErrorIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.apiErrorMessage {
+  font-size: 13px;
+  color: #b5294b;
+  margin: 0;
+  line-height: 1.5;
+  flex: 1;
+}
+
+/* Success Card Improvements */
+.successDetails {
+  text-align: left;
+  margin-top: 16px;
+}
+
+.successDetails p {
+  margin: 8px 0;
+}

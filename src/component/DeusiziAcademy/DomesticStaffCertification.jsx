@@ -1,7 +1,10 @@
-// DomesticStaffCertification.jsx
+// DomesticStaffCertification.jsx - Updated with backend API integration
 import { useState, useEffect } from "react";
 import styles from "./DomesticStaffCertification.module.css";
 import FixedHeader from "../FixedHeader";
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const CERTIFICATION_PROGRAMS = [
   {
@@ -346,6 +349,8 @@ export default function DomesticStaffCertification() {
   const [sending, setSending] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [showReferralCode, setShowReferralCode] = useState(false);
+  const [apiError, setApiError] = useState(null);
+  const [submittedData, setSubmittedData] = useState(null);
 
   const [formData, setFormData] = useState({
     // Step 1: Personal
@@ -384,6 +389,7 @@ export default function DomesticStaffCertification() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+    if (apiError) setApiError(null);
   };
 
   const validateStep1 = () => {
@@ -440,12 +446,14 @@ export default function DomesticStaffCertification() {
 
     if (isValid && currentStep < totalSteps) {
       setCurrentStep((prev) => prev + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep((prev) => prev - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -454,13 +462,87 @@ export default function DomesticStaffCertification() {
     if (!validateStep4()) return;
 
     setSending(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setSending(false);
-    setFormSubmitted(true);
+    setApiError(null);
+
+    try {
+      // Prepare data for API
+      const applicationData = {
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        city: formData.city,
+        programChoice: formData.programChoice,
+        experience: formData.experience,
+        education: formData.education,
+        previousTraining: formData.previousTraining || "",
+        schedulePreference: formData.schedulePreference,
+        startMonth: formData.startMonth,
+        motivation: formData.motivation,
+        referralCode: formData.referralCode || "",
+        hearAbout: formData.hearAbout || "",
+        emergencyContact: formData.emergencyContact,
+        emergencyPhone: formData.emergencyPhone,
+      };
+
+      // Make API call to backend
+      const response = await axios.post(
+        `${API_BASE_URL}/api/domestic-certification/applications`,
+        applicationData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.data.success) {
+        setSubmittedData(response.data.application);
+        setFormSubmitted(true);
+        // Scroll to success message
+        document
+          .getElementById("success-message")
+          ?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        throw new Error(response.data.error || "Failed to submit application");
+      }
+    } catch (error) {
+      console.error("Application submission error:", error);
+
+      // Handle different error types
+      if (error.response) {
+        // Server responded with error
+        const serverError = error.response.data;
+        if (
+          serverError.error ===
+          "An application from this email was submitted recently"
+        ) {
+          setApiError(
+            `You've already submitted an application recently. Reference: ${serverError.existingReference || "Check your email"}`,
+          );
+        } else {
+          setApiError(
+            serverError.error ||
+              "Failed to submit application. Please try again.",
+          );
+        }
+      } else if (error.request) {
+        // Request was made but no response
+        setApiError(
+          "Network error. Please check your connection and try again.",
+        );
+      } else {
+        // Something else happened
+        setApiError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setSending(false);
+    }
   };
 
   const resetForm = () => {
     setFormSubmitted(false);
+    setSubmittedData(null);
+    setApiError(null);
     setCurrentStep(1);
     setFormData({
       fullName: "",
@@ -479,6 +561,7 @@ export default function DomesticStaffCertification() {
       emergencyContact: "",
       emergencyPhone: "",
     });
+    setErrors({});
   };
 
   const scrollToForm = () => {
@@ -724,7 +807,7 @@ export default function DomesticStaffCertification() {
             </p>
 
             {formSubmitted ? (
-              <div className={styles.successCard}>
+              <div className={styles.successCard} id="success-message">
                 <div className={styles.successIcon}>🎉</div>
                 <h3 className={styles.successTitle}>
                   Application Submitted Successfully!
@@ -734,11 +817,12 @@ export default function DomesticStaffCertification() {
                   closer to becoming a certified professional.
                 </p>
                 <div className={styles.successDetails}>
-                  <p>
-                    <strong>Application ID:</strong> DSA-
-                    {Math.floor(Math.random() * 100000)}-
-                    {formData.programChoice.substring(0, 3).toUpperCase()}
-                  </p>
+                  {submittedData && (
+                    <p>
+                      <strong>Reference ID:</strong>{" "}
+                      {submittedData.referenceNumber}
+                    </p>
+                  )}
                   <p>
                     <strong>Program:</strong>{" "}
                     {formData.programChoice || "Selected"}
@@ -760,6 +844,14 @@ export default function DomesticStaffCertification() {
               </div>
             ) : (
               <form className={styles.form} onSubmit={handleSubmit} noValidate>
+                {/* API Error Display */}
+                {apiError && (
+                  <div className={styles.apiErrorBox}>
+                    <span className={styles.apiErrorIcon}>⚠️</span>
+                    <p className={styles.apiErrorMessage}>{apiError}</p>
+                  </div>
+                )}
+
                 {/* Progress Steps */}
                 <div className={styles.progressSteps}>
                   {[1, 2, 3, 4].map((step) => (
