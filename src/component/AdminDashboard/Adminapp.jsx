@@ -19,6 +19,7 @@ import AdminAuditLog from "./AdminAuditLog.jsx";
 import AdminSubscriptions from "./AdminSubscriptions.jsx";
 import AdminCleanerApplications from "./AdminCleanerApplications.jsx";
 import AdminHousekeeperApplications from "./AdminHousekeeperApplications.jsx";
+import AdminCaregiverApplications from "./AdminCaregiverApplications.jsx";
 
 export default function AdminApp({ onLogout }) {
   const [view, setView] = useState("leads");
@@ -86,6 +87,9 @@ export default function AdminApp({ onLogout }) {
 
   if (view === "housekeeper-applications")
     return <AdminHousekeeperApplications onBack={() => setView("leads")} />;
+
+  if (view === "caregiver-applications")
+    return <AdminCaregiverApplications onBack={() => setView("leads")} />;
 
   if (view === "subscriptions")
     return <AdminSubscriptions onBack={() => setView("leads")} />;

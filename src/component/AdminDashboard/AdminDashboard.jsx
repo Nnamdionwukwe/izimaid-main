@@ -59,10 +59,11 @@ const NAV_GROUPS = [
         icon: "🧼",
         label: "Housekeeper Training Forms",
       },
-      // { key: "maid-support", icon: "🧹", label: "Maid Support" },
-      // { key: "chats", icon: "💬", label: "All Live Chats" },
-      // { key: "support-chat", icon: "🛎️", label: "Customer Live Chat" },
-      // { key: "maid-support-chat", icon: "🫧", label: "Maid Live Chat" },
+      {
+        key: "caregiver-applications",
+        icon: "👩‍⚕️",
+        label: "Caregiver Training Forms",
+      },
     ],
   },
   {

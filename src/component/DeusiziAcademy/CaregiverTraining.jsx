@@ -1,8 +1,11 @@
-// CaregiverTraining.jsx - Updated with dark theme
+// CaregiverTraining.jsx - Updated with backend API integration
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CaregiverTraining.module.css";
 import FixedHeader from "../FixedHeader";
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const PROGRAM_BENEFITS = [
   {
@@ -181,6 +184,8 @@ export default function CaregiverTraining() {
   const [openFaq, setOpenFaq] = useState(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
+  const [apiError, setApiError] = useState(null);
+  const [submittedData, setSubmittedData] = useState(null);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -201,6 +206,7 @@ export default function CaregiverTraining() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+    if (apiError) setApiError(null);
   };
 
   const validateForm = () => {
@@ -225,9 +231,91 @@ export default function CaregiverTraining() {
     if (!validateForm()) return;
 
     setSending(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setSending(false);
-    setFormSubmitted(true);
+    setApiError(null);
+
+    try {
+      // Prepare data for API
+      const applicationData = {
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        city: formData.city,
+        course: formData.course,
+        experience: formData.experience || "none",
+        motivation: formData.motivation,
+        schedule: formData.schedule,
+      };
+
+      // Make API call to backend
+      const response = await axios.post(
+        `${API_BASE_URL}/api/caregiver-training/applications`,
+        applicationData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.data.success) {
+        setSubmittedData(response.data.application);
+        setFormSubmitted(true);
+        // Scroll to success message
+        document
+          .getElementById("success-message")
+          ?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        throw new Error(response.data.error || "Failed to submit application");
+      }
+    } catch (error) {
+      console.error("Application submission error:", error);
+
+      // Handle different error types
+      if (error.response) {
+        // Server responded with error
+        const serverError = error.response.data;
+        if (
+          serverError.error ===
+          "An application from this email was submitted recently"
+        ) {
+          setApiError(
+            `You've already submitted an application recently. Reference: ${serverError.existingReference || "Check your email"}`,
+          );
+        } else {
+          setApiError(
+            serverError.error ||
+              "Failed to submit application. Please try again.",
+          );
+        }
+      } else if (error.request) {
+        // Request was made but no response
+        setApiError(
+          "Network error. Please check your connection and try again.",
+        );
+      } else {
+        // Something else happened
+        setApiError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const resetForm = () => {
+    setFormSubmitted(false);
+    setSubmittedData(null);
+    setApiError(null);
+    setFormData({
+      fullName: "",
+      email: "",
+      phone: "",
+      city: "",
+      course: "",
+      experience: "",
+      schedule: "",
+      motivation: "",
+    });
+    setErrors({});
   };
 
   const scrollToForm = () => {
@@ -390,7 +478,7 @@ export default function CaregiverTraining() {
             </p>
 
             {formSubmitted ? (
-              <div className={styles.successCard}>
+              <div className={styles.successCard} id="success-message">
                 <div className={styles.successIcon}>🎉</div>
                 <h3 className={styles.successTitle}>Application Received!</h3>
                 <p className={styles.successText}>
@@ -398,37 +486,32 @@ export default function CaregiverTraining() {
                   have you join our caregiving community.
                 </p>
                 <div className={styles.successDetails}>
-                  <p>
-                    <strong>Reference ID:</strong> CGC-
-                    {Math.floor(Math.random() * 100000)}
-                  </p>
+                  {submittedData && (
+                    <p>
+                      <strong>Reference ID:</strong>{" "}
+                      {submittedData.referenceNumber}
+                    </p>
+                  )}
                   <p>
                     <strong>Next Steps:</strong> Our team will contact you
                     within 2 business days to schedule an interview and discuss
                     your training pathway.
                   </p>
                 </div>
-                <button
-                  className={styles.resetButton}
-                  onClick={() => {
-                    setFormSubmitted(false);
-                    setFormData({
-                      fullName: "",
-                      email: "",
-                      phone: "",
-                      city: "",
-                      course: "",
-                      experience: "",
-                      schedule: "",
-                      motivation: "",
-                    });
-                  }}
-                >
+                <button className={styles.resetButton} onClick={resetForm}>
                   Submit Another Application
                 </button>
               </div>
             ) : (
               <form className={styles.form} onSubmit={handleSubmit} noValidate>
+                {/* API Error Display */}
+                {apiError && (
+                  <div className={styles.apiErrorBox}>
+                    <span className={styles.apiErrorIcon}>⚠️</span>
+                    <p className={styles.apiErrorMessage}>{apiError}</p>
+                  </div>
+                )}
+
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Full Name *</label>
