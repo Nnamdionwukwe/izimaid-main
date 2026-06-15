@@ -1,4 +1,4 @@
-// CaregiverTraining.jsx
+// CaregiverTraining.jsx - Updated with dark theme
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CaregiverTraining.module.css";
@@ -45,7 +45,6 @@ const COURSES = [
       "Infection Control",
     ],
     badge: "Most Popular",
-    color: "#bb132f",
   },
   {
     id: "senior",
@@ -64,7 +63,6 @@ const COURSES = [
       "Nutrition for Seniors",
     ],
     badge: "New",
-    color: "#202041",
   },
   {
     id: "pediatric",
@@ -83,7 +81,6 @@ const COURSES = [
       "Play Therapy Basics",
     ],
     badge: null,
-    color: "#bb132f",
   },
   {
     id: "mental",
@@ -101,8 +98,7 @@ const COURSES = [
       "Self-Care Strategies",
       "Boundary Setting",
     ],
-    badge: "Limited",
-    color: "#202041",
+    badge: "Limited Seats",
   },
 ];
 
@@ -247,7 +243,7 @@ export default function CaregiverTraining() {
       {/* Hero Section */}
       <div className={styles.hero}>
         <div className={styles.heroContent}>
-          <p className={styles.heroEyebrow}>Start a rewarding career</p>
+          <p className={styles.heroEyebrow}>Deusizi Academy</p>
           <h1 className={styles.heroTitle}>
             Become a Certified
             <br />
@@ -313,11 +309,6 @@ export default function CaregiverTraining() {
                 key={course.id}
                 className={`${styles.courseTab} ${activeCourse === course.id ? styles.courseTabActive : ""}`}
                 onClick={() => setActiveCourse(course.id)}
-                style={{
-                  borderBottomColor:
-                    activeCourse === course.id ? course.color : "transparent",
-                  color: activeCourse === course.id ? course.color : "#666",
-                }}
               >
                 <span className={styles.courseTabIcon}>
                   {course.id === "foundation" && "📘"}
@@ -331,25 +322,12 @@ export default function CaregiverTraining() {
           </div>
 
           {/* Active Course Card */}
-          <div
-            className={styles.courseCard}
-            style={{ borderTopColor: currentCourse.color }}
-          >
+          <div className={styles.courseCard}>
             {currentCourse.badge && (
-              <div
-                className={styles.courseBadge}
-                style={{ background: currentCourse.color }}
-              >
-                {currentCourse.badge}
-              </div>
+              <div className={styles.courseBadge}>{currentCourse.badge}</div>
             )}
             <div className={styles.courseHeader}>
-              <div
-                className={styles.courseLevel}
-                style={{ background: currentCourse.color }}
-              >
-                {currentCourse.level}
-              </div>
+              <div className={styles.courseLevel}>{currentCourse.level}</div>
               <div className={styles.courseMeta}>
                 <span>⏱ {currentCourse.duration}</span>
                 <span>📚 {currentCourse.hours}</span>
@@ -362,23 +340,12 @@ export default function CaregiverTraining() {
             <p className={styles.courseDesc}>{currentCourse.description}</p>
             <div className={styles.courseTopics}>
               {currentCourse.topics.map((topic, i) => (
-                <span
-                  key={i}
-                  className={styles.topicTag}
-                  style={{
-                    borderColor: `${currentCourse.color}40`,
-                    color: currentCourse.color,
-                  }}
-                >
+                <span key={i} className={styles.topicTag}>
                   {topic}
                 </span>
               ))}
             </div>
-            <button
-              className={styles.courseApplyBtn}
-              onClick={scrollToForm}
-              style={{ background: currentCourse.color }}
-            >
+            <button className={styles.courseApplyBtn} onClick={scrollToForm}>
               Apply for This Course →
             </button>
           </div>
@@ -696,6 +663,8 @@ export default function CaregiverTraining() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
     </div>
   );
 }
