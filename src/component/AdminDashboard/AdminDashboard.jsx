@@ -51,8 +51,13 @@ const NAV_GROUPS = [
     items: [
       {
         key: "cleaner-applications",
-        icon: "🎫",
+        icon: "🧹",
         label: "Cleaner Training Forms",
+      },
+      {
+        key: "housekeeper-applications",
+        icon: "🧼",
+        label: "Housekeeper Training Forms",
       },
       // { key: "maid-support", icon: "🧹", label: "Maid Support" },
       // { key: "chats", icon: "💬", label: "All Live Chats" },

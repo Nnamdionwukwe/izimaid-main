@@ -1,6 +1,10 @@
+// HousekeeperTraining.jsx
 import { useState } from "react";
 import styles from "./HousekeeperTraining.module.css";
 import FixedHeader from "../FixedHeader";
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 /* ─── SVG icon set (no emoji) ─────────────────────────────────────────── */
 const Icons = {
@@ -438,11 +442,14 @@ export default function HousekeeperTraining() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
+  const [apiError, setApiError] = useState(null);
+  const [submittedData, setSubmittedData] = useState(null);
 
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((p) => ({ ...p, [name]: value }));
     if (errors[name]) setErrors((p) => ({ ...p, [name]: "" }));
+    if (apiError) setApiError(null);
   }
 
   function toggleAvail(opt) {
@@ -475,14 +482,82 @@ export default function HousekeeperTraining() {
       setErrors(errs);
       return;
     }
+
     setSending(true);
-    await new Promise((r) => setTimeout(r, 1400));
-    setSending(false);
-    setSubmitted(true);
+    setApiError(null);
+
+    try {
+      // Prepare data for API
+      const applicationData = {
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        city: form.city,
+        track: form.track,
+        experience: form.experience || "none",
+        motivation: form.motivation,
+        availability: form.availability,
+      };
+
+      // Make API call to backend
+      const response = await axios.post(
+        `${API_BASE_URL}/api/housekeeper-training/applications`,
+        applicationData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.data.success) {
+        setSubmittedData(response.data.application);
+        setSubmitted(true);
+        // Scroll to success message
+        document
+          .getElementById("success-message")
+          ?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        throw new Error(response.data.error || "Failed to submit application");
+      }
+    } catch (error) {
+      console.error("Application submission error:", error);
+
+      // Handle different error types
+      if (error.response) {
+        // Server responded with error
+        const serverError = error.response.data;
+        if (
+          serverError.error ===
+          "An application from this email was submitted recently"
+        ) {
+          setApiError(
+            `You've already submitted an application recently. Reference: ${serverError.existingReference || "Check your email"}`,
+          );
+        } else {
+          setApiError(
+            serverError.error ||
+              "Failed to submit application. Please try again.",
+          );
+        }
+      } else if (error.request) {
+        // Request was made but no response
+        setApiError(
+          "Network error. Please check your connection and try again.",
+        );
+      } else {
+        // Something else happened
+        setApiError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setSending(false);
+    }
   }
 
   function resetForm() {
     setSubmitted(false);
+    setSubmittedData(null);
+    setApiError(null);
     setForm({
       name: "",
       email: "",
@@ -493,6 +568,7 @@ export default function HousekeeperTraining() {
       motivation: "",
       availability: [],
     });
+    setErrors({});
   }
 
   function scrollTo(id) {
@@ -655,7 +731,7 @@ export default function HousekeeperTraining() {
           </p>
 
           {submitted ? (
-            <div className={styles.successBox}>
+            <div className={styles.successBox} id="success-message">
               <div className={styles.successIcon}>
                 <Icons.GradCap />
               </div>
@@ -665,15 +741,25 @@ export default function HousekeeperTraining() {
                 review your application and contact you within 48 hours by email
                 or phone.
               </p>
-              <p className={styles.successRef}>
-                Reference: DHA-{Date.now().toString().slice(-6)}
-              </p>
+              {submittedData && (
+                <p className={styles.successRef}>
+                  Reference: {submittedData.referenceNumber}
+                </p>
+              )}
               <button className={styles.heroPrimary} onClick={resetForm}>
                 Submit another application
               </button>
             </div>
           ) : (
             <form className={styles.form} onSubmit={handleSubmit} noValidate>
+              {/* API Error Display */}
+              {apiError && (
+                <div className={styles.apiErrorBox}>
+                  <span className={styles.apiErrorIcon}>⚠️</span>
+                  <p className={styles.apiErrorMessage}>{apiError}</p>
+                </div>
+              )}
+
               {/* Personal details */}
               <div className={styles.formGroup}>
                 <p className={styles.groupTitle}>Personal details</p>
