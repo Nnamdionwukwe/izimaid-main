@@ -23,6 +23,7 @@ import AdminCaregiverApplications from "./AdminCaregiverApplications.jsx";
 import AdminDomesticCertification from "./AdminDomesticCertification.jsx";
 import AdminContactUs from "./AdminContactUs.jsx";
 import AdminApplyLocally from "./AdminApplyLocally.jsx";
+import AdminFoundation from "./AdminFoundation.jsx";
 
 export default function AdminApp({ onLogout }) {
   const [view, setView] = useState("leads");
@@ -87,6 +88,9 @@ export default function AdminApp({ onLogout }) {
 
   if (view === "contact-us")
     return <AdminContactUs onBack={() => setView("leads")} />;
+
+  if (view === "donations")
+    return <AdminFoundation onBack={() => setView("leads")} />;
 
   if (view === "apply-locally")
     return <AdminApplyLocally onBack={() => setView("leads")} />;

@@ -34,6 +34,7 @@ const NAV_GROUPS = [
       { key: "admin-wallets", icon: "👛", label: "Maid Wallets" },
       { key: "withdrawals", icon: "🏦", label: "Withdrawals" },
       { key: "subscriptions", icon: "⭐", label: "Subscriptions" },
+      { key: "donations", icon: "💝", label: "Donations" },
     ],
   },
 
