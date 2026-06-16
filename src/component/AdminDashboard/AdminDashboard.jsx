@@ -36,6 +36,7 @@ const NAV_GROUPS = [
       { key: "subscriptions", icon: "⭐", label: "Subscriptions" },
     ],
   },
+
   {
     label: "Support & Chat",
     items: [
@@ -44,6 +45,13 @@ const NAV_GROUPS = [
       { key: "chats", icon: "💬", label: "All Live Chats" },
       { key: "support-chat", icon: "🛎️", label: "Customer Live Chat" },
       { key: "maid-support-chat", icon: "🫧", label: "Maid Live Chat" },
+    ],
+  },
+  {
+    label: "Contact & Worker Apply Form",
+    items: [
+      { key: "contact-us", icon: "�", label: "Contact Us" },
+      { key: "apply-locally", icon: "📍", label: "Apply Locally" },
     ],
   },
   {

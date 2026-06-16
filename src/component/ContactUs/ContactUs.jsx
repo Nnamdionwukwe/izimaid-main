@@ -1,7 +1,11 @@
+// ContactUs.jsx - Updated with backend API integration
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ContactUs.module.css";
 import FixedHeader from "../FixedHeader";
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const CONTACT_METHODS = [
   {
@@ -75,11 +79,14 @@ export default function ContactUs() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
+  const [apiError, setApiError] = useState(null);
+  const [submittedData, setSubmittedData] = useState(null);
 
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+    if (apiError) setApiError(null);
   }
 
   function validate() {
@@ -100,11 +107,83 @@ export default function ContactUs() {
       setErrors(errs);
       return;
     }
+
     setSending(true);
-    // Simulate submission — replace with real API call
-    await new Promise((r) => setTimeout(r, 1200));
-    setSending(false);
-    setSubmitted(true);
+    setApiError(null);
+
+    try {
+      // Prepare data for API
+      const contactData = {
+        name: form.name,
+        email: form.email,
+        phone: form.phone || "",
+        subject: form.subject,
+        message: form.message,
+      };
+
+      // Make API call to backend
+      const response = await axios.post(
+        `${API_BASE_URL}/api/contact/messages`,
+        contactData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.data.success) {
+        setSubmittedData(response.data.contact);
+        setSubmitted(true);
+        // Scroll to success message
+        document
+          .getElementById("success-message")
+          ?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        throw new Error(response.data.error || "Failed to send message");
+      }
+    } catch (error) {
+      console.error("Contact form submission error:", error);
+
+      // Handle different error types
+      if (error.response) {
+        // Server responded with error
+        const serverError = error.response.data;
+        if (serverError.error === "A similar message was sent recently") {
+          setApiError(
+            `You've already sent a similar message recently. Reference: ${serverError.existingReference || "Check your email"}`,
+          );
+        } else {
+          setApiError(
+            serverError.error || "Failed to send message. Please try again.",
+          );
+        }
+      } else if (error.request) {
+        // Request was made but no response
+        setApiError(
+          "Network error. Please check your connection and try again.",
+        );
+      } else {
+        // Something else happened
+        setApiError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setSending(false);
+    }
+  }
+
+  function resetForm() {
+    setSubmitted(false);
+    setSubmittedData(null);
+    setApiError(null);
+    setForm({
+      name: "",
+      email: "",
+      phone: "",
+      subject: "",
+      message: "",
+    });
+    setErrors({});
   }
 
   return (
@@ -166,30 +245,31 @@ export default function ContactUs() {
           <h2 className={styles.sectionTitle}>Fill in the form below</h2>
 
           {submitted ? (
-            <div className={styles.successBox}>
+            <div className={styles.successBox} id="success-message">
               <div className={styles.successIcon}>✅</div>
               <h3 className={styles.successTitle}>Message sent!</h3>
               <p className={styles.successText}>
                 Thanks for reaching out. We'll get back to you within 24 hours.
               </p>
-              <button
-                className={styles.heroPrimary}
-                onClick={() => {
-                  setSubmitted(false);
-                  setForm({
-                    name: "",
-                    email: "",
-                    phone: "",
-                    subject: "",
-                    message: "",
-                  });
-                }}
-              >
+              {submittedData && (
+                <p className={styles.successRef}>
+                  Reference: {submittedData.referenceNumber}
+                </p>
+              )}
+              <button className={styles.heroPrimary} onClick={resetForm}>
                 Send another message
               </button>
             </div>
           ) : (
             <form className={styles.form} onSubmit={handleSubmit} noValidate>
+              {/* API Error Display */}
+              {apiError && (
+                <div className={styles.apiErrorBox}>
+                  <span className={styles.apiErrorIcon}>⚠️</span>
+                  <p className={styles.apiErrorMessage}>{apiError}</p>
+                </div>
+              )}
+
               <div className={styles.row}>
                 <div className={styles.field}>
                   <label className={styles.label}>

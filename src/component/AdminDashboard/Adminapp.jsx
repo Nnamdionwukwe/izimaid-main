@@ -21,6 +21,8 @@ import AdminCleanerApplications from "./AdminCleanerApplications.jsx";
 import AdminHousekeeperApplications from "./AdminHousekeeperApplications.jsx";
 import AdminCaregiverApplications from "./AdminCaregiverApplications.jsx";
 import AdminDomesticCertification from "./AdminDomesticCertification.jsx";
+import AdminContactUs from "./AdminContactUs.jsx";
+import AdminApplyLocally from "./AdminApplyLocally.jsx";
 
 export default function AdminApp({ onLogout }) {
   const [view, setView] = useState("leads");
@@ -82,6 +84,12 @@ export default function AdminApp({ onLogout }) {
 
   if (view === "notifications")
     return <AdminNotifications onBack={() => setView("leads")} />;
+
+  if (view === "contact-us")
+    return <AdminContactUs onBack={() => setView("leads")} />;
+
+  if (view === "apply-locally")
+    return <AdminApplyLocally onBack={() => setView("leads")} />;
 
   if (view === "cleaner-applications")
     return <AdminCleanerApplications onBack={() => setView("leads")} />;
