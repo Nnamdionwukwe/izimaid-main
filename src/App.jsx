@@ -86,6 +86,7 @@ import CaregiverTraining from "./component/DeusiziAcademy/CaregiverTraining.jsx"
 import DomesticStaffCertification from "./component/DeusiziAcademy/DomesticStaffCertification.jsx";
 import AdminCleanerApplications from "./component/AdminDashboard/AdminCleanerApplications.jsx";
 import FoundationVerify from "./component/DeausiziFoundation/FoundationVerify.jsx";
+import GiftCertificateVerify from "./component/GiftCertificates/GiftCertificateVerify.jsx";
 
 function App() {
   return (
@@ -182,6 +183,10 @@ function AppRoutes() {
       <Route path="/app" element={<DeusiziApp />} />
       <Route path="/franchise" element={<OwnAFranchise />} />
       <Route path="/gift-certificates" element={<GiftCertificates />} />
+      <Route
+        path="/gift-certificates/verify"
+        element={<GiftCertificateVerify />}
+      />
       <Route path="/aplicar-localmente" element={<AplicarLocalmente />} />
       <Route path="/apply-locally" element={<ApplyLocally />} />
       <Route path="/whats-included" element={<WhatsIncluded />} />
