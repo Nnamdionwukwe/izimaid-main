@@ -1,7 +1,29 @@
+// DeausiziFoundation.jsx - Updated with Paystack payment integration
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DeausiziFoundation.module.css";
 import FixedHeader from "../FixedHeader";
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+// Load Paystack script dynamically
+const loadPaystackScript = () => {
+  return new Promise((resolve) => {
+    if (
+      document.querySelector(
+        'script[src="https://js.paystack.co/v1/inline.js"]',
+      )
+    ) {
+      resolve();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://js.paystack.co/v1/inline.js";
+    script.onload = () => resolve();
+    document.head.appendChild(script);
+  });
+};
 
 const PILLARS = [
   {
@@ -119,8 +141,16 @@ export default function DeausiziFoundation() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
+  const [apiError, setApiError] = useState(null);
+  const [submittedData, setSubmittedData] = useState(null);
+  const [paystackLoaded, setPaystackLoaded] = useState(false);
 
   const finalAmount = customAmount ? Number(customAmount) : selectedAmount;
+
+  // Load Paystack script on mount
+  useState(() => {
+    loadPaystackScript().then(() => setPaystackLoaded(true));
+  }, []);
 
   function validate() {
     const e = {};
@@ -140,11 +170,100 @@ export default function DeausiziFoundation() {
       setErrors(errs);
       return;
     }
+
     setSending(true);
-    // Replace with real Paystack or payment integration
-    await new Promise((r) => setTimeout(r, 1400));
+    setApiError(null);
+
+    try {
+      // Prepare data for API
+      const donationData = {
+        donorName: donorName,
+        donorEmail: donorEmail,
+        donorMessage: donorMessage || "",
+        amount: finalAmount,
+        donationType: donateType,
+        paymentMethod: "paystack",
+      };
+
+      // Make API call to backend to initialize payment
+      const response = await axios.post(
+        `${API_BASE_URL}/api/foundation/donations`,
+        donationData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.data.success && response.data.payment) {
+        const { authorization_url, reference } = response.data.payment;
+
+        // Store donation reference for verification
+        setSubmittedData({
+          ...response.data.donation,
+          paymentReference: reference,
+        });
+
+        // Redirect to Paystack payment page
+        window.location.href = authorization_url;
+
+        // Note: The user will be redirected to Paystack, so we don't set submitted state here
+        // The success page will handle the verification
+      } else {
+        throw new Error(response.data.error || "Failed to process donation");
+      }
+    } catch (error) {
+      console.error("Donation submission error:", error);
+
+      // Handle different error types
+      if (error.response) {
+        const serverError = error.response.data;
+        setApiError(
+          serverError.error || "Failed to process donation. Please try again.",
+        );
+      } else if (error.request) {
+        setApiError(
+          "Network error. Please check your connection and try again.",
+        );
+      } else {
+        setApiError("An unexpected error occurred. Please try again.");
+      }
+      setSending(false);
+    }
+  }
+
+  // Check for payment verification on page load
+  useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const reference = urlParams.get("reference");
+    const status = urlParams.get("status");
+
+    if (reference && status === "success") {
+      // Payment was successful, show success message
+      setSubmitted(true);
+      setSending(false);
+      // Clear URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (reference && status === "cancelled") {
+      setApiError("Payment was cancelled. Please try again.");
+      setSending(false);
+      // Clear URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  function resetForm() {
+    setSubmitted(false);
+    setSubmittedData(null);
+    setApiError(null);
+    setDonorName("");
+    setDonorEmail("");
+    setDonorMessage("");
+    setCustomAmount("");
+    setSelectedAmount(2500);
+    setErrors({});
     setSending(false);
-    setSubmitted(true);
   }
 
   return (
@@ -309,7 +428,7 @@ export default function DeausiziFoundation() {
           </p>
 
           {submitted ? (
-            <div className={styles.successBox}>
+            <div className={styles.successBox} id="donation-success">
               <div className={styles.successIcon}>💚</div>
               <h3 className={styles.successTitle}>Thank you, {donorName}!</h3>
               <p className={styles.successText}>
@@ -318,22 +437,25 @@ export default function DeausiziFoundation() {
                 received. A confirmation will be sent to {donorEmail}. You are
                 making a real difference.
               </p>
-              <button
-                className={styles.heroPrimary}
-                onClick={() => {
-                  setSubmitted(false);
-                  setDonorName("");
-                  setDonorEmail("");
-                  setDonorMessage("");
-                  setCustomAmount("");
-                  setSelectedAmount(2500);
-                }}
-              >
+              {submittedData && (
+                <p className={styles.successRef}>
+                  Reference: {submittedData.paymentReference}
+                </p>
+              )}
+              <button className={styles.heroPrimary} onClick={resetForm}>
                 Donate again
               </button>
             </div>
           ) : (
             <form className={styles.form} onSubmit={handleDonate} noValidate>
+              {/* API Error Display */}
+              {apiError && (
+                <div className={styles.apiErrorBox}>
+                  <span className={styles.apiErrorIcon}>⚠️</span>
+                  <p className={styles.apiErrorMessage}>{apiError}</p>
+                </div>
+              )}
+
               {/* Frequency toggle */}
               <div className={styles.freqRow}>
                 {[

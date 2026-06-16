@@ -85,6 +85,7 @@ import HousekeeperTraining from "./component/DeusiziAcademy/HousekeeperTraining.
 import CaregiverTraining from "./component/DeusiziAcademy/CaregiverTraining.jsx";
 import DomesticStaffCertification from "./component/DeusiziAcademy/DomesticStaffCertification.jsx";
 import AdminCleanerApplications from "./component/AdminDashboard/AdminCleanerApplications.jsx";
+import FoundationVerify from "./component/DeausiziFoundation/FoundationVerify.jsx";
 
 function App() {
   return (
@@ -186,6 +187,7 @@ function AppRoutes() {
       <Route path="/whats-included" element={<WhatsIncluded />} />
       <Route path="/before-after-cleaning" element={<BeforeAfter />} />
       <Route path="/foundation" element={<DeausiziFoundation />} />
+      <Route path="/foundation/verify" element={<FoundationVerify />} />
       <Route path="/awards" element={<DeausiziAwards />} />
       <Route path="/local-shelter-support" element={<LocalShelterSupport />} />
       <Route path="/board-of-directors" element={<BoardOfDirectors />} />
