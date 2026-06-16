@@ -1,7 +1,11 @@
+// LocalShelterSupport.jsx - Updated with backend API integration
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./LocalShelterSupport.module.css";
 import FixedHeader from "../FixedHeader";
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const PROGRAMMES = [
   {
@@ -161,11 +165,14 @@ export default function LocalShelterSupport() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
+  const [apiError, setApiError] = useState(null);
+  const [submittedData, setSubmittedData] = useState(null);
 
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+    if (apiError) setApiError(null);
   }
 
   function validate() {
@@ -189,10 +196,95 @@ export default function LocalShelterSupport() {
       setErrors(errs);
       return;
     }
+
     setSending(true);
-    await new Promise((r) => setTimeout(r, 1300));
-    setSending(false);
-    setSubmitted(true);
+    setApiError(null);
+
+    try {
+      // Prepare data for API
+      const applicationData = {
+        orgName: form.orgName,
+        contactName: form.contactName,
+        email: form.email,
+        phone: form.phone,
+        city: form.city,
+        orgType: form.orgType || "",
+        supportType: form.supportType,
+        residents: form.residents || "",
+        message: form.message,
+      };
+
+      // Make API call to backend
+      const response = await axios.post(
+        `${API_BASE_URL}/api/shelter/applications`,
+        applicationData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.data.success) {
+        setSubmittedData(response.data.application);
+        setSubmitted(true);
+        // Scroll to success message
+        document
+          .getElementById("success-message")
+          ?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        throw new Error(response.data.error || "Failed to submit application");
+      }
+    } catch (error) {
+      console.error("Application submission error:", error);
+
+      // Handle different error types
+      if (error.response) {
+        // Server responded with error
+        const serverError = error.response.data;
+        if (
+          serverError.error ===
+          "An application from this email was submitted recently"
+        ) {
+          setApiError(
+            `You've already submitted an application recently. Reference: ${serverError.existingReference || "Check your email"}`,
+          );
+        } else {
+          setApiError(
+            serverError.error ||
+              "Failed to submit application. Please try again.",
+          );
+        }
+      } else if (error.request) {
+        // Request was made but no response
+        setApiError(
+          "Network error. Please check your connection and try again.",
+        );
+      } else {
+        // Something else happened
+        setApiError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setSending(false);
+    }
+  }
+
+  function resetForm() {
+    setSubmitted(false);
+    setSubmittedData(null);
+    setApiError(null);
+    setForm({
+      orgName: "",
+      contactName: "",
+      email: "",
+      phone: "",
+      city: "",
+      orgType: "",
+      supportType: "",
+      residents: "",
+      message: "",
+    });
+    setErrors({});
   }
 
   return (
@@ -345,35 +437,32 @@ export default function LocalShelterSupport() {
           </p>
 
           {submitted ? (
-            <div className={styles.successBox}>
+            <div className={styles.successBox} id="success-message">
               <div className={styles.successIcon}>🤝</div>
               <h3 className={styles.successTitle}>Application received!</h3>
               <p className={styles.successText}>
                 Thank you for reaching out. Our foundation team will review your
                 application and contact you within 5 working days.
               </p>
-              <button
-                className={styles.heroPrimary}
-                onClick={() => {
-                  setSubmitted(false);
-                  setForm({
-                    orgName: "",
-                    contactName: "",
-                    email: "",
-                    phone: "",
-                    city: "",
-                    orgType: "",
-                    supportType: "",
-                    residents: "",
-                    message: "",
-                  });
-                }}
-              >
+              {submittedData && (
+                <p className={styles.successRef}>
+                  Reference: {submittedData.referenceNumber}
+                </p>
+              )}
+              <button className={styles.heroPrimary} onClick={resetForm}>
                 Submit another application
               </button>
             </div>
           ) : (
             <form className={styles.form} onSubmit={handleSubmit} noValidate>
+              {/* API Error Display */}
+              {apiError && (
+                <div className={styles.apiErrorBox}>
+                  <span className={styles.apiErrorIcon}>⚠️</span>
+                  <p className={styles.apiErrorMessage}>{apiError}</p>
+                </div>
+              )}
+
               <div className={styles.row}>
                 <div className={styles.field}>
                   <label className={styles.label}>

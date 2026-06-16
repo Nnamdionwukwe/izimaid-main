@@ -25,6 +25,7 @@ import AdminContactUs from "./AdminContactUs.jsx";
 import AdminApplyLocally from "./AdminApplyLocally.jsx";
 import AdminFoundation from "./AdminFoundation.jsx";
 import AdminGiftCertificates from "./AdminGiftCertificates.jsx";
+import AdminShelter from "./AdminShelter.jsx";
 
 export default function AdminApp({ onLogout }) {
   const [view, setView] = useState("leads");
@@ -95,6 +96,9 @@ export default function AdminApp({ onLogout }) {
 
   if (view === "gift-certificates")
     return <AdminGiftCertificates onBack={() => setView("leads")} />;
+
+  if (view === "shelter")
+    return <AdminShelter onBack={() => setView("leads")} />;
 
   if (view === "apply-locally")
     return <AdminApplyLocally onBack={() => setView("leads")} />;

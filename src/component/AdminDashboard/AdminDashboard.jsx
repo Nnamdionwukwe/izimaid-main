@@ -53,6 +53,7 @@ const NAV_GROUPS = [
     label: "Contact & Worker Apply Form",
     items: [
       { key: "contact-us", icon: "�", label: "Contact Us" },
+      { key: "shelter", icon: "🏠", label: "Shelter" },
       { key: "apply-locally", icon: "📍", label: "Apply Locally" },
     ],
   },
