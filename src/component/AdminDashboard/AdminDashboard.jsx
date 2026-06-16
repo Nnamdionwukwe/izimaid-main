@@ -35,6 +35,7 @@ const NAV_GROUPS = [
       { key: "withdrawals", icon: "🏦", label: "Withdrawals" },
       { key: "subscriptions", icon: "⭐", label: "Subscriptions" },
       { key: "donations", icon: "💝", label: "Donations" },
+      { key: "gift-certificates", icon: "🎁", label: "Gift Certificates" },
     ],
   },
 
