@@ -34,7 +34,7 @@ const CITIES = [
   "Enugu (Independence Layout)",
 ];
 
-export default function AdminDomesticCertification() {
+export default function AdminDomesticCertification({ onBack }) {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -404,6 +404,15 @@ export default function AdminDomesticCertification() {
 
   return (
     <div className={styles.adminPage}>
+      <div className={styles.header1}>
+        <div className={styles.headerTop}>
+          {onBack && (
+            <button className={styles.backBtn} onClick={onBack}>
+              ← Back
+            </button>
+          )}
+        </div>
+      </div>
       <div className={styles.container}>
         {/* Header */}
         <div className={styles.header}>

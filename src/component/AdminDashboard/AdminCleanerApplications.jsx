@@ -25,7 +25,7 @@ const TRACK_OPTIONS = [
 
 const CITIES = ["Abuja", "Lagos"];
 
-export default function AdminCleanerApplications() {
+export default function AdminCleanerApplications({ onBack }) {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -378,6 +378,15 @@ export default function AdminCleanerApplications() {
   return (
     <div className={styles.adminPage}>
       <div className={styles.container}>
+        <div className={styles.header1}>
+          <div className={styles.headerTop}>
+            {onBack && (
+              <button className={styles.backBtn} onClick={onBack}>
+                ← Back
+              </button>
+            )}
+          </div>
+        </div>
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerLeft}>
