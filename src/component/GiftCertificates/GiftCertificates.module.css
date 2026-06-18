@@ -359,7 +359,7 @@
     border-color: rgb(187, 19, 47);
   }
 
-  /* Personalise form */
+  /* Personalise form - RESPONSIVE FIXES */
   .personalise {
     background: rgb(32, 32, 65);
     padding: 44px 20px;
@@ -380,11 +380,13 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    width: 100%;
   }
   .field {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    width: 100%;
   }
   .label {
     font-size: 12px;
@@ -403,12 +405,19 @@
     color: white;
     background: rgba(255, 255, 255, 0.07);
     outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
   }
   .input:focus {
     border-color: rgb(187, 19, 47);
   }
   .input::placeholder {
     color: rgba(255, 255, 255, 0.3);
+  }
+  .inputError {
+    border-color: rgb(187, 19, 47) !important;
   }
   .textarea {
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -422,6 +431,7 @@
     min-height: 90px;
     resize: vertical;
     width: 100%;
+    box-sizing: border-box;
   }
   .textarea:focus {
     border-color: rgb(187, 19, 47);
@@ -433,7 +443,25 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+    width: 100%;
   }
+
+  /* Mobile: stack inputs on smaller screens */
+  @media (max-width: 480px) {
+    .row {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
+
+  /* Tablet: keep 2 columns but adjust gap */
+  @media (min-width: 481px) and (max-width: 768px) {
+    .row {
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+  }
+
   .submitBtn {
     height: 50px;
     background: rgb(187, 19, 47);
@@ -445,6 +473,7 @@
     cursor: pointer;
     font-family: inherit;
     transition: background 0.15s;
+    width: 100%;
   }
   .submitBtn:hover {
     background: rgb(150, 15, 37);
@@ -453,6 +482,41 @@
     opacity: 0.6;
     cursor: not-allowed;
   }
+
+  /* Select dropdown inside form */
+  .select {
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background: rgba(255, 255, 255, 0.07);
+    color: white;
+    transition: border-color 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .select option {
+    background: rgb(32, 32, 65);
+    color: white;
+  }
+  .select:focus {
+    border-color: rgb(187, 19, 47);
+  }
+  .select option:hover {
+    background: rgb(187, 19, 47);
+  }
+
   .successCard {
     background: rgba(209, 247, 224, 0.15);
     border: 1px solid rgba(144, 238, 144, 0.3);
@@ -656,19 +720,106 @@
   .ctaSecondary:hover {
     border-color: white;
   }
-}
 
-@media screen and (min-width: 480px) {
-  .heroButtons {
-    flex-direction: row;
+  /* Error Message */
+  .errorMsg {
+    font-size: 11px;
+    color: rgb(187, 19, 47);
+    margin: 4px 0 0;
+  }
+
+  /* Spinner */
+  .spinnerRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     justify-content: center;
   }
-  .ctaButtons {
-    flex-direction: row;
-    justify-content: center;
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2.5px solid rgba(255, 255, 255, 0.35);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Secure Note */
+  .secureNote {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    margin: 8px 0 0;
+  }
+
+  /* API Error Box */
+  .apiErrorBox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(187, 19, 47, 0.15);
+    border: 1px solid #bb132f;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .apiErrorIcon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .apiErrorMessage {
+    font-size: 13px;
+    color: #bb132f;
+    margin: 0;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  /* Success Certificate Details */
+  .certificateDetails {
+    background: rgba(73, 221, 73, 0.08);
+    border: 1px solid rgba(73, 221, 73, 0.2);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    text-align: left;
+  }
+  .certificateDetails p {
+    margin: 6px 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .certificateDetails strong {
+    color: white;
+  }
+
+  /* Reset Button */
+  .resetBtn {
+    padding: 12px 28px;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    margin-top: 12px;
+  }
+  .resetBtn:hover {
+    border-color: rgb(73, 180, 73);
+    color: rgb(73, 180, 73);
   }
 }
 
+/* Tablet (576px+) */
 @media screen and (min-width: 576px) {
   .heroTitle {
     font-size: 40px;
@@ -686,6 +837,7 @@
   }
 }
 
+/* Tablet large (768px+) */
 @media screen and (min-width: 768px) {
   .section,
   .occasions,
@@ -711,6 +863,7 @@
   }
 }
 
+/* Desktop (992px+) */
 @media screen and (min-width: 992px) {
   .hero {
     padding: 80px 80px 70px;
@@ -739,184 +892,125 @@
   }
 }
 
-/* Add to GiftCertificates.module.css */
-
-/* API Error Box */
-.apiErrorBox {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(187, 19, 47, 0.08);
-  border: 1px solid #bb132f;
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-bottom: 18px;
-}
-
-.apiErrorIcon {
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.apiErrorMessage {
-  font-size: 13px;
-  color: #bb132f;
-  margin: 0;
-  line-height: 1.5;
-  flex: 1;
-}
-
-/* Success Certificate Details */
-.certificateDetails {
-  background: rgba(73, 221, 73, 0.08);
-  border: 1px solid rgba(73, 221, 73, 0.2);
-  border-radius: 10px;
-  padding: 16px 20px;
-  margin: 16px 0;
-  text-align: left;
-}
-
-.certificateDetails p {
-  margin: 6px 0;
-  font-size: 14px;
-  color: rgb(50, 50, 70);
-}
-
-.certificateDetails strong {
-  color: rgb(32, 32, 65);
-}
-
-.resetBtn {
-  padding: 12px 28px;
-  background: transparent;
-  border: 2px solid rgb(220, 218, 212);
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: rgb(32, 32, 65);
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-  margin-top: 12px;
-}
-
-.resetBtn:hover {
-  border-color: rgb(73, 180, 73);
-  color: rgb(73, 180, 73);
-}
-
-/* Select */
-.select {
-  height: 46px;
-  padding: 0 14px;
-  border: 1.5px solid rgb(220, 218, 212);
-  border-radius: 10px;
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  background: white;
-  color: rgb(32, 32, 65);
-  transition: border-color 0.15s;
-  box-sizing: border-box;
-  width: 100%;
-  appearance: none;
-  cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  padding-right: 36px;
-}
-
-.select:focus {
-  border-color: rgb(73, 180, 73);
-}
-
-/* Error Message */
-.errorMsg {
-  font-size: 11px;
-  color: rgb(187, 19, 47);
-  margin: 4px 0 0;
-}
-
-/* Custom Card */
-.customCard {
-  background: white;
-  border: 1px solid rgb(235, 232, 225);
-  border-radius: 12px;
-  padding: 16px 18px;
-}
-
-.customLabel {
-  font-size: 13px;
-  font-weight: 600;
-  color: rgb(50, 50, 70);
-  margin-bottom: 8px;
-}
-
-.customInput {
-  height: 46px;
-  padding: 0 14px;
-  border: 1.5px solid rgb(220, 218, 212);
-  border-radius: 10px;
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  background: white;
-  color: rgb(32, 32, 65);
-  transition: border-color 0.15s;
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.customInput:focus {
-  border-color: rgb(73, 180, 73);
-}
-
-/* Spinner */
-.spinnerRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: center;
-}
-
-.spinner {
-  width: 16px;
-  height: 16px;
-  border: 2.5px solid rgba(255, 255, 255, 0.35);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  display: inline-block;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+/* Mobile-specific fixes (max-width: 480px) */
+@media (max-width: 480px) {
+  .heroTitle {
+    font-size: 28px;
   }
-}
 
-/* Secure Note */
-.secureNote {
-  font-size: 12px;
-  color: gray;
-  text-align: center;
-  margin: 8px 0 0;
-}
+  .packageBody {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
 
-/* Input Error */
-.inputError {
-  border-color: rgb(187, 19, 47) !important;
-}
+  .packageLeft {
+    gap: 12px;
+  }
 
-/* Responsive adjustments */
-@media (max-width: 576px) {
+  .packageRight {
+    text-align: left;
+  }
+
+  .packagePrice {
+    font-size: 20px;
+  }
+
+  /* Form inputs full width on mobile */
+  .row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .input,
+  .select,
+  .textarea,
+  .customInput {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 0 12px;
+  }
+
+  .personalise {
+    padding: 30px 16px;
+  }
+
+  .personaliseTitle {
+    font-size: 20px;
+  }
+
+  .giftCard {
+    padding: 18px;
+  }
+
+  .giftCardAmount {
+    font-size: 32px;
+  }
+
+  .occasionGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .occasionCard {
+    padding: 12px;
+  }
+
+  .occasionEmoji {
+    font-size: 22px;
+  }
+
+  .ctaTitle {
+    font-size: 20px;
+  }
+
+  .heroButtons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .ctaButtons {
+    flex-direction: column;
+    align-items: center;
+  }
+
   .certificateDetails {
-    padding: 12px 16px;
+    padding: 12px 14px;
   }
 
   .certificateDetails p {
     font-size: 12px;
     word-break: break-word;
+  }
+}
+
+/* Extra small screens (max-width: 360px) */
+@media (max-width: 360px) {
+  .heroTitle {
+    font-size: 24px;
+  }
+
+  .giftCardAmount {
+    font-size: 28px;
+  }
+
+  .packageName {
+    font-size: 13px;
+  }
+
+  .packageEmoji {
+    font-size: 22px;
+  }
+
+  .occasionGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .occasionName {
+    font-size: 11px;
+  }
+
+  .heroDesc {
+    font-size: 13px;
   }
 }
