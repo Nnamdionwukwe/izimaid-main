@@ -1,4 +1,4 @@
-// GiftCertificates.jsx - Updated with backend API integration and Paystack
+// GiftCertificates.jsx - Updated with recipient phone number
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./GiftCertificates.module.css";
@@ -80,7 +80,7 @@ const HOW_STEPS = [
   {
     num: "2",
     title: "Personalise it",
-    text: "Add the recipient's name, your message, and choose a delivery date.",
+    text: "Add the recipient's name, phone, your message, and choose a delivery date.",
   },
   {
     num: "3",
@@ -112,6 +112,7 @@ export default function GiftCertificates() {
     from: "",
     to: "",
     email: "",
+    phone: "",
     date: "",
     message: "",
     occasion: "",
@@ -157,6 +158,14 @@ export default function GiftCertificates() {
     if (!form.email.trim()) e.email = "Please enter recipient's email";
     else if (!/\S+@\S+\.\S+/.test(form.email))
       e.email = "Please enter a valid email";
+    if (!form.phone.trim()) {
+      e.phone = "Please enter recipient's phone number";
+    } else {
+      const phoneRegex = /^[\+]?[0-9\s]{10,15}$/;
+      if (!phoneRegex.test(form.phone.replace(/\s/g, ""))) {
+        e.phone = "Please enter a valid phone number";
+      }
+    }
     if (!form.date) e.date = "Please select a delivery date";
     if (!finalAmount) e.amount = "Please select or enter an amount";
     else if (finalAmount < 1000) e.amount = "Minimum amount is ₦1,000";
@@ -180,6 +189,7 @@ export default function GiftCertificates() {
         from: form.from,
         to: form.to,
         email: form.email,
+        phone: form.phone,
         date: form.date,
         message: form.message || "",
         amount: finalAmount,
@@ -240,6 +250,7 @@ export default function GiftCertificates() {
       from: "",
       to: "",
       email: "",
+      phone: "",
       date: "",
       message: "",
       occasion: "",
@@ -412,6 +423,11 @@ export default function GiftCertificates() {
                   <strong>Expires:</strong>{" "}
                   {new Date(submittedData.expiresAt).toLocaleDateString()}
                 </p>
+                {submittedData.phone && (
+                  <p>
+                    <strong>Recipient Phone:</strong> {submittedData.phone}
+                  </p>
+                )}
               </div>
             )}
             <button className={styles.resetBtn} onClick={resetForm}>
@@ -470,6 +486,22 @@ export default function GiftCertificates() {
                 )}
               </div>
               <div className={styles.field}>
+                <label className={styles.label}>Recipient's Phone *</label>
+                <input
+                  className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
+                  type="tel"
+                  placeholder="e.g. 0803 0588 774"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                />
+                {errors.phone && (
+                  <p className={styles.errorMsg}>{errors.phone}</p>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.row}>
+              <div className={styles.field}>
                 <label className={styles.label}>Delivery Date *</label>
                 <input
                   className={`${styles.input} ${errors.date ? styles.inputError : ""}`}
@@ -481,22 +513,23 @@ export default function GiftCertificates() {
                   <p className={styles.errorMsg}>{errors.date}</p>
                 )}
               </div>
-            </div>
-
-            <div className={styles.field}>
-              <label className={styles.label}>Occasion (optional)</label>
-              <select
-                className={styles.select}
-                value={form.occasion}
-                onChange={(e) => setForm({ ...form, occasion: e.target.value })}
-              >
-                <option value="">Select an occasion...</option>
-                {OCCASIONS.map((o) => (
-                  <option key={o.name} value={o.name}>
-                    {o.emoji} {o.name}
-                  </option>
-                ))}
-              </select>
+              <div className={styles.field}>
+                <label className={styles.label}>Occasion (optional)</label>
+                <select
+                  className={styles.select}
+                  value={form.occasion}
+                  onChange={(e) =>
+                    setForm({ ...form, occasion: e.target.value })
+                  }
+                >
+                  <option value="">Select an occasion...</option>
+                  {OCCASIONS.map((o) => (
+                    <option key={o.name} value={o.name}>
+                      {o.emoji} {o.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className={styles.field}>

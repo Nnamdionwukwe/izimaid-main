@@ -919,3 +919,17 @@
     font-size: 12px;
   }
 }
+
+/* Add to GiftCertificates.module.css */
+
+/* Phone input field - inherit existing styles */
+/* The .input and .inputError classes already exist in your CSS */
+/* No additional styles needed as the phone field uses the same classes */
+
+/* Update responsive styles if needed */
+@media (max-width: 576px) {
+  .certificateDetails p {
+    font-size: 12px;
+    word-break: break-word;
+  }
+}

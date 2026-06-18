@@ -1,4 +1,4 @@
-// AdminGiftCertificates.jsx
+// AdminGiftCertificates.jsx - Updated with recipient phone number
 import { useState, useEffect, useCallback } from "react";
 import styles from "./AdminGiftCertificates.module.css";
 import axios from "axios";
@@ -224,6 +224,7 @@ export default function AdminGiftCertificates() {
       "From",
       "To",
       "Email",
+      "Phone",
       "Occasion",
       "Status",
       "Expires At",
@@ -237,6 +238,7 @@ export default function AdminGiftCertificates() {
       c.from_name,
       c.recipient_name,
       c.recipient_email,
+      c.recipient_phone || "N/A",
       c.occasion || "N/A",
       c.status,
       new Date(c.expires_at).toLocaleDateString(),
@@ -305,7 +307,8 @@ export default function AdminGiftCertificates() {
       c.certificate_code.toLowerCase().includes(search) ||
       c.from_name.toLowerCase().includes(search) ||
       c.recipient_name.toLowerCase().includes(search) ||
-      c.recipient_email.toLowerCase().includes(search)
+      c.recipient_email.toLowerCase().includes(search) ||
+      c.recipient_phone?.includes(search)
     );
   });
 
@@ -337,6 +340,7 @@ export default function AdminGiftCertificates() {
               <div>👤 From: {c.from_name}</div>
               <div>🎯 To: {c.recipient_name}</div>
               <div>📧 {c.recipient_email}</div>
+              {c.recipient_phone && <div>📱 {c.recipient_phone}</div>}
               {c.occasion && <div>🎉 {c.occasion}</div>}
               <div>📅 Expires: {formatDate(c.expires_at)}</div>
             </div>
@@ -507,7 +511,7 @@ export default function AdminGiftCertificates() {
             <input
               type="text"
               className={styles.searchInput}
-              placeholder="Search by code, from, to or email..."
+              placeholder="Search by code, from, to, email or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -656,7 +660,16 @@ export default function AdminGiftCertificates() {
                         </td>
                         <td className={styles.code}>{c.certificate_code}</td>
                         <td>{c.from_name}</td>
-                        <td>{c.recipient_name}</td>
+                        <td>
+                          <div className={styles.recipientInfo}>
+                            <div>{c.recipient_name}</div>
+                            {c.recipient_phone && (
+                              <div className={styles.recipientPhone}>
+                                {c.recipient_phone}
+                              </div>
+                            )}
+                          </div>
+                        </td>
                         <td className={styles.amount}>
                           {formatCurrency(c.amount)}
                         </td>
@@ -852,12 +865,18 @@ export default function AdminGiftCertificates() {
                       <p>{selectedCertificate.from_name}</p>
                     </div>
                     <div className={styles.detailItem}>
-                      <label>To</label>
+                      <label>Recipient Name</label>
                       <p>{selectedCertificate.recipient_name}</p>
                     </div>
                     <div className={styles.detailItem}>
                       <label>Recipient Email</label>
                       <p>{selectedCertificate.recipient_email}</p>
+                    </div>
+                    <div className={styles.detailItem}>
+                      <label>Recipient Phone</label>
+                      <p>
+                        {selectedCertificate.recipient_phone || "Not provided"}
+                      </p>
                     </div>
                     <div className={styles.detailItem}>
                       <label>Occasion</label>

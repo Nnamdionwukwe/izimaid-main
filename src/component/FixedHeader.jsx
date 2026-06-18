@@ -3,6 +3,8 @@ import styles from "./FixedHeader.module.css";
 import SideBar from "./SideBar";
 import { useNavigate } from "react-router-dom";
 
+const logo = "deusizi.jpg";
+
 export default function FixedHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
@@ -18,7 +20,7 @@ export default function FixedHeader() {
 
         <div className={styles.header}>
           <div onClick={() => navigate("/")}>
-            <img className={styles.logo} alt="Logo" src="deusizi.jpg" />
+            <img className={styles.logo} alt="Logo" src={logo} />
           </div>
 
           <div className={styles.hamburger}>

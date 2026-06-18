@@ -1052,3 +1052,25 @@
     animation: none !important;
   }
 }
+
+/* Add to AdminGiftCertificates.module.css */
+
+/* Recipient Info in Table */
+.recipientInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.recipientPhone {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: monospace;
+}
+
+/* Mobile Card - Phone display */
+.mobileCardDetails .recipientPhone {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: monospace;
+}
