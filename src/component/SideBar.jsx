@@ -10,6 +10,8 @@ import CleaningTipsSideBar from "./CleaningTipsSIdeBar";
 import PracticalSideBar from "./PracticalSideBar";
 import DeusiziAcademy from "./DeusiziAcademy";
 
+const logo = "/deusizi.jpg";
+
 export default function SideBar({ isOpen, setIsOpen }) {
   const [isClose, setIsClose] = useState(false);
   const [isOpen2, setIsOpen2] = useState(true);
@@ -211,7 +213,7 @@ export default function SideBar({ isOpen, setIsOpen }) {
           </div>
 
           <a href="https://deusizisparkle.com">
-            <img className={styles.logo} alt="Logo" src="deusizi.jpg" />
+            <img className={styles.logo} alt="Logo" src={logo} />
           </a>
 
           <div className={styles.SubHeader2}>
