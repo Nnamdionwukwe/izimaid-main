@@ -1,6 +1,18 @@
 // src/component/Maids/Maids.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  FaArrowLeft,
+  FaMapMarkerAlt,
+  FaStar,
+  FaMoneyBill,
+  FaMap,
+  FaTimes,
+  FaExclamationTriangle,
+  FaCheck,
+  FaSpinner,
+  FaLocationArrow,
+} from "react-icons/fa";
 import styles from "./Maids.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
@@ -92,8 +104,6 @@ export default function Maids() {
   const [geoError, setGeoError] = useState("");
 
   // ── Fetch ALL maids — NO radius filter — we sort distance client-side
-  // This guarantees we never show "No maids found" just because
-  // the maid hasn't saved GPS coordinates in their profile yet.
   useEffect(() => {
     let cancelled = false;
     async function fetchMaids() {
@@ -101,8 +111,6 @@ export default function Maids() {
       try {
         const params = new URLSearchParams({ limit: 200 });
         if (service !== "All") params.set("service", service);
-        // ⚠️ Do NOT pass lat/lng to backend — backend radius filter would
-        //    exclude maids with no coordinates set. We compute distance here.
         const res = await fetch(`${API_URL}/api/maids?${params}`);
         const data = await res.json();
         if (!cancelled) setAllMaids(data.maids || []);
@@ -178,7 +186,6 @@ export default function Maids() {
   // ── Sort ─────────────────────────────────────────────────────────────
   const sorted = [...filtered].sort((a, b) => {
     if (sortBy === "distance") {
-      // Maids with no GPS coordinates sort to end — never excluded
       return (a._dist ?? 99999) - (b._dist ?? 99999);
     }
     if (sortBy === "rate_asc") {
@@ -187,13 +194,13 @@ export default function Maids() {
         Number(b.hourly_rate || b.rate_hourly || 0)
       );
     }
-    return Number(b.rating || 0) - Number(a.rating || 0); // rating DESC
+    return Number(b.rating || 0) - Number(a.rating || 0);
   });
 
   return (
     <div className={styles.page}>
       <button className={styles.backLink} onClick={() => navigate(-1)}>
-        ← Back
+        <FaArrowLeft /> Back
       </button>
       <h1 className={styles.pageTitle}>Find a Maid</h1>
       <p className={styles.pageSubtitle}>
@@ -214,21 +221,31 @@ export default function Maids() {
             onClick={handleUseLocation}
             disabled={geoStatus === "loading"}
           >
-            {geoStatus === "loading"
-              ? "📍 Getting location…"
-              : "📍 Use my location"}
+            {geoStatus === "loading" ? (
+              <>
+                <FaSpinner className={styles.spinner} /> Getting location…
+              </>
+            ) : (
+              <>
+                <FaMapMarkerAlt /> Use my location
+              </>
+            )}
           </button>
         ) : (
           <button
             className={`${styles.geoBtn} ${styles.geoBtnActive}`}
             onClick={clearLocation}
           >
-            📍 Near me ✕
+            <FaMapMarkerAlt /> Near me <FaTimes />
           </button>
         )}
       </div>
 
-      {geoError && <p className={styles.geoError}>⚠️ {geoError}</p>}
+      {geoError && (
+        <p className={styles.geoError}>
+          <FaExclamationTriangle /> {geoError}
+        </p>
+      )}
 
       {/* ── Service chips ───────────────────────────────────────── */}
       <div className={styles.filters}>
@@ -251,14 +268,14 @@ export default function Maids() {
           className={`${styles.sortBtn} ${sortBy === "rating" ? styles.sortBtnActive : ""}`}
           onClick={() => setSortBy("rating")}
         >
-          ⭐ Top Rated
+          <FaStar /> Top Rated
         </button>
 
         <button
           className={`${styles.sortBtn} ${sortBy === "rate_asc" ? styles.sortBtnActive : ""}`}
           onClick={() => setSortBy("rate_asc")}
         >
-          💰 Lowest Rate
+          <FaMoneyBill /> Lowest Rate
         </button>
 
         <button
@@ -267,7 +284,15 @@ export default function Maids() {
             geoStatus === "ok" ? setSortBy("distance") : handleUseLocation()
           }
         >
-          {geoStatus === "loading" ? "📍 Getting…" : "📍 Nearest First"}
+          {geoStatus === "loading" ? (
+            <>
+              <FaSpinner className={styles.spinner} /> Getting…
+            </>
+          ) : (
+            <>
+              <FaLocationArrow /> Nearest First
+            </>
+          )}
         </button>
       </div>
 
@@ -332,7 +357,7 @@ export default function Maids() {
                   </div>
                   {maid.id_verified && (
                     <span className={styles.verifiedDot} title="ID Verified">
-                      ✓
+                      <FaCheck />
                     </span>
                   )}
                 </div>
@@ -342,26 +367,30 @@ export default function Maids() {
                   <div className={styles.cardNameRow}>
                     <p className={styles.cardName}>{maid.name}</p>
                     {maid.id_verified && (
-                      <span className={styles.verifiedTag}>✓ Verified</span>
+                      <span className={styles.verifiedTag}>
+                        <FaCheck /> Verified
+                      </span>
                     )}
                   </div>
 
                   {maid.location && (
-                    <p className={styles.cardLocation}>📍 {maid.location}</p>
+                    <p className={styles.cardLocation}>
+                      <FaMapMarkerAlt /> {maid.location}
+                    </p>
                   )}
 
                   {/* Distance — shown when location is active */}
                   {geoStatus === "ok" &&
                     (dist != null ? (
                       <p className={styles.cardDistance}>
-                        🗺{" "}
+                        <FaMap />{" "}
                         {dist < 1
                           ? `${(dist * 1000).toFixed(0)} m away`
                           : `${dist.toFixed(1)} km away`}
                       </p>
                     ) : (
                       <p className={styles.cardDistanceUnknown}>
-                        📍 Location not set by maid
+                        <FaMapMarkerAlt /> Location not set by maid
                       </p>
                     ))}
 
@@ -385,7 +414,7 @@ export default function Maids() {
                   <div className={styles.cardMeta}>
                     <div>
                       <span className={styles.cardRating}>
-                        ★ {Number(maid.rating || 0).toFixed(1)}
+                        <FaStar /> {Number(maid.rating || 0).toFixed(1)}
                       </span>
                       <span className={styles.cardReviews}>
                         ({maid.total_reviews || 0})

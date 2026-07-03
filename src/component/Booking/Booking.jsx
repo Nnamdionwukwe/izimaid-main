@@ -1,6 +1,25 @@
 // src/component/Booking/Booking.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import {
+  FaArrowLeft,
+  FaClock,
+  FaCalendarDay,
+  FaCalendarWeek,
+  FaCalendarAlt,
+  FaStar,
+  FaHandshake,
+  FaMapMarkerAlt,
+  FaCity,
+  FaGlobe,
+  FaPen,
+  FaLock,
+  FaCheck,
+  FaMinus,
+  FaPlus,
+  FaSpinner,
+  FaInfoCircle,
+} from "react-icons/fa";
 import styles from "./Booking.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
@@ -118,7 +137,7 @@ function buildRateOptions(maid, s) {
     options.push({
       id: "hourly",
       label: "Hourly",
-      icon: "⏱",
+      icon: <FaClock />,
       price: hourly,
       unit: "/hr",
       rateType: "hourly",
@@ -127,7 +146,7 @@ function buildRateOptions(maid, s) {
     options.push({
       id: "daily",
       label: "Daily",
-      icon: "📅",
+      icon: <FaCalendarDay />,
       price: daily,
       unit: "/day",
       rateType: "daily",
@@ -136,7 +155,7 @@ function buildRateOptions(maid, s) {
     options.push({
       id: "weekly",
       label: "Weekly",
-      icon: "🗓",
+      icon: <FaCalendarWeek />,
       price: weekly,
       unit: "/week",
       rateType: "weekly",
@@ -145,7 +164,7 @@ function buildRateOptions(maid, s) {
     options.push({
       id: "monthly",
       label: "Monthly",
-      icon: "📆",
+      icon: <FaCalendarAlt />,
       price: monthly,
       unit: "/month",
       rateType: "monthly",
@@ -162,7 +181,7 @@ function buildRateOptions(maid, s) {
           options.push({
             id: `custom_${label}`,
             label,
-            icon: "✨",
+            icon: <FaStar />,
             price: Number(price),
             unit: "",
             rateType: "custom",
@@ -176,7 +195,7 @@ function buildRateOptions(maid, s) {
   options.push({
     id: "negotiated",
     label: "Custom / Negotiated",
-    icon: "🤝",
+    icon: <FaHandshake />,
     price: null,
     unit: "",
     rateType: "negotiated",
@@ -398,7 +417,7 @@ export default function Booking() {
   return (
     <div className={styles.page}>
       <button className={styles.backBtn} onClick={() => navigate("/maids")}>
-        ← Back to maids
+        <FaArrowLeft /> Back to maids
       </button>
 
       {/* ── Maid card ───────────────────────────────────────────── */}
@@ -428,7 +447,9 @@ export default function Booking() {
             /hr · {currency}
           </p>
           {maid.id_verified && (
-            <span className={styles.maidVerified}>✓ Verified</span>
+            <span className={styles.maidVerified}>
+              <FaCheck /> Verified
+            </span>
           )}
         </div>
       </div>
@@ -474,7 +495,9 @@ export default function Booking() {
                     )}
                   </div>
                   {isSelected && (
-                    <span className={styles.rateCardCheck}>✓</span>
+                    <span className={styles.rateCardCheck}>
+                      <FaCheck />
+                    </span>
                   )}
                 </button>
               );
@@ -486,12 +509,7 @@ export default function Booking() {
         {selected && selected.rateType !== "negotiated" && (
           <div className={styles.field}>
             <label className={styles.label}>
-              {selected.rateType === "hourly" && "⏱ "}
-              {selected.rateType === "daily" && "📅 "}
-              {selected.rateType === "weekly" && "🗓 "}
-              {selected.rateType === "monthly" && "📆 "}
-              {selected.rateType === "custom" && "✨ "}
-              {durationLabel()} *
+              <FaClock /> {durationLabel()} *
             </label>
             <div className={styles.durationRow}>
               <button
@@ -503,7 +521,7 @@ export default function Booking() {
                   )
                 }
               >
-                −
+                <FaMinus />
               </button>
               <input
                 className={`${styles.input} ${styles.durationInput}`}
@@ -526,7 +544,7 @@ export default function Booking() {
                   )
                 }
               >
-                +
+                <FaPlus />
               </button>
             </div>
             {/* Live cost preview */}
@@ -550,7 +568,7 @@ export default function Booking() {
           <>
             <div className={styles.field}>
               <label className={styles.label}>
-                🤝 Agreed Total Price ({currency})
+                <FaHandshake /> Agreed Total Price ({currency})
               </label>
               <p className={styles.fieldHint}>
                 Enter the total amount you and the maid agreed on.
@@ -572,7 +590,9 @@ export default function Booking() {
             </div>
 
             <div className={styles.field}>
-              <label className={styles.label}>⏳ Agreed Duration</label>
+              <label className={styles.label}>
+                <FaClock /> Agreed Duration
+              </label>
               <p className={styles.fieldHint}>
                 How long did you agree the service will run?
               </p>
@@ -587,7 +607,7 @@ export default function Booking() {
                       )
                     }
                   >
-                    −
+                    <FaMinus />
                   </button>
                   <input
                     className={`${styles.input} ${styles.durationInput}`}
@@ -606,7 +626,7 @@ export default function Booking() {
                       setNegotiatedQty((q) => String(Number(q) + 1))
                     }
                   >
-                    +
+                    <FaPlus />
                   </button>
                 </div>
                 <select
@@ -622,7 +642,7 @@ export default function Booking() {
                 </select>
               </div>
               <p className={styles.negotiatedNote}>
-                ℹ️ {negotiatedQty}{" "}
+                <FaInfoCircle /> {negotiatedQty}{" "}
                 {NEGOT_UNITS.find(
                   (u) => u.value === negotiatedUnit,
                 )?.label.toLowerCase()}
@@ -637,7 +657,9 @@ export default function Booking() {
 
         {/* ── Date ──────────────────────────────────────────────── */}
         <div className={styles.field}>
-          <label className={styles.label}>📅 Service Date & Time *</label>
+          <label className={styles.label}>
+            <FaCalendarAlt /> Service Date & Time *
+          </label>
           <input
             className={styles.input}
             type="datetime-local"
@@ -651,14 +673,22 @@ export default function Booking() {
         {/* ── Address ───────────────────────────────────────────── */}
         <div className={styles.field}>
           <div className={styles.labelRow}>
-            <label className={styles.label}>📍 Service Address *</label>
+            <label className={styles.label}>
+              <FaMapMarkerAlt /> Service Address *
+            </label>
             <button
               type="button"
               className={styles.geoLink}
               onClick={getCurrentLocation}
               disabled={gettingLocation}
             >
-              {gettingLocation ? "Getting location…" : "Use my location"}
+              {gettingLocation ? (
+                <>
+                  <FaSpinner className={styles.spinner} /> Getting location…
+                </>
+              ) : (
+                "Use my location"
+              )}
             </button>
           </div>
           <input
@@ -671,11 +701,29 @@ export default function Booking() {
           />
           {detectedAddress && (
             <div className={styles.addressBox}>
-              <p className={styles.addressBoxTitle}>📍 Detected:</p>
-              {detectedAddress.street && <p>🏠 {detectedAddress.street}</p>}
-              {detectedAddress.city && <p>🏙️ {detectedAddress.city}</p>}
-              {detectedAddress.state && <p>📌 {detectedAddress.state}</p>}
-              {detectedAddress.country && <p>🌍 {detectedAddress.country}</p>}
+              <p className={styles.addressBoxTitle}>
+                <FaMapMarkerAlt /> Detected:
+              </p>
+              {detectedAddress.street && (
+                <p>
+                  <FaCity /> {detectedAddress.street}
+                </p>
+              )}
+              {detectedAddress.city && (
+                <p>
+                  <FaCity /> {detectedAddress.city}
+                </p>
+              )}
+              {detectedAddress.state && (
+                <p>
+                  <FaGlobe /> {detectedAddress.state}
+                </p>
+              )}
+              {detectedAddress.country && (
+                <p>
+                  <FaGlobe /> {detectedAddress.country}
+                </p>
+              )}
             </div>
           )}
           {locationError && (
@@ -686,7 +734,7 @@ export default function Booking() {
         {/* ── Notes ─────────────────────────────────────────────── */}
         <div className={styles.field}>
           <label className={styles.label}>
-            📝 Notes <span className={styles.optional}>(optional)</span>
+            <FaPen /> Notes <span className={styles.optional}>(optional)</span>
           </label>
           <textarea
             className={styles.textarea}
@@ -755,8 +803,8 @@ export default function Booking() {
 
         {/* ── Payment note ──────────────────────────────────────── */}
         <div className={styles.paymentNote}>
-          🔒 After booking, you'll be taken to payment. Your booking is only
-          confirmed after payment and admin approval.
+          <FaLock /> After booking, you'll be taken to payment. Your booking is
+          only confirmed after payment and admin approval.
         </div>
 
         {error && <p className={styles.error}>{error}</p>}
@@ -766,9 +814,15 @@ export default function Booking() {
           onClick={handleSubmit}
           disabled={loading || total <= 0}
         >
-          {loading
-            ? "Creating booking…"
-            : `Continue to Payment → ${total > 0 ? `(${s}${total.toLocaleString()})` : ""}`}
+          {loading ? (
+            <>
+              <FaSpinner className={styles.spinner} /> Creating booking…
+            </>
+          ) : (
+            `Continue to Payment → ${
+              total > 0 ? `(${s}${total.toLocaleString()})` : ""
+            }`
+          )}
         </button>
       </div>
     </div>

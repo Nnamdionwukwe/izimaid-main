@@ -1,6 +1,24 @@
 // src/component/MaidDetail/MaidDetail.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  FaArrowLeft,
+  FaMapMarkerAlt,
+  FaStar,
+  FaCheck,
+  FaShieldAlt,
+  FaPhoneAlt,
+  FaEnvelope,
+  FaCommentDots,
+  FaClock,
+  FaCalendarAlt,
+  FaBriefcase,
+  FaGraduationCap,
+  FaGlobe,
+  FaUser,
+  FaInfoCircle,
+  FaTimes,
+} from "react-icons/fa";
 import styles from "./MaidDetail.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
@@ -103,8 +121,6 @@ export default function MaidDetail() {
 
   const totalPages = Math.ceil(totalReviews / REVIEWS_PER_PAGE);
 
-  // Remove the booking lookup useEffect and latestBookingId state.
-  // Replace with just:
   const token = localStorage.getItem("token");
   const userStr = localStorage.getItem("user");
   const currentUser = userStr ? JSON.parse(userStr) : null;
@@ -127,7 +143,7 @@ export default function MaidDetail() {
         <div style={{ textAlign: "center", padding: "40px 20px" }}>
           <p style={{ color: "gray", marginBottom: 16 }}>Maid not found</p>
           <button className={styles.backBtn} onClick={() => navigate("/maids")}>
-            ← Back to maids
+            <FaArrowLeft /> Back to maids
           </button>
         </div>
       </div>
@@ -137,7 +153,7 @@ export default function MaidDetail() {
   const s = sym(c);
   const hasRates = maid.rate_daily || maid.rate_weekly || maid.rate_monthly;
 
-  // Parse custom rates — stored as JSONB object { "Deep Clean": 5000, ... }
+  // Parse custom rates
   let customRates = [];
   if (maid.rate_custom) {
     try {
@@ -151,7 +167,7 @@ export default function MaidDetail() {
     } catch {}
   }
 
-  // Availability — group by day, sort by day_of_week
+  // Availability
   const availByDay = {};
   availability.forEach((a) => {
     availByDay[a.day_of_week] = a;
@@ -161,7 +177,7 @@ export default function MaidDetail() {
   return (
     <div className={styles.page}>
       <button className={styles.backBtn} onClick={() => navigate("/maids")}>
-        ← Back to maids
+        <FaArrowLeft /> Back to maids
       </button>
 
       {/* ── Header ─────────────────────────────────────────────── */}
@@ -200,7 +216,7 @@ export default function MaidDetail() {
                     color: "rgb(27,94,32)",
                   }}
                 >
-                  🪪 Verified
+                  <FaCheck /> Verified
                 </span>
               )}
               {maid.background_checked && (
@@ -211,26 +227,29 @@ export default function MaidDetail() {
                     color: "rgb(13,71,161)",
                   }}
                 >
-                  🔍 Checked
+                  <FaShieldAlt /> Checked
                 </span>
               )}
             </div>
           </div>
 
           {maid.location && (
-            <p className={styles.location}>📍 {maid.location}</p>
+            <p className={styles.location}>
+              <FaMapMarkerAlt /> {maid.location}
+            </p>
           )}
 
           <div className={styles.rating}>
             <span className={styles.ratingNumber}>
-              ★ {Number(maid.rating || 0).toFixed(1)}
+              <FaStar /> {Number(maid.rating || 0).toFixed(1)}
             </span>
             <span className={styles.ratingCount}>
               ({maid.total_reviews || 0} reviews)
             </span>
             {maid.years_exp > 0 && (
               <span className={styles.expPill}>
-                🎓 {maid.years_exp} yr{maid.years_exp !== 1 ? "s" : ""} exp
+                <FaGraduationCap /> {maid.years_exp} yr
+                {maid.years_exp !== 1 ? "s" : ""} exp
               </span>
             )}
           </div>
@@ -252,20 +271,26 @@ export default function MaidDetail() {
           </div>
 
           {maid.pricing_note && (
-            <p className={styles.pricingNote}>💬 {maid.pricing_note}</p>
+            <p className={styles.pricingNote}>
+              <FaInfoCircle /> {maid.pricing_note}
+            </p>
           )}
 
           {/* ── Contact row ──────────────────────────────────────── */}
           <div className={styles.contactRow}>
             {maid.phone && (
               <a href={`tel:${maid.phone}`} className={styles.contactChip}>
-                <span className={styles.contactChipIcon}>📞</span>
+                <span className={styles.contactChipIcon}>
+                  <FaPhoneAlt />
+                </span>
                 <span className={styles.contactChipText}>{maid.phone}</span>
               </a>
             )}
             {maid.email && (
               <a href={`mailto:${maid.email}`} className={styles.contactChip}>
-                <span className={styles.contactChipIcon}>✉️</span>
+                <span className={styles.contactChipIcon}>
+                  <FaEnvelope />
+                </span>
                 <span className={styles.contactChipText}>{maid.email}</span>
               </a>
             )}
@@ -287,14 +312,14 @@ export default function MaidDetail() {
                   navigate(`/chat/inquiry/${maid.id}`, { state: { maid } })
                 }
               >
-                💬 Message
+                <FaCommentDots /> Message
               </button>
             ) : !token ? (
               <button
                 className={styles.chatBtn}
                 onClick={() => navigate("/login")}
               >
-                💬 Login to Message
+                <FaCommentDots /> Login to Message
               </button>
             ) : null}
           </div>
@@ -419,17 +444,29 @@ export default function MaidDetail() {
             <h2 className={styles.sectionTitle}>Details</h2>
             <div className={styles.experienceBox}>
               <div className={styles.experienceItem}>
-                <span className={styles.experienceLabel}>Experience</span>
+                <span className={styles.experienceLabel}>
+                  <FaBriefcase /> Experience
+                </span>
                 <span className={styles.experienceValue}>
                   {Number(maid.years_exp || 0)} years
                 </span>
               </div>
               <div className={styles.experienceItem}>
-                <span className={styles.experienceLabel}>Status</span>
+                <span className={styles.experienceLabel}>
+                  <FaClock /> Status
+                </span>
                 <span
                   className={`${styles.experienceValue} ${maid.is_available ? styles.available : styles.unavailable}`}
                 >
-                  {maid.is_available ? "✅ Available" : "❌ Unavailable"}
+                  {maid.is_available ? (
+                    <>
+                      <FaCheck style={{ color: "#28a745" }} /> Available
+                    </>
+                  ) : (
+                    <>
+                      <FaTimes style={{ color: "#dc3545" }} /> Unavailable
+                    </>
+                  )}
                 </span>
               </div>
               {maid.languages?.length > 0 && (
@@ -437,7 +474,9 @@ export default function MaidDetail() {
                   className={styles.experienceItem}
                   style={{ gridColumn: "1/-1" }}
                 >
-                  <span className={styles.experienceLabel}>Languages</span>
+                  <span className={styles.experienceLabel}>
+                    <FaGlobe /> Languages
+                  </span>
                   <span className={styles.experienceValue}>
                     {maid.languages.join(", ")}
                   </span>
@@ -445,7 +484,9 @@ export default function MaidDetail() {
               )}
               {maid.member_since && (
                 <div className={styles.experienceItem}>
-                  <span className={styles.experienceLabel}>Member Since</span>
+                  <span className={styles.experienceLabel}>
+                    <FaCalendarAlt /> Member Since
+                  </span>
                   <span className={styles.experienceValue}>
                     {formatDate(maid.member_since)}
                   </span>
@@ -480,7 +521,7 @@ export default function MaidDetail() {
                     <div className={styles.reviewHeader}>
                       <div className={styles.reviewerInfo}>
                         <div className={styles.reviewerAvatar}>
-                          {initials(review.customer_name || "Anonymous")}
+                          <FaUser />
                         </div>
                         <div>
                           <p className={styles.reviewerName}>
@@ -492,8 +533,15 @@ export default function MaidDetail() {
                         </div>
                       </div>
                       <div className={styles.reviewRating}>
-                        {"★".repeat(review.rating)}
-                        {"☆".repeat(5 - review.rating)}
+                        {[...Array(review.rating)].map((_, i) => (
+                          <FaStar key={i} style={{ color: "#f5b342" }} />
+                        ))}
+                        {[...Array(5 - review.rating)].map((_, i) => (
+                          <FaStar
+                            key={i + review.rating}
+                            style={{ color: "#ddd" }}
+                          />
+                        ))}
                       </div>
                     </div>
                     {review.comment && (
@@ -510,7 +558,7 @@ export default function MaidDetail() {
                     disabled={page === 1}
                     onClick={() => setPage((p) => p - 1)}
                   >
-                    ← Prev
+                    <FaArrowLeft /> Prev
                   </button>
                   <span className={styles.pageInfo}>
                     {page} / {totalPages}
@@ -520,7 +568,7 @@ export default function MaidDetail() {
                     disabled={page === totalPages}
                     onClick={() => setPage((p) => p + 1)}
                   >
-                    Next →
+                    Next <FaArrowRight />
                   </button>
                 </div>
               )}
