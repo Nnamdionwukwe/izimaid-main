@@ -1,5 +1,13 @@
-// src/component/Payment/CryptoPaymentOptions.jsx
 import { useState, useEffect } from "react";
+import {
+  FaSync,
+  FaArrowLeft,
+  FaArrowRight,
+  FaExclamationTriangle,
+  FaDollarSign,
+} from "react-icons/fa";
+import { IoLogoBitcoin } from "react-icons/io5";
+import { SiEthereum, SiTether } from "react-icons/si";
 import styles from "./Payment.module.css";
 
 // ── Supported cryptos (without BNB) ──────────────────────────────
@@ -8,28 +16,28 @@ const CRYPTO_OPTIONS = [
     id: "bitcoin",
     symbol: "BTC",
     name: "Bitcoin",
-    logo: "₿",
+    icon: <IoLogoBitcoin />,
     color: "#F7931A",
   },
   {
     id: "ethereum",
     symbol: "ETH",
     name: "Ethereum",
-    logo: "⟠",
+    icon: <SiEthereum />,
     color: "#627EEA",
   },
   {
     id: "tether",
     symbol: "USDT",
     name: "Tether (ERC20)",
-    logo: "₮",
+    icon: <SiTether />,
     color: "#26A17B",
   },
   {
     id: "usd-coin",
     symbol: "USDC",
     name: "USD Coin",
-    logo: "●",
+    icon: <FaDollarSign />, // reliable fallback for USDC
     color: "#2775CA",
   },
 ];
@@ -78,13 +86,11 @@ export default function CryptoPaymentOptions({
     setError("");
     try {
       const ids = CRYPTO_OPTIONS.map((c) => c.id).join(",");
-      // Use the actual currency (fallback to NGN if not provided)
       const vsCurrency = currency?.toLowerCase() || "ngn";
       const res = await fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=${vsCurrency}`,
       );
       if (!res.ok) {
-        // If the currency is not supported, fallback to NGN
         if (res.status === 400) {
           throw new Error(
             `Currency "${currency}" is not supported by the exchange rate service.`,
@@ -105,13 +111,11 @@ export default function CryptoPaymentOptions({
 
   useEffect(() => {
     fetchRates();
-    const interval = setInterval(fetchRates, 60000); // refresh every 60s
+    const interval = setInterval(fetchRates, 60000);
     return () => clearInterval(interval);
-  }, [currency]); // re-fetch if currency changes
+  }, [currency]);
 
-  const handleSelect = (cryptoId) => {
-    setSelected(cryptoId);
-  };
+  const handleSelect = (cryptoId) => setSelected(cryptoId);
 
   const handleConfirm = () => {
     if (selected) {
@@ -161,14 +165,13 @@ export default function CryptoPaymentOptions({
 
   const fiatAmount = Number(amount);
   const vsCurrency = currency?.toLowerCase() || "ngn";
-  const selectedCrypto = CRYPTO_OPTIONS.find((c) => c.id === selected);
 
   return (
     <div className={styles.card}>
       <div className={styles.rateHeader}>
         <p className={styles.cardTitle}>Choose your crypto</p>
         <button className={styles.refreshBtn} onClick={fetchRates}>
-          ↻ Refresh rates
+          <FaSync /> Refresh rates
         </button>
       </div>
       <p className={styles.rateSub}>
@@ -190,7 +193,7 @@ export default function CryptoPaymentOptions({
                 className={styles.cryptoLogo}
                 style={{ color: crypto.color }}
               >
-                {crypto.logo}
+                {crypto.icon}
               </div>
               <div className={styles.cryptoInfo}>
                 <span className={styles.cryptoSymbol}>{crypto.symbol}</span>
@@ -208,7 +211,7 @@ export default function CryptoPaymentOptions({
                   </>
                 ) : (
                   <span className={styles.cryptoUnavailable}>
-                    Rate unavailable
+                    <FaExclamationTriangle /> Rate unavailable
                   </span>
                 )}
               </div>
@@ -218,7 +221,7 @@ export default function CryptoPaymentOptions({
       </div>
       <div className={styles.cryptoActions}>
         <button className={styles.ghostBtn} onClick={onBack}>
-          ← Back
+          <FaArrowLeft /> Back
         </button>
         <button
           className={styles.payBtn}
@@ -226,11 +229,11 @@ export default function CryptoPaymentOptions({
           onClick={handleConfirm}
           style={{ background: "#F7931A" }}
         >
-          Confirm & Proceed →
+          Confirm & Proceed <FaArrowRight />
         </button>
       </div>
       <p className={styles.secureNote}>
-        🔐 Exchange rates update automatically every 60 seconds.
+        <FaSync /> Exchange rates update automatically every 60 seconds.
       </p>
     </div>
   );

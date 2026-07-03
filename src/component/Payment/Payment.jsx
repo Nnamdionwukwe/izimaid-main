@@ -1,6 +1,20 @@
 // src/component/Payment/Payment.jsx – Flutterwave + Bank Transfer + Crypto (Trust Wallet)
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import {
+  FaCopy,
+  FaPaperclip,
+  FaCheck,
+  FaTimes,
+  FaArrowLeft,
+  FaArrowRight,
+  FaSync,
+  FaExclamationTriangle,
+  FaLock,
+  FaUniversity,
+  FaCreditCard,
+} from "react-icons/fa";
+import { IoLogoBitcoin } from "react-icons/io5";
 import styles from "./Payment.module.css";
 import CryptoPaymentOptions from "./CryptoPaymentOptions";
 
@@ -74,14 +88,14 @@ const ALT_METHODS = [
     id: "bank",
     label: "Bank Transfer",
     sublabel: "Manual — upload proof after transfer",
-    icon: "🏦",
+    icon: <FaUniversity />,
     color: "#1a2466",
   },
   {
     id: "crypto",
     label: "Cryptocurrency",
     sublabel: "BTC · ETH · USDT · USDC – send and submit proof",
-    icon: "₿",
+    icon: <IoLogoBitcoin />,
     color: "#F7931A",
   },
 ];
@@ -109,16 +123,14 @@ export default function Payment() {
   const token = localStorage.getItem("token");
 
   const [selectedCryptoCurrency, setSelectedCryptoCurrency] = useState("USDT");
-
   const [selectedCryptoData, setSelectedCryptoData] = useState(null);
-
-  const [modalMessage, setModalMessage] = useState(null); // 👈 NEW
+  const [modalMessage, setModalMessage] = useState(null);
 
   // ── Modal helpers ──────────────────────────────────────────────────
   const showModal = (msg) => setModalMessage(msg);
   const hideModal = () => setModalMessage(null);
 
-  // ── Copy function (inside pending_crypto block) ──────────────────
+  // ── Copy function ──────────────────────────────────────────────────
   const copyToClipboard = (text) => {
     navigator.clipboard
       .writeText(text)
@@ -126,7 +138,6 @@ export default function Payment() {
         showModal("Copied to clipboard!");
       })
       .catch(() => {
-        // Fallback for older browsers
         const textarea = document.createElement("textarea");
         textarea.value = text;
         document.body.appendChild(textarea);
@@ -196,7 +207,7 @@ export default function Payment() {
     try {
       const body = { booking_id: booking.id };
       if (method === "crypto") {
-        body.currency = currencyOverride || "USDT"; // use the selected one
+        body.currency = currencyOverride || "USDT";
       }
       const res = await fetch(`${API_URL}${endpoints[method]}`, {
         method: "POST",
@@ -328,7 +339,9 @@ export default function Payment() {
     return (
       <div className={styles.page}>
         <div className={`${styles.statusCard} ${styles.statusSuccess}`}>
-          <div className={styles.statusIcon}>✅</div>
+          <div className={styles.statusIcon}>
+            <FaCheck />
+          </div>
           <p className={styles.statusTitle}>
             {payStatus === "success_bank"
               ? "Proof Submitted!"
@@ -357,7 +370,9 @@ export default function Payment() {
     return (
       <div className={styles.page}>
         <div className={`${styles.statusCard} ${styles.statusFailed}`}>
-          <div className={styles.statusIcon}>❌</div>
+          <div className={styles.statusIcon}>
+            <FaTimes />
+          </div>
           <p className={styles.statusTitle}>Payment Failed</p>
           <p className={styles.statusText}>
             {error || "Could not process payment. Please try again."}
@@ -385,7 +400,6 @@ export default function Payment() {
   if (payStatus === "pending_bank" && bankDetails) {
     return (
       <div className={styles.page}>
-        {/* Back button to return to payment options */}
         <button
           className={styles.backBtn}
           onClick={() => {
@@ -396,7 +410,7 @@ export default function Payment() {
             setProofUrl("");
           }}
         >
-          ← Back to payment options
+          <FaArrowLeft /> Back to payment options
         </button>
 
         <div className={styles.card}>
@@ -430,8 +444,9 @@ export default function Payment() {
             </div>
           </div>
           <p className={styles.bankNote}>
-            ⚠️ Transfer exactly <strong>{fmt(customerPays, currency)}</strong>{" "}
-            and include the narration so we can match your payment.
+            <FaExclamationTriangle /> Transfer exactly{" "}
+            <strong>{fmt(customerPays, currency)}</strong> and include the
+            narration so we can match your payment.
           </p>
         </div>
 
@@ -454,7 +469,7 @@ export default function Payment() {
                       setProofUrl("");
                     }}
                   >
-                    ✕ Remove
+                    <FaTimes /> Remove
                   </button>
                 </div>
               ) : (
@@ -483,7 +498,7 @@ export default function Payment() {
                       }
                     }}
                   />
-                  <span className={styles.proofUploadIcon}>📎</span>
+                  <FaPaperclip className={styles.proofUploadIcon} />
                   <span>
                     {uploadingProof ? "Uploading…" : "Tap to upload receipt"}
                   </span>
@@ -529,7 +544,6 @@ export default function Payment() {
   }
 
   // ── Crypto instructions ──────────────────────────────────────────
-
   if (payStatus === "pending_crypto" && cryptoDetails) {
     const cryptoSymbol =
       selectedCryptoData?.symbol || cryptoDetails.currency || "USDT";
@@ -547,7 +561,7 @@ export default function Payment() {
             setSelectedCryptoData(null);
           }}
         >
-          ← Back to payment options
+          <FaArrowLeft /> Back to payment options
         </button>
 
         <div className={styles.card}>
@@ -577,7 +591,7 @@ export default function Payment() {
                   onClick={() => copyToClipboard(cryptoDetails.address)}
                   aria-label="Copy address"
                 >
-                  📋
+                  <FaCopy />
                 </button>
               </div>
             </div>
@@ -608,7 +622,7 @@ export default function Payment() {
                     }
                     aria-label="Copy crypto amount"
                   >
-                    📋
+                    <FaCopy />
                   </button>
                 </div>
               </div>
@@ -623,8 +637,9 @@ export default function Payment() {
             )}
           </div>
           <p className={styles.bankNote}>
-            ⚠️ Send the exact crypto amount to the address above. Then submit
-            the transaction hash and a proof screenshot.
+            <FaExclamationTriangle /> Send the exact crypto amount to the
+            address above. Then submit the transaction hash and a proof
+            screenshot.
           </p>
         </div>
 
@@ -671,7 +686,7 @@ export default function Payment() {
                       setProofUrl("");
                     }}
                   >
-                    ✕ Remove
+                    <FaTimes /> Remove
                   </button>
                 </div>
               ) : (
@@ -700,7 +715,7 @@ export default function Payment() {
                       }
                     }}
                   />
-                  <span className={styles.proofUploadIcon}>📎</span>
+                  <FaPaperclip className={styles.proofUploadIcon} />
                   <span>
                     {uploadingProof ? "Uploading…" : "Tap to upload proof"}
                   </span>
@@ -733,7 +748,7 @@ export default function Payment() {
           <div className={styles.modalOverlay} onClick={hideModal}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
               <button className={styles.modalClose} onClick={hideModal}>
-                ✕
+                <FaTimes />
               </button>
               <p className={styles.modalMessage}>{modalMessage}</p>
             </div>
@@ -742,6 +757,7 @@ export default function Payment() {
       </div>
     );
   }
+
   // ── No booking ────────────────────────────────────────────────────
   if (!booking) {
     return (
@@ -763,7 +779,7 @@ export default function Payment() {
   // ── MAIN PAYMENT PAGE (Flutterwave) ──────────────────────────────
   const activeMethod = altMethod || "flutterwave";
   const gatewayLabel = "Flutterwave";
-  const gatewayIcon = "💳";
+  const gatewayIcon = <FaCreditCard />;
   const gatewayColor = "#1a73e8";
   const gatewayDesc =
     "Secure card payments, bank transfers & mobile money – accepted worldwide.";
@@ -771,8 +787,9 @@ export default function Payment() {
   return (
     <div className={styles.page}>
       <button className={styles.backBtn} onClick={() => navigate(-1)}>
-        ← Back
+        <FaArrowLeft /> Back
       </button>
+
       <div className={styles.card}>
         <p className={styles.cardTitle}>Booking Summary</p>
         <div className={styles.row}>
@@ -826,6 +843,7 @@ export default function Payment() {
           <span>{fmt(customerPays, currency)}</span>
         </div>
       </div>
+
       <div className={styles.autoBanner} style={{ borderColor: gatewayColor }}>
         <div className={styles.autoBannerLeft}>
           <span className={styles.autoBannerIcon}>{gatewayIcon}</span>
@@ -843,13 +861,16 @@ export default function Payment() {
           </div>
         </div>
       </div>
+
       <div className={styles.card}>
         <p className={styles.cardTitle}>Or pay differently</p>
         <div className={styles.methodList}>
           {ALT_METHODS.map((m) => (
             <button
               key={m.id}
-              className={`${styles.methodCard} ${altMethod === m.id ? styles.methodCardActive : ""}`}
+              className={`${styles.methodCard} ${
+                altMethod === m.id ? styles.methodCardActive : ""
+              }`}
               onClick={() => setAltMethod(altMethod === m.id ? null : m.id)}
               style={{ "--method-color": m.color }}
             >
@@ -859,7 +880,9 @@ export default function Payment() {
                 <p className={styles.methodSub}>{m.sublabel}</p>
               </div>
               {altMethod === m.id && (
-                <span className={styles.methodCheck}>✓</span>
+                <span className={styles.methodCheck}>
+                  <FaCheck />
+                </span>
               )}
             </button>
           ))}
@@ -873,6 +896,7 @@ export default function Payment() {
           </button>
         )}
       </div>
+
       {!altMethod && (
         <div
           className={styles.methodNote}
@@ -884,8 +908,8 @@ export default function Payment() {
       )}
       {altMethod === "bank" && (
         <div className={styles.methodNote} style={{ borderColor: "#1a2466" }}>
-          🏦 Make a direct bank transfer and upload your receipt. Admin verifies
-          within <strong>24 hours</strong>.
+          <FaUniversity /> Make a direct bank transfer and upload your receipt.
+          Admin verifies within <strong>24 hours</strong>.
         </div>
       )}
       {altMethod === "crypto" && !payStatus && (
@@ -893,12 +917,13 @@ export default function Payment() {
           amount={customerPays}
           currency={currency}
           onSelect={(cryptoData) => {
-            setSelectedCryptoData(cryptoData); // store the full data
+            setSelectedCryptoData(cryptoData);
             handlePay(cryptoData.symbol);
           }}
           onBack={() => setAltMethod(null)}
         />
       )}
+
       <div className={styles.card}>
         <p className={styles.cardTitle}>How it works</p>
         <div className={styles.steps}>
@@ -925,7 +950,9 @@ export default function Payment() {
           </div>
         </div>
       </div>
+
       {error && <p className={styles.errorMsg}>{error}</p>}
+
       <button
         className={styles.payBtn}
         onClick={handlePay}
@@ -944,23 +971,31 @@ export default function Payment() {
         ) : (
           <>
             {activeMethod === "flutterwave" &&
-              `💳 Pay ${fmt(customerPays, currency)} via Flutterwave`}
-            {activeMethod === "bank" && `🏦 Get Bank Transfer Details`}
-            {activeMethod === "crypto" &&
-              `₿ Pay ${fmt(customerPays, currency)} in Crypto`}
+              `${gatewayIcon} Pay ${fmt(customerPays, currency)} via Flutterwave`}
+            {activeMethod === "bank" && (
+              <>
+                <FaUniversity /> Get Bank Transfer Details
+              </>
+            )}
+            {activeMethod === "crypto" && (
+              <>
+                <IoLogoBitcoin /> Pay {fmt(customerPays, currency)} in Crypto
+              </>
+            )}
           </>
         )}
       </button>
+
       <p className={styles.secureNote}>
-        🔐 All payments are encrypted · Your money is held safely until the job
-        is done
+        <FaLock /> All payments are encrypted · Your money is held safely until
+        the job is done
       </p>
 
       {modalMessage && (
         <div className={styles.modalOverlay} onClick={hideModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <button className={styles.modalClose} onClick={hideModal}>
-              ✕
+              <FaTimes />
             </button>
             <p className={styles.modalMessage}>{modalMessage}</p>
           </div>
