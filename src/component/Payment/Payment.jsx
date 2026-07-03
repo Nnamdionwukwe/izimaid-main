@@ -1,15 +1,13 @@
-// src/component/Payment/Payment.jsx
+// src/component/Payment/Payment.jsx – Flutterwave + Bank Transfer + Crypto (Trust Wallet)
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import styles from "./Payment.module.css";
+import CryptoPaymentOptions from "./CryptoPaymentOptions";
 
-const CLOUDINARY_CLOUD =
-  import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || "dlh6z8ygd";
-const CLOUDINARY_PRESET =
-  import.meta.env.VITE_CLOUDINARY_PRESET || "deusizi_unsigned";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const PLATFORM_FEE_PCT = 10;
 
-// REMOVE the old uploadToCloudinary function and Cloudinary constants entirely.
-// REPLACE with:
+// ── Helper for uploading bank/crypto proof ──────────────────────
 async function uploadProof(file, token) {
   const formData = new FormData();
   formData.append("file", file);
@@ -23,12 +21,7 @@ async function uploadProof(file, token) {
   return data.url;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
-const PLATFORM_FEE_PCT = 10; // Must match backend PLATFORM_FEE_PERCENT
-
-// Paystack handles these natively — all others go to Stripe
-const PAYSTACK_CURRENCIES = new Set(["NGN", "GHS", "ZAR", "KES"]);
-
+// ── Currency helpers ──────────────────────────────────────────────
 const CURRENCY_SYMBOLS = {
   NGN: "₦",
   USD: "$",
@@ -48,7 +41,6 @@ const CURRENCY_SYMBOLS = {
 function sym(c) {
   return CURRENCY_SYMBOLS[c] || (c ? c + " " : "₦");
 }
-
 function fmt(amount, currency) {
   const c = currency || "NGN";
   const n = Number(amount || 0);
@@ -57,7 +49,6 @@ function fmt(amount, currency) {
     maximumFractionDigits: 2,
   })}`;
 }
-
 function formatDate(d) {
   return new Date(d).toLocaleDateString("en-NG", {
     weekday: "short",
@@ -69,8 +60,7 @@ function formatDate(d) {
   });
 }
 
-// ── Fee: platform adds 10% ON TOP of the maid's service cost ─────────
-// Maid charges ₦10,000 → Customer pays ₦11,000 → Maid gets ₦10,000
+// ── Fee: platform adds 10% on top ────────────────────────────────
 function calcFees(serviceAmount) {
   const platformFee =
     Math.round(((serviceAmount * PLATFORM_FEE_PCT) / 100) * 100) / 100;
@@ -78,11 +68,7 @@ function calcFees(serviceAmount) {
   return { platformFee, customerPays };
 }
 
-function autoGateway(currency) {
-  return PAYSTACK_CURRENCIES.has(currency) ? "paystack" : "stripe";
-}
-
-// ── Alternative payment methods (bank + crypto always available) ──────
+// ── Alternative methods (bank + crypto) ───────────────────────────
 const ALT_METHODS = [
   {
     id: "bank",
@@ -94,7 +80,7 @@ const ALT_METHODS = [
   {
     id: "crypto",
     label: "Cryptocurrency",
-    sublabel: "BTC · ETH · USDT · USDC via Coinbase",
+    sublabel: "BTC · ETH · USDT · USDC – send and submit proof",
     icon: "₿",
     color: "#F7931A",
   },
@@ -112,33 +98,59 @@ export default function Payment() {
   const [payStatus, setPayStatus] = useState(null);
   const [error, setError] = useState("");
   const [bankDetails, setBankDetails] = useState(null);
+  const [cryptoDetails, setCryptoDetails] = useState(null);
   const [proofUrl, setProofUrl] = useState("");
   const [proofRef, setProofRef] = useState("");
+  const [txHash, setTxHash] = useState("");
+  const [cryptoAmountSent, setCryptoAmountSent] = useState("");
   const [submittingProof, setSubmittingProof] = useState(false);
-
   const [uploadingProof, setUploadingProof] = useState(false);
   const [proofPreview, setProofPreview] = useState(null);
-
   const token = localStorage.getItem("token");
 
-  // ── Derive currency + amounts early so ALL branches can use them ────
-  const currency = booking?.maid_currency || booking?.currency || "NGN";
-  const serviceAmt = Number(booking?.total_amount || 0); // maid's price
-  const { platformFee, customerPays } = calcFees(serviceAmt);
-  const gateway = autoGateway(currency); // "paystack" | "stripe"
+  const [selectedCryptoCurrency, setSelectedCryptoCurrency] = useState("USDT");
 
-  // ── Detect callback from payment gateways ────────────────────────
+  const [selectedCryptoData, setSelectedCryptoData] = useState(null);
+
+  const [modalMessage, setModalMessage] = useState(null); // 👈 NEW
+
+  // ── Modal helpers ──────────────────────────────────────────────────
+  const showModal = (msg) => setModalMessage(msg);
+  const hideModal = () => setModalMessage(null);
+
+  // ── Copy function (inside pending_crypto block) ──────────────────
+  const copyToClipboard = (text) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        showModal("Copied to clipboard!");
+      })
+      .catch(() => {
+        // Fallback for older browsers
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        showModal("Copied to clipboard!");
+      });
+  };
+
+  const currency = booking?.maid_currency || booking?.currency || "NGN";
+  const serviceAmt = Number(booking?.total_amount || 0);
+  const { platformFee, customerPays } = calcFees(serviceAmt);
+
+  // ── Detect callback from Flutterwave ─────────────────────────────
   const reference = searchParams.get("reference") || searchParams.get("trxref");
-  const session_id = searchParams.get("session_id");
   const gwParam = searchParams.get("gateway");
 
   useEffect(() => {
-    if (!reference && !session_id) return;
+    if (!reference) return;
     setVerifying(true);
     const q = new URLSearchParams();
     if (gwParam) q.set("gateway", gwParam);
     if (reference) q.set("reference", reference);
-    if (session_id) q.set("session_id", session_id);
 
     fetch(`${API_URL}/api/payments/verify?${q}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -166,29 +178,26 @@ export default function Payment() {
         setError("Network error during verification");
       })
       .finally(() => setVerifying(false));
-  }, [reference, session_id]);
+  }, [reference, gwParam]);
 
-  // ── Pay ───────────────────────────────────────────────────────────
-  async function handlePay() {
+  // ── Pay with Flutterwave or initialize alt method ──────────────
+  async function handlePay(currencyOverride) {
     if (!booking) return;
     setLoading(true);
     setError("");
 
-    const method = altMethod || gateway; // use alt if chosen, else auto
-
+    const method = altMethod || "flutterwave";
     const endpoints = {
-      paystack: "/api/payments/initialize",
-      stripe: "/api/payments/initialize/stripe",
+      flutterwave: "/api/payments/initialize",
       bank: "/api/payments/initialize/bank",
       crypto: "/api/payments/initialize/crypto",
     };
 
     try {
       const body = { booking_id: booking.id };
-      if (method === "stripe") {
-        body.currency = currency.toLowerCase();
+      if (method === "crypto") {
+        body.currency = currencyOverride || "USDT"; // use the selected one
       }
-
       const res = await fetch(`${API_URL}${endpoints[method]}`, {
         method: "POST",
         headers: {
@@ -201,32 +210,32 @@ export default function Payment() {
       if (!res.ok)
         throw new Error(data.error || "Payment initialization failed");
 
-      if (method === "paystack") {
-        window.location.href = data.authorization_url;
-        return;
-      }
-      if (method === "stripe") {
-        window.location.href = data.url;
-        return;
-      }
-      if (method === "crypto") {
-        window.location.href = data.hosted_url;
+      if (method === "flutterwave") {
+        window.location.href = data.link;
         return;
       }
       if (method === "bank") {
         setBankDetails(data);
         setPayStatus("pending_bank");
+        setLoading(false);
+        return;
+      }
+      if (method === "crypto") {
+        setCryptoDetails(data);
+        setPayStatus("pending_crypto");
+        setLoading(false);
+        return;
       }
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   }
 
-  async function handleSubmitProof() {
+  // ── Submit bank proof ────────────────────────────────────────────
+  async function handleSubmitBankProof() {
     if (!proofUrl) {
-      setError("Paste an image URL or receipt link");
+      setError("Please upload an image or provide a receipt URL");
       return;
     }
     setSubmittingProof(true);
@@ -254,8 +263,40 @@ export default function Payment() {
     }
   }
 
-  // ── VERIFYING ─────────────────────────────────────────────────────
-  if (verifying)
+  // ── Submit crypto proof ──────────────────────────────────────────
+  async function handleSubmitCryptoProof() {
+    if (!txHash || !proofUrl) {
+      setError("Transaction hash and proof image are required.");
+      return;
+    }
+    setSubmittingProof(true);
+    setError("");
+    try {
+      const res = await fetch(`${API_URL}/api/payments/confirm/crypto`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          booking_id: booking.id,
+          tx_hash: txHash,
+          amount_sent: cryptoAmountSent || null,
+          proof_url: proofUrl,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setPayStatus("success_crypto");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmittingProof(false);
+    }
+  }
+
+  // ── State views ────────────────────────────────────────────────────
+  if (verifying) {
     return (
       <div className={styles.page}>
         <div
@@ -270,9 +311,20 @@ export default function Payment() {
         </div>
       </div>
     );
+  }
 
-  // ── SUCCESS ───────────────────────────────────────────────────────
-  if (payStatus === "success" || payStatus === "success_bank")
+  if (
+    payStatus === "success" ||
+    payStatus === "success_bank" ||
+    payStatus === "success_crypto"
+  ) {
+    const message =
+      payStatus === "success_bank"
+        ? "Your bank transfer proof has been submitted. Admin will verify within 24 hours."
+        : payStatus === "success_crypto"
+          ? "Your crypto payment proof has been submitted. Admin will verify the transaction on‑chain shortly."
+          : "Payment received. Admin will review and confirm your booking shortly.";
+
     return (
       <div className={styles.page}>
         <div className={`${styles.statusCard} ${styles.statusSuccess}`}>
@@ -280,13 +332,11 @@ export default function Payment() {
           <p className={styles.statusTitle}>
             {payStatus === "success_bank"
               ? "Proof Submitted!"
-              : "Payment Successful!"}
+              : payStatus === "success_crypto"
+                ? "Crypto Proof Submitted!"
+                : "Payment Successful!"}
           </p>
-          <p className={styles.statusText}>
-            {payStatus === "success_bank"
-              ? "Your proof has been submitted. Admin will verify within 24 hours."
-              : "Payment received. Admin will review and confirm your booking shortly."}
-          </p>
+          <p className={styles.statusText}>{message}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <button
               className={styles.actionBtn}
@@ -301,9 +351,9 @@ export default function Payment() {
         </div>
       </div>
     );
+  }
 
-  // ── FAILED ────────────────────────────────────────────────────────
-  if (payStatus === "failed")
+  if (payStatus === "failed") {
     return (
       <div className={styles.page}>
         <div className={`${styles.statusCard} ${styles.statusFailed}`}>
@@ -329,12 +379,26 @@ export default function Payment() {
         </div>
       </div>
     );
+  }
 
-  // ── BANK TRANSFER INSTRUCTIONS ────────────────────────────────────
-  // NOTE: currency / customerPays are declared at top of component so they're always available
-  if (payStatus === "pending_bank" && bankDetails)
+  // ── Bank transfer instructions ────────────────────────────────────
+  if (payStatus === "pending_bank" && bankDetails) {
     return (
       <div className={styles.page}>
+        {/* Back button to return to payment options */}
+        <button
+          className={styles.backBtn}
+          onClick={() => {
+            setPayStatus(null);
+            setBankDetails(null);
+            setAltMethod(null);
+            setProofPreview(null);
+            setProofUrl("");
+          }}
+        >
+          ← Back to payment options
+        </button>
+
         <div className={styles.card}>
           <p className={styles.cardTitle}>Bank Transfer Details</p>
           <div className={styles.bankInstructions}>
@@ -373,8 +437,6 @@ export default function Payment() {
 
         <div className={styles.card}>
           <p className={styles.cardTitle}>Upload Payment Proof</p>
-
-          {/* File picker */}
           <div className={styles.proofField}>
             <label>Receipt / Screenshot</label>
             <div className={styles.proofUploadBox}>
@@ -411,7 +473,7 @@ export default function Payment() {
                       setUploadingProof(true);
                       setError("");
                       try {
-                        const url = await uploadProof(file, token); // ← pass token
+                        const url = await uploadProof(file, token);
                         setProofUrl(url);
                         setProofPreview(url);
                       } catch (err) {
@@ -433,7 +495,6 @@ export default function Payment() {
             </div>
           </div>
 
-          {/* Optional reference */}
           <div className={styles.proofField}>
             <label>
               Bank Reference / Transaction ID{" "}
@@ -453,7 +514,7 @@ export default function Payment() {
           <button
             className={styles.payBtn}
             style={{ background: "#1a2466" }}
-            onClick={handleSubmitProof}
+            onClick={handleSubmitBankProof}
             disabled={submittingProof || !proofUrl || uploadingProof}
           >
             {submittingProof
@@ -465,9 +526,224 @@ export default function Payment() {
         </div>
       </div>
     );
+  }
 
-  // ── NO BOOKING ────────────────────────────────────────────────────
-  if (!booking)
+  // ── Crypto instructions ──────────────────────────────────────────
+
+  if (payStatus === "pending_crypto" && cryptoDetails) {
+    const cryptoSymbol =
+      selectedCryptoData?.symbol || cryptoDetails.currency || "USDT";
+    const cryptoAmount = selectedCryptoData?.amount || 0;
+    const cryptoRate = selectedCryptoData?.rate;
+
+    return (
+      <div className={styles.page}>
+        <button
+          className={styles.backBtn}
+          onClick={() => {
+            setPayStatus(null);
+            setCryptoDetails(null);
+            setAltMethod(null);
+            setSelectedCryptoData(null);
+          }}
+        >
+          ← Back to payment options
+        </button>
+
+        <div className={styles.card}>
+          <p className={styles.cardTitle}>Crypto Payment Details</p>
+          <div className={styles.bankInstructions}>
+            <div className={styles.bankRow}>
+              <span>Currency</span>
+              <strong>{cryptoDetails.currency}</strong>
+            </div>
+            <div className={styles.bankRow}>
+              <span>Network</span>
+              <strong>{cryptoDetails.network}</strong>
+            </div>
+            <div className={styles.bankRow}>
+              <span>Wallet Address</span>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                <strong
+                  className={styles.acctNo}
+                  style={{ wordBreak: "break-all" }}
+                >
+                  {cryptoDetails.address}
+                </strong>
+                <button
+                  className={styles.copyBtn}
+                  onClick={() => copyToClipboard(cryptoDetails.address)}
+                  aria-label="Copy address"
+                >
+                  📋
+                </button>
+              </div>
+            </div>
+            <div className={styles.bankRow}>
+              <span>Amount to Send (fiat)</span>
+              <strong className={styles.bankAmount}>
+                {fmt(customerPays, currency)}
+              </strong>
+            </div>
+            {cryptoAmount > 0 && (
+              <div className={styles.bankRow}>
+                <span>Amount to Send (crypto)</span>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "10px" }}
+                >
+                  <strong
+                    className={styles.bankAmount}
+                    style={{ color: "#F7931A" }}
+                  >
+                    {cryptoAmount.toFixed(6)} {cryptoSymbol}
+                  </strong>
+                  <button
+                    className={styles.copyBtn}
+                    onClick={() =>
+                      copyToClipboard(
+                        `${cryptoAmount.toFixed(6)} ${cryptoSymbol}`,
+                      )
+                    }
+                    aria-label="Copy crypto amount"
+                  >
+                    📋
+                  </button>
+                </div>
+              </div>
+            )}
+            {cryptoRate && (
+              <div className={styles.bankRow}>
+                <span>Exchange Rate</span>
+                <strong>
+                  1 {cryptoSymbol} = {fmt(cryptoRate, currency)}
+                </strong>
+              </div>
+            )}
+          </div>
+          <p className={styles.bankNote}>
+            ⚠️ Send the exact crypto amount to the address above. Then submit
+            the transaction hash and a proof screenshot.
+          </p>
+        </div>
+
+        <div className={styles.card}>
+          <p className={styles.cardTitle}>Submit Crypto Proof</p>
+
+          <div className={styles.proofField}>
+            <label>Transaction Hash (TXID) *</label>
+            <input
+              className={styles.proofInput}
+              type="text"
+              placeholder="0x... or 123abc..."
+              value={txHash}
+              onChange={(e) => setTxHash(e.target.value.trim())}
+            />
+          </div>
+
+          <div className={styles.proofField}>
+            <label>Amount Sent (optional)</label>
+            <input
+              className={styles.proofInput}
+              type="number"
+              step="0.01"
+              placeholder="e.g. 12.5"
+              value={cryptoAmountSent}
+              onChange={(e) => setCryptoAmountSent(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.proofField}>
+            <label>Proof Screenshot *</label>
+            <div className={styles.proofUploadBox}>
+              {proofPreview ? (
+                <div className={styles.proofPreviewWrap}>
+                  <img
+                    src={proofPreview}
+                    alt="Proof"
+                    className={styles.proofPreviewImg}
+                  />
+                  <button
+                    className={styles.proofRemoveBtn}
+                    onClick={() => {
+                      setProofPreview(null);
+                      setProofUrl("");
+                    }}
+                  >
+                    ✕ Remove
+                  </button>
+                </div>
+              ) : (
+                <label
+                  className={styles.proofUploadLabel}
+                  style={{ opacity: uploadingProof ? 0.5 : 1 }}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    disabled={uploadingProof}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setUploadingProof(true);
+                      setError("");
+                      try {
+                        const url = await uploadProof(file, token);
+                        setProofUrl(url);
+                        setProofPreview(url);
+                      } catch (err) {
+                        setError("Upload failed: " + err.message);
+                      } finally {
+                        setUploadingProof(false);
+                      }
+                    }}
+                  />
+                  <span className={styles.proofUploadIcon}>📎</span>
+                  <span>
+                    {uploadingProof ? "Uploading…" : "Tap to upload proof"}
+                  </span>
+                  <span className={styles.proofUploadHint}>
+                    JPG, PNG · max 10MB
+                  </span>
+                </label>
+              )}
+            </div>
+          </div>
+
+          {error && <p className={styles.errorMsg}>{error}</p>}
+
+          <button
+            className={styles.payBtn}
+            style={{ background: "#F7931A" }}
+            onClick={handleSubmitCryptoProof}
+            disabled={submittingProof || !txHash || !proofUrl || uploadingProof}
+          >
+            {submittingProof
+              ? "Submitting…"
+              : uploadingProof
+                ? "Uploading…"
+                : "Submit Crypto Proof"}
+          </button>
+        </div>
+
+        {/* ── MODAL ── */}
+        {modalMessage && (
+          <div className={styles.modalOverlay} onClick={hideModal}>
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+              <button className={styles.modalClose} onClick={hideModal}>
+                ✕
+              </button>
+              <p className={styles.modalMessage}>{modalMessage}</p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+  // ── No booking ────────────────────────────────────────────────────
+  if (!booking) {
     return (
       <div className={styles.page}>
         <div className={styles.card} style={{ textAlign: "center" }}>
@@ -482,27 +758,23 @@ export default function Payment() {
         </div>
       </div>
     );
+  }
 
-  // ── MAIN PAYMENT PAGE ──────────────────────────────────────────────
-  const activeMethod = altMethod || gateway;
-  const gatewayLabel = gateway === "paystack" ? "Paystack" : "Stripe";
-  const gatewayIcon = gateway === "paystack" ? "💳" : "🌍";
-  const gatewayColor = gateway === "paystack" ? "#00C3F7" : "#635BFF";
+  // ── MAIN PAYMENT PAGE (Flutterwave) ──────────────────────────────
+  const activeMethod = altMethod || "flutterwave";
+  const gatewayLabel = "Flutterwave";
+  const gatewayIcon = "💳";
+  const gatewayColor = "#1a73e8";
   const gatewayDesc =
-    gateway === "paystack"
-      ? `Cards, bank transfer & mobile money — recommended for ${currency}`
-      : `International cards — recommended for ${currency}`;
+    "Secure card payments, bank transfers & mobile money – accepted worldwide.";
 
   return (
     <div className={styles.page}>
       <button className={styles.backBtn} onClick={() => navigate(-1)}>
         ← Back
       </button>
-
-      {/* ── Fee breakdown ──────────────────────────────────── */}
       <div className={styles.card}>
         <p className={styles.cardTitle}>Booking Summary</p>
-
         <div className={styles.row}>
           <span className={styles.rowKey}>Maid</span>
           <span className={styles.rowVal}>{booking.maid_name}</span>
@@ -532,8 +804,6 @@ export default function Payment() {
             </span>
           </div>
         )}
-
-        {/* Fee breakdown — additive model */}
         <div className={styles.feeDivider} />
         <div className={styles.row}>
           <span className={styles.rowKey}>
@@ -556,8 +826,6 @@ export default function Payment() {
           <span>{fmt(customerPays, currency)}</span>
         </div>
       </div>
-
-      {/* ── Auto-selected gateway banner ─────────────────── */}
       <div className={styles.autoBanner} style={{ borderColor: gatewayColor }}>
         <div className={styles.autoBannerLeft}>
           <span className={styles.autoBannerIcon}>{gatewayIcon}</span>
@@ -568,15 +836,13 @@ export default function Payment() {
                 className={styles.autoBadge}
                 style={{ background: gatewayColor }}
               >
-                Auto-selected
+                Secure
               </span>
             </p>
             <p className={styles.autoBannerDesc}>{gatewayDesc}</p>
           </div>
         </div>
       </div>
-
-      {/* ── Alternative methods ───────────────────────────── */}
       <div className={styles.card}>
         <p className={styles.cardTitle}>Or pay differently</p>
         <div className={styles.methodList}>
@@ -607,34 +873,32 @@ export default function Payment() {
           </button>
         )}
       </div>
-
-      {/* ── Context note ─────────────────────────────────── */}
       {!altMethod && (
         <div
           className={styles.methodNote}
           style={{ borderColor: gatewayColor }}
         >
-          {gatewayIcon} You'll be redirected to <strong>{gatewayLabel}</strong>{" "}
-          to complete payment securely. You'll return here automatically after
-          payment.
+          {gatewayIcon} You'll be redirected to <strong>Flutterwave</strong> to
+          complete payment securely.
         </div>
       )}
       {altMethod === "bank" && (
         <div className={styles.methodNote} style={{ borderColor: "#1a2466" }}>
           🏦 Make a direct bank transfer and upload your receipt. Admin verifies
-          within
-          <strong> 24 hours</strong> and confirms your booking.
+          within <strong>24 hours</strong>.
         </div>
       )}
-      {altMethod === "crypto" && (
-        <div className={styles.methodNote} style={{ borderColor: "#F7931A" }}>
-          ₿ Pay with <strong>Bitcoin, Ethereum, USDT or USDC</strong> via
-          Coinbase Commerce. You'll be redirected to a secure hosted payment
-          page.
-        </div>
+      {altMethod === "crypto" && !payStatus && (
+        <CryptoPaymentOptions
+          amount={customerPays}
+          currency={currency}
+          onSelect={(cryptoData) => {
+            setSelectedCryptoData(cryptoData); // store the full data
+            handlePay(cryptoData.symbol);
+          }}
+          onBack={() => setAltMethod(null)}
+        />
       )}
-
-      {/* ── Steps ────────────────────────────────────────── */}
       <div className={styles.card}>
         <p className={styles.cardTitle}>How it works</p>
         <div className={styles.steps}>
@@ -661,44 +925,47 @@ export default function Payment() {
           </div>
         </div>
       </div>
-
       {error && <p className={styles.errorMsg}>{error}</p>}
-
-      {/* ── Pay button ────────────────────────────────────── */}
       <button
         className={styles.payBtn}
         onClick={handlePay}
         disabled={loading}
         style={{
           background:
-            activeMethod === "paystack"
-              ? "#00C3F7"
-              : activeMethod === "stripe"
-                ? "#635BFF"
-                : activeMethod === "crypto"
-                  ? "#F7931A"
-                  : "#1a2466",
+            activeMethod === "crypto"
+              ? "#F7931A"
+              : activeMethod === "bank"
+                ? "#1a2466"
+                : gatewayColor,
         }}
       >
         {loading ? (
-          "Redirecting…"
+          "Processing…"
         ) : (
           <>
-            {activeMethod === "paystack" &&
-              `💳 Pay ${fmt(customerPays, currency)} via Paystack`}
-            {activeMethod === "stripe" &&
-              `🌍 Pay ${fmt(customerPays, currency)} via Stripe`}
+            {activeMethod === "flutterwave" &&
+              `💳 Pay ${fmt(customerPays, currency)} via Flutterwave`}
             {activeMethod === "bank" && `🏦 Get Bank Transfer Details`}
             {activeMethod === "crypto" &&
               `₿ Pay ${fmt(customerPays, currency)} in Crypto`}
           </>
         )}
       </button>
-
       <p className={styles.secureNote}>
         🔐 All payments are encrypted · Your money is held safely until the job
         is done
       </p>
+
+      {modalMessage && (
+        <div className={styles.modalOverlay} onClick={hideModal}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalClose} onClick={hideModal}>
+              ✕
+            </button>
+            <p className={styles.modalMessage}>{modalMessage}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

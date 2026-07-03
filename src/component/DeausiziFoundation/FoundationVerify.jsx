@@ -1,11 +1,11 @@
-// FoundationVerify.jsx
+// FoundationVerify.jsx – Flutterwave only
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import styles from "./FoundationVerify.module.css";
 import FixedHeader from "../FixedHeader";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 export default function FoundationVerify() {
   const [searchParams] = useSearchParams();
@@ -16,10 +16,11 @@ export default function FoundationVerify() {
   const [donationDetails, setDonationDetails] = useState(null);
 
   useEffect(() => {
-    const reference = searchParams.get("reference");
+    const reference =
+      searchParams.get("reference") || searchParams.get("trxref");
     const statusParam = searchParams.get("status");
+    const gateway = searchParams.get("gateway");
 
-    // If payment was cancelled
     if (statusParam === "cancelled") {
       setStatus("cancelled");
       setMessage(
@@ -40,8 +41,12 @@ export default function FoundationVerify() {
 
     const verifyPayment = async () => {
       try {
+        const params = new URLSearchParams();
+        params.set("reference", reference);
+        if (gateway) params.set("gateway", gateway);
+
         const response = await axios.get(
-          `${API_BASE_URL}/api/foundation/donations/verify?reference=${reference}`,
+          `${API_BASE_URL}/api/foundation/donations/verify?${params}`,
         );
 
         if (response.data.success) {
@@ -64,8 +69,6 @@ export default function FoundationVerify() {
         }
       } catch (error) {
         console.error("Verification error:", error);
-
-        // Check if it's a network error
         if (error.message === "Network Error") {
           setStatus("error");
           setMessage(
@@ -89,17 +92,9 @@ export default function FoundationVerify() {
     verifyPayment();
   }, [searchParams]);
 
-  const handleRetry = () => {
-    navigate("/foundation");
-  };
-
-  const handleGoHome = () => {
-    navigate("/");
-  };
-
-  const handleContact = () => {
-    navigate("/contact");
-  };
+  const handleRetry = () => navigate("/foundation");
+  const handleGoHome = () => navigate("/");
+  const handleContact = () => navigate("/contact");
 
   if (loading) {
     return (

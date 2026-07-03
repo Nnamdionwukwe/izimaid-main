@@ -21,20 +21,26 @@ export default function SubscriptionVerify() {
         return;
       }
 
+      // Flutterwave uses 'reference' (tx_ref) or 'trxref'
       const ref = params.get("reference") || params.get("trxref");
-      const sessionId = params.get("session_id");
-      const gateway = params.get("gateway") || "paystack";
+      // Only accept Flutterwave gateway
+      const gateway = params.get("gateway");
 
-      if (!ref && !sessionId) {
+      if (!ref) {
         setStatus("error");
         setError("No payment reference found in URL.");
         return;
       }
 
+      if (gateway && gateway !== "flutterwave") {
+        setStatus("error");
+        setError("Only Flutterwave payments are supported.");
+        return;
+      }
+
       try {
-        const query = new URLSearchParams({ gateway });
-        if (ref) query.set("reference", ref);
-        if (sessionId) query.set("session_id", sessionId);
+        const query = new URLSearchParams({ gateway: "flutterwave" });
+        query.set("reference", ref);
 
         const res = await fetch(`${API}/api/subscriptions/verify?${query}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -62,8 +68,9 @@ export default function SubscriptionVerify() {
       }
     }
     verify();
-  }, [token]);
+  }, [token, navigate, params, user, updateUser]);
 
+  // ── Styles ──────────────────────────────────────────────────────────
   const style = {
     page: {
       minHeight: "100vh",
@@ -84,8 +91,18 @@ export default function SubscriptionVerify() {
       textAlign: "center",
       boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
     },
+    spin: {
+      width: 40,
+      height: 40,
+      margin: "24px auto 0",
+      border: "3px solid rgb(228,228,228)",
+      borderTopColor: "rgb(19,19,103)",
+      borderRadius: "50%",
+      animation: "spin 0.65s linear infinite",
+    },
   };
 
+  // ── VERIFYING ──────────────────────────────────────────────────────
   if (status === "verifying")
     return (
       <div style={style.page}>
@@ -104,22 +121,13 @@ export default function SubscriptionVerify() {
           <p style={{ fontSize: 13, color: "gray", margin: 0 }}>
             Please wait, do not close this page.
           </p>
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              margin: "24px auto 0",
-              border: "3px solid rgb(228,228,228)",
-              borderTopColor: "rgb(19,19,103)",
-              borderRadius: "50%",
-              animation: "spin 0.65s linear infinite",
-            }}
-          />
+          <div style={style.spin} />
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
     );
 
+  // ── ERROR ─────────────────────────────────────────────────────────
   if (status === "error")
     return (
       <div style={style.page}>
@@ -167,10 +175,10 @@ export default function SubscriptionVerify() {
       </div>
     );
 
+  // ── SUCCESS ────────────────────────────────────────────────────────
   return (
     <div style={style.page}>
       <div style={style.card}>
-        {/* Success animation */}
         <div
           style={{
             width: 72,
@@ -212,7 +220,6 @@ export default function SubscriptionVerify() {
           receipt has been sent to your email address.
         </p>
 
-        {/* Plan features */}
         {plan?.features?.length > 0 && (
           <div
             style={{

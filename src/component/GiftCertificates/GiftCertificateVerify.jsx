@@ -1,11 +1,11 @@
-// GiftCertificateVerify.jsx
+// GiftCertificateVerify.jsx – Flutterwave only
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import styles from "./GiftCertificateVerify.module.css";
 import FixedHeader from "../FixedHeader";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 export default function GiftCertificateVerify() {
   const [searchParams] = useSearchParams();
@@ -16,8 +16,10 @@ export default function GiftCertificateVerify() {
   const [certificateDetails, setCertificateDetails] = useState(null);
 
   useEffect(() => {
-    const reference = searchParams.get("reference");
+    const reference =
+      searchParams.get("reference") || searchParams.get("trxref");
     const statusParam = searchParams.get("status");
+    const gateway = searchParams.get("gateway");
 
     // If payment was cancelled
     if (statusParam === "cancelled") {
@@ -40,8 +42,13 @@ export default function GiftCertificateVerify() {
 
     const verifyPayment = async () => {
       try {
+        // Build query params – we only support Flutterwave
+        const params = new URLSearchParams();
+        params.set("reference", reference);
+        if (gateway) params.set("gateway", gateway);
+
         const response = await axios.get(
-          `${API_BASE_URL}/api/gift-certificates/certificates/verify?reference=${reference}`,
+          `${API_BASE_URL}/api/gift-certificates/certificates/verify?${params}`,
         );
 
         if (response.data.success) {
@@ -67,7 +74,6 @@ export default function GiftCertificateVerify() {
         }
       } catch (error) {
         console.error("Verification error:", error);
-
         if (error.message === "Network Error") {
           setStatus("error");
           setMessage(
@@ -91,22 +97,10 @@ export default function GiftCertificateVerify() {
     verifyPayment();
   }, [searchParams]);
 
-  const handleRetry = () => {
-    navigate("/gift-certificates");
-  };
-
-  const handleGoHome = () => {
-    navigate("/");
-  };
-
-  const handleContact = () => {
-    navigate("/contact");
-  };
-
-  const handleViewCertificate = () => {
-    // Navigate to certificate details or download
-    navigate("/gift-certificates");
-  };
+  const handleRetry = () => navigate("/gift-certificates");
+  const handleGoHome = () => navigate("/");
+  const handleContact = () => navigate("/contact");
+  const handleViewCertificate = () => navigate("/gift-certificates");
 
   if (loading) {
     return (

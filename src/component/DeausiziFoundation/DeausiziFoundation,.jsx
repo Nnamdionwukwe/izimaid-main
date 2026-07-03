@@ -1,29 +1,11 @@
-// DeausiziFoundation.jsx - Updated with Paystack payment integration
+// DeausiziFoundation.jsx – Flutterwave only
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DeausiziFoundation.module.css";
 import FixedHeader from "../FixedHeader";
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-// Load Paystack script dynamically
-const loadPaystackScript = () => {
-  return new Promise((resolve) => {
-    if (
-      document.querySelector(
-        'script[src="https://js.paystack.co/v1/inline.js"]',
-      )
-    ) {
-      resolve();
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = "https://js.paystack.co/v1/inline.js";
-    script.onload = () => resolve();
-    document.head.appendChild(script);
-  });
-};
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const PILLARS = [
   {
@@ -143,14 +125,8 @@ export default function DeausiziFoundation() {
   const [openFaq, setOpenFaq] = useState(null);
   const [apiError, setApiError] = useState(null);
   const [submittedData, setSubmittedData] = useState(null);
-  const [paystackLoaded, setPaystackLoaded] = useState(false);
 
   const finalAmount = customAmount ? Number(customAmount) : selectedAmount;
-
-  // Load Paystack script on mount
-  useState(() => {
-    loadPaystackScript().then(() => setPaystackLoaded(true));
-  }, []);
 
   function validate() {
     const e = {};
@@ -175,52 +151,40 @@ export default function DeausiziFoundation() {
     setApiError(null);
 
     try {
-      // Prepare data for API
       const donationData = {
         donorName: donorName,
         donorEmail: donorEmail,
         donorMessage: donorMessage || "",
         amount: finalAmount,
         donationType: donateType,
-        paymentMethod: "paystack",
+        paymentMethod: "flutterwave",
       };
 
-      // Make API call to backend to initialize payment
       const response = await axios.post(
         `${API_BASE_URL}/api/foundation/donations`,
         donationData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
+        { headers: { "Content-Type": "application/json" } },
       );
 
       if (response.data.success && response.data.payment) {
-        const { authorization_url, reference } = response.data.payment;
+        const { link, tx_ref } = response.data.payment;
 
-        // Store donation reference for verification
         setSubmittedData({
           ...response.data.donation,
-          paymentReference: reference,
+          paymentReference: tx_ref,
         });
 
-        // Redirect to Paystack payment page
-        window.location.href = authorization_url;
-
-        // Note: The user will be redirected to Paystack, so we don't set submitted state here
-        // The success page will handle the verification
+        // Redirect to Flutterwave payment page
+        window.location.href = link;
       } else {
         throw new Error(response.data.error || "Failed to process donation");
       }
     } catch (error) {
       console.error("Donation submission error:", error);
-
-      // Handle different error types
       if (error.response) {
-        const serverError = error.response.data;
         setApiError(
-          serverError.error || "Failed to process donation. Please try again.",
+          error.response.data?.error ||
+            "Failed to process donation. Please try again.",
         );
       } else if (error.request) {
         setApiError(
@@ -233,22 +197,19 @@ export default function DeausiziFoundation() {
     }
   }
 
-  // Check for payment verification on page load
+  // Check for payment verification on page load (Flutterwave redirect)
   useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const reference = urlParams.get("reference");
+    const reference = urlParams.get("reference") || urlParams.get("trxref");
     const status = urlParams.get("status");
 
     if (reference && status === "success") {
-      // Payment was successful, show success message
       setSubmitted(true);
       setSending(false);
-      // Clear URL params
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (reference && status === "cancelled") {
       setApiError("Payment was cancelled. Please try again.");
       setSending(false);
-      // Clear URL params
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
@@ -448,7 +409,6 @@ export default function DeausiziFoundation() {
             </div>
           ) : (
             <form className={styles.form} onSubmit={handleDonate} noValidate>
-              {/* API Error Display */}
               {apiError && (
                 <div className={styles.apiErrorBox}>
                   <span className={styles.apiErrorIcon}>⚠️</span>
@@ -456,7 +416,6 @@ export default function DeausiziFoundation() {
                 </div>
               )}
 
-              {/* Frequency toggle */}
               <div className={styles.freqRow}>
                 {[
                   ["once", "Give once"],
@@ -473,7 +432,6 @@ export default function DeausiziFoundation() {
                 ))}
               </div>
 
-              {/* Amount selector */}
               <div className={styles.field}>
                 <label className={styles.label}>
                   Choose an amount <span className={styles.req}>*</span>
@@ -562,7 +520,6 @@ export default function DeausiziFoundation() {
                 />
               </div>
 
-              {/* Summary */}
               {finalAmount >= 100 && (
                 <div className={styles.summary}>
                   <span className={styles.summaryLabel}>
@@ -591,7 +548,7 @@ export default function DeausiziFoundation() {
               </button>
 
               <p className={styles.secureNote}>
-                🔒 Payments processed securely via Paystack
+                🔒 Payments processed securely via Flutterwave
               </p>
             </form>
           )}

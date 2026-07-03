@@ -601,20 +601,20 @@ export default function Login({ onSuccess }) {
                 onClick={() => setRole("customer")}
                 type="button"
               >
-                I need a maid
+                I need a worker
               </button>
               <button
                 className={`${styles.roleBtn} ${role === "maid" ? styles.roleBtnActive : ""}`}
                 onClick={() => setRole("maid")}
                 type="button"
               >
-                I am a maid
+                I am a worker
               </button>
             </div>
 
             <p className={styles.terms}>
-              Choose if you need a maid or you want to register as a
-              maid/cleaner
+              Choose if you need a professional worker or you want to register
+              as a professional worker
             </p>
 
             <button
@@ -747,20 +747,20 @@ export default function Login({ onSuccess }) {
               onClick={() => setRole("customer")}
               type="button"
             >
-              I need a maid
+              I need a worker
             </button>
             <button
               className={`${styles.roleBtn} ${role === "maid" ? styles.roleBtnActive : ""}`}
               onClick={() => setRole("maid")}
               type="button"
             >
-              I am a maid
+              I am a worker
             </button>
           </div>
 
           <p className={styles.terms}>
-            Choose if you need a maid or you want to sign in or register as a
-            maid/cleaner
+            Choose if you need a professional worker or you want to sign in or
+            register as a professional worker
           </p>
 
           <button

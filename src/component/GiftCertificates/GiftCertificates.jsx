@@ -1,11 +1,11 @@
-// GiftCertificates.jsx - Updated with recipient phone number
+// GiftCertificates.jsx – Flutterwave only
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./GiftCertificates.module.css";
 import FixedHeader from "../FixedHeader";
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const PACKAGES = [
   {
@@ -85,7 +85,7 @@ const HOW_STEPS = [
   {
     num: "3",
     title: "Pay securely",
-    text: "Complete payment via Paystack. Your gift certificate is generated instantly.",
+    text: "Complete payment via Flutterwave. Your gift certificate is generated instantly.",
   },
   {
     num: "4",
@@ -98,7 +98,7 @@ const TERMS = [
   "Gift certificates are valid for 12 months from the date of purchase.",
   "Certificates can be used for any cleaning service available on the Deusizi Sparkle platform.",
   "If the clean costs less than the certificate value, the remaining balance stays on the certificate.",
-  "If the clean costs more, the recipient can pay the difference via Paystack.",
+  "If the clean costs more, the recipient can pay the difference via Flutterwave.",
   "Gift certificates are non-refundable once redeemed but can be transferred to another recipient.",
   "One certificate can be used per booking. Multiple certificates cannot be combined in a single booking.",
   "Deusizi Sparkle reserves the right to cancel fraudulently obtained certificates.",
@@ -132,14 +132,13 @@ export default function GiftCertificates() {
         : "₦—"
       : selectedPkg.formattedPrice;
 
-  // Check for payment verification on page load
+  // Check for payment verification on page load (Flutterwave redirects with reference)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const reference = urlParams.get("reference");
+    const reference = urlParams.get("reference") || urlParams.get("trxref");
     const status = urlParams.get("status");
 
     if (reference && status === "success") {
-      // Payment was successful, show success message
       setSubmitted(true);
       setLoading(false);
       // Clear URL params
@@ -184,7 +183,6 @@ export default function GiftCertificates() {
     setApiError(null);
 
     try {
-      // Prepare data for API
       const certificateData = {
         from: form.from,
         to: form.to,
@@ -196,28 +194,22 @@ export default function GiftCertificates() {
         occasion: form.occasion || null,
       };
 
-      // Make API call to backend
       const response = await axios.post(
         `${API_BASE_URL}/api/gift-certificates/certificates`,
         certificateData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
+        { headers: { "Content-Type": "application/json" } },
       );
 
       if (response.data.success && response.data.payment) {
-        const { authorization_url, reference } = response.data.payment;
+        const { link, tx_ref } = response.data.payment;
 
-        // Store certificate data for success page
         setSubmittedData({
           ...response.data.certificate,
-          paymentReference: reference,
+          paymentReference: tx_ref,
         });
 
-        // Redirect to Paystack payment page
-        window.location.href = authorization_url;
+        // Redirect to Flutterwave payment page
+        window.location.href = link;
       } else {
         throw new Error(
           response.data.error || "Failed to create gift certificate",
@@ -225,11 +217,9 @@ export default function GiftCertificates() {
       }
     } catch (error) {
       console.error("Gift certificate submission error:", error);
-
       if (error.response) {
-        const serverError = error.response.data;
         setApiError(
-          serverError.error || "Failed to process. Please try again.",
+          error.response.data?.error || "Failed to process. Please try again.",
         );
       } else if (error.request) {
         setApiError(
@@ -436,7 +426,6 @@ export default function GiftCertificates() {
           </div>
         ) : (
           <form className={styles.form} onSubmit={handleSubmit}>
-            {/* API Error Display */}
             {apiError && (
               <div className={styles.apiErrorBox}>
                 <span className={styles.apiErrorIcon}>⚠️</span>
@@ -559,7 +548,7 @@ export default function GiftCertificates() {
             </button>
 
             <p className={styles.secureNote}>
-              🔒 Payments processed securely via Paystack
+              🔒 Payments processed securely via Flutterwave
             </p>
           </form>
         )}
