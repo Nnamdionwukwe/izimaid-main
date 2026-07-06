@@ -135,7 +135,7 @@ function timeAgo(dateStr) {
 }
 
 // ── Single notification item ─────────────────────────────────────────
-function NotifItem({ notif, onRead, onDelete }) {
+function NotifItem({ notif, onRead, onDelete, onDetails }) {
   const cfg = TYPE_CONFIG[notif.type] || {
     icon: FALLBACK_ICON,
     color: FALLBACK_COLOR,
@@ -143,10 +143,15 @@ function NotifItem({ notif, onRead, onDelete }) {
   };
   const isUnread = !notif.is_read;
 
+  const handleClick = () => {
+    if (isUnread) onRead(notif.id);
+    onDetails(notif);
+  };
+
   return (
     <div
       className={`${styles.item} ${isUnread ? styles.itemUnread : ""}`}
-      onClick={() => !notif.is_read && onRead(notif.id)}
+      onClick={handleClick}
     >
       {/* Unread indicator */}
       {isUnread && <div className={styles.unreadDot} />}
@@ -206,6 +211,7 @@ export default function NotificationsPanel({ token, onClose }) {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const [selectedNotif, setSelectedNotif] = useState(null); // for details popup
   const panelRef = useRef(null);
   const LIMIT = 20;
 
@@ -295,6 +301,7 @@ export default function NotificationsPanel({ token, onClose }) {
       });
       setNotifs((prev) => prev.filter((n) => n.id !== id));
       setTotal((t) => t - 1);
+      if (selectedNotif?.id === id) setSelectedNotif(null);
     } catch {}
   }
 
@@ -316,7 +323,22 @@ export default function NotificationsPanel({ token, onClose }) {
     fetchNotifs(next, true);
   }
 
+  function handleDetails(notif) {
+    setSelectedNotif(notif);
+  }
+
+  function closeDetails() {
+    setSelectedNotif(null);
+  }
+
   const readCount = notifs.filter((n) => n.is_read).length;
+  const selectedCfg = selectedNotif
+    ? TYPE_CONFIG[selectedNotif.type] || {
+        icon: FALLBACK_ICON,
+        color: FALLBACK_COLOR,
+        label: selectedNotif.type,
+      }
+    : null;
 
   return (
     <div className={styles.overlay}>
@@ -405,6 +427,7 @@ export default function NotificationsPanel({ token, onClose }) {
                   notif={n}
                   onRead={handleRead}
                   onDelete={handleDelete}
+                  onDetails={handleDetails}
                 />
               ))}
 
@@ -417,6 +440,71 @@ export default function NotificationsPanel({ token, onClose }) {
           )}
         </div>
       </div>
+
+      {/* ── Notification Details Popup ────────────────────────── */}
+      {selectedNotif && selectedCfg && (
+        <div className={styles.detailsOverlay} onClick={closeDetails}>
+          <div
+            className={styles.detailsPanel}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.detailsHeader}>
+              <div className={styles.detailsHeaderLeft}>
+                <span
+                  className={styles.detailsIcon}
+                  style={{
+                    background: selectedCfg.color + "18",
+                    borderColor: selectedCfg.color + "30",
+                  }}
+                >
+                  {selectedCfg.icon}
+                </span>
+                <span
+                  className={styles.detailsType}
+                  style={{ color: selectedCfg.color }}
+                >
+                  {selectedCfg.label}
+                </span>
+              </div>
+              <button
+                className={styles.detailsClose}
+                onClick={closeDetails}
+                title="Close"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <div className={styles.detailsBody}>
+              <h3 className={styles.detailsTitle}>{selectedNotif.title}</h3>
+              <p className={styles.detailsMessage}>{selectedNotif.body}</p>
+              <div className={styles.detailsMeta}>
+                <span className={styles.detailsTime}>
+                  {new Date(selectedNotif.created_at).toLocaleString("en-NG", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+                {selectedNotif.priority !== "normal" && (
+                  <span
+                    className={styles.detailsPriority}
+                    style={{ color: PRIORITY_DOT[selectedNotif.priority] }}
+                  >
+                    ● {selectedNotif.priority}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className={styles.detailsFooter}>
+              <button className={styles.detailsCloseBtn} onClick={closeDetails}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

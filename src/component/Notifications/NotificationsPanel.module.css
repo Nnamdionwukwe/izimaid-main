@@ -420,3 +420,150 @@
     border-radius: 0;
   }
 }
+
+/* ── Notification Details Popup ──────────────────────────────── */
+.detailsOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.detailsPanel {
+  background: #ffffff;
+  border-radius: 16px;
+  max-width: 420px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.detailsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.detailsHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detailsIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.detailsType {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.detailsClose {
+  background: none;
+  border: none;
+  color: #6a7a9e;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.detailsClose:hover {
+  background: #f0f2f5;
+}
+
+.detailsBody {
+  padding: 20px;
+}
+
+.detailsTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0b1a33;
+  margin: 0 0 8px;
+}
+
+.detailsMessage {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #2a4068;
+  margin: 0 0 16px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.detailsMeta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: #6a7a9e;
+}
+
+.detailsPriority {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.detailsFooter {
+  padding: 12px 20px 20px;
+  border-top: 1px solid #f0f2f5;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.detailsCloseBtn {
+  padding: 8px 24px;
+  background: #0b1a33;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.detailsCloseBtn:hover {
+  background: #1a2a4a;
+}
