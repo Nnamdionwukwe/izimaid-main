@@ -17,6 +17,7 @@ import {
   FaClipboardList,
   FaExclamationTriangle,
   FaLock,
+  FaTimes,
 } from "react-icons/fa";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
@@ -145,6 +146,9 @@ export default function MyBookings() {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [showInbox, setShowInbox] = useState(false);
 
+  // ── Logout modal state ──────────────────────────────────────────────
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
   const isMaid = user?.role === "maid";
 
   // ── Fetch bookings ──────────────────────────────────────────────────
@@ -218,7 +222,16 @@ export default function MyBookings() {
     return () => clearInterval(id);
   }, [token]);
 
-  function handleLogout() {
+  // ── Logout handlers ──────────────────────────────────────────────────
+  function handleLogoutClick() {
+    setShowLogoutModal(true);
+  }
+
+  function handleCancelLogout() {
+    setShowLogoutModal(false);
+  }
+
+  function handleConfirmLogout() {
     logout();
     navigate("/login", { replace: true });
   }
@@ -295,7 +308,7 @@ export default function MyBookings() {
             )}
             <span className={styles.userName}>{user?.name?.split(" ")[0]}</span>
           </div>
-          <button className={styles.logoutBtn} onClick={handleLogout}>
+          <button className={styles.logoutBtn} onClick={handleLogoutClick}>
             Logout
           </button>
         </div>
@@ -467,6 +480,44 @@ export default function MyBookings() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ── Logout Confirmation Modal ──────────────────────────────── */}
+      {showLogoutModal && (
+        <div className={styles.modalOverlay} onClick={handleCancelLogout}>
+          <div
+            className={styles.modalContainer}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.modalHeader}>
+              <FaExclamationTriangle className={styles.modalIcon} />
+              <h3>Confirm Logout</h3>
+              <button
+                className={styles.modalClose}
+                onClick={handleCancelLogout}
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p>Are you sure you want to log out?</p>
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                className={styles.modalCancelBtn}
+                onClick={handleCancelLogout}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.modalConfirmBtn}
+                onClick={handleConfirmLogout}
+              >
+                Yes, Logout
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
