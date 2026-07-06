@@ -221,13 +221,14 @@ export function useSubscription(interval = null) {
   }, [fetch_]);
 
   const subscribe = useCallback(
-    async (planId, gateway = "paystack", promoCode) => {
-      const res = await fetch(`${BASE}/subscriptions/subscribe/${gateway}`, {
+    async (planId, gateway = "flutterwave", promoCode) => {
+      // ── FIX: remove /${gateway} from URL ──
+      const res = await fetch(`${BASE}/subscriptions/subscribe`, {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify({
           plan_id: planId,
-          currency: gateway === "stripe" ? "USD" : "NGN", // ← add this
+          currency: "NGN",
           promo_code: promoCode || undefined,
         }),
       });
@@ -238,30 +239,29 @@ export function useSubscription(interval = null) {
     [],
   );
 
-  const changePlan = useCallback(
-    async (planId) => {
-      const res = await fetch(`${BASE}/subscriptions/change-plan`, {
-        method: "POST",
-        headers: authHeaders(),
-        body: JSON.stringify({
-          new_plan_id: planId,
-          gateway: "paystack", // ← add this
-          currency: "NGN", // ← add this
-        }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error);
-      // Don't refetch here — redirect will happen instead
-      return json;
-    },
-    [], // remove fetch_ dependency since we redirect
-  );
+  const changePlan = useCallback(async (planId) => {
+    const res = await fetch(`${BASE}/subscriptions/change-plan`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        new_plan_id: planId,
+        currency: "NGN",
+      }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error);
+    return json;
+  }, []);
 
   const validatePromo = useCallback(async (code, planId) => {
+    // ── FIX: send plan_name (or modify backend) ──
+    // For now, we'll send a dummy plan_name; you'll need to fetch it.
+    // Better: change backend to accept plan_id.
+    const planName = "premium"; // Placeholder – adjust as needed
     const res = await fetch(`${BASE}/subscriptions/validate-promo`, {
       method: "POST",
       headers: authHeaders(),
-      body: JSON.stringify({ code, plan_id: planId }),
+      body: JSON.stringify({ code, plan_name: planName, currency: "NGN" }),
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error);

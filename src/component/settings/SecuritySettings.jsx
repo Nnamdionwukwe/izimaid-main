@@ -10,6 +10,17 @@ import {
   DangerButton,
 } from "./SettingsUI";
 import { changePassword } from "../../pages/hooks/useSettings";
+import {
+  FaEye,
+  FaEyeSlash,
+  FaKey,
+  FaEnvelope,
+  FaBell,
+  FaBan,
+  FaCheck,
+  FaCircle,
+  FaSpinner,
+} from "react-icons/fa";
 
 export default function SecuritySettings() {
   const [form, setForm] = useState({
@@ -118,8 +129,9 @@ export default function SecuritySettings() {
                   className={styles.inputSuffix}
                   onClick={() => setShowPwd((s) => !s)}
                   tabIndex={-1}
+                  aria-label={showPwd ? "Hide password" : "Show password"}
                 >
-                  {showPwd ? "🙈" : "👁️"}
+                  {showPwd ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
             </Field>
@@ -179,14 +191,27 @@ export default function SecuritySettings() {
                 ],
               ].map(([met, text], i) => (
                 <li key={i} style={{ color: met ? "#16a34a" : "#9fa4bf" }}>
-                  {met ? "✓" : "○"} {text}
+                  {met ? (
+                    <FaCheck style={{ marginRight: 6 }} />
+                  ) : (
+                    <FaCircle style={{ marginRight: 6 }} />
+                  )}
+                  {text}
                 </li>
               ))}
             </ul>
           </div>
 
           <div className={styles.formFooter}>
-            <SaveButton loading={saving}>Change password</SaveButton>
+            <SaveButton loading={saving}>
+              {saving ? (
+                <>
+                  <FaSpinner className={styles.spinner} /> Changing…
+                </>
+              ) : (
+                "Change password"
+              )}
+            </SaveButton>
           </div>
         </form>
       </Section>
@@ -198,22 +223,22 @@ export default function SecuritySettings() {
         <div className={styles.securityTips}>
           {[
             {
-              icon: "🔑",
+              icon: <FaKey style={{ fontSize: 20 }} />,
               title: "Strong password",
               text: "Use a unique password not used on other sites.",
             },
             {
-              icon: "📧",
+              icon: <FaEnvelope style={{ fontSize: 20 }} />,
               title: "Verify your email",
               text: "Keep your email verified for account recovery.",
             },
             {
-              icon: "🔔",
+              icon: <FaBell style={{ fontSize: 20 }} />,
               title: "Login alerts",
               text: "We'll email you when a new device signs in.",
             },
             {
-              icon: "🚫",
+              icon: <FaBan style={{ fontSize: 20 }} />,
               title: "Suspicious activity",
               text: "Contact support immediately if you notice unusual activity.",
             },

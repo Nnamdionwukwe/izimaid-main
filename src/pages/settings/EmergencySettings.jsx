@@ -1,5 +1,16 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import {
+  FaPhone,
+  FaEnvelope,
+  FaExclamationTriangle,
+  FaPlus,
+  FaSpinner,
+  FaTrash,
+  FaUser,
+  FaUsers,
+  FaStar,
+} from "react-icons/fa";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -118,7 +129,9 @@ export default function EmergencySettings({ styles }) {
     <div>
       {toast.msg && (
         <div
-          className={`${styles.toast} ${toast.type === "error" ? styles.toastError : styles.toastSuccess}`}
+          className={`${styles.toast} ${
+            toast.type === "error" ? styles.toastError : styles.toastSuccess
+          }`}
         >
           <span>{toast.msg}</span>
           <button
@@ -135,8 +148,8 @@ export default function EmergencySettings({ styles }) {
         <div className={styles.sectionHeader}>
           <p className={styles.sectionTitle}>Your emergency contacts</p>
           <p className={styles.sectionDesc}>
-            Shared with the other party (maid/customer) and sent to admins when
-            an SOS alert is triggered. Always use full international phone
+            Shared with the other party (worker/customer) and sent to admins
+            when an SOS alert is triggered. Always use full international phone
             numbers.
           </p>
         </div>
@@ -153,7 +166,9 @@ export default function EmergencySettings({ styles }) {
               border: "1px dashed rgb(200,200,220)",
             }}
           >
-            <p style={{ fontSize: 32, margin: "0 0 8px" }}>🆘</p>
+            <p style={{ fontSize: 32, margin: "0 0 8px" }}>
+              <FaUsers style={{ fontSize: 32, color: "#888" }} />
+            </p>
             <p
               style={{
                 fontWeight: 700,
@@ -202,6 +217,7 @@ export default function EmergencySettings({ styles }) {
                         color: "rgb(30,30,30)",
                       }}
                     >
+                      <FaUser style={{ marginRight: 6, fontSize: 14 }} />
                       {c.name}
                     </p>
                     {c.is_primary && (
@@ -216,6 +232,7 @@ export default function EmergencySettings({ styles }) {
                           textTransform: "uppercase",
                         }}
                       >
+                        <FaStar style={{ marginRight: 4, fontSize: 10 }} />
                         Primary
                       </span>
                     )}
@@ -243,13 +260,14 @@ export default function EmergencySettings({ styles }) {
                       marginBottom: c.email ? 4 : 0,
                     }}
                   >
-                    📞 {c.phone}
+                    <FaPhone style={{ fontSize: 13 }} /> {c.phone}
                   </a>
                   {c.email && (
                     <p
                       style={{ fontSize: 12, color: "gray", margin: "2px 0 0" }}
                     >
-                      ✉️ {c.email}
+                      <FaEnvelope style={{ marginRight: 4, fontSize: 12 }} />
+                      {c.email}
                     </p>
                   )}
                 </div>
@@ -265,9 +283,12 @@ export default function EmergencySettings({ styles }) {
                     fontWeight: 700,
                     cursor: "pointer",
                     flexShrink: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 4,
                   }}
                 >
-                  Remove
+                  <FaTrash style={{ fontSize: 12 }} /> Remove
                 </button>
               </div>
             ))}
@@ -400,10 +421,12 @@ export default function EmergencySettings({ styles }) {
           >
             {saving ? (
               <>
-                <span className={styles.spinner} /> Adding…
+                <FaSpinner className={styles.spinner} /> Adding…
               </>
             ) : (
-              "🆘 Add Emergency Contact"
+              <>
+                <FaPlus style={{ marginRight: 8 }} /> Add Emergency Contact
+              </>
             )}
           </button>
         </div>
@@ -427,7 +450,8 @@ export default function EmergencySettings({ styles }) {
               margin: "0 0 6px",
             }}
           >
-            ⚠️ Why this matters
+            <FaExclamationTriangle style={{ marginRight: 8 }} />
+            Why this matters
           </p>
           <p
             style={{
@@ -438,9 +462,9 @@ export default function EmergencySettings({ styles }) {
             }}
           >
             When an SOS alert is triggered during a booking, your emergency
-            contacts are immediately emailed alongside the maid's and customer's
-            contacts. Admins are also notified with everyone's details so help
-            can be coordinated fast.
+            contacts are immediately emailed alongside the worker's and
+            customer's contacts. Admins are also notified with everyone's
+            details so help can be coordinated fast.
           </p>
         </div>
       </div>

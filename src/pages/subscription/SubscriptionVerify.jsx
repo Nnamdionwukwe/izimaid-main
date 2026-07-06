@@ -21,10 +21,10 @@ export default function SubscriptionVerify() {
         return;
       }
 
-      // Flutterwave uses 'reference' (tx_ref) or 'trxref'
-      const ref = params.get("reference") || params.get("trxref");
-      // Only accept Flutterwave gateway
-      const gateway = params.get("gateway");
+      // ── Flutterwave sends 'tx_ref' – try all possible param names ──
+      const ref =
+        params.get("tx_ref") || params.get("reference") || params.get("trxref");
+      const gateway = params.get("gateway") || "flutterwave";
 
       if (!ref) {
         setStatus("error");
@@ -32,16 +32,17 @@ export default function SubscriptionVerify() {
         return;
       }
 
-      if (gateway && gateway !== "flutterwave") {
+      if (gateway !== "flutterwave") {
         setStatus("error");
         setError("Only Flutterwave payments are supported.");
         return;
       }
 
       try {
-        const query = new URLSearchParams({ gateway: "flutterwave" });
-        query.set("reference", ref);
-
+        const query = new URLSearchParams({
+          gateway: "flutterwave",
+          reference: ref,
+        });
         const res = await fetch(`${API}/api/subscriptions/verify?${query}`, {
           headers: { Authorization: `Bearer ${token}` },
         });

@@ -11,18 +11,39 @@ import {
   Badge,
 } from "./SettingsUI";
 import { useBankDetails } from "../../pages/hooks/useSettings";
+import {
+  FaUniversity,
+  FaGlobe,
+  FaMobileAlt,
+  FaPaypal,
+  FaExchangeAlt,
+  FaBitcoin,
+  FaMoneyBillWave,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaSpinner,
+  FaInfoCircle,
+} from "react-icons/fa";
 
 const _raw = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 const API = _raw.replace(/\/$/, "").replace(/\/api$/, "") + "/api";
 
 const METHODS = [
-  { value: "bank_transfer", label: "Nigerian Bank / Fintech", flag: "🇳🇬" },
-  { value: "wire_transfer", label: "International Wire (SWIFT)", flag: "🌍" },
-  { value: "mobile_money", label: "Mobile Money", flag: "📱" },
-  { value: "paypal", label: "PayPal", flag: "💙" },
-  { value: "wise", label: "Wise (TransferWise)", flag: "💚" },
-  { value: "crypto", label: "Cryptocurrency", flag: "₿" },
-  { value: "flutterwave", label: "Flutterwave", flag: "🌊" },
+  {
+    value: "bank_transfer",
+    label: "Nigerian Bank / Fintech",
+    icon: <FaUniversity />,
+  },
+  {
+    value: "wire_transfer",
+    label: "International Wire (SWIFT)",
+    icon: <FaGlobe />,
+  },
+  { value: "mobile_money", label: "Mobile Money", icon: <FaMobileAlt /> },
+  { value: "paypal", label: "PayPal", icon: <FaPaypal /> },
+  { value: "wise", label: "Wise (TransferWise)", icon: <FaExchangeAlt /> },
+  { value: "crypto", label: "Cryptocurrency", icon: <FaBitcoin /> },
+  { value: "flutterwave", label: "Flutterwave", icon: <FaMoneyBillWave /> },
 ];
 
 const MOBILE_PROVIDERS = [
@@ -182,7 +203,9 @@ export default function WithdrawalSettings() {
       {details && (
         <Section title="Saved payout method">
           <div className={styles.savedMethod}>
-            <span className={styles.savedMethodIcon}>🏦</span>
+            <span className={styles.savedMethodIcon}>
+              <FaUniversity style={{ fontSize: 24 }} />
+            </span>
             <div>
               <div className={styles.savedMethodName}>{details.bank_name}</div>
               <div className={styles.hint}>
@@ -206,7 +229,7 @@ export default function WithdrawalSettings() {
               onClick={() => setMethod(m.value)}
               className={`${styles.methodCard} ${method === m.value ? styles.methodCardActive : ""}`}
             >
-              <span className={styles.methodFlag}>{m.flag}</span>
+              <span className={styles.methodIcon}>{m.icon}</span>
               <span>{m.label}</span>
             </button>
           ))}
@@ -260,7 +283,14 @@ export default function WithdrawalSettings() {
                 label="Account number"
                 hint="Enter your 10-digit NUBAN account number"
               >
-                <div style={{ display: "flex", gap: 8 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                  }}
+                >
                   <Input
                     value={form.account_number}
                     onChange={(e) => {
@@ -272,15 +302,27 @@ export default function WithdrawalSettings() {
                     }}
                     placeholder="0000000000"
                     maxLength={10}
-                    style={{ flex: 1 }}
+                    style={{ flex: "1 1 180px", minWidth: "150px" }}
                   />
                   <button
                     type="button"
                     className={styles.btnSecondary}
                     onClick={verifyAccount}
                     disabled={verifying}
+                    style={{
+                      flex: "0 0 auto",
+                      whiteSpace: "nowrap",
+                      padding: "0 16px",
+                      height: "38px",
+                    }}
                   >
-                    {verifying ? "Checking…" : "Verify"}
+                    {verifying ? (
+                      <>
+                        <FaSpinner className={styles.spinner} /> Checking…
+                      </>
+                    ) : (
+                      "Verify"
+                    )}
                   </button>
                 </div>
               </Field>
@@ -297,12 +339,14 @@ export default function WithdrawalSettings() {
                 />
                 {verified && (
                   <p className={styles.hint} style={{ color: "#16a34a" }}>
-                    ✓ Account verified
+                    <FaCheckCircle style={{ marginRight: 4 }} /> Account
+                    verified
                   </p>
                 )}
               </Field>
             </div>
             <p className={styles.hint} style={{ marginTop: 8 }}>
+              <FaInfoCircle style={{ marginRight: 4 }} />
               Works with GTB, Zenith, Access, UBA, First Bank, OPay, Moniepoint,
               Kuda, PalmPay, and all CBN-licensed banks. For PiggyVest — use
               your linked bank account details.
@@ -363,7 +407,8 @@ export default function WithdrawalSettings() {
               className={styles.hint}
               style={{ marginTop: 8, color: "#c2410c" }}
             >
-              ⚠️ Wire transfer fee: ₦12,000 per withdrawal. Processing takes 3–5
+              <FaExclamationTriangle style={{ marginRight: 4 }} />
+              Wire transfer fee: ₦12,000 per withdrawal. Processing takes 3–5
               business days.
             </p>
           </Section>
@@ -465,7 +510,8 @@ export default function WithdrawalSettings() {
               className={styles.hint}
               style={{ color: "#15803d", marginTop: 8 }}
             >
-              ✓ No withdrawal fee for crypto. USDT on TRC20 is recommended —
+              <FaCheckCircle style={{ marginRight: 4 }} />
+              No withdrawal fee for crypto. USDT on TRC20 is recommended —
               cheapest and fastest.
             </p>
           </Section>
@@ -484,6 +530,7 @@ export default function WithdrawalSettings() {
               />
             </Field>
             <p className={styles.hint} style={{ marginTop: 8 }}>
+              <FaInfoCircle style={{ marginRight: 4 }} />
               PayPal withdrawal fee: ₦500 flat.
             </p>
           </Section>
@@ -502,6 +549,7 @@ export default function WithdrawalSettings() {
               />
             </Field>
             <p className={styles.hint} style={{ marginTop: 8 }}>
+              <FaInfoCircle style={{ marginRight: 4 }} />
               Wise fee: ₦250 flat. Supports 80+ currencies. Best for
               international withdrawals.
             </p>
@@ -540,6 +588,7 @@ export default function WithdrawalSettings() {
               </Field>
             </div>
             <p className={styles.hint} style={{ marginTop: 8 }}>
+              <FaInfoCircle style={{ marginRight: 4 }} />
               Flutterwave covers 34 African countries. Best for Ghana, Rwanda,
               Uganda, Cameroon.
             </p>

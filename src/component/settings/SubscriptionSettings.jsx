@@ -12,12 +12,23 @@ import {
 import sub from "./Subscription.module.css";
 import { useSubscription } from "../../pages/hooks/useSettings";
 
+// ─── React Icons ──────────────────────────────────────────────
+import {
+  FaUser,
+  FaBolt,
+  FaStar,
+  FaCrown,
+  FaMedal,
+  FaTicketAlt,
+  FaCheck,
+} from "react-icons/fa";
+
 const PLAN_ICONS = {
-  free: "🆓",
-  basic: "⚡",
-  standard: "⭐",
-  premium: "👑",
-  pro_badge: "🏅",
+  free: <FaUser />,
+  basic: <FaBolt />,
+  standard: <FaStar />,
+  premium: <FaCrown />,
+  pro_badge: <FaMedal />,
 };
 const CURRENCY_SYMBOLS = {
   NGN: "₦",
@@ -55,25 +66,80 @@ const STATUS_COLOR = {
   cancelled: "gray",
   expired: "gray",
 };
-const GATEWAYS = [
-  { id: "paystack", label: "🏦 Paystack", hint: "NGN · GHS · ZAR · KES" },
-  { id: "stripe", label: "💳 Stripe", hint: "USD · GBP · EUR · global" },
-];
 
 export default function SubscriptionSettings({ styles }) {
-  // ── State must be declared BEFORE useSubscription ──
   const [view, setView] = useState("overview");
   const [billingInterval, setBillingInterval] = useState("monthly");
   const [toast, setToast] = useState({ message: null, type: "success" });
   const [busy, setBusy] = useState("");
   const [showCancelForm, setShowCancelForm] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
-  const [gateway, setGateway] = useState("paystack");
   const [promo, setPromo] = useState("");
   const [promoResult, setPromoResult] = useState(null);
   const [promoLoading, setPromoLoading] = useState(false);
 
-  // ── Hook called AFTER state so billingInterval is defined ──
+  function formatInterval(interval, planName) {
+    if (!interval && !planName) return "month";
+    // If the plan name suggests annual, override
+    if (planName && /annual|yearly|year/i.test(planName)) {
+      return "yearly";
+    }
+    const map = { annual: "yearly", year: "yearly", yearly: "yearly" };
+    return map[interval] || interval || "month";
+  }
+
+  // ─── Annual plan helpers ─────────────────────────────────────
+  function isAnnualPlan(plan) {
+    if (!plan) return false;
+    // Check plan interval or name
+    if (plan.interval === "year" || plan.interval === "annual") return true;
+    const name = (plan.display_name || plan.name || "").toLowerCase();
+    return (
+      name.includes("annual") ||
+      name.includes("yearly") ||
+      name.includes("year")
+    );
+  }
+
+  function getEffectivePeriod(subData, activePlan, invoices) {
+    if (!subData) return null;
+    // Default: use the stored period
+    const end = subData.current_period_end
+      ? new Date(subData.current_period_end)
+      : null;
+    const start = subData.current_period_start
+      ? new Date(subData.current_period_start)
+      : null;
+
+    // If annual, override with 1 year from the earliest invoice start
+    if (isAnnualPlan(activePlan) && invoices && invoices.length > 0) {
+      // Sort invoices by period_start ascending
+      const sorted = [...invoices].sort(
+        (a, b) => new Date(a.period_start) - new Date(b.period_start),
+      );
+      const first = sorted[0];
+      if (first && first.period_start) {
+        const startDate = new Date(first.period_start);
+        const annualEnd = new Date(startDate);
+        annualEnd.setFullYear(annualEnd.getFullYear() + 1);
+        // If the computed end is still in the past, add another year (edge case)
+        if (annualEnd < new Date()) {
+          annualEnd.setFullYear(annualEnd.getFullYear() + 1);
+        }
+        return { start: startDate, end: annualEnd };
+      }
+    }
+    // Fallback: use stored start/end (or infer start from end if missing)
+    if (end && !start) {
+      // For monthly, assume 30 days back (rough)
+      const inferredStart = new Date(end);
+      inferredStart.setDate(inferredStart.getDate() - 30);
+      return { start: inferredStart, end };
+    }
+    return { start, end };
+  }
+
+  // ── Hook ──
   const {
     data,
     plans,
@@ -85,6 +151,7 @@ export default function SubscriptionSettings({ styles }) {
     changePlan,
     validatePromo,
   } = useSubscription(view === "plans" ? billingInterval : null);
+
   function showToast(message, type = "success") {
     setToast({ message, type });
     setTimeout(() => setToast({ message: null, type: "success" }), 5000);
@@ -96,8 +163,22 @@ export default function SubscriptionSettings({ styles }) {
   const isPaused = subData?.status === "paused";
   const isPastDue = subData?.status === "past_due";
   const noSub = !subData || ["cancelled", "expired"].includes(subData?.status);
-  const days = daysLeft(subData?.current_period_end);
-  const progressW = `${Math.max(4, Math.min(100, 100 - (days / 30) * 100))}%`;
+
+  // ── Compute effective period ──────────────────────────────
+  const effective = getEffectivePeriod(subData, activePlan, data?.invoices);
+  const effectiveEnd = effective?.end;
+  const effectiveStart = effective?.start;
+  const effectiveDaysLeft = effectiveEnd
+    ? daysLeft(effectiveEnd.toISOString())
+    : 0;
+  const effectiveTotalDays =
+    effectiveStart && effectiveEnd
+      ? Math.max(1, Math.ceil((effectiveEnd - effectiveStart) / 86400000))
+      : 30; // fallback
+  const progressW =
+    effectiveStart && effectiveEnd
+      ? `${Math.max(4, Math.min(100, 100 - (effectiveDaysLeft / effectiveTotalDays) * 100))}%`
+      : `${Math.max(4, Math.min(100, 100 - (effectiveDaysLeft / 30) * 100))}%`;
 
   async function handlePromo() {
     if (!promo.trim()) return;
@@ -118,10 +199,10 @@ export default function SubscriptionSettings({ styles }) {
     try {
       const d = await subscribe(
         plan.id,
-        gateway,
+        "flutterwave",
         promoResult?.valid ? promo : undefined,
       );
-      const url = d.authorization_url || d.url || d.checkout_url;
+      const url = d.authorization_url || d.url || d.checkout_url || d.link;
       if (url) {
         window.location.href = url;
         return;
@@ -138,13 +219,11 @@ export default function SubscriptionSettings({ styles }) {
     setBusy("chg_" + plan.id);
     try {
       const d = await changePlan(plan.id);
-      // If backend returns a payment URL, redirect to it
-      const url = d.authorization_url || d.url || d.checkout_url;
+      const url = d.authorization_url || d.url || d.checkout_url || d.link;
       if (url) {
         window.location.href = url;
         return;
       }
-      // Free plan switch — no redirect needed
       showToast(`✅ Switched to ${plan.display_name || plan.name}!`);
       setView("overview");
     } catch (err) {
@@ -242,7 +321,9 @@ export default function SubscriptionSettings({ styles }) {
               description="Upgrade to get more bookings, priority matching, and exclusive discounts."
             >
               <div className={sub.freePlanCard}>
-                <span className={sub.freePlanIcon}>🆓</span>
+                <span className={sub.freePlanIcon}>
+                  <FaUser />
+                </span>
                 <div>
                   <p className={sub.freePlanName}>Free plan</p>
                   <p className={sub.freePlanHint}>
@@ -283,21 +364,30 @@ export default function SubscriptionSettings({ styles }) {
                       </Badge>
                       {subData.cancel_at_period_end && (
                         <Badge color="red">
-                          Cancels {fmtDate(subData.current_period_end)}
+                          Cancels{" "}
+                          {fmtDate(
+                            effectiveEnd?.toISOString() ||
+                              subData.current_period_end,
+                          )}
                         </Badge>
                       )}
                     </div>
                     <p className={sub.planHeaderName}>
-                      {PLAN_ICONS[activePlan?.name] || "⭐"}{" "}
+                      {PLAN_ICONS[activePlan?.name] || <FaStar />}{" "}
                       {activePlan?.display_name ||
                         activePlan?.name ||
                         "Premium"}
                     </p>
                     <p className={sub.planHeaderMeta}>
                       {isActive &&
-                        `${days} day${days !== 1 ? "s" : ""} remaining · `}
+                        `${effectiveDaysLeft} day${
+                          effectiveDaysLeft !== 1 ? "s" : ""
+                        } remaining · `}
                       {subData.cancel_at_period_end ? "Cancels" : "Renews"}{" "}
-                      {fmtDate(subData.current_period_end)}
+                      {fmtDate(
+                        effectiveEnd?.toISOString() ||
+                          subData.current_period_end,
+                      )}
                     </p>
                   </div>
                   <div className={sub.planHeaderRight}>
@@ -305,7 +395,11 @@ export default function SubscriptionSettings({ styles }) {
                       {fmtAmt(subData.amount, subData.currency)}
                     </p>
                     <p className={sub.planHeaderInterval}>
-                      /{subData.interval || "month"}
+                      /
+                      {formatInterval(
+                        subData.interval,
+                        activePlan?.display_name || activePlan?.name,
+                      )}
                     </p>
                   </div>
                 </div>
@@ -342,7 +436,9 @@ export default function SubscriptionSettings({ styles }) {
                 <div className={sub.featuresList}>
                   {activePlan.features.map((f, i) => (
                     <div key={i} className={sub.featureRow}>
-                      <span className={sub.featureCheck}>✓</span>
+                      <span className={sub.featureCheck}>
+                        <FaCheck />
+                      </span>
                       {f}
                     </div>
                   ))}
@@ -358,24 +454,6 @@ export default function SubscriptionSettings({ styles }) {
                     Change Plan
                   </SecondaryButton>
                 )}
-                {/* {isActive && (
-                  <SecondaryButton
-                    loading={busy === "pause"}
-                    onClick={handlePause}
-                    disabled={!!busy && busy !== "pause"}
-                  >
-                    ⏸ Pause
-                  </SecondaryButton>
-                )}
-                {isPaused && (
-                  <SaveButton
-                    loading={busy === "resume"}
-                    disabled={!!busy && busy !== "resume"}
-                    onClick={handleResume}
-                  >
-                    ▶ Resume
-                  </SaveButton>
-                )} */}
                 {isPastDue && (
                   <SaveButton onClick={() => setView("plans")}>
                     Update Payment
@@ -392,7 +470,11 @@ export default function SubscriptionSettings({ styles }) {
                   <div key={inv.id} className={sub.invoiceRow}>
                     <div>
                       <p className={sub.invoicePeriod}>
-                        {fmtDate(inv.period_start)} – {fmtDate(inv.period_end)}
+                        {fmtDate(inv.period_start)} –{" "}
+                        {fmtDate(
+                          effectiveEnd?.toISOString() ||
+                            subData?.current_period_end,
+                        )}
                       </p>
                       <p className={sub.invoiceDate}>
                         Paid {fmtDate(inv.paid_at || inv.created_at)}
@@ -413,7 +495,9 @@ export default function SubscriptionSettings({ styles }) {
           {isActive && !subData?.cancel_at_period_end && (
             <Section
               title="Cancel subscription"
-              description={`You'll keep access until ${fmtDate(subData?.current_period_end)}.`}
+              description={`You'll keep access until ${fmtDate(
+                effectiveEnd?.toISOString() || subData?.current_period_end,
+              )}.`}
             >
               {!showCancelForm ? (
                 <DangerButton onClick={() => setShowCancelForm(true)}>
@@ -473,20 +557,9 @@ export default function SubscriptionSettings({ styles }) {
               ))}
             </div>
 
-            <div className={sub.gatewayRow}>
-              {GATEWAYS.map((g) => (
-                <button
-                  key={g.id}
-                  onClick={() => setGateway(g.id)}
-                  className={`${sub.gatewayBtn} ${gateway === g.id ? sub.gatewayBtnActive : ""}`}
-                >
-                  <p className={sub.gatewayLabel}>{g.label}</p>
-                  <p className={sub.gatewayHint}>{g.hint}</p>
-                </button>
-              ))}
-            </div>
-
-            <label className={sub.promoLabel}>🎟 Promo code</label>
+            <label className={sub.promoLabel}>
+              <FaTicketAlt /> Promo code
+            </label>
             <div className={sub.promoRow}>
               <input
                 className={sub.promoInput}
@@ -547,7 +620,7 @@ export default function SubscriptionSettings({ styles }) {
                       <p
                         className={`${sub.planCardName} ${showBadge ? sub.planCardNameOffset : ""}`}
                       >
-                        {PLAN_ICONS[plan.name] || "⭐"}{" "}
+                        {PLAN_ICONS[plan.name] || <FaStar />}{" "}
                         {plan.display_name || plan.name}
                       </p>
 
@@ -561,7 +634,11 @@ export default function SubscriptionSettings({ styles }) {
                           {fmtAmt(finalPrice, plan.currency)}
                         </span>
                         <span className={sub.planPriceInterval}>
-                          /{plan.interval || "mo"}
+                          /
+                          {formatInterval(
+                            plan.interval,
+                            plan.display_name || plan.name,
+                          )}
                         </span>
                       </div>
 
@@ -574,7 +651,10 @@ export default function SubscriptionSettings({ styles }) {
                       <div className={sub.planFeatures}>
                         {plan.features?.slice(0, 4).map((f, i) => (
                           <div key={i} className={sub.planFeatureRow}>
-                            <span className={sub.planFeatureTick}>✓</span> {f}
+                            <span className={sub.planFeatureTick}>
+                              <FaCheck />
+                            </span>{" "}
+                            {f}
                           </div>
                         ))}
                       </div>
@@ -609,7 +689,7 @@ export default function SubscriptionSettings({ styles }) {
               </div>
             )}
             <p className={sub.plansFootnote}>
-              Secure payments · Cancel anytime · Receipt sent by email
+              🔒 Secured by Flutterwave · Cancel anytime · Receipt sent by email
             </p>
           </Section>
         </>

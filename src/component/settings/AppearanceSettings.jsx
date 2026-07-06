@@ -99,7 +99,7 @@ export default function AppearanceSettings() {
       />
       <form onSubmit={handleSubmit}>
         {/* Theme */}
-        <Section
+        {/* <Section
           title="Theme"
           description="Choose how Deusizi Sparkle looks on your device."
         >
@@ -119,7 +119,7 @@ export default function AppearanceSettings() {
               </button>
             ))}
           </div>
-        </Section>
+        </Section> */}
 
         {/* Language */}
         <Section

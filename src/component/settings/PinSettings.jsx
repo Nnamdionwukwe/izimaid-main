@@ -9,6 +9,14 @@ import {
   Badge,
   SecondaryButton,
 } from "./SettingsUI";
+import {
+  FaLock,
+  FaKey,
+  FaEnvelope,
+  FaShieldAlt,
+  FaCheckCircle,
+  FaSpinner,
+} from "react-icons/fa";
 
 const _raw = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 const API = _raw.replace(/\/$/, "").replace(/\/api$/, "") + "/api";
@@ -279,14 +287,14 @@ export default function PinSettings() {
                 className={styles.btnPrimary}
                 onClick={() => setMode("set")}
               >
-                Set PIN
+                <FaLock style={{ marginRight: 6 }} /> Set PIN
               </button>
             ) : (
               <button
                 className={styles.btnSecondary}
                 onClick={() => setMode(mode === "change" ? null : "change")}
               >
-                Change PIN
+                <FaKey style={{ marginRight: 6 }} /> Change PIN
               </button>
             )}
           </div>
@@ -329,7 +337,7 @@ export default function PinSettings() {
                   fontSize: ".85rem",
                 }}
               >
-                ✓ PINs match
+                <FaCheckCircle style={{ marginRight: 4 }} /> PINs match
               </p>
             )}
 
@@ -339,7 +347,13 @@ export default function PinSettings() {
                 loading={saving}
                 disabled={pin.length < 4 || pin !== confirm}
               >
-                Set PIN
+                {saving ? (
+                  <>
+                    <FaSpinner className={styles.spinner} /> Setting…
+                  </>
+                ) : (
+                  "Set PIN"
+                )}
               </SaveButton>
             </div>
           </form>
@@ -377,13 +391,21 @@ export default function PinSettings() {
                     fontSize: ".85rem",
                   }}
                 >
-                  ✓ PINs match
+                  <FaCheckCircle style={{ marginRight: 4 }} /> PINs match
                 </p>
               )}
 
             <div className={styles.formFooter}>
               <SecondaryButton onClick={resetForms}>Cancel</SecondaryButton>
-              <SaveButton loading={saving}>Change PIN</SaveButton>
+              <SaveButton loading={saving}>
+                {saving ? (
+                  <>
+                    <FaSpinner className={styles.spinner} /> Changing…
+                  </>
+                ) : (
+                  "Change PIN"
+                )}
+              </SaveButton>
             </div>
           </form>
         </Section>
@@ -396,7 +418,15 @@ export default function PinSettings() {
             We'll send a reset link to your registered email address.
           </p>
           <DangerButton loading={saving} onClick={handleRequestReset}>
-            Send PIN reset email
+            {saving ? (
+              <>
+                <FaSpinner className={styles.spinner} /> Sending…
+              </>
+            ) : (
+              <>
+                <FaEnvelope style={{ marginRight: 6 }} /> Send PIN reset email
+              </>
+            )}
           </DangerButton>
         </Section>
       )}
@@ -406,22 +436,22 @@ export default function PinSettings() {
         <div className={styles.securityTips}>
           {[
             {
-              icon: "🔐",
+              icon: <FaLock style={{ fontSize: 20 }} />,
               title: "Required on every withdrawal",
               text: "You must enter your PIN each time you request a payout. It can't be skipped.",
             },
             {
-              icon: "🔒",
+              icon: <FaShieldAlt style={{ fontSize: 20 }} />,
               title: "Auto-lock after 5 wrong attempts",
               text: "After 5 incorrect attempts your PIN locks for 30 minutes to prevent brute-force attacks.",
             },
             {
-              icon: "📧",
+              icon: <FaEnvelope style={{ fontSize: 20 }} />,
               title: "Reset via email",
               text: "If you forget your PIN, use the email reset link. No admin can see or override your PIN.",
             },
             {
-              icon: "🔑",
+              icon: <FaKey style={{ fontSize: 20 }} />,
               title: "Separate from your login password",
               text: "Your PIN only protects withdrawals — changing your password doesn't change your PIN.",
             },
