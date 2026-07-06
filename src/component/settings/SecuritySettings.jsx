@@ -8,6 +8,7 @@ import {
   SaveButton,
   Toast,
   DangerButton,
+  SecondaryButton,
 } from "./SettingsUI";
 import { changePassword } from "../../pages/hooks/useSettings";
 import {
@@ -20,6 +21,8 @@ import {
   FaCheck,
   FaCircle,
   FaSpinner,
+  FaExclamationTriangle,
+  FaTimes,
 } from "react-icons/fa";
 
 export default function SecuritySettings() {
@@ -32,6 +35,7 @@ export default function SecuritySettings() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
   const [showPwd, setShowPwd] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   function validate() {
     const e = {};
@@ -99,6 +103,22 @@ export default function SecuritySettings() {
     }
   }
 
+  function openDeleteModal() {
+    setShowDeleteModal(true);
+  }
+
+  function closeDeleteModal() {
+    setShowDeleteModal(false);
+  }
+
+  function confirmDelete() {
+    closeDeleteModal();
+    setToast({
+      message: "Please contact support to delete your account.",
+      type: "error",
+    });
+  }
+
   return (
     <div>
       <Toast
@@ -106,6 +126,123 @@ export default function SecuritySettings() {
         type={toast?.type}
         onClose={() => setToast(null)}
       />
+
+      {/* ─── Delete Account Modal ─── */}
+      {showDeleteModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.6)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            padding: "20px",
+          }}
+          onClick={closeDeleteModal}
+        >
+          <div
+            style={{
+              background: "var(--ds-bg-card, #fff)",
+              borderRadius: "16px",
+              maxWidth: "460px",
+              width: "100%",
+              padding: "32px 28px",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+              position: "relative",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={closeDeleteModal}
+              style={{
+                position: "absolute",
+                top: "16px",
+                right: "16px",
+                background: "none",
+                border: "none",
+                fontSize: "1.4rem",
+                color: "var(--ds-text-muted, #6a6a7a)",
+                cursor: "pointer",
+                padding: "4px",
+                lineHeight: 1,
+              }}
+              aria-label="Close modal"
+            >
+              <FaTimes />
+            </button>
+
+            <div style={{ marginBottom: "20px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  marginBottom: "12px",
+                }}
+              >
+                <FaExclamationTriangle
+                  style={{ fontSize: "2rem", color: "#dc2626" }}
+                />
+                <h2
+                  style={{
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    margin: 0,
+                    color: "var(--ds-text, #1a1a2e)",
+                  }}
+                >
+                  Delete Account
+                </h2>
+              </div>
+              <p
+                style={{
+                  fontSize: "0.95rem",
+                  color: "var(--ds-text-secondary, #4a4a5a)",
+                  margin: "0 0 8px",
+                  lineHeight: 1.6,
+                }}
+              >
+                Are you absolutely sure? This action will permanently delete:
+              </p>
+              <ul
+                style={{
+                  fontSize: "0.9rem",
+                  color: "var(--ds-text-secondary, #4a4a5a)",
+                  margin: "8px 0 0 20px",
+                  lineHeight: 1.8,
+                }}
+              >
+                <li>Your account and all profile data</li>
+                <li>All bookings and history</li>
+                <li>Any earnings and payout records</li>
+                <li>This cannot be undone</li>
+              </ul>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                justifyContent: "flex-end",
+                marginTop: "8px",
+              }}
+            >
+              <SecondaryButton onClick={closeDeleteModal}>
+                Cancel
+              </SecondaryButton>
+              <DangerButton onClick={confirmDelete}>
+                Yes, delete my account
+              </DangerButton>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Section
         title="Change password"
@@ -264,20 +401,7 @@ export default function SecuritySettings() {
                 undone.
               </div>
             </div>
-            <DangerButton
-              onClick={() => {
-                if (
-                  window.confirm(
-                    "Are you absolutely sure? This will permanently delete your account.",
-                  )
-                ) {
-                  setToast({
-                    message: "Please contact support to delete your account.",
-                    type: "error",
-                  });
-                }
-              }}
-            >
+            <DangerButton onClick={openDeleteModal}>
               Delete account
             </DangerButton>
           </div>
