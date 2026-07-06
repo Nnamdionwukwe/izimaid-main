@@ -551,3 +551,133 @@
   border: 2px solid rgb(19, 19, 103);
   font-family: inherit;
 }
+
+/* ── Logout Confirmation Modal ───────────────────────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContainer {
+  background: white;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #f0f2f5;
+  background: #fafafa;
+}
+
+.modalIcon {
+  font-size: 24px;
+  color: #f59e0b;
+}
+
+.modalHeader h3 {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0b1a33;
+  margin: 0;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  color: #6a7a9e;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.modalClose:hover {
+  background: #f0f2f5;
+}
+
+.modalBody {
+  padding: 24px 20px;
+}
+
+.modalBody p {
+  font-size: 15px;
+  color: #2a4068;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid #f0f2f5;
+}
+
+.modalCancelBtn {
+  padding: 8px 20px;
+  background: transparent;
+  color: #2a4068;
+  border: 1px solid #d0d7e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.modalCancelBtn:hover {
+  background: #f0f2f5;
+}
+
+.modalConfirmBtn {
+  padding: 8px 24px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.modalConfirmBtn:hover {
+  background: #b91c1c;
+}

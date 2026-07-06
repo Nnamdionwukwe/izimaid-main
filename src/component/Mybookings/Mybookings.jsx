@@ -1,4 +1,3 @@
-// src/component/Mybookings/Mybookings.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Mybookings.module.css";
@@ -6,6 +5,19 @@ import Chat from "../Chat/Chat";
 import NotificationBell from "../Notifications/NotificationBell";
 import { useAuth } from "../../context/AuthContext";
 import Inbox from "../Chat/Inbox";
+
+// ─── React Icons ──────────────────────────────────────────────
+import {
+  FaArrowLeft,
+  FaComment,
+  FaComments,
+  FaTicketAlt,
+  FaCreditCard,
+  FaPlus,
+  FaClipboardList,
+  FaExclamationTriangle,
+  FaLock,
+} from "react-icons/fa";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -123,7 +135,7 @@ const CHAT_STATUSES = ["confirmed", "in_progress", "completed", "pending"];
 
 export default function MyBookings() {
   const navigate = useNavigate();
-  const { user, token, logout } = useAuth(); // ← token + logout from context
+  const { user, token, logout } = useAuth();
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -247,7 +259,7 @@ export default function MyBookings() {
       {/* ── Top bar ────────────────────────────────────────────── */}
       <div className={styles.topBar}>
         <button className={styles.backLink} onClick={() => navigate("/")}>
-          ← Home
+          <FaArrowLeft /> Home
         </button>
         <div className={styles.topBarRight}>
           <NotificationBell token={token} />
@@ -258,7 +270,7 @@ export default function MyBookings() {
             className={styles.msgIconBtn}
             title="Messages"
           >
-            💬
+            <FaComment />
             {unreadMessages > 0 && (
               <span className={styles.msgBadge}>
                 {unreadMessages > 99 ? "99+" : unreadMessages}
@@ -303,19 +315,19 @@ export default function MyBookings() {
               className={styles.ghostBtn}
               onClick={() => navigate("/customersupport")}
             >
-              🎫 Support
+              <FaTicketAlt /> Support
             </button>
             <button
               className={styles.ghostBtn}
               onClick={() => navigate("/payments")}
             >
-              💳 My Payments
+              <FaCreditCard /> My Payments
             </button>
             <button
               className={styles.newBookingBtn}
               onClick={() => navigate("/maids")}
             >
-              + New Booking
+              <FaPlus /> New Booking
             </button>
           </div>
         )}
@@ -342,7 +354,9 @@ export default function MyBookings() {
         </div>
       ) : bookings.length === 0 ? (
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>📋</div>
+          <div className={styles.emptyIcon}>
+            <FaClipboardList />
+          </div>
           <p className={styles.emptyTitle}>
             No {filter !== "all" ? filter.replace(/_/g, " ") : ""} bookings
             found
@@ -386,7 +400,9 @@ export default function MyBookings() {
               {/* Declined alert */}
               {b.status === "declined" && b.declined_reason && (
                 <div className={styles.declinedAlert}>
-                  <span className={styles.declinedIcon}>⚠️</span>
+                  <span className={styles.declinedIcon}>
+                    <FaExclamationTriangle />
+                  </span>
                   <p className={styles.declinedReason}>
                     <span className={styles.reasonLabel}>Reason: </span>
                     {b.declined_reason}
@@ -425,7 +441,7 @@ export default function MyBookings() {
                       navigate("/payment", { state: { booking: b } });
                     }}
                   >
-                    🔒 Pay Now — {fmtBookingAmt(b)}
+                    <FaLock /> Pay Now — {fmtBookingAmt(b)}
                   </button>
                 </div>
               )}
@@ -437,7 +453,7 @@ export default function MyBookings() {
                     className={styles.chatBtn}
                     onClick={(e) => handleOpenChat(e, b)}
                   >
-                    💬 {isMaid ? "Chat Customer" : "Chat Maid"}
+                    <FaComments /> {isMaid ? "Chat Customer" : "Chat Maid"}
                   </button>
                 )}
                 {!isMaid && (
@@ -445,7 +461,7 @@ export default function MyBookings() {
                     className={styles.supportBtn}
                     onClick={(e) => handleGetSupport(e, b)}
                   >
-                    🎫 Support
+                    <FaTicketAlt /> Support
                   </button>
                 )}
               </div>
