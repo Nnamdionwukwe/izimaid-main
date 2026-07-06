@@ -69,6 +69,12 @@ function formatAddress(a) {
   );
 }
 
+// ── Unified helper for hourly rate ────────────────────────────────
+function getHourlyRate(maid) {
+  // Priority: hourly_rate first, then rate_hourly, then 0
+  return Number(maid.hourly_rate || maid.rate_hourly || 0);
+}
+
 // ── Duration config per rate type ────────────────────────────────────
 const DURATION_CONFIG = {
   hourly: {
@@ -128,7 +134,8 @@ const NEGOT_UNITS = [
 
 function buildRateOptions(maid, s) {
   const options = [];
-  const hourly = Number(maid.rate_hourly || maid.hourly_rate || 0);
+  // Use the same helper to ensure consistency
+  const hourly = getHourlyRate(maid);
   const daily = Number(maid.rate_daily || 0);
   const weekly = Number(maid.rate_weekly || 0);
   const monthly = Number(maid.rate_monthly || 0);
@@ -214,11 +221,9 @@ export default function Booking() {
   const [maid, setMaid] = useState(state?.maid || {});
   const [loadingMaid, setLoadingMaid] = useState(!state?.maid);
 
-  // ── Fetch latest maid data if we have an ID ──────────────────
+  // ── Fetch latest maid data ────────────────────────────────────
   useEffect(() => {
     if (!maidId) return;
-    // If we already have maid data from state and it matches the ID, we could skip.
-    // But we always fetch to get fresh rates.
     const fetchMaid = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -227,13 +232,12 @@ export default function Booking() {
         });
         if (!res.ok) throw new Error("Maid not found");
         const data = await res.json();
-        // Merge with existing state to keep any extra fields (like avatar)
+        // Merge with existing state to keep extra fields (avatar etc.)
         setMaid((prev) => ({ ...prev, ...data }));
       } catch (err) {
         console.error("Failed to fetch maid:", err);
-        // Fallback: keep the state data if available
         if (!state?.maid) {
-          // No fallback, show error or redirect
+          // No fallback – you may set an error state
         }
       } finally {
         setLoadingMaid(false);
@@ -469,6 +473,7 @@ export default function Booking() {
     );
   }
 
+  // ── Main render ──────────────────────────────────────────────────
   return (
     <div className={styles.page}>
       <button className={styles.backBtn} onClick={() => navigate("/maids")}>
@@ -498,7 +503,7 @@ export default function Booking() {
           <p className={styles.maidName}>{maid.name || "Selected Maid"}</p>
           <p className={styles.maidRate}>
             {s}
-            {Number(maid.hourly_rate || maid.rate_hourly || 0).toLocaleString()}
+            {getHourlyRate(maid).toLocaleString()}
             /hr · {currency}
           </p>
           {maid.id_verified && (
