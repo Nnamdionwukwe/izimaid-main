@@ -7,11 +7,24 @@
 import { useState, useEffect, useCallback } from "react";
 import styles from "./EarningsTab.module.css";
 
+// ─── React Icons ──────────────────────────────────────────────
+import {
+  FaMoneyBillWave,
+  FaClipboardList,
+  FaChartBar,
+  FaTrophy,
+  FaInbox,
+  FaClock,
+  FaMapMarkerAlt,
+  FaStickyNote,
+} from "react-icons/fa";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const API = API_URL.replace(/\/$/, "").replace(/\/api$/, "") + "/api";
 
-// ── Currency symbols ──────────────────────────────────────────────────
+// ── Currency symbols (fiat + crypto) ────────────────────────────────
 const SYMBOLS = {
+  // Fiat currencies
   NGN: "₦",
   USD: "$",
   GBP: "£",
@@ -28,6 +41,56 @@ const SYMBOLS = {
   AED: "د.إ",
   SAR: "﷼",
   SGD: "S$",
+
+  // Cryptocurrencies – using ticker symbols as they are
+  BTC: "₿",
+  ETH: "Ξ",
+  USDC: "USDC ",
+  USDT: "USDT ",
+  BNB: "BNB ",
+  SOL: "SOL ",
+  XRP: "XRP ",
+  ADA: "ADA ",
+  DOGE: "DOGE ",
+  DOT: "DOT ",
+  AVAX: "AVAX ",
+  MATIC: "MATIC ",
+  LINK: "LINK ",
+  UNI: "UNI ",
+  ATOM: "ATOM ",
+  LTC: "Ł",
+  XLM: "XLM ",
+  BCH: "BCH ",
+  EOS: "EOS ",
+  TRX: "TRX ",
+  XTZ: "XTZ ",
+  FIL: "FIL ",
+  ICP: "ICP ",
+  VET: "VET ",
+  HBAR: "HBAR ",
+  ETC: "ETC ",
+  RUNE: "RUNE ",
+  FTM: "FTM ",
+  AAVE: "AAVE ",
+  MKR: "MKR ",
+  COMP: "COMP ",
+  SUSHI: "SUSHI ",
+  YFI: "YFI ",
+  SNX: "SNX ",
+  CRV: "CRV ",
+  UST: "UST ",
+  LUNC: "LUNC ",
+  LUNA: "LUNA ",
+  AVAX: "AVAX ",
+  NEAR: "NEAR ",
+  ALGO: "ALGO ",
+  FLOW: "FLOW ",
+  THETA: "THETA ",
+  HNT: "HNT ",
+  KSM: "KSM ",
+  ZEC: "ZEC ",
+  DASH: "DASH ",
+  XMR: "XMR ",
 };
 function sym(c) {
   return SYMBOLS[c] || c + " ";
@@ -106,7 +169,6 @@ function BarChart({ data, currency }) {
 }
 
 // ── Summary cards ─────────────────────────────────────────────────────
-// REPLACE SummaryCards to accept active currency from filter:
 function SummaryCards({ summary, activeCurrency }) {
   const row = summary.find((s) => s.currency === activeCurrency) || summary[0];
   if (!row) return null;
@@ -114,13 +176,17 @@ function SummaryCards({ summary, activeCurrency }) {
   return (
     <div className={styles.summaryGrid}>
       <div className={styles.statCard}>
-        <span className={styles.statIcon}>💰</span>
+        <span className={styles.statIcon}>
+          <FaMoneyBillWave />
+        </span>
         <p className={styles.statLabel}>Total Earned</p>
         <p className={styles.statValue}>{fmtShort(row.total_earned, c)}</p>
         <p className={styles.statFull}>{fmt(row.total_earned, c)}</p>
       </div>
       <div className={styles.statCard}>
-        <span className={styles.statIcon}>📋</span>
+        <span className={styles.statIcon}>
+          <FaClipboardList />
+        </span>
         <p className={styles.statLabel}>Bookings</p>
         <p className={styles.statValue}>
           {Number(row.booking_count).toLocaleString()}
@@ -130,13 +196,17 @@ function SummaryCards({ summary, activeCurrency }) {
         </p>
       </div>
       <div className={styles.statCard}>
-        <span className={styles.statIcon}>📊</span>
+        <span className={styles.statIcon}>
+          <FaChartBar />
+        </span>
         <p className={styles.statLabel}>Avg / Booking</p>
         <p className={styles.statValue}>{fmtShort(row.avg_per_booking, c)}</p>
         <p className={styles.statFull}>{fmt(row.avg_per_booking, c)}</p>
       </div>
       <div className={styles.statCard}>
-        <span className={styles.statIcon}>🏆</span>
+        <span className={styles.statIcon}>
+          <FaTrophy />
+        </span>
         <p className={styles.statLabel}>Highest</p>
         <p className={styles.statValue}>{fmtShort(row.highest_booking, c)}</p>
         <p className={styles.statFull}>{fmt(row.highest_booking, c)}</p>
@@ -147,7 +217,6 @@ function SummaryCards({ summary, activeCurrency }) {
 
 // ── Main EarningsTab ──────────────────────────────────────────────────
 export default function EarningsTab({ token }) {
-  // ── State FIRST — activeCurrency depends on currency ──
   const [data, setData] = useState({
     bookings: [],
     summary: [],
@@ -164,11 +233,9 @@ export default function EarningsTab({ token }) {
   const [page, setPage] = useState(1);
   const LIMIT = 15;
 
-  // ── Derived — must come AFTER state declarations ──
   const activeCurrency = currency || data?.summary?.[0]?.currency || "NGN";
   const allCurrencies = data?.currencies || [];
 
-  // Filter monthly chart to selected currency only
   const monthlyFiltered = currency
     ? data.monthly.filter((m) => m.currency === currency)
     : data.monthly.filter((m) => m.currency === activeCurrency);
@@ -330,12 +397,14 @@ export default function EarningsTab({ token }) {
 
         {loading && page === 1 ? (
           <div className={styles.loadingState}>
-            <div className={styles.spinner} />
+            <div className={styles.spinner} /> {/* ← original spinner kept */}
             <p>Loading earnings…</p>
           </div>
         ) : data?.bookings?.length === 0 ? (
           <div className={styles.emptyState}>
-            <span className={styles.emptyIcon}>📭</span>
+            <span className={styles.emptyIcon}>
+              <FaInbox />
+            </span>
             <p>No earnings found for this filter.</p>
             <p className={styles.emptyHint}>
               Try changing the period or currency filter.
@@ -379,7 +448,6 @@ export default function EarningsTab({ token }) {
                       </div>
                     </div>
                     <div className={styles.bookingRight}>
-                      {/* Use booking's own currency — each row shows the right symbol */}
                       <p className={styles.bookingAmount}>
                         {fmt(b.total_amount, b.currency || activeCurrency)}
                       </p>
@@ -392,11 +460,17 @@ export default function EarningsTab({ token }) {
                     </div>
                   </div>
                   <div className={styles.bookingMeta}>
-                    <span>⏱ {b.duration_hours}h</span>
-                    {b.address && <span>📍 {b.address.split(",")[0]}</span>}
+                    <span>
+                      <FaClock /> {b.duration_hours}h
+                    </span>
+                    {b.address && (
+                      <span>
+                        <FaMapMarkerAlt /> {b.address.split(",")[0]}
+                      </span>
+                    )}
                     {b.notes && (
                       <span>
-                        📝 {b.notes.slice(0, 40)}
+                        <FaStickyNote /> {b.notes.slice(0, 40)}
                         {b.notes.length > 40 ? "…" : ""}
                       </span>
                     )}

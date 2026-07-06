@@ -3,6 +3,21 @@ import { useAuth } from "../../context/AuthContext";
 import styles from "./Settings.module.css";
 import EmergencySettings from "./EmergencySettings";
 
+// ─── React Icons ──────────────────────────────────────────────
+import {
+  FaUser,
+  FaExclamationTriangle,
+  FaPalette,
+  FaBell,
+  FaStar,
+  FaMoneyBillWave,
+  FaLock,
+  FaShieldAlt,
+  FaCog,
+  FaTimes,
+  FaArrowLeft,
+} from "react-icons/fa";
+
 const ProfileSettings = lazy(
   () => import("../../component/settings/ProfileSettings"),
 );
@@ -27,42 +42,42 @@ const ALL_TABS = [
   {
     id: "profile",
     label: "Profile",
-    icon: "👤",
+    icon: <FaUser />,
     component: ProfileSettings,
     roles: ["customer", "maid", "admin"],
   },
   {
     id: "emergency",
     label: "Emergency",
-    icon: "🆘",
+    icon: <FaExclamationTriangle />,
     component: EmergencySettings,
     roles: ["customer", "maid", "admin"],
   },
   {
     id: "appearance",
     label: "Appearance",
-    icon: "🎨",
+    icon: <FaPalette />,
     component: AppearanceSettings,
     roles: ["customer", "maid", "admin"],
   },
   {
     id: "notifications",
     label: "Notifications",
-    icon: "🔔",
+    icon: <FaBell />,
     component: NotificationSettings,
     roles: ["customer", "maid", "admin"],
   },
   {
     id: "subscription",
     label: "Subscription",
-    icon: "⭐",
+    icon: <FaStar />,
     component: SubscriptionSettings,
     roles: ["customer", "maid"],
   },
   {
     id: "withdrawal",
     label: "Payouts",
-    icon: "💸",
+    icon: <FaMoneyBillWave />,
     component: WithdrawalSettings,
     roles: ["maid"],
     badge: "Maid",
@@ -70,7 +85,7 @@ const ALL_TABS = [
   {
     id: "pin",
     label: "Transaction PIN",
-    icon: "🔐",
+    icon: <FaLock />,
     component: PinSettings,
     roles: ["maid"],
     badge: "Maid",
@@ -78,7 +93,7 @@ const ALL_TABS = [
   {
     id: "security",
     label: "Security",
-    icon: "🔒",
+    icon: <FaShieldAlt />,
     component: SecuritySettings,
     roles: ["customer", "maid", "admin"],
   },
@@ -159,12 +174,14 @@ export default function SettingsPage() {
         className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ""}`}
       >
         <div className={styles.drawerHeader}>
-          <p className={styles.drawerTitle}>⚙️ Settings</p>
+          <p className={styles.drawerTitle}>
+            <FaCog style={{ marginRight: "6px" }} /> Settings
+          </p>
           <button
             className={styles.drawerClose}
             onClick={() => setDrawerOpen(false)}
           >
-            ✕
+            <FaTimes />
           </button>
         </div>
         <div className={styles.drawerUser}>
@@ -214,7 +231,7 @@ export default function SettingsPage() {
           className={styles.backBtn}
           onClick={() => window.history.back()}
         >
-          ← Back
+          <FaArrowLeft /> Back
         </button>
 
         <div className={styles.pageHeaderText}>

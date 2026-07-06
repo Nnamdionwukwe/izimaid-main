@@ -1,18 +1,37 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import styles from "./Maidsupporttab.module.css";
-// Maid support tab — embedded in MaidDashboard, no router dependency
+
+// ─── React Icons ──────────────────────────────────────────────
+import {
+  FaClipboardList,
+  FaCreditCard,
+  FaUser,
+  FaCog,
+  FaComment,
+  FaVideo,
+  FaImage,
+  FaPaperclip,
+  FaPlay,
+  FaTimes,
+  FaCalendarAlt,
+  FaTicketAlt,
+  FaCheckCircle,
+  FaBell,
+  FaSync,
+  FaPlus,
+} from "react-icons/fa";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const SUPPORT_URL = `${API_URL}/api/maid-support`;
 const POLL_INTERVAL = 30000; // 30s background refresh
 
 const CATEGORIES = [
-  { value: "booking", label: "Job Issue", icon: "📋" },
-  { value: "payment", label: "Payment", icon: "💳" },
-  { value: "customer", label: "Customer Issue", icon: "👤" },
-  { value: "account", label: "Account", icon: "👤" },
-  { value: "technical", label: "Technical", icon: "⚙️" },
-  { value: "other", label: "Other", icon: "💬" },
+  { value: "booking", label: "Job Issue", icon: <FaClipboardList /> },
+  { value: "payment", label: "Payment", icon: <FaCreditCard /> },
+  { value: "customer", label: "Customer Issue", icon: <FaUser /> },
+  { value: "account", label: "Account", icon: <FaUser /> },
+  { value: "technical", label: "Technical", icon: <FaCog /> },
+  { value: "other", label: "Other", icon: <FaComment /> },
 ];
 
 const PRIORITIES = [
@@ -89,9 +108,11 @@ function MediaPreviewGrid({ files, onRemove }) {
               className={styles.previewRemove}
               onClick={() => onRemove(i)}
             >
-              ×
+              <FaTimes />
             </button>
-            <span className={styles.previewType}>{isVideo ? "🎥" : "🖼️"}</span>
+            <span className={styles.previewType}>
+              {isVideo ? <FaVideo /> : <FaImage />}
+            </span>
           </div>
         );
       })}
@@ -123,7 +144,9 @@ function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
   return (
     <>
       <div className={styles.attSection}>
-        <p className={styles.attTitle}>📎 Attachments ({attachments.length})</p>
+        <p className={styles.attTitle}>
+          <FaPaperclip /> Attachments ({attachments.length})
+        </p>
         <div className={styles.attGrid}>
           {attachments.map((a) => {
             const isVideo = a.media_type === "video";
@@ -136,7 +159,9 @@ function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
                 >
                   {isVideo ? (
                     <div className={styles.attVideoThumb}>
-                      <span className={styles.attPlayIcon}>▶</span>
+                      <span className={styles.attPlayIcon}>
+                        <FaPlay />
+                      </span>
                     </div>
                   ) : (
                     <img
@@ -153,7 +178,7 @@ function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
                     onClick={() => handleDelete(a)}
                     disabled={deleting === a.id}
                   >
-                    {deleting === a.id ? "…" : "✕"}
+                    {deleting === a.id ? "…" : <FaTimes />}
                   </button>
                 )}
               </div>
@@ -174,7 +199,7 @@ function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
               className={styles.lightboxClose}
               onClick={() => setLightbox(null)}
             >
-              ×
+              <FaTimes />
             </button>
             {lightbox.media_type === "video" ? (
               <video
@@ -288,7 +313,9 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
 
       {prefillBooking && (
         <div className={styles.bookingTag}>
-          <span className={styles.bookingTagIcon}>📅</span>
+          <span className={styles.bookingTagIcon}>
+            <FaCalendarAlt />
+          </span>
           <span>
             Linked to booking with customer{" "}
             <strong>{prefillBooking.customer_name}</strong>
@@ -385,7 +412,9 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
                 className={styles.hiddenInput}
                 onChange={handleFileChange}
               />
-              <span className={styles.uploadIcon}>📎</span>
+              <span className={styles.uploadIcon}>
+                <FaPaperclip />
+              </span>
               <span className={styles.uploadText}>
                 Tap to attach photos or videos
               </span>
@@ -543,7 +572,7 @@ function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
             onClick={() => fetchDetail(false)}
             title="Refresh"
           >
-            ↻
+            <FaSync />
           </button>
         </div>
       </div>
@@ -639,7 +668,8 @@ function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
                       <span className={styles.spinnerDark} />
                     ) : (
                       <>
-                        📎 <span className={styles.attachLabel}>Attach</span>
+                        <FaPaperclip />{" "}
+                        <span className={styles.attachLabel}>Attach</span>
                       </>
                     )}
                   </label>
@@ -709,7 +739,7 @@ function TicketCard({ ticket: initialTicket, unread, onClick }) {
         </span>
         {unread > 0 && (
           <span className={styles.newMsgPill}>
-            🔔 {unread} new message{unread > 1 ? "s" : ""}
+            <FaBell /> {unread} new message{unread > 1 ? "s" : ""}
           </span>
         )}
       </div>
@@ -798,10 +828,10 @@ function TicketsList({ onNew, onOpen }) {
             onClick={() => fetchTickets(false)}
             title="Refresh tickets"
           >
-            ↻
+            <FaSync />
           </button>
           <button className={styles.newBtn} onClick={onNew}>
-            + New Ticket
+            <FaPlus /> New Ticket
           </button>
         </div>
       </div>
@@ -840,7 +870,9 @@ function TicketsList({ onNew, onOpen }) {
         </div>
       ) : tickets.length === 0 ? (
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>🎫</div>
+          <div className={styles.emptyIcon}>
+            <FaTicketAlt />
+          </div>
           <p className={styles.emptyTitle}>No tickets yet</p>
           <p className={styles.emptySub}>Have an issue? We're here to help.</p>
           <button className={styles.newBtn} onClick={onNew}>
@@ -897,7 +929,9 @@ export default function MaidSupportTab({ token, prefillBooking = null }) {
     return (
       <div className={styles.page}>
         <div className={styles.successWrap}>
-          <div className={styles.successIcon}>✅</div>
+          <div className={styles.successIcon}>
+            <FaCheckCircle />
+          </div>
           <h2 className={styles.successTitle}>Ticket Submitted!</h2>
           <p className={styles.successSub}>
             Your ticket <strong>#{successTicket?.id?.slice(0, 8)}</strong> has

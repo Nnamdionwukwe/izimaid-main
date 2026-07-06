@@ -11,6 +11,32 @@ import WithdrawPage from "../WithdrawTab/WithdrawPage";
 import EarningsTab from "../EarningsTab/EarningsTab";
 import Inbox from "../Chat/Inbox";
 
+// ─── React Icons ──────────────────────────────────────────────
+import {
+  FaCamera,
+  FaUser,
+  FaMapMarkerAlt,
+  FaMoneyBillWave,
+  FaIdCard,
+  FaBook,
+  FaCar,
+  FaHome,
+  FaTicketAlt,
+  FaComment,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaTimes,
+  FaCheck,
+  FaArrowRight,
+  FaClipboardList,
+  FaBroom,
+  FaCalendarAlt,
+  FaStar,
+  FaRegStar,
+  FaClock,
+  FaSpinner,
+} from "react-icons/fa";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 // At the top of ProfileTab (or at the top of MaidDashboard.jsx alongside API_URL), add:
 const API = (() => {
@@ -163,10 +189,10 @@ const WORLD_CURRENCIES = [
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const DOC_TYPES = [
-  { value: "national_id", label: "National ID", icon: "🪪" },
-  { value: "passport", label: "International Passport", icon: "📘" },
-  { value: "drivers_license", label: "Driver's License", icon: "🚗" },
-  { value: "utility_bill", label: "Utility Bill", icon: "🏠" },
+  { value: "national_id", label: "National ID", icon: <FaIdCard /> },
+  { value: "passport", label: "International Passport", icon: <FaBook /> },
+  { value: "drivers_license", label: "Driver's License", icon: <FaCar /> },
+  { value: "utility_bill", label: "Utility Bill", icon: <FaHome /> },
 ];
 
 function ProfileTab({ token }) {
@@ -601,7 +627,9 @@ function ProfileTab({ token }) {
       <div className={styles.form}>
         {/* ══ SECTION: Profile Photo ════════════════════════════ */}
         <div className={styles.profileSection}>
-          <p className={styles.profileSectionTitle}>📸 Profile Photo</p>
+          <p className={styles.profileSectionTitle}>
+            <FaCamera style={{ marginRight: 6 }} /> Profile Photo
+          </p>
 
           <div className={styles.field}>
             <div className={styles.avatarRow}>
@@ -619,14 +647,22 @@ function ProfileTab({ token }) {
                   </span>
                 )}
                 {uploadingAvatar && (
-                  <div className={styles.avatarOverlay}>📤</div>
+                  <div className={styles.avatarOverlay}>
+                    <FaSpinner className={styles.spinIcon} />
+                  </div>
                 )}
               </div>
               <div className={styles.avatarActions}>
                 <label
                   className={`${styles.avatarUploadBtn} ${uploadingAvatar ? styles.avatarUploadBtnDisabled : ""}`}
                 >
-                  {uploadingAvatar ? "Uploading…" : "📸 Change Photo"}
+                  {uploadingAvatar ? (
+                    "Uploading…"
+                  ) : (
+                    <>
+                      <FaCamera /> Change Photo
+                    </>
+                  )}
                   <input
                     type="file"
                     accept="image/*"
@@ -643,7 +679,9 @@ function ProfileTab({ token }) {
 
         {/* ══ SECTION: Basic Info ═══════════════════════════════ */}
         <div className={styles.profileSection}>
-          <p className={styles.profileSectionTitle}>👤 Basic Information</p>
+          <p className={styles.profileSectionTitle}>
+            <FaUser style={{ marginRight: 6 }} /> Basic Information
+          </p>
 
           <div className={styles.field}>
             <label className={styles.label}>Bio</label>
@@ -667,9 +705,13 @@ function ProfileTab({ token }) {
                 onClick={getCurrentLocation}
                 disabled={gettingLocation}
               >
-                {gettingLocation
-                  ? "📍 Getting location…"
-                  : "📍 Use current location"}
+                {gettingLocation ? (
+                  "📍 Getting location…"
+                ) : (
+                  <>
+                    <FaMapMarkerAlt /> Use current location
+                  </>
+                )}
               </button>
             </div>
             <input
@@ -684,7 +726,7 @@ function ProfileTab({ token }) {
             {fullAddress && (fullAddress.street || fullAddress.city) && (
               <div className={styles.addressDetail}>
                 <p className={styles.addressDetailTitle}>
-                  📍 Detected address:
+                  <FaMapMarkerAlt /> Detected address:
                 </p>
                 {fullAddress.street && <p>🏠 {fullAddress.street}</p>}
                 {fullAddress.city && <p>🏙️ {fullAddress.city}</p>}
@@ -736,7 +778,9 @@ function ProfileTab({ token }) {
 
         {/* ══ SECTION: Pricing ══════════════════════════════════ */}
         <div className={styles.profileSection}>
-          <p className={styles.profileSectionTitle}>💰 Pricing Rates</p>
+          <p className={styles.profileSectionTitle}>
+            <FaMoneyBillWave style={{ marginRight: 6 }} /> Pricing Rates
+          </p>
           <p className={styles.profileSectionDesc}>
             Set your rates per hour, day, week, or month. Customers will see all
             rates you fill in. Currency: <strong>{profile.currency}</strong>
@@ -867,7 +911,7 @@ function ProfileTab({ token }) {
                   className={styles.removeRateBtn}
                   onClick={() => removeCustomRate(i)}
                 >
-                  ✕
+                  <FaTimes />
                 </button>
               </div>
             ))}
@@ -877,7 +921,7 @@ function ProfileTab({ token }) {
         {/* ══ SECTION: Services ═════════════════════════════════ */}
         <div className={styles.profileSection}>
           <p className={styles.profileSectionTitle}>
-            🧹 Services Offered
+            <FaBroom style={{ marginRight: 6 }} /> Services Offered
             {profile.services.length > 0 && (
               <span className={styles.labelCount}>
                 {" "}
@@ -899,7 +943,7 @@ function ProfileTab({ token }) {
                   <div
                     className={`${styles.serviceCheck} ${selected ? styles.serviceCheckActive : ""}`}
                   >
-                    {selected && "✓"}
+                    {selected && <FaCheck />}
                   </div>
                   {s}
                 </div>
@@ -921,7 +965,7 @@ function ProfileTab({ token }) {
                       className={styles.customChipRemove}
                       onClick={() => toggleService(s)}
                     >
-                      ✕
+                      <FaTimes />
                     </button>
                   </span>
                 ))}
@@ -964,7 +1008,9 @@ function ProfileTab({ token }) {
       {/* ══ SECTION: Availability ════════════════════════════════ */}
       <div className={styles.form} style={{ marginTop: 24 }}>
         <div className={styles.profileSection}>
-          <p className={styles.profileSectionTitle}>🗓 Weekly Availability</p>
+          <p className={styles.profileSectionTitle}>
+            <FaCalendarAlt style={{ marginRight: 6 }} /> Weekly Availability
+          </p>
           <p className={styles.profileSectionDesc}>
             Set which days and hours you're available for bookings.
           </p>
@@ -1048,7 +1094,9 @@ function ProfileTab({ token }) {
       {/* ══ SECTION: Identity Documents ══════════════════════════ */}
       <div className={styles.form} style={{ marginTop: 24, paddingBottom: 24 }}>
         <div className={styles.profileSection}>
-          <p className={styles.profileSectionTitle}>🪪 Identity Verification</p>
+          <p className={styles.profileSectionTitle}>
+            <FaIdCard style={{ marginRight: 6 }} /> Identity Verification
+          </p>
           <p className={styles.profileSectionDesc}>
             Upload a valid document to get your profile verified, which ever ID
             you choose to upload you must upload a Utility Bill for proof of
@@ -1138,7 +1186,9 @@ function DeclineConfirmModal({ booking, onConfirm, onCancel, isLoading }) {
       <div className={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHandle} />
         <div style={{ textAlign: "center", paddingTop: 16 }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>
+            <FaExclamationTriangle />
+          </div>
           <h2 style={{ fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
             Decline Booking?
           </h2>
@@ -1483,7 +1533,7 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                         updateStatus(b.id, "confirmed");
                       }}
                     >
-                      ✅ Accept
+                      <FaCheckCircle /> Accept
                     </button>
                     <button
                       className={styles.actionBtn}
@@ -1506,7 +1556,7 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                       navigate(`/bookings/${b.id}`, { state: { booking: b } });
                     }}
                   >
-                    📍 Check In & Start Job
+                    <FaMapMarkerAlt /> Check In & Start Job
                   </button>
                 )}
 
@@ -1522,7 +1572,7 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                         });
                       }}
                     >
-                      📍 Check Out
+                      <FaMapMarkerAlt /> Check Out
                     </button>
                     <button
                       className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
@@ -1535,7 +1585,7 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                         updateStatus(b.id, "completed");
                       }}
                     >
-                      ✅ Mark Complete
+                      <FaCheckCircle /> Mark Complete
                     </button>
                   </>
                 )}
@@ -1565,7 +1615,7 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                       onOpenChat(b);
                     }}
                   >
-                    💬 Chat Customer
+                    <FaComment /> Chat Customer
                   </button>
                 )}
 
@@ -1586,7 +1636,7 @@ function BookingsTab({ token, onDeclineMessage, onGetSupport, onOpenChat }) {
                     onGetSupport(b);
                   }}
                 >
-                  🎫 Get Support
+                  <FaTicketAlt /> Get Support
                 </button>
               </div>
             </div>
@@ -1636,7 +1686,16 @@ function ReviewsTab({ token }) {
         <div className={styles.statsGrid} style={{ marginBottom: 16 }}>
           <div className={styles.statCard}>
             <p className={styles.statLabel}>Average Rating</p>
-            <p className={styles.statValue}>★ {avg}</p>
+            <p className={styles.statValue}>
+              {Array.from({ length: 5 }, (_, i) =>
+                i < Math.floor(avg) ? (
+                  <FaStar key={i} style={{ color: "#f59e0b" }} />
+                ) : (
+                  <FaRegStar key={i} style={{ color: "#d1d5db" }} />
+                ),
+              )}{" "}
+              {avg}
+            </p>
           </div>
           <div className={styles.statCard}>
             <p className={styles.statLabel}>Total Reviews</p>
@@ -1657,8 +1716,12 @@ function ReviewsTab({ token }) {
               <div className={styles.reviewTop}>
                 <span className={styles.reviewCustomer}>{r.customer_name}</span>
                 <span className={styles.reviewStars}>
-                  {"★".repeat(r.rating)}
-                  {"☆".repeat(5 - r.rating)}
+                  {Array.from({ length: r.rating }, (_, i) => (
+                    <FaStar key={i} style={{ color: "#f59e0b" }} />
+                  ))}
+                  {Array.from({ length: 5 - r.rating }, (_, i) => (
+                    <FaRegStar key={i} style={{ color: "#d1d5db" }} />
+                  ))}
                 </span>
               </div>
               {r.comment && (
@@ -1994,7 +2057,9 @@ export default function MaidDashboard({ onLogout }) {
             )}
             <div>
               <p className={styles.headerName}>{user.name}</p>
-              <p className={styles.headerRole}>Maid · Deusizi Sparkle</p>
+              <p className={styles.headerRole}>
+                Worker Portal · Deusizi Sparkle
+              </p>
             </div>
           </div>
           {/* REPLACE: */}
@@ -2020,7 +2085,7 @@ export default function MaidDashboard({ onLogout }) {
               }}
               title="Messages"
             >
-              💬
+              <FaComment />
               {unreadMessages > 0 && (
                 <span
                   style={{
@@ -2078,21 +2143,27 @@ export default function MaidDashboard({ onLogout }) {
           {/* Top row: booking counts */}
           <div className={styles.statsRow}>
             <div className={styles.statPill}>
-              <span className={styles.statPillIcon}>📋</span>
+              <span className={styles.statPillIcon}>
+                <FaClipboardList />
+              </span>
               <div>
                 <p className={styles.statPillLabel}>Total</p>
                 <p className={styles.statPillVal}>{stats.total}</p>
               </div>
             </div>
             <div className={styles.statPill}>
-              <span className={styles.statPillIcon}>⏳</span>
+              <span className={styles.statPillIcon}>
+                <FaClock />
+              </span>
               <div>
                 <p className={styles.statPillLabel}>Pending</p>
                 <p className={styles.statPillVal}>{stats.pending}</p>
               </div>
             </div>
             <div className={styles.statPill}>
-              <span className={styles.statPillIcon}>✅</span>
+              <span className={styles.statPillIcon}>
+                <FaCheckCircle />
+              </span>
               <div>
                 <p className={styles.statPillLabel}>Done</p>
                 <p className={styles.statPillVal}>{stats.completed}</p>

@@ -14,6 +14,25 @@
 import { useState, useEffect, useCallback } from "react";
 import styles from "./WithdrawPage.module.css";
 
+// ─── React Icons ──────────────────────────────────────────────
+import {
+  FaArrowLeft,
+  FaMoneyBillWave,
+  FaCreditCard,
+  FaMobileAlt,
+  FaGlobe,
+  FaPaypal,
+  FaLeaf,
+  FaCoins,
+  FaUniversity,
+  FaInbox,
+  FaChartBar,
+  FaTrophy,
+  FaClock,
+  FaMapMarkerAlt,
+  FaStickyNote,
+} from "react-icons/fa";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const API = API_URL.replace(/\/$/, "").replace(/\/api$/, "") + "/api";
 
@@ -41,7 +60,7 @@ const METHODS = [
   {
     id: "bank_transfer",
     label: "Local Bank Transfer",
-    icon: "🏦",
+    icon: <FaUniversity />,
     desc: "Nigerian bank accounts via Paystack",
     currencies: ["NGN"],
     feeDesc: "₦200 – ₦750 (tiered)",
@@ -51,7 +70,7 @@ const METHODS = [
   {
     id: "flutterwave",
     label: "Flutterwave",
-    icon: "🦋",
+    icon: <FaCreditCard />,
     desc: "Pan-African bank transfers (20+ countries)",
     currencies: [
       "NGN",
@@ -72,7 +91,7 @@ const METHODS = [
   {
     id: "mobile_money",
     label: "Mobile Money",
-    icon: "📱",
+    icon: <FaMobileAlt />,
     desc: "M-Pesa, MTN MoMo, Airtel, Vodafone",
     currencies: ["KES", "GHS", "UGX", "TZS", "RWF", "XOF", "ZMW"],
     feeDesc: "₦200 – ₦500 (tiered)",
@@ -82,7 +101,7 @@ const METHODS = [
   {
     id: "wire_transfer",
     label: "International Wire (SWIFT)",
-    icon: "🌍",
+    icon: <FaGlobe />,
     desc: "Send to any bank worldwide via SWIFT",
     currencies: ["USD", "GBP", "EUR", "CAD", "AUD", "SGD", "JPY", "CNY"],
     feeDesc: "Flat $15 / £12 / €14",
@@ -92,7 +111,7 @@ const METHODS = [
   {
     id: "paypal",
     label: "PayPal",
-    icon: "🅿️",
+    icon: <FaPaypal />,
     desc: "Fast transfer to any PayPal account",
     currencies: ["USD", "GBP", "EUR", "CAD", "AUD"],
     feeDesc: "Flat $2 / £1.50 / €1.80",
@@ -102,7 +121,7 @@ const METHODS = [
   {
     id: "wise",
     label: "Wise (TransferWise)",
-    icon: "💚",
+    icon: <FaLeaf />,
     desc: "Cheapest international transfers",
     currencies: ["USD", "GBP", "EUR", "CAD", "AUD", "SGD", "MYR", "BRL", "MXN"],
     feeDesc: "Flat $1 / £0.80 / €0.90",
@@ -112,7 +131,7 @@ const METHODS = [
   {
     id: "crypto",
     label: "Cryptocurrency",
-    icon: "₿",
+    icon: <FaCoins />,
     desc: "BTC, ETH, USDT, BNB, SOL & more",
     currencies: ["BTC", "ETH", "USDT", "USDC", "BNB", "SOL", "TRX", "MATIC"],
     feeDesc: "No fee (network gas only)",
@@ -267,7 +286,9 @@ export function WalletOverview({ token, onWithdraw }) {
           className={styles.ov_empty}
           style={{ padding: "40px 20px", textAlign: "center" }}
         >
-          <p style={{ fontSize: 40, marginBottom: 12 }}>💰</p>
+          <p style={{ fontSize: 40, marginBottom: 12 }}>
+            <FaMoneyBillWave />
+          </p>
           <p style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>
             No wallet yet
           </p>
@@ -342,7 +363,8 @@ export function WalletOverview({ token, onWithdraw }) {
         {/* Pending note */}
         {Number(activeWallet.pending_balance || 0) > 0 && (
           <p className={styles.ov_pendingNote}>
-            ⏳ {fmtBal(activeWallet.pending_balance, activeWallet.currency)}{" "}
+            <FaClock />{" "}
+            {fmtBal(activeWallet.pending_balance, activeWallet.currency)}{" "}
             pending release (released 24h after booking completion)
           </p>
         )}
@@ -356,7 +378,7 @@ export function WalletOverview({ token, onWithdraw }) {
             ) <= 0
           }
         >
-          💸 Withdraw {activeWallet.currency}
+          <FaMoneyBillWave /> Withdraw {activeWallet.currency}
         </button>
       </div>
 
@@ -404,7 +426,9 @@ export function WalletOverview({ token, onWithdraw }) {
       {/* ── Requests ── */}
       {innerView === "requests" &&
         (withdrawals.length === 0 ? (
-          <div className={styles.ov_empty}>📭 No withdrawal requests yet.</div>
+          <div className={styles.ov_empty}>
+            <FaInbox /> No withdrawal requests yet.
+          </div>
         ) : (
           withdrawals.map((w) => {
             const cfg = STATUS_CFG[w.status] || STATUS_CFG.pending;
@@ -449,13 +473,17 @@ export function WalletOverview({ token, onWithdraw }) {
       {/* ── History ── */}
       {innerView === "history" &&
         (history.length === 0 ? (
-          <div className={styles.ov_empty}>📊 No transactions yet.</div>
+          <div className={styles.ov_empty}>
+            <FaInbox /> No transactions yet.
+          </div>
         ) : (
           history.map((tx, i) => {
             const isCredit = tx.type === "credit" || tx.type === "release";
             return (
               <div key={tx.id || i} className={styles.ov_txRow}>
-                <div className={styles.ov_txIcon}>{isCredit ? "💰" : "📤"}</div>
+                <div className={styles.ov_txIcon}>
+                  {isCredit ? <FaMoneyBillWave /> : <FaArrowLeft />}
+                </div>
                 <div className={styles.ov_txInfo}>
                   <p>{tx.description || tx.type}</p>
                   <span>{timeAgo(tx.created_at)}</span>
@@ -480,8 +508,7 @@ export function WalletOverview({ token, onWithdraw }) {
 // WithdrawPage — full-page overlay, same pattern as MaidChat
 // ══════════════════════════════════════════════════════════════════════
 export default function WithdrawPage({ token, onClose }) {
-  // REPLACE these lines at the top of WithdrawPage (default export):
-  const [wallets, setWallets] = useState([]); // ← was `wallet`
+  const [wallets, setWallets] = useState([]);
   const [banks, setBanks] = useState([]);
   const [step, setStep] = useState("method");
   const [method, setMethod] = useState(null);
@@ -1075,7 +1102,7 @@ export default function WithdrawPage({ token, onClose }) {
       <div className={styles.page}>
         <div className={styles.pageHeader}>
           <button className={styles.backBtn} onClick={onClose}>
-            ← Back
+            <FaArrowLeft /> Back
           </button>
           <h1 className={styles.pageTitle}>Withdraw Funds</h1>
           <div className={styles.balancePill}>
@@ -1086,7 +1113,6 @@ export default function WithdrawPage({ token, onClose }) {
 
         <div className={styles.pageBody}>
           <p className={styles.stepLabel}>Choose how to receive your money</p>
-          {/* ADD this currency selector just before <div className={styles.methodGrid}> */}
           {wallets.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <p className={styles.stepLabel}>Withdraw from</p>
@@ -1151,7 +1177,7 @@ export default function WithdrawPage({ token, onClose }) {
               setMsg({ type: "", text: "" });
             }}
           >
-            ← Back
+            <FaArrowLeft /> Back
           </button>
           <h1 className={styles.pageTitle}>
             {m?.icon} {m?.label}
@@ -1232,7 +1258,7 @@ export default function WithdrawPage({ token, onClose }) {
       <div className={styles.page}>
         <div className={styles.pageHeader}>
           <button className={styles.backBtn} onClick={() => setStep("form")}>
-            ← Back
+            <FaArrowLeft /> Back
           </button>
           <h1 className={styles.pageTitle}>Confirm PIN</h1>
           <div className={styles.balancePill}>₦{fmt(Number(amount))}</div>
