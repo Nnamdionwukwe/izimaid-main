@@ -209,7 +209,38 @@ export default function Booking() {
   const { maidId } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
-  const maid = state?.maid || {};
+
+  // ── State for maid data (fetched or from location) ───────────
+  const [maid, setMaid] = useState(state?.maid || {});
+  const [loadingMaid, setLoadingMaid] = useState(!state?.maid);
+
+  // ── Fetch latest maid data if we have an ID ──────────────────
+  useEffect(() => {
+    if (!maidId) return;
+    // If we already have maid data from state and it matches the ID, we could skip.
+    // But we always fetch to get fresh rates.
+    const fetchMaid = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_URL}/api/maids/${maidId}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (!res.ok) throw new Error("Maid not found");
+        const data = await res.json();
+        // Merge with existing state to keep any extra fields (like avatar)
+        setMaid((prev) => ({ ...prev, ...data }));
+      } catch (err) {
+        console.error("Failed to fetch maid:", err);
+        // Fallback: keep the state data if available
+        if (!state?.maid) {
+          // No fallback, show error or redirect
+        }
+      } finally {
+        setLoadingMaid(false);
+      }
+    };
+    fetchMaid();
+  }, [maidId, state?.maid]);
 
   const currency = maid.currency || "NGN";
   const s = sym(currency);
@@ -218,10 +249,10 @@ export default function Booking() {
   const [selectedRateId, setSelectedRateId] = useState(
     rateOptions[0]?.id || "hourly",
   );
-  const [duration, setDuration] = useState("2"); // for all rate types
+  const [duration, setDuration] = useState("2");
   const [negotiatedPrice, setNegotiatedPrice] = useState("");
-  const [negotiatedQty, setNegotiatedQty] = useState("2"); // how many units
-  const [negotiatedUnit, setNegotiatedUnit] = useState("hours"); // hours|days|weeks|months
+  const [negotiatedQty, setNegotiatedQty] = useState("2");
+  const [negotiatedUnit, setNegotiatedUnit] = useState("hours");
 
   const [form, setForm] = useState({
     service_date: "",
@@ -237,12 +268,16 @@ export default function Booking() {
 
   const selected = rateOptions.find((r) => r.id === selectedRateId);
   const durConfig =
-    DURATION_CONFIG[selected?.rateType] || DURATION_CONFIG.hourly;
+    selected?.rateType && DURATION_CONFIG[selected.rateType]
+      ? DURATION_CONFIG[selected.rateType]
+      : DURATION_CONFIG.hourly;
 
-  // Reset duration to sensible default when rate type changes
+  // Reset duration when rate type changes
   useEffect(() => {
-    const cfg = DURATION_CONFIG[selected?.rateType];
-    if (cfg) setDuration(cfg.default);
+    if (selected) {
+      const cfg = DURATION_CONFIG[selected.rateType];
+      if (cfg) setDuration(cfg.default);
+    }
   }, [selectedRateId]);
 
   useEffect(() => {
@@ -354,12 +389,11 @@ export default function Booking() {
         duration_qty:
           selected.rateType === "negotiated"
             ? Number(negotiatedQty) || 1
-            : Number(duration) || 1, // ← raw count (days/weeks/months/units)
+            : Number(duration) || 1,
         address: form.address,
         rate_type:
           selected.rateType === "negotiated" ? "hourly" : selected.rateType,
       };
-      // Build human-readable notes
       const noteLines = [];
       if (form.notes) noteLines.push(form.notes);
 
@@ -398,7 +432,6 @@ export default function Booking() {
         maid_name: maid.name || "",
         maid_avatar: maid.avatar || "",
         maid_currency: maid.currency || "NGN",
-        // total_amount is already on data.booking from the INSERT RETURNING *
       });
     } catch (err) {
       setError(err.message || "Something went wrong");
@@ -412,6 +445,28 @@ export default function Booking() {
     if (selected.rateType === "custom")
       return `Number of ${selected.label} sessions`;
     return `Number of ${durConfig.label}`;
+  }
+
+  // ── Loading / Error states ──────────────────────────────────────
+  if (loadingMaid) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.loading}>
+          <FaSpinner className={styles.spinner} /> Loading maid details…
+        </div>
+      </div>
+    );
+  }
+
+  if (!maid || !maid.id) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.error}>Maid not found. Please go back.</div>
+        <button className={styles.backBtn} onClick={() => navigate("/maids")}>
+          <FaArrowLeft /> Back to maids
+        </button>
+      </div>
+    );
   }
 
   return (
