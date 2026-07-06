@@ -87,6 +87,7 @@ import DomesticStaffCertification from "./component/DeusiziAcademy/DomesticStaff
 import AdminCleanerApplications from "./component/AdminDashboard/AdminCleanerApplications.jsx";
 import FoundationVerify from "./component/DeausiziFoundation/FoundationVerify.jsx";
 import GiftCertificateVerify from "./component/GiftCertificates/GiftCertificateVerify.jsx";
+import ResetPinPage from "./pages/settings/ResetPinPage.jsx";
 
 function App() {
   return (
@@ -276,6 +277,7 @@ function AppRoutes() {
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
       <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/settings/reset-pin" element={<ResetPinPage />} />
       <Route path="/subscription/verify" element={<SubscriptionVerify />} />
 
       {/* Catch all */}

@@ -1736,6 +1736,57 @@ function ReviewsTab({ token }) {
   );
 }
 
+import { FaSignOutAlt } from "react-icons/fa"; // add to imports
+
+// ─── Logout Confirmation Modal ──────────────────────────────
+function LogoutConfirmModal({ onConfirm, onCancel, isLoading }) {
+  return (
+    <div className={styles.modalOverlay} onClick={onCancel}>
+      <div className={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHandle} />
+        <div style={{ textAlign: "center", paddingTop: 16 }}>
+          <div
+            style={{ fontSize: 48, marginBottom: 16, color: "rgb(187,19,47)" }}
+          >
+            <FaSignOutAlt />
+          </div>
+          <h2 style={{ fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
+            Logout?
+          </h2>
+          <p
+            style={{
+              color: "rgb(100,100,100)",
+              fontSize: 14,
+              marginBottom: 16,
+            }}
+          >
+            Are you sure you want to logout? You will need to sign in again.
+          </p>
+        </div>
+        <div className={styles.modalActions}>
+          <button
+            className={styles.modalBtn}
+            onClick={onCancel}
+            disabled={isLoading}
+          >
+            Cancel
+          </button>
+          <button
+            className={`${styles.modalBtn} ${styles.modalBtnDanger}`}
+            onClick={onConfirm}
+            disabled={isLoading}
+            style={{
+              background: isLoading ? "rgb(200,100,100)" : "rgb(187,19,47)",
+            }}
+          >
+            {isLoading ? "Logging out..." : "Logout"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Dashboard ───────────────────────────────────────────
 export default function MaidDashboard({ onLogout }) {
   const navigate = useNavigate();
@@ -1763,6 +1814,8 @@ export default function MaidDashboard({ onLogout }) {
 
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [showInbox, setShowInbox] = useState(false);
+
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     if (!token || user.role !== "maid") {
@@ -2111,7 +2164,10 @@ export default function MaidDashboard({ onLogout }) {
               )}
             </button>
 
-            <button className={styles.logoutBtn} onClick={handleLogout}>
+            <button
+              className={styles.logoutBtn}
+              onClick={() => setShowLogoutModal(true)}
+            >
               Logout
             </button>
           </div>
@@ -2363,6 +2419,18 @@ export default function MaidDashboard({ onLogout }) {
           visible={toast.visible}
         />
       </div>
+
+      {/* ─── Logout Modal ─── */}
+      {showLogoutModal && (
+        <LogoutConfirmModal
+          onConfirm={() => {
+            setShowLogoutModal(false);
+            handleLogout();
+          }}
+          onCancel={() => setShowLogoutModal(false)}
+          isLoading={false}
+        />
+      )}
 
       {/* Floating maid support chat — only renders for logged-in maids */}
       <FloatingMaidSupportChat />
