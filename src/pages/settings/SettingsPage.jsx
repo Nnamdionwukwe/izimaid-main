@@ -1,4 +1,5 @@
 import { useState, lazy, Suspense, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // ← added
 import { useAuth } from "../../context/AuthContext";
 import styles from "./Settings.module.css";
 import EmergencySettings from "./EmergencySettings";
@@ -112,6 +113,7 @@ function TabSkeleton({ styles }) {
 export default function SettingsPage() {
   const { user } = useAuth();
   const role = user?.role || "customer";
+  const navigate = useNavigate(); // ← added
   const [tab, setTab] = useState("profile");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -140,6 +142,17 @@ export default function SettingsPage() {
   function selectTab(id) {
     setTab(id);
     setDrawerOpen(false);
+  }
+
+  // ─── Role‑based back navigation ──────────────────────────────
+  function handleBack() {
+    if (role === "maid") {
+      navigate("/maid");
+    } else if (role === "customer") {
+      navigate("/my-bookings");
+    } else {
+      navigate("/");
+    }
   }
 
   const NavList = () => (
@@ -229,7 +242,7 @@ export default function SettingsPage() {
 
         <button
           className={styles.backBtn}
-          onClick={() => window.history.back()}
+          onClick={handleBack} // ← updated
         >
           <FaArrowLeft /> Back
         </button>
