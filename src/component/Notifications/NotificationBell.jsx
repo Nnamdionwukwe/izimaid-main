@@ -6,6 +6,9 @@ import { useState, useEffect } from "react";
 import NotificationsPanel from "./NotificationsPanel.jsx";
 import styles from "./NotificationsPanel.module.css";
 
+// ─── React Icons ──────────────────────────────────────────────
+import { FaBell } from "react-icons/fa";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const API = API_URL.replace(/\/$/, "").replace(/\/api$/, "") + "/api";
 
@@ -44,7 +47,7 @@ export default function NotificationBell({ token }) {
         title="Notifications"
         aria-label={`Notifications${unread > 0 ? `, ${unread} unread` : ""}`}
       >
-        🔔
+        <FaBell />
         {unread > 0 && (
           <span className={styles.bellBadge}>
             {unread > 99 ? "99+" : unread}

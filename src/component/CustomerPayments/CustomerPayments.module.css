@@ -1,3 +1,4 @@
+/* ── Page ───────────────────────────────────────────────────── */
 .page {
   min-height: 100vh;
   background: rgb(245, 245, 248);
@@ -227,6 +228,9 @@
   border: 3px solid rgb(228, 228, 228);
   border-top-color: rgb(19, 19, 103);
   border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+.spinIcon {
   animation: spin 0.65s linear infinite;
 }
 @keyframes spin {

@@ -2,17 +2,41 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./CustomerSupport.module.css";
 
+// ─── React Icons ──────────────────────────────────────────────
+import {
+  FaCalendarAlt,
+  FaCreditCard,
+  FaBroom,
+  FaUser,
+  FaCog,
+  FaComment,
+  FaPaperclip,
+  FaBell,
+  FaCheckCircle,
+  FaTicketAlt,
+  FaImage,
+  FaPlay,
+  FaTimes,
+  FaArrowLeft,
+  FaPlus,
+  FaSync,
+  FaSpinner,
+  FaExclamationTriangle,
+  FaCheck,
+  FaFileImage,
+} from "react-icons/fa";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const SUPPORT_URL = `${API_URL}/api/customer-support`;
 const POLL_INTERVAL = 30000; // 30s background refresh
 
 const CATEGORIES = [
-  { value: "booking", label: "Booking Issue", icon: "📅" },
-  { value: "payment", label: "Payment", icon: "💳" },
-  { value: "maid", label: "Maid / Service", icon: "🧹" },
-  { value: "account", label: "Account", icon: "👤" },
-  { value: "technical", label: "Technical", icon: "⚙️" },
-  { value: "other", label: "Other", icon: "💬" },
+  { value: "booking", label: "Booking Issue", icon: <FaCalendarAlt /> },
+  { value: "payment", label: "Payment", icon: <FaCreditCard /> },
+  { value: "maid", label: "Maid / Service", icon: <FaBroom /> },
+  { value: "account", label: "Account", icon: <FaUser /> },
+  { value: "technical", label: "Technical", icon: <FaCog /> },
+  { value: "other", label: "Other", icon: <FaComment /> },
 ];
 
 const PRIORITIES = [
@@ -89,9 +113,11 @@ function MediaPreviewGrid({ files, onRemove }) {
               className={styles.previewRemove}
               onClick={() => onRemove(i)}
             >
-              ×
+              <FaTimes />
             </button>
-            <span className={styles.previewType}>{isVideo ? "🎥" : "🖼️"}</span>
+            <span className={styles.previewType}>
+              {isVideo ? <FaPlay /> : <FaImage />}
+            </span>
           </div>
         );
       })}
@@ -123,7 +149,9 @@ function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
   return (
     <>
       <div className={styles.attSection}>
-        <p className={styles.attTitle}>📎 Attachments ({attachments.length})</p>
+        <p className={styles.attTitle}>
+          <FaPaperclip /> Attachments ({attachments.length})
+        </p>
         <div className={styles.attGrid}>
           {attachments.map((a) => {
             const isVideo = a.media_type === "video";
@@ -136,7 +164,9 @@ function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
                 >
                   {isVideo ? (
                     <div className={styles.attVideoThumb}>
-                      <span className={styles.attPlayIcon}>▶</span>
+                      <span className={styles.attPlayIcon}>
+                        <FaPlay />
+                      </span>
                     </div>
                   ) : (
                     <img
@@ -153,7 +183,7 @@ function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
                     onClick={() => handleDelete(a)}
                     disabled={deleting === a.id}
                   >
-                    {deleting === a.id ? "…" : "✕"}
+                    {deleting === a.id ? "…" : <FaTimes />}
                   </button>
                 )}
               </div>
@@ -174,7 +204,7 @@ function AttachmentGallery({ attachments, ticketId, canDelete, onDeleted }) {
               className={styles.lightboxClose}
               onClick={() => setLightbox(null)}
             >
-              ×
+              <FaTimes />
             </button>
             {lightbox.media_type === "video" ? (
               <video
@@ -278,7 +308,7 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
     <div className={styles.formWrap}>
       <div className={styles.formHeader}>
         <button className={styles.backBtn} onClick={onCancel}>
-          ← Back
+          <FaArrowLeft /> Back
         </button>
         <div>
           <h2 className={styles.formTitle}>New Support Ticket</h2>
@@ -288,7 +318,9 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
 
       {prefillBooking && (
         <div className={styles.bookingTag}>
-          <span className={styles.bookingTagIcon}>📅</span>
+          <span className={styles.bookingTagIcon}>
+            <FaCalendarAlt />
+          </span>
           <span>
             Linked to booking with <strong>{prefillBooking.maid_name}</strong>
             {prefillBooking.service_date &&
@@ -384,7 +416,9 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
                 className={styles.hiddenInput}
                 onChange={handleFileChange}
               />
-              <span className={styles.uploadIcon}>📎</span>
+              <span className={styles.uploadIcon}>
+                <FaPaperclip />
+              </span>
               <span className={styles.uploadText}>
                 Tap to attach photos or videos
               </span>
@@ -395,7 +429,11 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
           )}
         </div>
 
-        {error && <div className={styles.errorBox}>{error}</div>}
+        {error && (
+          <div className={styles.errorBox}>
+            <FaExclamationTriangle /> {error}
+          </div>
+        )}
 
         <button
           type="submit"
@@ -404,7 +442,9 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
         >
           {submitting ? (
             <span className={styles.spinnerRow}>
-              <span className={styles.spinner} />
+              <span className={styles.spinner}>
+                <FaSpinner className={styles.spinIcon} />
+              </span>
               {uploadProgress || "Submitting…"}
             </span>
           ) : (
@@ -529,7 +569,7 @@ function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
     <div className={styles.detailWrap}>
       <div className={styles.detailNav}>
         <button className={styles.backBtn} onClick={onBack}>
-          ← Back to Tickets
+          <FaArrowLeft /> Back to Tickets
         </button>
         <div className={styles.refreshRow}>
           {lastRefresh && (
@@ -542,7 +582,7 @@ function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
             onClick={() => fetchDetail(false)}
             title="Refresh"
           >
-            ↻
+            <FaSync />
           </button>
         </div>
       </div>
@@ -618,7 +658,9 @@ function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
                 rows={3}
               />
               {uploadError && (
-                <p className={styles.uploadErrInline}>{uploadError}</p>
+                <p className={styles.uploadErrInline}>
+                  <FaExclamationTriangle /> {uploadError}
+                </p>
               )}
               <div className={styles.replyToolbar}>
                 {attachments.length < MAX_FILES && (
@@ -635,10 +677,13 @@ function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
                       disabled={uploadingMedia}
                     />
                     {uploadingMedia ? (
-                      <span className={styles.spinnerDark} />
+                      <span className={styles.spinnerDark}>
+                        <FaSpinner className={styles.spinIcon} />
+                      </span>
                     ) : (
                       <>
-                        📎 <span className={styles.attachLabel}>Attach</span>
+                        <FaPaperclip />{" "}
+                        <span className={styles.attachLabel}>Attach</span>
                       </>
                     )}
                   </label>
@@ -653,7 +698,13 @@ function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
               onClick={sendReply}
               disabled={sending || !replyMsg.trim()}
             >
-              {sending ? <span className={styles.spinner} /> : "Send"}
+              {sending ? (
+                <span className={styles.spinner}>
+                  <FaSpinner className={styles.spinIcon} />
+                </span>
+              ) : (
+                "Send"
+              )}
             </button>
           </div>
         )}
@@ -708,7 +759,7 @@ function TicketCard({ ticket: initialTicket, unread, onClick }) {
         </span>
         {unread > 0 && (
           <span className={styles.newMsgPill}>
-            🔔 {unread} new message{unread > 1 ? "s" : ""}
+            <FaBell /> {unread} new message{unread > 1 ? "s" : ""}
           </span>
         )}
       </div>
@@ -799,17 +850,17 @@ function TicketsList({ onNew, onOpen }) {
             className={styles.newBtn}
             onClick={() => navigate("/my-bookings")}
           >
-            &larr;
+            <FaArrowLeft />
           </button>
           <button
             className={`${styles.syncBtn} ${syncing ? styles.syncBtnSyncing : ""}`}
             onClick={() => fetchTickets(false)}
             title="Refresh tickets"
           >
-            ↻
+            <FaSync />
           </button>
           <button className={styles.newBtn} onClick={onNew}>
-            + New Ticket
+            <FaPlus /> New Ticket
           </button>
         </div>
       </div>
@@ -848,7 +899,9 @@ function TicketsList({ onNew, onOpen }) {
         </div>
       ) : tickets.length === 0 ? (
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>🎫</div>
+          <div className={styles.emptyIcon}>
+            <FaTicketAlt />
+          </div>
           <p className={styles.emptyTitle}>No tickets yet</p>
           <p className={styles.emptySub}>Have an issue? We're here to help.</p>
           <button className={styles.newBtn} onClick={onNew}>
@@ -903,7 +956,9 @@ export default function CustomerSupport() {
     return (
       <div className={styles.page}>
         <div className={styles.successWrap}>
-          <div className={styles.successIcon}>✅</div>
+          <div className={styles.successIcon}>
+            <FaCheckCircle />
+          </div>
           <h2 className={styles.successTitle}>Ticket Submitted!</h2>
           <p className={styles.successSub}>
             Your ticket <strong>#{successTicket?.id?.slice(0, 8)}</strong> has

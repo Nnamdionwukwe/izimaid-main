@@ -5,52 +5,112 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import styles from "./NotificationsPanel.module.css";
 
+// ─── React Icons ──────────────────────────────────────────────
+import {
+  FaBell,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaCalendarCheck,
+  FaMoneyBillWave,
+  FaExclamationTriangle,
+  FaStar,
+  FaComment,
+  FaTicketAlt,
+  FaBullhorn,
+  FaIdCard,
+  FaFileAlt,
+  FaTimes,
+  FaSpinner,
+  FaArrowLeft,
+  FaClipboardList,
+} from "react-icons/fa";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const API = API_URL.replace(/\/$/, "").replace(/\/api$/, "") + "/api";
 
 // ── Notification type config ─────────────────────────────────────────
 const TYPE_CONFIG = {
-  booking_created: { icon: "📋", color: "#3b82f6", label: "New Booking" },
+  booking_created: {
+    icon: <FaCalendarCheck />,
+    color: "#3b82f6",
+    label: "New Booking",
+  },
   booking_confirmed: {
-    icon: "✅",
+    icon: <FaCheckCircle />,
     color: "#22c55e",
     label: "Booking Confirmed",
   },
   booking_cancelled: {
-    icon: "❌",
+    icon: <FaTimesCircle />,
     color: "#ef4444",
     label: "Booking Cancelled",
   },
   booking_completed: {
-    icon: "🎉",
+    icon: <FaStar />,
     color: "#8b5cf6",
     label: "Booking Completed",
   },
-  booking_declined: { icon: "🚫", color: "#f97316", label: "Booking Declined" },
-  payment_received: { icon: "💰", color: "#22c55e", label: "Payment Received" },
-  payment_failed: { icon: "💳", color: "#ef4444", label: "Payment Failed" },
-  payment_refunded: { icon: "↩️", color: "#6366f1", label: "Refund Issued" },
+  booking_declined: {
+    icon: <FaTimesCircle />,
+    color: "#f97316",
+    label: "Booking Declined",
+  },
+  payment_received: {
+    icon: <FaMoneyBillWave />,
+    color: "#22c55e",
+    label: "Payment Received",
+  },
+  payment_failed: {
+    icon: <FaTimesCircle />,
+    color: "#ef4444",
+    label: "Payment Failed",
+  },
+  payment_refunded: {
+    icon: <FaArrowLeft />,
+    color: "#6366f1",
+    label: "Refund Issued",
+  },
   withdrawal_success: {
-    icon: "🏦",
+    icon: <FaMoneyBillWave />,
     color: "#22c55e",
     label: "Withdrawal Sent",
   },
   withdrawal_failed: {
-    icon: "⚠️",
+    icon: <FaExclamationTriangle />,
     color: "#ef4444",
     label: "Withdrawal Failed",
   },
-  review_received: { icon: "⭐", color: "#f59e0b", label: "New Review" },
-  message_received: { icon: "💬", color: "#3b82f6", label: "New Message" },
-  support_reply: { icon: "🎫", color: "#8b5cf6", label: "Support Reply" },
-  system_announcement: { icon: "📢", color: "#1a2466", label: "Announcement" },
-  account_verified: { icon: "🪪", color: "#22c55e", label: "Account Verified" },
+  review_received: { icon: <FaStar />, color: "#f59e0b", label: "New Review" },
+  message_received: {
+    icon: <FaComment />,
+    color: "#3b82f6",
+    label: "New Message",
+  },
+  support_reply: {
+    icon: <FaTicketAlt />,
+    color: "#8b5cf6",
+    label: "Support Reply",
+  },
+  system_announcement: {
+    icon: <FaBullhorn />,
+    color: "#1a2466",
+    label: "Announcement",
+  },
+  account_verified: {
+    icon: <FaIdCard />,
+    color: "#22c55e",
+    label: "Account Verified",
+  },
   document_reviewed: {
-    icon: "📄",
+    icon: <FaFileAlt />,
     color: "#f59e0b",
     label: "Document Reviewed",
   },
 };
+
+// Fallback for unknown types
+const FALLBACK_ICON = <FaBell />;
+const FALLBACK_COLOR = "#1a2466";
 
 const PRIORITY_DOT = {
   urgent: "#ef4444",
@@ -77,8 +137,8 @@ function timeAgo(dateStr) {
 // ── Single notification item ─────────────────────────────────────────
 function NotifItem({ notif, onRead, onDelete }) {
   const cfg = TYPE_CONFIG[notif.type] || {
-    icon: "🔔",
-    color: "#1a2466",
+    icon: FALLBACK_ICON,
+    color: FALLBACK_COLOR,
     label: notif.type,
   };
   const isUnread = !notif.is_read;
@@ -130,7 +190,7 @@ function NotifItem({ notif, onRead, onDelete }) {
         }}
         title="Dismiss"
       >
-        ✕
+        <FaTimes />
       </button>
     </div>
   );
@@ -287,7 +347,7 @@ export default function NotificationsPanel({ token, onClose }) {
               </button>
             )}
             <button className={styles.closeBtn} onClick={onClose}>
-              ✕
+              <FaTimes />
             </button>
           </div>
         </div>
@@ -316,12 +376,16 @@ export default function NotificationsPanel({ token, onClose }) {
         <div className={styles.list}>
           {loading ? (
             <div className={styles.emptyState}>
-              <div className={styles.spinner} />
+              <div className={styles.spinner}>
+                <FaSpinner className={styles.spinIcon} />
+              </div>
               <p>Loading notifications…</p>
             </div>
           ) : notifs.length === 0 ? (
             <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>🔔</div>
+              <div className={styles.emptyIcon}>
+                <FaBell />
+              </div>
               <p className={styles.emptyTitle}>
                 {filter === "unread"
                   ? "No unread notifications"
