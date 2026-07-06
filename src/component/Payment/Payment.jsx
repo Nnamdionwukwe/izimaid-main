@@ -55,14 +55,26 @@ const CURRENCY_SYMBOLS = {
 function sym(c) {
   return CURRENCY_SYMBOLS[c] || (c ? c + " " : "₦");
 }
+
+// ── DEFENSIVE fmt – handles objects and anything else ────────────
 function fmt(amount, currency) {
-  const c = currency || "NGN";
+  let c = currency || "NGN";
+  // If currency is an object, extract the code
+  if (typeof c === "object" && c !== null) {
+    c = c.code || c.currency || c.symbol || "NGN";
+  }
+  // If still an object, fallback
+  if (typeof c === "object") c = "NGN";
+  // Convert to string
+  c = String(c);
   const n = Number(amount || 0);
-  return `${sym(c)}${n.toLocaleString("en-US", {
+  const symbol = CURRENCY_SYMBOLS[c] || (c ? c + " " : "₦");
+  return `${symbol}${n.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
 }
+
 function formatDate(d) {
   return new Date(d).toLocaleDateString("en-NG", {
     weekday: "short",
@@ -80,6 +92,14 @@ function calcFees(serviceAmount) {
     Math.round(((serviceAmount * PLATFORM_FEE_PCT) / 100) * 100) / 100;
   const customerPays = Math.round((serviceAmount + platformFee) * 100) / 100;
   return { platformFee, customerPays };
+}
+
+// ── Safely extract currency code ──────────────────────────────────
+function getCurrencyCode(val) {
+  if (!val) return null;
+  if (typeof val === "string") return val;
+  if (typeof val === "object" && val.code) return val.code;
+  return null;
 }
 
 // ── Alternative methods (bank + crypto) ───────────────────────────
@@ -148,7 +168,11 @@ export default function Payment() {
       });
   };
 
-  const currency = booking?.maid_currency || booking?.currency || "NGN";
+  // ── Extract currency string safely ──────────────────────────────
+  const currency =
+    getCurrencyCode(booking?.maid_currency) ||
+    getCurrencyCode(booking?.currency) ||
+    "NGN";
   const serviceAmt = Number(booking?.total_amount || 0);
   const { platformFee, customerPays } = calcFees(serviceAmt);
 
@@ -953,6 +977,7 @@ export default function Payment() {
 
       {error && <p className={styles.errorMsg}>{error}</p>}
 
+      {/* ── FIXED BUTTON ── */}
       <button
         className={styles.payBtn}
         onClick={handlePay}
@@ -970,8 +995,12 @@ export default function Payment() {
           "Processing…"
         ) : (
           <>
-            {activeMethod === "flutterwave" &&
-              `${gatewayIcon} Pay ${fmt(customerPays, currency)} via Flutterwave`}
+            {activeMethod === "flutterwave" && (
+              <>
+                <FaCreditCard /> Pay {fmt(customerPays, currency)} via
+                Flutterwave
+              </>
+            )}
             {activeMethod === "bank" && (
               <>
                 <FaUniversity /> Get Bank Transfer Details
