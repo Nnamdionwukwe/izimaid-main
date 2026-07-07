@@ -88,6 +88,8 @@ export default function Login({ onSuccess }) {
   const [regConfirm, setRegConfirm] = useState("");
   const [regPhone, setRegPhone] = useState("");
   const [regErrors, setRegErrors] = useState({});
+  // ✅ NEW: terms acceptance state
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Forgot password
   const [fpEmail, setFpEmail] = useState("");
@@ -96,7 +98,7 @@ export default function Login({ onSuccess }) {
   // Phone prompt (after Google register)
   const [phoneVal, setPhoneVal] = useState("");
   const [phoneError, setPhoneError] = useState(null);
-  const [googleToken, setGoogleToken] = useState(null); // token from Google login, needed for /complete-profile
+  const [googleToken, setGoogleToken] = useState(null);
   const [googleUser, setGoogleUser] = useState(null);
 
   const navigate = useNavigate();
@@ -117,7 +119,6 @@ export default function Login({ onSuccess }) {
     setLoading(true);
     setError(null);
 
-    // Clear any stale session
     const currentToken = localStorage.getItem("token");
     if (currentToken) {
       localStorage.removeItem("token");
@@ -138,19 +139,15 @@ export default function Login({ onSuccess }) {
         if (!ok) throw new Error(data.error || "Authentication failed");
         if (!data.token) throw new Error("No token in response");
 
-        // Store token first so completeProfile request is authenticated
         setLoading(false);
 
         if (data.needsPhone) {
-          // Don't call login() yet — it would trigger loginRedirect() in App.jsx
-          // and navigate away before the phone prompt renders
           setGoogleToken(data.token);
-          setGoogleUser(data.user); // store user in state (add this state var)
+          setGoogleUser(data.user);
           setView("phone_prompt");
           return;
         }
 
-        // No phone needed — safe to login now
         login(data.user, data.token);
         onSuccess?.(data);
         const path =
@@ -160,16 +157,6 @@ export default function Login({ onSuccess }) {
               ? "/maid"
               : "/my-bookings";
         navigate(path, { replace: true });
-
-        // Existing user or new user who already has phone
-        onSuccess?.(data);
-        const paths =
-          data.user.role === "admin"
-            ? "/admin"
-            : data.user.role === "maid"
-              ? "/maid"
-              : "/my-bookings";
-        navigate(paths, { replace: true });
       })
       .catch((err) => {
         setError(err.message || "Something went wrong.");
@@ -184,7 +171,7 @@ export default function Login({ onSuccess }) {
     window.location.href = buildGoogleOAuthURL(role);
   };
 
-  // ── Phone prompt submit (after Google register) ────────────────────
+  // ── Phone prompt submit ────────────────────────────────────────────
   async function handlePhoneSubmit(e) {
     e.preventDefault();
     if (!phoneVal.trim()) {
@@ -211,7 +198,6 @@ export default function Login({ onSuccess }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save phone");
 
-      // NOW call login — after phone is saved
       login(data.user, token);
       onSuccess?.({ user: data.user, token });
       const path =
@@ -294,6 +280,10 @@ export default function Login({ onSuccess }) {
     if (!regPass) errs.password = "Password is required";
     if (regPass.length < 8) errs.password = "At least 8 characters";
     if (regPass !== regConfirm) errs.confirm = "Passwords do not match";
+    // ✅ Check terms acceptance
+    if (!termsAccepted) {
+      errs.terms = "You must accept the Terms of Service and Privacy Policy";
+    }
     if (Object.keys(errs).length) {
       setRegErrors(errs);
       return;
@@ -430,7 +420,7 @@ export default function Login({ onSuccess }) {
     );
   }
 
-  // ── PHONE PROMPT (after Google register) ───────────────────────────
+  // ── PHONE PROMPT ───────────────────────────────────────────────────
   if (view === "phone_prompt") {
     return (
       <div className={styles.page}>
@@ -468,27 +458,7 @@ export default function Login({ onSuccess }) {
             </form>
 
             <p className={styles.switchPrompt}>
-              {/* <button
-                className={styles.switchLink}
-                onClick={() => {
-                  const token = googleToken;
-                  const user = googleUser;
-                  if (token && user) {
-                    login(user, token); // ← call login on skip too
-                    onSuccess?.({ user, token });
-                  }
-                  const role = googleUser?.role;
-                  const path =
-                    role === "admin"
-                      ? "/admin"
-                      : role === "maid"
-                        ? "/maid"
-                        : "/my-bookings";
-                  navigate(path, { replace: true });
-                }}
-              >
-                Skip for now
-              </button> */}
+              {/* Skip button removed per request */}
             </p>
           </div>
         </div>
@@ -677,6 +647,39 @@ export default function Login({ onSuccess }) {
                 disabled={loading}
               />
 
+              {/* ✅ Terms checkbox */}
+              <div className={styles.termsCheckbox}>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    disabled={loading}
+                  />
+                  <span>
+                    I agree to the{" "}
+                    <span
+                      onClick={() => navigate("/terms-of-service")}
+                      className={styles.termsLink}
+                      style={{ cursor: "pointer" }}
+                    >
+                      Terms of Service
+                    </span>{" "}
+                    and{" "}
+                    <span
+                      onClick={() => navigate("/privacy-policy")}
+                      className={styles.termsLink}
+                      style={{ cursor: "pointer" }}
+                    >
+                      Privacy Policy
+                    </span>
+                  </span>
+                </label>
+                {regErrors.terms && (
+                  <p className={styles.fieldError}>{regErrors.terms}</p>
+                )}
+              </div>
+
               {error && (
                 <div className={styles.error}>
                   <div className={styles.errorDot} />
@@ -705,22 +708,6 @@ export default function Login({ onSuccess }) {
               >
                 Sign in
               </button>
-            </p>
-            <p className={styles.terms}>
-              By creating an account, you agree to our{" "}
-              <span
-                onClick={() => navigate("/terms-of-service")}
-                className={styles.termsLink}
-              >
-                Terms of Service
-              </span>{" "}
-              and{" "}
-              <span
-                onClick={() => navigate("/privacy-policy")}
-                className={styles.termsLink}
-              >
-                Privacy Policy
-              </span>
             </p>
           </div>
         </div>
@@ -871,7 +858,7 @@ export default function Login({ onSuccess }) {
   );
 }
 
-// Google G icon — extracted to avoid repetition
+// Google G icon
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" style={{ flexShrink: 0 }}>
