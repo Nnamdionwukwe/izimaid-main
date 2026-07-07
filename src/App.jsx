@@ -88,6 +88,7 @@ import AdminCleanerApplications from "./component/AdminDashboard/AdminCleanerApp
 import FoundationVerify from "./component/DeausiziFoundation/FoundationVerify.jsx";
 import GiftCertificateVerify from "./component/GiftCertificates/GiftCertificateVerify.jsx";
 import ResetPinPage from "./pages/settings/ResetPinPage.jsx";
+import CookieBanner from "./component/CookieBanner/CookieBanner.jsx";
 
 function App() {
   return (
@@ -96,6 +97,7 @@ function App() {
         <BrowserRouter>
           {/* Floating support chat — only renders for logged-in customers */}
           <FloatingSupportChat />
+          <CookieBanner />
           <AppRoutes />
           <PoweredByGestech />
         </BrowserRouter>

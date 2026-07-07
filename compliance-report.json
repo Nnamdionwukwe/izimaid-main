@@ -1,0 +1,35 @@
+{
+  "projectName": "izimaid",
+  "version": "0.0.0",
+  "termsAndPrivacy": {
+    "hasTermsPage": false,
+    "hasPrivacyPage": false,
+    "hasCookiePolicy": false,
+    "termsMentioned": true,
+    "privacyMentioned": true,
+    "cookieMentioned": true
+  },
+  "dataCollection": {
+    "formsFound": true,
+    "analyticsFound": false,
+    "thirdPartyFound": true,
+    "socialLoginFound": true,
+    "paymentFound": true,
+    "cookiesMentioned": false,
+    "consentMechanismFound": true
+  },
+  "routes": [],
+  "findings": [
+    "No dedicated Terms of Use page found.",
+    "No dedicated Privacy Policy page found."
+  ],
+  "recommendations": [
+    "Ensure Terms of Use page is accessible via a route.",
+    "Ensure Privacy Policy page is accessible via a route.",
+    "Disclose third‑party data sharing (social logins, payment processors) in Privacy Policy."
+  ],
+  "warnings": [
+    "No Cookie Policy route found. Consider adding one if you use cookies."
+  ],
+  "overallStatus": "✅ Ready for production"
+}

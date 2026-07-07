@@ -1,0 +1,119 @@
+/* ===== OVERLAY (full‑screen dim) ===== */
+.overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== BANNER CARD ===== */
+.banner {
+  max-width: 720px;
+  width: 100%;
+  background: var(--bg-secondary, #ffffff);
+  color: var(--text-primary, #1a1a2e);
+  border-radius: 16px;
+  padding: 24px 28px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-glass, rgba(0, 0, 0, 0.08));
+  transition:
+    background 0.3s,
+    color 0.3s;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.message {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.link {
+  color: var(--accent-1, #1a73e8);
+  text-decoration: underline;
+  font-weight: 500;
+}
+.link:hover {
+  color: var(--accent-2, #4da1ff);
+}
+
+/* ===== BUTTONS ===== */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.acceptBtn,
+.declineBtn {
+  padding: 10px 28px;
+  border: none;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.acceptBtn {
+  background: var(--accent-gradient, #1a73e8);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(26, 115, 232, 0.3);
+}
+.acceptBtn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 24px rgba(26, 115, 232, 0.4);
+}
+
+.declineBtn {
+  background: transparent;
+  color: var(--text-secondary, #4a4a5a);
+  border: 1px solid var(--border-glass, rgba(0, 0, 0, 0.15));
+}
+.declineBtn:hover {
+  background: var(--bg-glass, rgba(0, 0, 0, 0.04));
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  .overlay {
+    padding: 12px;
+  }
+  .banner {
+    padding: 18px 16px;
+  }
+  .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .acceptBtn,
+  .declineBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
