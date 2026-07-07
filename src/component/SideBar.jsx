@@ -19,6 +19,7 @@ const instagramLink =
 const twitterLink = "https://x.com/Deusizigroup";
 const linkedinLink =
   "https://www.linkedin.com/in/queen-lily-adiyono-11a767420?utm_source=share_via&utm_content=profile&utm_medium=member_android";
+const youtubeLink = "https://youtube.com/@deusizisparkle?si=rjTmvPkm8AaAERUF";
 
 export default function SideBar({ isOpen, setIsOpen }) {
   const [isClose, setIsClose] = useState(false);
@@ -523,9 +524,8 @@ export default function SideBar({ isOpen, setIsOpen }) {
                 >
                   <i className="fa-brands fa-x-twitter"></i>
                 </a>
-                {/* YouTube – no link provided; you can replace the href or remove */}
                 <a
-                  href="#"
+                  href={youtubeLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="YouTube"

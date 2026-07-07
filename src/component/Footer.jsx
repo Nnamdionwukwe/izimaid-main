@@ -11,8 +11,7 @@ export default function Footer() {
   const twitterLink = "https://x.com/Deusizigroup";
   const linkedinLink =
     "https://www.linkedin.com/in/queen-lily-adiyono-11a767420?utm_source=share_via&utm_content=profile&utm_medium=member_android";
-  // YouTube link not provided – we'll keep the icon without a link or remove it.
-  // For now, we'll keep it without an href, but you can replace with your YouTube URL if needed.
+  const youtubeLink = "https://youtube.com/@deusizisparkle?si=rjTmvPkm8AaAERUF";
 
   return (
     <div>
@@ -55,7 +54,7 @@ export default function Footer() {
             </a>
             {/* YouTube – no link provided; you can replace the href or remove */}
             <a
-              href="#"
+              href={youtubeLink}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="YouTube"
