@@ -12,6 +12,14 @@ import DeusiziAcademy from "./DeusiziAcademy";
 
 const logo = "/deusizi.jpg";
 
+// Your social media links
+const facebookLink = "https://www.facebook.com/share/1DH3rUFVdU/";
+const instagramLink =
+  "https://www.instagram.com/deusizisparkle?utm_source=qr&igsh=ZGR2b3BqYW45MWow";
+const twitterLink = "https://x.com/Deusizigroup";
+const linkedinLink =
+  "https://www.linkedin.com/in/queen-lily-adiyono-11a767420?utm_source=share_via&utm_content=profile&utm_medium=member_android";
+
 export default function SideBar({ isOpen, setIsOpen }) {
   const [isClose, setIsClose] = useState(false);
   const [isOpen2, setIsOpen2] = useState(true);
@@ -488,13 +496,50 @@ export default function SideBar({ isOpen, setIsOpen }) {
                     : "My Bookings"}
             </button>
 
+            {/* ─── SOCIAL ICONS WITH LINKS ─── */}
             {isOpenFotter && (
               <div className={styles.icons}>
-                <i className="fa-brands fa-facebook"></i>
-                <i className="fa-brands fa-instagram"></i>
-                <i className="fa-brands fa-x-twitter"></i>
-                <i className="fa-brands fa-youtube"></i>
-                <i className="fa-brands fa-linkedin"></i>
+                <a
+                  href={facebookLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                >
+                  <i className="fa-brands fa-facebook"></i>
+                </a>
+                <a
+                  href={instagramLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                >
+                  <i className="fa-brands fa-instagram"></i>
+                </a>
+                <a
+                  href={twitterLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Twitter"
+                >
+                  <i className="fa-brands fa-x-twitter"></i>
+                </a>
+                {/* YouTube – no link provided; you can replace the href or remove */}
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
+                >
+                  <i className="fa-brands fa-youtube"></i>
+                </a>
+                <a
+                  href={linkedinLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                >
+                  <i className="fa-brands fa-linkedin"></i>
+                </a>
               </div>
             )}
 
