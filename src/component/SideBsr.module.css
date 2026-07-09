@@ -538,3 +538,112 @@
 .authBtn:hover {
   background-color: rgb(4, 4, 52);
 }
+
+/* ── Logout Modal ── */
+.logoutModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease;
+}
+
+.logoutModal {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.25s ease;
+}
+
+.logoutModalHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.logoutModalHeader i {
+  font-size: 28px;
+  color: rgb(187, 19, 47);
+}
+
+.logoutModalHeader h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgb(32, 32, 65);
+  margin: 0;
+}
+
+.logoutModalText {
+  font-size: 15px;
+  color: rgb(90, 88, 110);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.logoutModalButtons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.logoutModalCancel,
+.logoutModalConfirm {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.logoutModalCancel {
+  background: rgb(242, 242, 245);
+  color: rgb(90, 88, 110);
+}
+
+.logoutModalCancel:hover {
+  background: rgb(230, 230, 235);
+}
+
+.logoutModalConfirm {
+  background: rgb(187, 19, 47);
+  color: white;
+}
+
+.logoutModalConfirm:hover {
+  background: rgb(160, 14, 38);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

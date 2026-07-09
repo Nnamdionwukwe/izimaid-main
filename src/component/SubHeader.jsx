@@ -29,7 +29,7 @@ function formatAddress({ street, city, state, country, displayName }) {
   return parts.length > 0 ? parts.join(", ") : displayName;
 }
 
-function LocationModal({
+export function LocationModal({
   onClose,
   locationInput,
   onInput,
