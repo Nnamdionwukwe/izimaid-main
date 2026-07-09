@@ -10,8 +10,6 @@ import CleaningTipsSideBar from "./CleaningTipsSIdeBar";
 import PracticalSideBar from "./PracticalSideBar";
 import DeusiziAcademy from "./DeusiziAcademy";
 
-import { LocationModal } from "./SubHeader"; // ✅ imported
-
 const logo = "/deusizi.jpg";
 
 // ── Helper functions (copied from SubHeader) ──
@@ -31,6 +29,119 @@ function extractAddressDetails(data) {
 function formatAddress({ street, city, state, country, displayName }) {
   const parts = [street, city, state, country].filter(Boolean);
   return parts.length > 0 ? parts.join(", ") : displayName;
+}
+
+export function LocationModal({
+  onClose,
+  locationInput,
+  onInput,
+  onClear,
+  onSubmit,
+  onUseLocation,
+  locating,
+  locationError,
+  pleaseEnter,
+  invalidZip,
+  clearInput,
+  detectedAddress,
+}) {
+  return (
+    <div className={styles.localIzimaidMain}>
+      <div className={styles.localIzimaidMainDiv}>
+        <div className={styles.localIzimaidMainDivSub}>
+          <div onClick={onClose} className={styles.timesHover}>
+            <h4>&times;</h4>
+          </div>
+
+          <div className={styles.logoDiv}>
+            <img className={styles.logo2} alt="Logo" src="deusizi.jpg" />
+          </div>
+
+          <div className={styles.located}>
+            <h4>Tell us where you are located</h4>
+          </div>
+
+          <div className={styles.ZIPcode}>
+            <input
+              onChange={onInput}
+              value={locationInput}
+              type="text"
+              placeholder="Enter ZIP Code, City, or Street"
+            />
+            {clearInput && (
+              <h3 onClick={onClear} className={styles.timesInput}>
+                &times;
+              </h3>
+            )}
+            <div
+              onClick={onUseLocation}
+              className={styles.location}
+              style={{
+                cursor: locating ? "wait" : "pointer",
+                opacity: locating ? 0.5 : 1,
+              }}
+            >
+              <h5>
+                {locating ? "📍 Detecting location..." : "📍 Use My Location"}
+              </h5>
+            </div>
+            {locationError && (
+              <h5 style={{ color: "red", fontSize: 11, marginTop: 4 }}>
+                {locationError}
+              </h5>
+            )}
+          </div>
+
+          {detectedAddress && (
+            <div
+              style={{
+                background: "rgb(209, 247, 224)",
+                padding: "10px 12px",
+                borderRadius: "8px",
+                marginTop: 12,
+                fontSize: "12px",
+                color: "rgb(10, 107, 46)",
+                lineHeight: "1.6",
+              }}
+            >
+              <p style={{ margin: "0 0 6px 0", fontWeight: "bold" }}>
+                ✅ Location Detected:
+              </p>
+              {detectedAddress.street && (
+                <p style={{ margin: "2px 0" }}>🏠 {detectedAddress.street}</p>
+              )}
+              {(detectedAddress.city || detectedAddress.state) && (
+                <p style={{ margin: "2px 0" }}>
+                  🏙️{" "}
+                  {[detectedAddress.city, detectedAddress.state]
+                    .filter(Boolean)
+                    .join(", ")}
+                </p>
+              )}
+              {detectedAddress.country && (
+                <p style={{ margin: "2px 0" }}>🌍 {detectedAddress.country}</p>
+              )}
+            </div>
+          )}
+
+          {pleaseEnter && (
+            <h5 className={styles.zip}>Please enter a location</h5>
+          )}
+          {invalidZip && (
+            <h5 className={styles.zip}>Please enter at least 2 characters</h5>
+          )}
+
+          <div onClick={onSubmit} className={styles.help}>
+            <h4>Find Local Help</h4>
+          </div>
+
+          <div className={styles.field}>
+            <p>*indicates a required field</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // Your social media links
