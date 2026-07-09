@@ -251,7 +251,6 @@
 
 /* ── Tablet (577px – 991px) ────────────────────────────────────────────── */
 @media screen and (min-width: 577px) and (max-width: 991px) {
-  /* ── Mobile header adapts to tablet ── */
   .SubMain {
     display: flex;
     flex-direction: row;
@@ -274,7 +273,7 @@
 
   .sub1,
   .sub2 {
-    width: auto; /* allow content to determine width */
+    width: auto;
     padding: 0 14px;
     height: 44px;
     font-size: 11px;
@@ -318,12 +317,10 @@
     font-size: 22px;
   }
 
-  /* ── Keep the desktop nav hidden on tablet ── */
   .thirdHeaderMain {
     display: none;
   }
 
-  /* ── Ensure the location modal is properly sized ── */
   .localIzimaidMainDiv {
     width: 90%;
     max-width: 480px;
@@ -374,15 +371,6 @@
     font-size: 13px;
   }
 
-  /* ── Logout Modal (unchanged) ── */
-  .logoutModalOverlay {
-    /* ... existing ... */
-  }
-  .logoutModal {
-    /* ... existing ... */
-  }
-  /* ... (keep your existing logout modal styles) ... */
-
   /* ── Dashboard & Logout buttons ── */
   .dashboardBtn,
   .logoutBtn {
@@ -421,6 +409,115 @@
     border-color: rgb(187, 19, 47);
   }
 
+  /* ── Logout Modal ── */
+  .logoutModalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .logoutModal {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.25s ease;
+  }
+
+  .logoutModalHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .logoutModalHeader i {
+    font-size: 28px;
+    color: rgb(187, 19, 47);
+  }
+
+  .logoutModalHeader h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: rgb(32, 32, 65);
+    margin: 0;
+  }
+
+  .logoutModalText {
+    font-size: 15px;
+    color: rgb(90, 88, 110);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .logoutModalButtons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+
+  .logoutModalCancel,
+  .logoutModalConfirm {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition:
+      background 0.15s,
+      color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .logoutModalCancel {
+    background: rgb(242, 242, 245);
+    color: rgb(90, 88, 110);
+  }
+
+  .logoutModalCancel:hover {
+    background: rgb(230, 230, 235);
+  }
+
+  .logoutModalConfirm {
+    background: rgb(187, 19, 47);
+    color: white;
+  }
+
+  .logoutModalConfirm:hover {
+    background: rgb(160, 14, 38);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
   /* ── Top utility bar ─────────────────────────────────────────────── */
   .secondMain1 {
     display: flex;
@@ -430,12 +527,14 @@
     padding: 0 40px;
     height: 44px;
   }
+
   .secondMainLogo {
     display: flex;
     align-items: center;
     flex-shrink: 0;
     margin-right: 24px;
   }
+
   .logo {
     width: 110px;
     padding-left: 0;
@@ -446,6 +545,7 @@
     padding-left: 0;
     cursor: pointer;
   }
+
   .secondMainLogo::after {
     content: "";
     display: block;
@@ -454,6 +554,7 @@
     background: rgb(210, 208, 220);
     margin-left: 24px;
   }
+
   .secondMain {
     display: flex;
     align-items: center;
@@ -465,6 +566,7 @@
     color: rgb(90, 88, 110);
     letter-spacing: 0.01em;
   }
+
   .thirdPara1 p,
   .thirdPara2 p {
     height: auto;
@@ -478,11 +580,13 @@
       background 0.15s,
       color 0.15s;
   }
+
   .thirdPara1 p:hover,
   .thirdPara2 p:hover {
     background: rgb(237, 236, 245);
     color: rgb(32, 32, 65);
   }
+
   .thirdPara3 {
     padding: 5px 14px;
     border-radius: 20px;
@@ -495,10 +599,12 @@
       background 0.15s,
       color 0.15s;
   }
+
   .thirdPara3:hover {
     background: rgb(237, 236, 245);
     color: rgb(32, 32, 65);
   }
+
   .thirdHeader3 {
     display: flex;
     align-items: center;
@@ -512,15 +618,18 @@
     transition: background 0.15s;
     white-space: nowrap;
   }
+
   .thirdHeader3:hover {
     background: rgb(160, 14, 38);
   }
+
   .thirdHeader3 p {
     font-size: 12px;
     font-weight: 700;
     color: white;
     margin: 0;
   }
+
   .thirdHeader3 i {
     font-size: 13px;
     color: white;
@@ -547,9 +656,9 @@
     height: 58px;
     display: flex;
     align-items: center;
-    flex: 0 1 auto; /* allow shrink, don't grow */
-    min-width: 0; /* allow truncation */
-    max-width: 140px; /* limit width so ellipsis kicks in */
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 140px;
   }
 
   .thirdMainDiv1,
@@ -567,8 +676,8 @@
     color: rgb(40, 38, 65);
     cursor: pointer;
     white-space: nowrap;
-    overflow: hidden; /* hide overflow */
-    text-overflow: ellipsis; /* show … */
+    overflow: hidden;
+    text-overflow: ellipsis;
     position: relative;
     letter-spacing: 0.01em;
     transition: color 0.15s;
@@ -606,6 +715,7 @@
     text-decoration: none;
     border-radius: 0;
   }
+
   .thirdMainDiv1:hover::after,
   .thirdMainDiv2:hover::after,
   .thirdMainDiv3:hover::after,
@@ -630,11 +740,11 @@
     filter: drop-shadow(0 8px 24px rgba(32, 32, 65, 0.14));
   }
 
-  /* Last 3 nav items anchor panel to the right */
   .residence:nth-last-child(-n + 3) .hoverMain {
     left: auto;
     right: 0;
   }
+
   .residence:hover .hoverMain {
     opacity: 1;
     pointer-events: auto;
@@ -650,7 +760,7 @@
     border: none;
     padding: 0;
     margin-top: 0;
-    flex-shrink: 0; /* never shrink */
+    flex-shrink: 0;
     flex-wrap: nowrap;
   }
 
@@ -678,13 +788,16 @@
     width: auto;
     transition: background 0.15s;
   }
+
   .sub3:hover {
     background: rgb(160, 14, 38);
   }
+
   .sub3 i {
     margin: 0;
     font-size: 14px;
   }
+
   .subP3 {
     font-size: 13px;
   }
@@ -693,6 +806,7 @@
     margin-left: 0;
     margin-top: 2px;
   }
+
   .minsDi .mins {
     font-size: 10px;
     color: gray;
@@ -709,10 +823,12 @@
     border-left: 1px solid rgb(232, 230, 240);
     padding-left: 14px;
   }
+
   .numberDiv::before {
     content: "📞";
     font-size: 14px;
   }
+
   .number {
     font-size: 15px;
     font-weight: 700;
@@ -721,6 +837,7 @@
     z-index: 100;
     letter-spacing: 0.02em;
   }
+
   .numberDiv:hover .number {
     color: rgb(187, 19, 47);
   }
@@ -837,339 +954,5 @@
   }
   .logo {
     width: 120px;
-  }
-}
-
-/* ── Narrow desktop (992px – 1100px) ────────────────────────────────────── */
-@media screen and (min-width: 992px) and (max-width: 1100px) {
-  .secondMain1 {
-    padding: 0 16px;
-  }
-  .thirdMain {
-    padding: 0 16px;
-    gap: 0;
-  }
-
-  /* Make nav items even smaller */
-  .thirdMainDiv1,
-  .thirdMainDiv2,
-  .thirdMainDiv3,
-  .thirdMainDiv4,
-  .thirdMainDiv5,
-  .thirdMainDiv6 {
-    padding: 0 6px; /* tight padding */
-    font-size: 10px; /* tiny font */
-  }
-  .thirdMainDiv1::after,
-  .thirdMainDiv2::after,
-  .thirdMainDiv3::after,
-  .thirdMainDiv4::after,
-  .thirdMainDiv5::after,
-  .thirdMainDiv6::after {
-    left: 6px;
-    right: 6px;
-  }
-
-  /* Utility links – tighter */
-  .thirdPara1 p,
-  .thirdPara2 p,
-  .thirdPara3 {
-    padding: 4px 6px;
-    font-size: 10px;
-  }
-  .thirdHeader3 {
-    padding: 4px 8px 4px 6px;
-    font-size: 10px;
-    margin-left: 4px;
-  }
-
-  /* Right side – smaller */
-  .SubMain {
-    gap: 8px;
-  }
-  .sub3 {
-    height: 34px;
-    font-size: 11px;
-    padding: 0 12px;
-  }
-  .subP3 {
-    font-size: 11px;
-  }
-  .number {
-    font-size: 12px;
-  }
-  .numberDiv {
-    padding-left: 8px;
-  }
-  .dashboardBtn,
-  .logoutBtn {
-    height: 34px;
-    font-size: 11px;
-    padding: 0 10px;
-  }
-  .logo {
-    width: 95px;
-  }
-}
-
-/* ── Large desktop (1200px+) ─────────────────────────────────────────────── */
-@media screen and (min-width: 1200px) {
-  .secondMain1 {
-    padding: 0 60px;
-  }
-  .thirdMain {
-    padding: 0 60px;
-    gap: 4px;
-  }
-  .thirdMainDiv1,
-  .thirdMainDiv2,
-  .thirdMainDiv3,
-  .thirdMainDiv4,
-  .thirdMainDiv5,
-  .thirdMainDiv6 {
-    padding: 0 18px;
-    font-size: 14px;
-  }
-  .thirdMainDiv1::after,
-  .thirdMainDiv2::after,
-  .thirdMainDiv3::after,
-  .thirdMainDiv4::after,
-  .thirdMainDiv5::after,
-  .thirdMainDiv6::after {
-    left: 18px;
-    right: 18px;
-  }
-  .sub3 {
-    height: 42px;
-    font-size: 14px;
-    padding: 0 20px;
-  }
-  .number {
-    font-size: 16px;
-  }
-  .logo {
-    width: 120px;
-  }
-}
-
-/* ── Tablet desktop edge (992px – 1100px) ────────────────────────────────── */
-@media screen and (min-width: 992px) and (max-width: 1100px) {
-  .secondMain1 {
-    padding: 0 16px;
-  }
-
-  .thirdMain {
-    padding: 0 16px;
-    gap: 0;
-  }
-
-  .thirdMainDiv1,
-  .thirdMainDiv2,
-  .thirdMainDiv3,
-  .thirdMainDiv4,
-  .thirdMainDiv5,
-  .thirdMainDiv6 {
-    padding: 0 8px; /* reduced from 10px */
-    font-size: 11px; /* smaller font */
-  }
-
-  .thirdMainDiv1::after,
-  .thirdMainDiv2::after,
-  .thirdMainDiv3::after,
-  .thirdMainDiv4::after,
-  .thirdMainDiv5::after,
-  .thirdMainDiv6::after {
-    left: 8px;
-    right: 8px;
-  }
-
-  /* Utility links – tighter */
-  .thirdPara1 p,
-  .thirdPara2 p,
-  .thirdPara3 {
-    padding: 5px 8px;
-    font-size: 11px;
-  }
-
-  .thirdHeader3 {
-    padding: 5px 10px 5px 8px;
-    font-size: 11px;
-    margin-left: 4px;
-  }
-
-  /* CTA button – smaller */
-  .sub3 {
-    height: 34px;
-    font-size: 11px;
-    padding: 0 12px;
-  }
-
-  .subP3 {
-    font-size: 11px;
-  }
-
-  .number {
-    font-size: 12px; /* smaller phone number */
-  }
-
-  .logo {
-    width: 95px;
-  }
-
-  /* Reduce gap between right side items */
-  .SubMain {
-    gap: 8px;
-  }
-  .numberDiv {
-    padding-left: 8px;
-  }
-}
-
-/* ── Large desktop (1200px+) ─────────────────────────────────────────────── */
-@media screen and (min-width: 1200px) {
-  .secondMain1 {
-    padding: 0 60px;
-  }
-
-  .thirdMain {
-    padding: 0 60px;
-    gap: 4px;
-  }
-
-  .thirdMainDiv1,
-  .thirdMainDiv2,
-  .thirdMainDiv3,
-  .thirdMainDiv4,
-  .thirdMainDiv5,
-  .thirdMainDiv6 {
-    padding: 0 18px;
-    font-size: 14px;
-  }
-
-  .thirdMainDiv1::after,
-  .thirdMainDiv2::after,
-  .thirdMainDiv3::after,
-  .thirdMainDiv4::after,
-  .thirdMainDiv5::after,
-  .thirdMainDiv6::after {
-    left: 18px;
-    right: 18px;
-  }
-
-  .sub3 {
-    height: 42px;
-    font-size: 14px;
-    padding: 0 20px;
-  }
-  .number {
-    font-size: 16px;
-  }
-  .logo {
-    width: 120px;
-  }
-}
-
-/* ── Large desktop (1200px+) ─────────────────────────────────────────────── */
-@media screen and (min-width: 1200px) {
-  .secondMain1 {
-    padding: 0 60px;
-  }
-
-  .thirdMain {
-    padding: 0 60px;
-    gap: 4px;
-  }
-
-  .thirdMainDiv1,
-  .thirdMainDiv2,
-  .thirdMainDiv3,
-  .thirdMainDiv4,
-  .thirdMainDiv5,
-  .thirdMainDiv6 {
-    padding: 0 18px;
-    font-size: 14px;
-  }
-
-  .thirdMainDiv1::after,
-  .thirdMainDiv2::after,
-  .thirdMainDiv3::after,
-  .thirdMainDiv4::after,
-  .thirdMainDiv5::after,
-  .thirdMainDiv6::after {
-    left: 18px;
-    right: 18px;
-  }
-
-  .sub3 {
-    height: 42px;
-    font-size: 14px;
-    padding: 0 20px;
-  }
-  .number {
-    font-size: 16px;
-  }
-  .logo {
-    width: 120px;
-  }
-}
-
-/* ── Tablet desktop edge (992px – 1100px) ────────────────────────────────── */
-@media screen and (min-width: 992px) and (max-width: 1100px) {
-  .secondMain1 {
-    padding: 0 16px;
-  }
-
-  .thirdMain {
-    padding: 0 16px;
-    gap: 0;
-  }
-
-  .thirdMainDiv1,
-  .thirdMainDiv2,
-  .thirdMainDiv3,
-  .thirdMainDiv4,
-  .thirdMainDiv5,
-  .thirdMainDiv6 {
-    padding: 0 10px;
-    font-size: 12px;
-  }
-
-  .thirdMainDiv1::after,
-  .thirdMainDiv2::after,
-  .thirdMainDiv3::after,
-  .thirdMainDiv4::after,
-  .thirdMainDiv5::after,
-  .thirdMainDiv6::after {
-    left: 10px;
-    right: 10px;
-  }
-
-  /* Tighter utility links */
-  .thirdPara1 p,
-  .thirdPara2 p,
-  .thirdPara3 {
-    padding: 5px 8px;
-    font-size: 11px;
-  }
-
-  .thirdHeader3 {
-    padding: 5px 10px 5px 8px;
-    font-size: 11px;
-    margin-left: 4px;
-  }
-
-  /* Smaller CTA button */
-  .sub3 {
-    height: 36px;
-    font-size: 12px;
-    padding: 0 12px;
-  }
-
-  .number {
-    font-size: 13px;
-  }
-
-  .logo {
-    width: 95px;
   }
 }
