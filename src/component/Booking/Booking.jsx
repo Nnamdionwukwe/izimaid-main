@@ -592,7 +592,9 @@ export default function Booking() {
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
               />
-              <span className={styles.durationUnit}>
+              <span
+                className={`${styles.durationUnit} ${styles.durationUnitText}`}
+              >
                 {durConfig.unit || selected.label?.toLowerCase()}
               </span>
               <button
