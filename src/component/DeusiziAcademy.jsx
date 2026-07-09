@@ -1,46 +1,44 @@
 import { useNavigate } from "react-router-dom";
-import styles from "./ResidentialSideBar.module.css";
+import styles from "./Residential.module.css"; // ← now uses the same CSS as Practically
 
 export default function DeusiziAcademy() {
   const navigate = useNavigate();
 
-  return (
-    <>
-      <div className={styles.de}>
-        <div className={styles.residentialDI}>
-          <div
-            onClick={() => navigate("/deusizi-academy/cleaner-training")}
-            className={styles.hoverMainDiv10}
-          >
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p>Cleaner Training</p>
-          </div>
+  const ITEMS = [
+    { label: "Cleaner Training", path: "/deusizi-academy/cleaner-training" },
+    {
+      label: "Housekeeper Training",
+      path: "/deusizi-academy/housekeeper-training",
+    },
+    {
+      label: "Caregiver Training",
+      path: "/deusizi-academy/caregiver-training",
+    },
+    {
+      label: "Domestic Staff Certification",
+      path: "/deusizi-academy/domestic-staff-certification",
+    },
+  ];
 
-          <div
-            onClick={() => navigate("/deusizi-academy/housekeeper-training")}
-            className={styles.hoverMainDiv11}
-          >
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p>Housekeeper Training</p>
-          </div>
-          <div
-            onClick={() => navigate("/deusizi-academy/caregiver-training")}
-            className={styles.hoverMainDiv12}
-          >
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p className={styles.para6}>Caregiver Training</p>
-          </div>
-          <div
-            onClick={() =>
-              navigate("/deusizi-academy/domestic-staff-certification")
-            }
-            className={styles.hoverMainDiv12}
-          >
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            <p className={styles.para6}>Domestic Staff Certification</p>
-          </div>
-        </div>
+  return (
+    <div className={styles.panel}>
+      <div className={styles.panelHeader}>
+        <span className={styles.panelTitle}>Deusizi Academy</span>
       </div>
-    </>
+      <div className={styles.grid}>
+        {ITEMS.map(({ label, path }) => (
+          <div
+            key={path}
+            className={styles.item}
+            onClick={() => navigate(path)}
+          >
+            <div className={styles.iconWrap}>
+              <i className="fa fa-th-large" aria-hidden="true" />
+            </div>
+            <span className={styles.label}>{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

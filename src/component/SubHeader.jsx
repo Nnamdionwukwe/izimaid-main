@@ -9,6 +9,7 @@ import Residential from "./Residential";
 import WhyHireUs from "./WhyHireUs";
 import styles from "./SubHeader.module.css";
 import DeusiziAcademy from "./DeusiziAcademy";
+import { useAuth } from "../context/AuthContext";
 
 function extractAddressDetails(data) {
   const address = data.address || {};
@@ -152,6 +153,35 @@ export default function SubHeader() {
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState("");
   const [detectedAddress, setDetectedAddress] = useState(null);
+
+  // ── NEW: logout modal state ──
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const { user, logout } = useAuth();
+
+  // ── Determine dashboard URL based on role ──
+  const getDashboardPath = () => {
+    if (!user) return "/";
+    if (user.role === "admin") return "/admin";
+    if (user.role === "maid") return "/maid";
+    return "/my-bookings"; // customer
+  };
+  // ── Open logout confirmation modal ──
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  // ── Confirm logout ──
+  const confirmLogout = () => {
+    logout();
+    setShowLogoutModal(false);
+    navigate("/login", { replace: true });
+  };
+
+  // ── Cancel logout ──
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
+  };
 
   function handleInput(e) {
     const val = e.target.value;
@@ -350,7 +380,7 @@ export default function SubHeader() {
               className={styles.thirdHeader3}
             >
               <i className="fa fa-map-marker" aria-hidden="true" />
-              <p>Find My Local Deusizi Sparkle Maid</p>
+              <p>Find My Local Deusizi Sparkle Professionals</p>
             </div>
             {findLocalIzimaid && <LocationModal {...modalProps} />}
           </div>
@@ -382,12 +412,67 @@ export default function SubHeader() {
                 <p className={styles.mins}>In under 2 mins</p>
               </div>
             </div>
+
             <a className={styles.numberDiv} href="tel:+2348030588774">
               <p className={styles.number}>0803 0588 774</p>
             </a>
+
+            {/* ── Dashboard & Logout buttons (only when logged in) ── */}
+            {user && (
+              <>
+                <button
+                  onClick={() => navigate(getDashboardPath())}
+                  className={styles.dashboardBtn}
+                >
+                  <i className="fa fa-tachometer" aria-hidden="true" />
+                  Dashboard
+                </button>
+                <button
+                  onClick={handleLogoutClick}
+                  className={styles.logoutBtn}
+                >
+                  <i className="fa fa-sign-out" aria-hidden="true" />
+                  Logout
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
+
+      {/* ── Logout Confirmation Modal ── */}
+      {showLogoutModal && (
+        <div className={styles.logoutModalOverlay} onClick={cancelLogout}>
+          <div
+            className={styles.logoutModal}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.logoutModalHeader}>
+              <i className="fa fa-sign-out" aria-hidden="true" />
+              <h3>Confirm Logout</h3>
+            </div>
+            <p className={styles.logoutModalText}>
+              Are you sure you want to log out? You will need to sign in again
+              to access your account.
+            </p>
+            <div className={styles.logoutModalButtons}>
+              <button
+                className={styles.logoutModalCancel}
+                onClick={cancelLogout}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.logoutModalConfirm}
+                onClick={confirmLogout}
+              >
+                <i className="fa fa-sign-out" aria-hidden="true" />
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

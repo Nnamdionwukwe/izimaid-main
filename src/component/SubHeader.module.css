@@ -249,20 +249,105 @@
   }
 }
 
-/* ── Tablet ───────────────────────────────────────────────────────────────── */
-@media screen and (min-width: 577px) {
+/* ── Tablet (577px – 991px) ────────────────────────────────────────────── */
+@media screen and (min-width: 577px) and (max-width: 991px) {
+  /* ── Mobile header adapts to tablet ── */
   .SubMain {
     display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px 10px 10px;
+    padding: 8px 16px;
+    border-top: 1px solid rgb(230, 226, 226);
+    border-bottom: 1px solid rgb(230, 226, 226);
+    margin-top: 0;
+    flex-wrap: nowrap;
   }
 
-  .sub2 {
-    margin-top: -5px;
+  .SubHeader2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    justify-content: flex-start;
   }
-  .thirdHeader2 {
+
+  .sub1,
+  .sub2 {
+    width: auto; /* allow content to determine width */
+    padding: 0 14px;
+    height: 44px;
+    font-size: 11px;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .sub1 i,
+  .sub2 i {
+    font-size: 16px;
+    margin-right: 6px;
+  }
+
+  .subP {
+    margin-left: 0;
+    width: auto;
+  }
+
+  .minsDiv {
+    padding-left: 0;
+    flex-shrink: 0;
+  }
+
+  .mins {
+    margin-left: 0;
+    font-size: 11px;
+    color: gray;
+  }
+
+  .thirdHeader {
+    margin-left: 16px;
+    margin-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .thirdHeader p {
+    font-size: 12px;
+  }
+
+  .thirdHeader i {
+    font-size: 22px;
+  }
+
+  /* ── Keep the desktop nav hidden on tablet ── */
+  .thirdHeaderMain {
     display: none;
+  }
+
+  /* ── Ensure the location modal is properly sized ── */
+  .localIzimaidMainDiv {
+    width: 90%;
+    max-width: 480px;
+    height: auto;
+    min-height: 24em;
+  }
+
+  .ZIPcode {
+    margin: 0 12px;
+    height: 40px;
+    flex-wrap: nowrap;
+  }
+
+  .ZIPcode input {
+    font-size: 14px;
+  }
+
+  .location h5 {
+    font-size: 11px;
+  }
+
+  .help {
+    height: 40px;
+    margin: 16px 12px 0;
   }
 }
 
@@ -289,6 +374,53 @@
     font-size: 13px;
   }
 
+  /* ── Logout Modal (unchanged) ── */
+  .logoutModalOverlay {
+    /* ... existing ... */
+  }
+  .logoutModal {
+    /* ... existing ... */
+  }
+  /* ... (keep your existing logout modal styles) ... */
+
+  /* ── Dashboard & Logout buttons ── */
+  .dashboardBtn,
+  .logoutBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background 0.15s,
+      color 0.15s;
+    border: none;
+    text-decoration: none;
+  }
+  .dashboardBtn {
+    background: rgb(6, 6, 60);
+    color: white;
+  }
+  .dashboardBtn:hover {
+    background: rgb(4, 4, 40);
+  }
+  .logoutBtn {
+    background: transparent;
+    color: rgb(90, 88, 110);
+    border: 1px solid rgb(210, 208, 220);
+  }
+  .logoutBtn:hover {
+    background: rgb(248, 245, 245);
+    color: rgb(187, 19, 47);
+    border-color: rgb(187, 19, 47);
+  }
+
   /* ── Top utility bar ─────────────────────────────────────────────── */
   .secondMain1 {
     display: flex;
@@ -298,14 +430,12 @@
     padding: 0 40px;
     height: 44px;
   }
-
   .secondMainLogo {
     display: flex;
     align-items: center;
     flex-shrink: 0;
     margin-right: 24px;
   }
-
   .logo {
     width: 110px;
     padding-left: 0;
@@ -316,7 +446,6 @@
     padding-left: 0;
     cursor: pointer;
   }
-
   .secondMainLogo::after {
     content: "";
     display: block;
@@ -325,7 +454,6 @@
     background: rgb(210, 208, 220);
     margin-left: 24px;
   }
-
   .secondMain {
     display: flex;
     align-items: center;
@@ -337,7 +465,6 @@
     color: rgb(90, 88, 110);
     letter-spacing: 0.01em;
   }
-
   .thirdPara1 p,
   .thirdPara2 p {
     height: auto;
@@ -351,13 +478,11 @@
       background 0.15s,
       color 0.15s;
   }
-
   .thirdPara1 p:hover,
   .thirdPara2 p:hover {
     background: rgb(237, 236, 245);
     color: rgb(32, 32, 65);
   }
-
   .thirdPara3 {
     padding: 5px 14px;
     border-radius: 20px;
@@ -370,12 +495,10 @@
       background 0.15s,
       color 0.15s;
   }
-
   .thirdPara3:hover {
     background: rgb(237, 236, 245);
     color: rgb(32, 32, 65);
   }
-
   .thirdHeader3 {
     display: flex;
     align-items: center;
@@ -389,22 +512,15 @@
     transition: background 0.15s;
     white-space: nowrap;
   }
-
   .thirdHeader3:hover {
     background: rgb(160, 14, 38);
   }
-
   .thirdHeader3 p {
     font-size: 12px;
     font-weight: 700;
     color: white;
     margin: 0;
   }
-
-  .thirdHeader3 p:hover {
-    text-decoration: none;
-  }
-
   .thirdHeader3 i {
     font-size: 13px;
     color: white;
@@ -419,9 +535,11 @@
     height: 58px;
     background: white;
     border-bottom: 2px solid rgb(232, 230, 240);
-    gap: 2px;
+    gap: 0;
     position: relative;
     z-index: 100;
+    flex-wrap: nowrap;
+    overflow: visible;
   }
 
   .residence {
@@ -429,6 +547,9 @@
     height: 58px;
     display: flex;
     align-items: center;
+    flex: 0 1 auto; /* allow shrink, don't grow */
+    min-width: 0; /* allow truncation */
+    max-width: 140px; /* limit width so ellipsis kicks in */
   }
 
   .thirdMainDiv1,
@@ -440,16 +561,20 @@
     display: flex;
     align-items: center;
     height: 58px;
-    padding: 0 16px;
-    font-size: 13px;
+    padding: 0 12px;
+    font-size: 12px;
     font-weight: 700;
     color: rgb(40, 38, 65);
     cursor: pointer;
     white-space: nowrap;
+    overflow: hidden; /* hide overflow */
+    text-overflow: ellipsis; /* show … */
     position: relative;
     letter-spacing: 0.01em;
     transition: color 0.15s;
-    width: auto;
+    width: 100%;
+    flex-shrink: 1;
+    min-width: 0;
   }
 
   .thirdMainDiv1::after,
@@ -461,8 +586,8 @@
     content: "";
     position: absolute;
     bottom: 0;
-    left: 16px;
-    right: 16px;
+    left: 12px;
+    right: 12px;
     height: 3px;
     background: rgb(187, 19, 47);
     border-radius: 2px 2px 0 0;
@@ -481,7 +606,6 @@
     text-decoration: none;
     border-radius: 0;
   }
-
   .thirdMainDiv1:hover::after,
   .thirdMainDiv2:hover::after,
   .thirdMainDiv3:hover::after,
@@ -502,17 +626,15 @@
       transform 0.18s ease;
     transform: translateY(6px);
     z-index: 500;
-    /* Never wider than viewport — prevents horizontal scroll on tablets */
     max-width: calc(100vw - 24px);
     filter: drop-shadow(0 8px 24px rgba(32, 32, 65, 0.14));
   }
 
-  /* Last 3 nav items anchor panel to the right so it doesn't bleed off-screen */
+  /* Last 3 nav items anchor panel to the right */
   .residence:nth-last-child(-n + 3) .hoverMain {
     left: auto;
     right: 0;
   }
-
   .residence:hover .hoverMain {
     opacity: 1;
     pointer-events: auto;
@@ -528,6 +650,8 @@
     border: none;
     padding: 0;
     margin-top: 0;
+    flex-shrink: 0; /* never shrink */
+    flex-wrap: nowrap;
   }
 
   .SubHeader3 {
@@ -554,7 +678,6 @@
     width: auto;
     transition: background 0.15s;
   }
-
   .sub3:hover {
     background: rgb(160, 14, 38);
   }
@@ -562,7 +685,6 @@
     margin: 0;
     font-size: 14px;
   }
-
   .subP3 {
     font-size: 13px;
   }
@@ -571,7 +693,6 @@
     margin-left: 0;
     margin-top: 2px;
   }
-
   .minsDi .mins {
     font-size: 10px;
     color: gray;
@@ -588,12 +709,10 @@
     border-left: 1px solid rgb(232, 230, 240);
     padding-left: 14px;
   }
-
   .numberDiv::before {
     content: "📞";
     font-size: 14px;
   }
-
   .number {
     font-size: 15px;
     font-weight: 700;
@@ -602,13 +721,351 @@
     z-index: 100;
     letter-spacing: 0.02em;
   }
-
   .numberDiv:hover .number {
     color: rgb(187, 19, 47);
   }
 
   .thirdHeader2 {
     display: none;
+  }
+}
+
+/* ── Narrow desktop (992px – 1100px) ────────────────────────────────────── */
+@media screen and (min-width: 992px) and (max-width: 1100px) {
+  .secondMain1 {
+    padding: 0 16px;
+  }
+  .thirdMain {
+    padding: 0 16px;
+    gap: 0;
+  }
+
+  .thirdMainDiv1,
+  .thirdMainDiv2,
+  .thirdMainDiv3,
+  .thirdMainDiv4,
+  .thirdMainDiv5,
+  .thirdMainDiv6 {
+    padding: 0 6px;
+    font-size: 10px;
+  }
+  .thirdMainDiv1::after,
+  .thirdMainDiv2::after,
+  .thirdMainDiv3::after,
+  .thirdMainDiv4::after,
+  .thirdMainDiv5::after,
+  .thirdMainDiv6::after {
+    left: 6px;
+    right: 6px;
+  }
+
+  .thirdPara1 p,
+  .thirdPara2 p,
+  .thirdPara3 {
+    padding: 4px 6px;
+    font-size: 10px;
+  }
+  .thirdHeader3 {
+    padding: 4px 8px 4px 6px;
+    font-size: 10px;
+    margin-left: 4px;
+  }
+
+  .SubMain {
+    gap: 8px;
+  }
+  .sub3 {
+    height: 34px;
+    font-size: 11px;
+    padding: 0 12px;
+  }
+  .subP3 {
+    font-size: 11px;
+  }
+  .number {
+    font-size: 12px;
+  }
+  .numberDiv {
+    padding-left: 8px;
+  }
+  .dashboardBtn,
+  .logoutBtn {
+    height: 34px;
+    font-size: 11px;
+    padding: 0 10px;
+  }
+  .logo {
+    width: 95px;
+  }
+}
+
+/* ── Large desktop (1200px+) ─────────────────────────────────────────────── */
+@media screen and (min-width: 1200px) {
+  .secondMain1 {
+    padding: 0 60px;
+  }
+  .thirdMain {
+    padding: 0 60px;
+    gap: 4px;
+  }
+
+  .thirdMainDiv1,
+  .thirdMainDiv2,
+  .thirdMainDiv3,
+  .thirdMainDiv4,
+  .thirdMainDiv5,
+  .thirdMainDiv6 {
+    padding: 0 18px;
+    font-size: 14px;
+  }
+  .thirdMainDiv1::after,
+  .thirdMainDiv2::after,
+  .thirdMainDiv3::after,
+  .thirdMainDiv4::after,
+  .thirdMainDiv5::after,
+  .thirdMainDiv6::after {
+    left: 18px;
+    right: 18px;
+  }
+  .sub3 {
+    height: 42px;
+    font-size: 14px;
+    padding: 0 20px;
+  }
+  .number {
+    font-size: 16px;
+  }
+  .logo {
+    width: 120px;
+  }
+}
+
+/* ── Narrow desktop (992px – 1100px) ────────────────────────────────────── */
+@media screen and (min-width: 992px) and (max-width: 1100px) {
+  .secondMain1 {
+    padding: 0 16px;
+  }
+  .thirdMain {
+    padding: 0 16px;
+    gap: 0;
+  }
+
+  /* Make nav items even smaller */
+  .thirdMainDiv1,
+  .thirdMainDiv2,
+  .thirdMainDiv3,
+  .thirdMainDiv4,
+  .thirdMainDiv5,
+  .thirdMainDiv6 {
+    padding: 0 6px; /* tight padding */
+    font-size: 10px; /* tiny font */
+  }
+  .thirdMainDiv1::after,
+  .thirdMainDiv2::after,
+  .thirdMainDiv3::after,
+  .thirdMainDiv4::after,
+  .thirdMainDiv5::after,
+  .thirdMainDiv6::after {
+    left: 6px;
+    right: 6px;
+  }
+
+  /* Utility links – tighter */
+  .thirdPara1 p,
+  .thirdPara2 p,
+  .thirdPara3 {
+    padding: 4px 6px;
+    font-size: 10px;
+  }
+  .thirdHeader3 {
+    padding: 4px 8px 4px 6px;
+    font-size: 10px;
+    margin-left: 4px;
+  }
+
+  /* Right side – smaller */
+  .SubMain {
+    gap: 8px;
+  }
+  .sub3 {
+    height: 34px;
+    font-size: 11px;
+    padding: 0 12px;
+  }
+  .subP3 {
+    font-size: 11px;
+  }
+  .number {
+    font-size: 12px;
+  }
+  .numberDiv {
+    padding-left: 8px;
+  }
+  .dashboardBtn,
+  .logoutBtn {
+    height: 34px;
+    font-size: 11px;
+    padding: 0 10px;
+  }
+  .logo {
+    width: 95px;
+  }
+}
+
+/* ── Large desktop (1200px+) ─────────────────────────────────────────────── */
+@media screen and (min-width: 1200px) {
+  .secondMain1 {
+    padding: 0 60px;
+  }
+  .thirdMain {
+    padding: 0 60px;
+    gap: 4px;
+  }
+  .thirdMainDiv1,
+  .thirdMainDiv2,
+  .thirdMainDiv3,
+  .thirdMainDiv4,
+  .thirdMainDiv5,
+  .thirdMainDiv6 {
+    padding: 0 18px;
+    font-size: 14px;
+  }
+  .thirdMainDiv1::after,
+  .thirdMainDiv2::after,
+  .thirdMainDiv3::after,
+  .thirdMainDiv4::after,
+  .thirdMainDiv5::after,
+  .thirdMainDiv6::after {
+    left: 18px;
+    right: 18px;
+  }
+  .sub3 {
+    height: 42px;
+    font-size: 14px;
+    padding: 0 20px;
+  }
+  .number {
+    font-size: 16px;
+  }
+  .logo {
+    width: 120px;
+  }
+}
+
+/* ── Tablet desktop edge (992px – 1100px) ────────────────────────────────── */
+@media screen and (min-width: 992px) and (max-width: 1100px) {
+  .secondMain1 {
+    padding: 0 16px;
+  }
+
+  .thirdMain {
+    padding: 0 16px;
+    gap: 0;
+  }
+
+  .thirdMainDiv1,
+  .thirdMainDiv2,
+  .thirdMainDiv3,
+  .thirdMainDiv4,
+  .thirdMainDiv5,
+  .thirdMainDiv6 {
+    padding: 0 8px; /* reduced from 10px */
+    font-size: 11px; /* smaller font */
+  }
+
+  .thirdMainDiv1::after,
+  .thirdMainDiv2::after,
+  .thirdMainDiv3::after,
+  .thirdMainDiv4::after,
+  .thirdMainDiv5::after,
+  .thirdMainDiv6::after {
+    left: 8px;
+    right: 8px;
+  }
+
+  /* Utility links – tighter */
+  .thirdPara1 p,
+  .thirdPara2 p,
+  .thirdPara3 {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  .thirdHeader3 {
+    padding: 5px 10px 5px 8px;
+    font-size: 11px;
+    margin-left: 4px;
+  }
+
+  /* CTA button – smaller */
+  .sub3 {
+    height: 34px;
+    font-size: 11px;
+    padding: 0 12px;
+  }
+
+  .subP3 {
+    font-size: 11px;
+  }
+
+  .number {
+    font-size: 12px; /* smaller phone number */
+  }
+
+  .logo {
+    width: 95px;
+  }
+
+  /* Reduce gap between right side items */
+  .SubMain {
+    gap: 8px;
+  }
+  .numberDiv {
+    padding-left: 8px;
+  }
+}
+
+/* ── Large desktop (1200px+) ─────────────────────────────────────────────── */
+@media screen and (min-width: 1200px) {
+  .secondMain1 {
+    padding: 0 60px;
+  }
+
+  .thirdMain {
+    padding: 0 60px;
+    gap: 4px;
+  }
+
+  .thirdMainDiv1,
+  .thirdMainDiv2,
+  .thirdMainDiv3,
+  .thirdMainDiv4,
+  .thirdMainDiv5,
+  .thirdMainDiv6 {
+    padding: 0 18px;
+    font-size: 14px;
+  }
+
+  .thirdMainDiv1::after,
+  .thirdMainDiv2::after,
+  .thirdMainDiv3::after,
+  .thirdMainDiv4::after,
+  .thirdMainDiv5::after,
+  .thirdMainDiv6::after {
+    left: 18px;
+    right: 18px;
+  }
+
+  .sub3 {
+    height: 42px;
+    font-size: 14px;
+    padding: 0 20px;
+  }
+  .number {
+    font-size: 16px;
+  }
+  .logo {
+    width: 120px;
   }
 }
 
