@@ -114,11 +114,15 @@ function AppRoutes() {
   const { user, token, logout } = useAuth();
 
   function handleLoginSuccess() {
-    // Context updates asynchronously so read localStorage for the immediate redirect
     const freshUser = JSON.parse(localStorage.getItem("user") || "{}");
-    if (freshUser.role === "admin") navigate("/admin", { replace: true });
-    else if (freshUser.role === "maid") navigate("/maid", { replace: true });
-    else navigate("/", { replace: true });
+    if (freshUser.role === "admin") {
+      navigate("/admin", { replace: true });
+    } else if (freshUser.role === "maid") {
+      navigate("/maid", { replace: true });
+    } else {
+      // Customer – go to their bookings dashboard
+      navigate("/my-bookings", { replace: true });
+    }
   }
 
   // ✅ context logout clears user state globally — every component using
@@ -142,7 +146,8 @@ function AppRoutes() {
     if (token && !hasGoogleHash) {
       if (user.role === "admin") return <Navigate to="/admin" replace />;
       if (user.role === "maid") return <Navigate to="/maid" replace />;
-      return <Navigate to="/" replace />;
+      // Customer – go to their dashboard
+      return <Navigate to="/my-bookings" replace />;
     }
     return <Login onSuccess={handleLoginSuccess} />;
   }

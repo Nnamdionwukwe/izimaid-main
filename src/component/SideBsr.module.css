@@ -726,6 +726,7 @@
   background: rgb(242, 242, 242);
   border: none;
   outline: none;
+  font-size: 16px; /* ← prevents zoom on mobile */
 }
 
 .timesInput {
@@ -817,7 +818,7 @@
   }
 
   .ZIPcode input {
-    font-size: 14px !important;
+    font-size: 16px !important; /* keep 16px */
     min-width: 120px !important;
     flex: 1 1 100% !important;
   }
@@ -892,7 +893,7 @@
   }
 
   .ZIPcode input {
-    font-size: 14px !important;
+    font-size: 16px !important;
   }
 
   .location {
