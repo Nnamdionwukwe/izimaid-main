@@ -26,7 +26,7 @@ export default function VideoCall({
   const [client, setClient] = useState(null);
   const [localAudioTrack, setLocalAudioTrack] = useState(null);
   const [localVideoTrack, setLocalVideoTrack] = useState(null);
-  const [remoteUser, setRemoteUser] = useState(null); // single remote user
+  const [remoteUser, setRemoteUser] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
@@ -37,10 +37,12 @@ export default function VideoCall({
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const tokenStorage = localStorage.getItem("token");
+  const mountedRef = useRef(true);
   const joinedRef = useRef(false);
 
   useEffect(() => {
-    let mounted = true;
+    mountedRef.current = true;
+    let isMounted = true;
 
     async function startCall() {
       if (joinedRef.current) return;
@@ -67,7 +69,7 @@ export default function VideoCall({
           encoderConfig: "720p",
         });
 
-        if (!mounted) {
+        if (!isMounted) {
           audioTrack.close();
           videoTrack.close();
           return;
@@ -92,7 +94,6 @@ export default function VideoCall({
           await rtcClient.subscribe(user, mediaType);
           if (mediaType === "video") {
             const remoteVideoTrack = user.videoTrack;
-            // Play remote video on the remote element
             remoteVideoTrack.play(remoteVideoRef.current);
             setRemoteUser(user);
             setStatus(`Remote user joined`);
@@ -143,14 +144,24 @@ export default function VideoCall({
     startCall();
 
     return () => {
-      mounted = false;
-      if (localAudioTrack) localAudioTrack.close();
-      if (localVideoTrack) localVideoTrack.close();
-      if (client) client.leave();
-      console.log("🧹 Cleaned up");
+      isMounted = false;
+      mountedRef.current = false;
+      // Cleanup tracks and client
+      if (localAudioTrack) {
+        localAudioTrack.close();
+        console.log("🔊 Audio track closed");
+      }
+      if (localVideoTrack) {
+        localVideoTrack.close();
+        console.log("📹 Video track closed");
+      }
+      if (client) {
+        client.leave();
+        console.log("👋 Left channel");
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // only run once
 
   // ── Controls ──────────────────────────────────────────────────
   const toggleMute = () => {
