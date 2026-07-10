@@ -19,7 +19,6 @@ export default function VideoCall({
   token,
   appId,
   otherName,
-  otherAvatar,
   onClose,
 }) {
   const navigate = useNavigate();
@@ -29,7 +28,6 @@ export default function VideoCall({
   const [remoteUser, setRemoteUser] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("Initializing...");
   const [isJoining, setIsJoining] = useState(false);
@@ -37,11 +35,9 @@ export default function VideoCall({
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const tokenStorage = localStorage.getItem("token");
-  const mountedRef = useRef(true);
   const joinedRef = useRef(false);
 
   useEffect(() => {
-    mountedRef.current = true;
     let isMounted = true;
 
     async function startCall() {
@@ -59,8 +55,8 @@ export default function VideoCall({
         setClient(rtcClient);
 
         setStatus("Joining channel...");
-        // Use uid = 0 to match token (0 allows any uid)
-        await rtcClient.join(appId, channel, token, 0);
+        // Use null to let Agora assign a unique UID
+        await rtcClient.join(appId, channel, token, null);
         console.log(`✅ Joined channel: ${channel}`);
         setStatus("Joined channel, creating tracks...");
 
@@ -94,9 +90,15 @@ export default function VideoCall({
           await rtcClient.subscribe(user, mediaType);
           if (mediaType === "video") {
             const remoteVideoTrack = user.videoTrack;
-            remoteVideoTrack.play(remoteVideoRef.current);
-            setRemoteUser(user);
-            setStatus(`Remote user joined`);
+            // Play remote video in the remote container
+            if (remoteVideoRef.current) {
+              remoteVideoTrack.play(remoteVideoRef.current);
+              setRemoteUser(user);
+              setStatus(`Remote user joined`);
+              console.log("✅ Remote video playing");
+            } else {
+              console.warn("Remote video container not ready");
+            }
           }
           if (mediaType === "audio") {
             user.audioTrack?.play();
@@ -145,23 +147,13 @@ export default function VideoCall({
 
     return () => {
       isMounted = false;
-      mountedRef.current = false;
-      // Cleanup tracks and client
-      if (localAudioTrack) {
-        localAudioTrack.close();
-        console.log("🔊 Audio track closed");
-      }
-      if (localVideoTrack) {
-        localVideoTrack.close();
-        console.log("📹 Video track closed");
-      }
-      if (client) {
-        client.leave();
-        console.log("👋 Left channel");
-      }
+      if (localAudioTrack) localAudioTrack.close();
+      if (localVideoTrack) localVideoTrack.close();
+      if (client) client.leave();
+      console.log("🧹 Cleaned up");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // only run once
+  }, []);
 
   // ── Controls ──────────────────────────────────────────────────
   const toggleMute = () => {
