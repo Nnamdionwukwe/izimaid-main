@@ -90,9 +90,8 @@ export default function VideoCall({
           if (mediaType === "video") {
             const remoteVideoTrack = user.videoTrack;
             remoteTrackRef.current = remoteVideoTrack;
-            // Ensure the remote container is ready and play
+            // Play remote video on the dedicated container
             if (remoteVideoRef.current) {
-              // Stop any previous playback
               remoteVideoTrack.play(remoteVideoRef.current);
               setRemoteUser(user);
               setStatus(`Remote user joined`);
@@ -193,16 +192,13 @@ export default function VideoCall({
   return (
     <div className={styles.overlay}>
       <div className={styles.container}>
-        {/* Remote video container – always visible */}
+        {/* Remote video container */}
         <div className={styles.remoteVideoContainer}>
+          {/* The remote video element – always rendered, hidden when no remote user */}
           <div
             ref={remoteVideoRef}
             className={styles.remoteVideo}
-            style={{
-              display: remoteUser ? "block" : "none",
-              width: "100%",
-              height: "100%",
-            }}
+            style={{ display: remoteUser ? "block" : "none" }}
           />
           {!remoteUser && (
             <div className={styles.waitingOverlay}>
