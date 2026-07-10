@@ -26,7 +26,7 @@ export default function VideoCall({
   const [client, setClient] = useState(null);
   const [localAudioTrack, setLocalAudioTrack] = useState(null);
   const [localVideoTrack, setLocalVideoTrack] = useState(null);
-  const [remoteUsers, setRemoteUsers] = useState([]);
+  const [remoteUser, setRemoteUser] = useState(null); // single remote user
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
@@ -43,7 +43,6 @@ export default function VideoCall({
     let mounted = true;
 
     async function startCall() {
-      // Prevent double join
       if (joinedRef.current) return;
       joinedRef.current = true;
 
@@ -58,8 +57,8 @@ export default function VideoCall({
         setClient(rtcClient);
 
         setStatus("Joining channel...");
-        // Pass null as UID to let Agora auto‑assign a unique one
-        await rtcClient.join(appId, channel, token, null);
+        // Use uid = 0 to match token (0 allows any uid)
+        await rtcClient.join(appId, channel, token, 0);
         console.log(`✅ Joined channel: ${channel}`);
         setStatus("Joined channel, creating tracks...");
 
@@ -93,8 +92,9 @@ export default function VideoCall({
           await rtcClient.subscribe(user, mediaType);
           if (mediaType === "video") {
             const remoteVideoTrack = user.videoTrack;
+            // Play remote video on the remote element
             remoteVideoTrack.play(remoteVideoRef.current);
-            setRemoteUsers((prev) => [...prev, user]);
+            setRemoteUser(user);
             setStatus(`Remote user joined`);
           }
           if (mediaType === "audio") {
@@ -105,13 +105,13 @@ export default function VideoCall({
         rtcClient.on("user-unpublished", (user, mediaType) => {
           console.log(`👋 Remote user ${user.uid} unpublished ${mediaType}`);
           if (mediaType === "video") {
-            setRemoteUsers((prev) => prev.filter((u) => u.uid !== user.uid));
+            setRemoteUser(null);
           }
         });
 
         rtcClient.on("user-left", (user) => {
           console.log(`🚪 Remote user ${user.uid} left`);
-          setRemoteUsers((prev) => prev.filter((u) => u.uid !== user.uid));
+          setRemoteUser(null);
           setStatus("Remote user left");
         });
 
@@ -126,13 +126,12 @@ export default function VideoCall({
         });
       } catch (err) {
         console.error("❌ Video call error:", err);
-        joinedRef.current = false; // allow retry if needed
+        joinedRef.current = false;
         setError(
           err.message || "Could not start video call. Please try again.",
         );
         setStatus("Error: " + err.message);
         setIsJoining(false);
-        // Clean up client if created
         if (client) {
           try {
             client.leave();
@@ -145,22 +144,13 @@ export default function VideoCall({
 
     return () => {
       mounted = false;
-      // Cleanup
-      if (localAudioTrack) {
-        localAudioTrack.close();
-        console.log("🔊 Audio track closed");
-      }
-      if (localVideoTrack) {
-        localVideoTrack.close();
-        console.log("📹 Video track closed");
-      }
-      if (client) {
-        client.leave();
-        console.log("👋 Left channel");
-      }
+      if (localAudioTrack) localAudioTrack.close();
+      if (localVideoTrack) localVideoTrack.close();
+      if (client) client.leave();
+      console.log("🧹 Cleaned up");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // only run once
+  }, []);
 
   // ── Controls ──────────────────────────────────────────────────
   const toggleMute = () => {
@@ -179,17 +169,13 @@ export default function VideoCall({
 
   const endCall = async () => {
     try {
-      // Notify backend call ended
       await fetch(`${API_URL}/api/bookings/${bookingId}/video-call`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${tokenStorage}` },
       });
-
-      // Cleanup tracks
       if (localAudioTrack) localAudioTrack.close();
       if (localVideoTrack) localVideoTrack.close();
       if (client) await client.leave();
-
       onClose?.();
       navigate(-1);
     } catch (err) {
@@ -203,7 +189,7 @@ export default function VideoCall({
       <div className={styles.container}>
         {/* Remote video */}
         <div className={styles.remoteVideoContainer}>
-          {remoteUsers.length > 0 ? (
+          {remoteUser ? (
             <div ref={remoteVideoRef} className={styles.remoteVideo} />
           ) : (
             <div className={styles.waiting}>
