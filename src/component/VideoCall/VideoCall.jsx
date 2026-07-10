@@ -32,35 +32,25 @@ export default function VideoCall({
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("Initializing...");
-  const [joined, setJoined] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
   const tokenStorage = localStorage.getItem("token");
-
-  // Generate a unique UID (1 - 2^31-1) based on user id + random
-  const getUid = () => {
-    if (user.id) {
-      // Convert UUID to a numeric hash
-      const hash = user.id.replace(/-/g, "").slice(0, 8);
-      const num = parseInt(hash, 16);
-      // Ensure it's within 1 - 2^31-1
-      if (num > 0 && num < 2147483647) return num;
-    }
-    // Fallback: random number between 1 and 2^31-1
-    return Math.floor(Math.random() * 2147483646) + 1;
-  };
-
-  const uid = getUid();
+  const joinedRef = useRef(false);
 
   useEffect(() => {
     let mounted = true;
 
     async function startCall() {
+      // Prevent double join
+      if (joinedRef.current) return;
+      joinedRef.current = true;
+
+      setIsJoining(true);
+      setStatus("Creating client...");
+
       try {
-        setStatus("Creating client...");
         const rtcClient = AgoraRTC.createClient({
           mode: "rtc",
           codec: "vp8",
@@ -68,9 +58,9 @@ export default function VideoCall({
         setClient(rtcClient);
 
         setStatus("Joining channel...");
-        await rtcClient.join(appId, channel, token, uid);
-        setJoined(true);
-        console.log(`✅ Joined channel: ${channel} with UID ${uid}`);
+        // Pass null as UID to let Agora auto‑assign a unique one
+        await rtcClient.join(appId, channel, token, null);
+        console.log(`✅ Joined channel: ${channel}`);
         setStatus("Joined channel, creating tracks...");
 
         const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
@@ -95,6 +85,7 @@ export default function VideoCall({
         console.log("✅ Published local tracks");
         setIsConnected(true);
         setStatus("Connected, waiting for remote user...");
+        setIsJoining(false);
 
         // ── Remote user events ──────────────────────────────────
         rtcClient.on("user-published", async (user, mediaType) => {
@@ -104,7 +95,7 @@ export default function VideoCall({
             const remoteVideoTrack = user.videoTrack;
             remoteVideoTrack.play(remoteVideoRef.current);
             setRemoteUsers((prev) => [...prev, user]);
-            setStatus(`Remote user ${user.uid} joined`);
+            setStatus(`Remote user joined`);
           }
           if (mediaType === "audio") {
             user.audioTrack?.play();
@@ -128,12 +119,25 @@ export default function VideoCall({
           console.log(`🔄 Connection state: ${prev} → ${cur} (${reason})`);
           setStatus(`Connection: ${cur}`);
         });
+
+        rtcClient.on("exception", (e) => {
+          console.error("⚠️ Agora exception:", e);
+          setError(e.message || "Agora exception occurred.");
+        });
       } catch (err) {
         console.error("❌ Video call error:", err);
+        joinedRef.current = false; // allow retry if needed
         setError(
           err.message || "Could not start video call. Please try again.",
         );
         setStatus("Error: " + err.message);
+        setIsJoining(false);
+        // Clean up client if created
+        if (client) {
+          try {
+            client.leave();
+          } catch {}
+        }
       }
     }
 
@@ -155,7 +159,8 @@ export default function VideoCall({
         console.log("👋 Left channel");
       }
     };
-  }, []); // Empty dependency array to run once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // only run once
 
   // ── Controls ──────────────────────────────────────────────────
   const toggleMute = () => {
@@ -205,6 +210,7 @@ export default function VideoCall({
               <FaUserCircle size={64} />
               <p>Waiting for {otherName || "the other party"} to join…</p>
               <p className={styles.statusText}>{status}</p>
+              {isJoining && <p className={styles.statusText}>Joining…</p>}
             </div>
           )}
         </div>
