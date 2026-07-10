@@ -16,7 +16,6 @@ import {
   FaBroom,
   FaCircle,
   FaInfoCircle,
-  FaLocationDot,
   FaPhoneAlt,
 } from "react-icons/fa";
 import styles from "./Bookingdetail.module.css";
@@ -92,7 +91,7 @@ function LiveMap({ lat, lng, updatedAt }) {
       />
       <div className={styles.mapOverlay}>
         <span className={styles.mapLiveTag}>
-          <FaLocationDot style={{ marginRight: 4 }} /> LIVE
+          <FaMapMarkerAlt style={{ marginRight: 4 }} /> LIVE
         </span>
         <a
           href={googleDirectUrl}
@@ -225,7 +224,6 @@ export default function BookingDetail() {
 
   // ─── POLL FOR INCOMING CALLS ──────────────────────────────────────
   useEffect(() => {
-    // Only poll if booking is active and not already in a call / showing overlay
     if (
       !booking ||
       !["confirmed", "in_progress"].includes(booking.status) ||
@@ -241,7 +239,6 @@ export default function BookingDetail() {
         });
         const data = await res.json();
         if (data.call && data.call.booking_id === booking.id) {
-          // Incoming call for this booking
           setIncomingCall({
             channel: data.call.channel,
             token: data.call.token,
@@ -567,7 +564,7 @@ export default function BookingDetail() {
       {showMap && (
         <div className={styles.section}>
           <p className={styles.sectionTitle}>
-            <FaLocationDot style={{ marginRight: 6 }} />
+            <FaMapMarkerAlt style={{ marginRight: 6 }} />
             {booking.status === "in_progress"
               ? "Live Location"
               : booking.status === "completed"
