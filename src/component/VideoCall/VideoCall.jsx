@@ -28,6 +28,7 @@ export default function VideoCall({
   const [remoteUser, setRemoteUser] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
+  const [isConnected, setIsConnected] = useState(false); // ✅ defined
   const [error, setError] = useState("");
   const [status, setStatus] = useState("Initializing...");
   const [isJoining, setIsJoining] = useState(false);
@@ -55,7 +56,6 @@ export default function VideoCall({
         setClient(rtcClient);
 
         setStatus("Joining channel...");
-        // Use null to let Agora assign a unique UID
         await rtcClient.join(appId, channel, token, null);
         console.log(`✅ Joined channel: ${channel}`);
         setStatus("Joined channel, creating tracks...");
@@ -90,7 +90,7 @@ export default function VideoCall({
           await rtcClient.subscribe(user, mediaType);
           if (mediaType === "video") {
             const remoteVideoTrack = user.videoTrack;
-            // Play remote video in the remote container
+            // The remote video container is always present, so ref is valid
             if (remoteVideoRef.current) {
               remoteVideoTrack.play(remoteVideoRef.current);
               setRemoteUser(user);
@@ -190,11 +190,14 @@ export default function VideoCall({
   return (
     <div className={styles.overlay}>
       <div className={styles.container}>
-        {/* Remote video */}
+        {/* Remote video – container always rendered so ref is available */}
         <div className={styles.remoteVideoContainer}>
-          {remoteUser ? (
-            <div ref={remoteVideoRef} className={styles.remoteVideo} />
-          ) : (
+          <div
+            ref={remoteVideoRef}
+            className={styles.remoteVideo}
+            style={{ display: remoteUser ? "block" : "none" }}
+          />
+          {!remoteUser && (
             <div className={styles.waiting}>
               <FaUserCircle size={64} />
               <p>Waiting for {otherName || "the other party"} to join…</p>
