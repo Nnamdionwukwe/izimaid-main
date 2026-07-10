@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import {
   FaArrowLeft,
-  FaMapMarkerAlt, // replaces FaLocationDot
+  FaMapMarkerAlt,
   FaVideo,
   FaExclamationTriangle,
   FaCheck,
@@ -16,12 +16,15 @@ import {
   FaBroom,
   FaCircle,
   FaInfoCircle,
+  FaLocationDot,
+  FaPhoneAlt,
 } from "react-icons/fa";
 import styles from "./Bookingdetail.module.css";
 import VideoCall from "../VideoCall/VideoCall";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+// ─── Currency helpers ──────────────────────────────────────────────
 const CURRENCY_SYMBOLS = {
   NGN: "₦",
   USD: "$",
@@ -47,6 +50,7 @@ function fmtAmt(n, c) {
   })}`;
 }
 
+// ─── Status classes & date formatter ──────────────────────────────
 const STATUS_CLASS = {
   pending: styles.statusPending,
   confirmed: styles.statusConfirmed,
@@ -68,7 +72,7 @@ function formatDate(d) {
   });
 }
 
-// LiveMap component – only emoji replaced
+// ─── LiveMap component ──────────────────────────────────────────────
 function LiveMap({ lat, lng, updatedAt }) {
   if (!lat || !lng) return null;
 
@@ -114,6 +118,7 @@ export default function BookingDetail() {
   const { state } = useLocation();
   const navigate = useNavigate();
 
+  // ─── State ────────────────────────────────────────────────────────
   const [booking, setBooking] = useState(state?.booking || null);
   const [payment, setPayment] = useState(null);
   const [location, setLocation] = useState(null);
@@ -130,19 +135,20 @@ export default function BookingDetail() {
   const [sosSending, setSosSending] = useState(false);
   const [sosSent, setSosSent] = useState(false);
   const [videoLoading, setVideoLoading] = useState(false);
-
   const [releaseLoading, setReleaseLoading] = useState(false);
   const [released, setReleased] = useState(false);
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelLoading, setCancelLoading] = useState(false);
-
-  const [showVideoCall, setShowVideoCall] = useState(false);
-  const [videoCallData, setVideoCallData] = useState(null);
-
   const [review, setReview] = useState(null);
 
+  // ─── Video call state ────────────────────────────────────────────
+  const [showVideoCall, setShowVideoCall] = useState(false);
+  const [videoCallData, setVideoCallData] = useState(null);
+  const [incomingCall, setIncomingCall] = useState(null);
+
   const pollRef = useRef(null);
+  const incomingPollRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const token = localStorage.getItem("token");
@@ -150,6 +156,7 @@ export default function BookingDetail() {
   const isCustomer = user.role === "customer";
   const isAdmin = user.role === "admin";
 
+  // ─── Fetch booking & payment ──────────────────────────────────────
   useEffect(() => {
     async function fetchAll() {
       if (!booking) setLoading(true);
@@ -182,8 +189,9 @@ export default function BookingDetail() {
       } catch {}
     }
     fetchPayment();
-  }, [id]);
+  }, [id, token, booking]);
 
+  // ─── Poll for live location ──────────────────────────────────────
   useEffect(() => {
     if (!["confirmed", "in_progress"].includes(booking?.status)) return;
 
@@ -199,10 +207,61 @@ export default function BookingDetail() {
     pollLocation();
     pollRef.current = setInterval(pollLocation, 15000);
     return () => clearInterval(pollRef.current);
-  }, [booking?.status, id]);
+  }, [booking?.status, id, token]);
 
+  // ─── Restore incoming call from navigation state ──────────────────
+  useEffect(() => {
+    if (state?.incomingCall) {
+      setIncomingCall({
+        channel: state.channel,
+        token: state.token,
+        appId: state.appId,
+        callerName: state.callerName,
+      });
+      // Clear the state to avoid re‑prompting on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [state]);
+
+  // ─── POLL FOR INCOMING CALLS ──────────────────────────────────────
+  useEffect(() => {
+    // Only poll if booking is active and not already in a call / showing overlay
+    if (
+      !booking ||
+      !["confirmed", "in_progress"].includes(booking.status) ||
+      showVideoCall ||
+      incomingCall
+    )
+      return;
+
+    const pollIncoming = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/bookings/active-call`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (data.call && data.call.booking_id === booking.id) {
+          // Incoming call for this booking
+          setIncomingCall({
+            channel: data.call.channel,
+            token: data.call.token,
+            appId: data.call.app_id,
+            callerName: data.call.caller_name,
+          });
+        }
+      } catch (err) {
+        // ignore
+      }
+    };
+
+    incomingPollRef.current = setInterval(pollIncoming, 5000);
+    return () => clearInterval(incomingPollRef.current);
+  }, [booking, token, showVideoCall, incomingCall]);
+
+  // ─── Currency ──────────────────────────────────────────────────────
   const currency = payment?.currency || booking?.maid_currency || "NGN";
 
+  // ─── Action handlers ──────────────────────────────────────────────
   async function updateStatus(status, extra = {}) {
     setActionLoading(status);
     setError("");
@@ -355,7 +414,6 @@ export default function BookingDetail() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // data: { channel, token, app_id, status }
       setVideoCallData({
         bookingId: id,
         channel: data.channel,
@@ -370,6 +428,18 @@ export default function BookingDetail() {
     } finally {
       setVideoLoading(false);
     }
+  }
+
+  async function declineIncomingCall() {
+    try {
+      await fetch(`${API_URL}/api/bookings/${id}/video-call`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      console.error("Failed to decline call:", err);
+    }
+    setIncomingCall(null);
   }
 
   async function submitReview() {
@@ -450,6 +520,7 @@ export default function BookingDetail() {
     }
   }
 
+  // ─── Loading / error states ──────────────────────────────────────
   if (loading)
     return (
       <div className={styles.loading}>
@@ -464,11 +535,14 @@ export default function BookingDetail() {
   const canVideo = ["confirmed", "in_progress"].includes(booking.status);
   const showMap = !!location;
 
+  // ─── Render ────────────────────────────────────────────────────────
   return (
     <div className={styles.page}>
       <button className={styles.backBtn} onClick={() => navigate(-1)}>
         <FaArrowLeft style={{ marginRight: 6 }} /> Back
       </button>
+
+      {/* SOS Banner */}
       {activeSOS.length > 0 && (
         <div className={styles.sosBanner}>
           <FaExclamationTriangle style={{ marginRight: 6 }} />
@@ -476,6 +550,8 @@ export default function BookingDetail() {
           by: {activeSOS[0]?.triggered_by_name}
         </div>
       )}
+
+      {/* Header */}
       <div className={styles.header}>
         <h1 className={styles.headerTitle}>Booking Details</h1>
         <span
@@ -487,6 +563,7 @@ export default function BookingDetail() {
         </span>
       </div>
 
+      {/* Live Map */}
       {showMap && (
         <div className={styles.section}>
           <p className={styles.sectionTitle}>
@@ -537,6 +614,8 @@ export default function BookingDetail() {
           </div>
         </div>
       )}
+
+      {/* Quick Actions (SOS & Video Call) */}
       {(canSOS || canVideo) && (
         <div className={styles.quickActions}>
           {canVideo && (
@@ -566,6 +645,8 @@ export default function BookingDetail() {
           )}
         </div>
       )}
+
+      {/* SOS Input */}
       {canSOS && !sosSent && (
         <div className={styles.sosInputWrap}>
           <input
@@ -577,6 +658,8 @@ export default function BookingDetail() {
           />
         </div>
       )}
+
+      {/* Customer/Maid Section */}
       <div className={styles.section}>
         <p className={styles.sectionTitle}>{isMaid ? "Customer" : "Maid"}</p>
         <div className={styles.row}>
@@ -586,6 +669,8 @@ export default function BookingDetail() {
           </span>
         </div>
       </div>
+
+      {/* Booking Info Section */}
       <div className={styles.section}>
         <p className={styles.sectionTitle}>Booking Info</p>
         <div className={styles.row}>
@@ -636,6 +721,8 @@ export default function BookingDetail() {
           <span>{fmtAmt(booking.total_amount, currency)}</span>
         </div>
       </div>
+
+      {/* Payment Section */}
       {(booking.payment_status || payment) && (
         <div className={styles.section}>
           <p className={styles.sectionTitle}>Payment</p>
@@ -680,13 +767,14 @@ export default function BookingDetail() {
           )}
         </div>
       )}
+
+      {/* Emergency Contacts */}
       {emergency.length > 0 && (
         <div className={styles.section}>
           <p className={styles.sectionTitle}>
             <FaExclamationTriangle style={{ marginRight: 6 }} />
             {isMaid ? "Customer's" : "Maid's"} Emergency Contacts
           </p>
-
           {emergency.map((c, i) => (
             <div key={i} className={styles.emergencyCard}>
               <div>
@@ -715,7 +803,11 @@ export default function BookingDetail() {
           ))}
         </div>
       )}
+
+      {/* Error */}
       {error && <p className={styles.error}>{error}</p>}
+
+      {/* Actions */}
       <div className={styles.actions}>
         {isCustomer && booking.status === "awaiting_payment" && (
           <button
@@ -871,6 +963,7 @@ export default function BookingDetail() {
         )}
       </div>
 
+      {/* Review Display */}
       {booking.status === "completed" && review && (
         <div className={styles.section} style={{ marginTop: 16 }}>
           <p className={styles.sectionTitle}>Customer Review</p>
@@ -906,6 +999,7 @@ export default function BookingDetail() {
         </div>
       )}
 
+      {/* Review Form */}
       {isCustomer && booking.status === "completed" && !reviewed && !review && (
         <div className={styles.section} style={{ marginTop: 16 }}>
           <p className={styles.sectionTitle}>Leave a Review</p>
@@ -942,7 +1036,6 @@ export default function BookingDetail() {
           </div>
         </div>
       )}
-
       {reviewed && !review && (
         <div
           className={styles.section}
@@ -960,6 +1053,47 @@ export default function BookingDetail() {
         </div>
       )}
 
+      {/* ─── INCOMING CALL OVERLAY ────────────────────────────────── */}
+      {incomingCall && (
+        <div className={styles.incomingOverlay}>
+          <div className={styles.incomingCard}>
+            <div className={styles.ringingAnimation}>
+              <FaPhoneAlt className={styles.ringingIcon} />
+            </div>
+            <h2 className={styles.incomingTitle}>Incoming Video Call</h2>
+            <p className={styles.incomingCaller}>
+              {incomingCall.callerName} is calling you
+            </p>
+            <div className={styles.incomingActions}>
+              <button
+                className={styles.declineBtn}
+                onClick={declineIncomingCall}
+              >
+                Decline
+              </button>
+              <button
+                className={styles.acceptBtn}
+                onClick={() => {
+                  setShowVideoCall(true);
+                  setVideoCallData({
+                    bookingId: id,
+                    channel: incomingCall.channel,
+                    token: incomingCall.token,
+                    appId: incomingCall.appId,
+                    otherName: incomingCall.callerName,
+                    otherAvatar: null,
+                  });
+                  setIncomingCall(null);
+                }}
+              >
+                Accept
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── VIDEO CALL COMPONENT ──────────────────────────────────── */}
       {showVideoCall && videoCallData && (
         <VideoCall
           bookingId={videoCallData.bookingId}
