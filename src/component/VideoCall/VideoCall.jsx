@@ -31,29 +31,32 @@ export default function VideoCall({
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState("");
+  const [status, setStatus] = useState("Initializing..."); // NEW status
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const tokenStorage = localStorage.getItem("token");
+  const uid = user.id ? parseInt(user.id.replace(/-/g, "").slice(0, 8), 16) : 0; // convert UUID to number
 
   useEffect(() => {
     let mounted = true;
 
     async function startCall() {
       try {
-        // Create client
+        setStatus("Creating client...");
         const rtcClient = AgoraRTC.createClient({
           mode: "rtc",
           codec: "vp8",
         });
         setClient(rtcClient);
 
-        // Join channel
-        await rtcClient.join(appId, channel, token, null);
+        setStatus("Joining channel...");
+        await rtcClient.join(appId, channel, token, uid);
+        console.log(`✅ Joined channel: ${channel} with UID ${uid}`);
+        setStatus("Joined channel, creating tracks...");
 
-        // Create local tracks
         const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
         const videoTrack = await AgoraRTC.createCameraVideoTrack({
           encoderConfig: "720p",
@@ -71,19 +74,21 @@ export default function VideoCall({
         // Play local video
         videoTrack.play(localVideoRef.current);
 
-        // Publish tracks
+        setStatus("Publishing tracks...");
         await rtcClient.publish([audioTrack, videoTrack]);
-
+        console.log("✅ Published local tracks");
         setIsConnected(true);
+        setStatus("Connected, waiting for remote user...");
 
-        // Handle remote user events
+        // ── Remote user events ──────────────────────────────────
         rtcClient.on("user-published", async (user, mediaType) => {
+          console.log(`📢 Remote user ${user.uid} published ${mediaType}`);
           await rtcClient.subscribe(user, mediaType);
           if (mediaType === "video") {
             const remoteVideoTrack = user.videoTrack;
-            // Play remote video in remote container
             remoteVideoTrack.play(remoteVideoRef.current);
             setRemoteUsers((prev) => [...prev, user]);
+            setStatus(`Remote user ${user.uid} joined`);
           }
           if (mediaType === "audio") {
             user.audioTrack?.play();
@@ -91,17 +96,28 @@ export default function VideoCall({
         });
 
         rtcClient.on("user-unpublished", (user, mediaType) => {
+          console.log(`👋 Remote user ${user.uid} unpublished ${mediaType}`);
           if (mediaType === "video") {
             setRemoteUsers((prev) => prev.filter((u) => u.uid !== user.uid));
           }
         });
 
         rtcClient.on("user-left", (user) => {
+          console.log(`🚪 Remote user ${user.uid} left`);
           setRemoteUsers((prev) => prev.filter((u) => u.uid !== user.uid));
+          setStatus("Remote user left");
+        });
+
+        rtcClient.on("connection-state-change", (cur, prev, reason) => {
+          console.log(`🔄 Connection state: ${prev} → ${cur} (${reason})`);
+          setStatus(`Connection: ${cur}`);
         });
       } catch (err) {
-        console.error("Video call error:", err);
-        setError("Could not start video call. Please try again.");
+        console.error("❌ Video call error:", err);
+        setError(
+          err.message || "Could not start video call. Please try again.",
+        );
+        setStatus("Error: " + err.message);
       }
     }
 
@@ -112,12 +128,15 @@ export default function VideoCall({
       // Cleanup
       if (localAudioTrack) {
         localAudioTrack.close();
+        console.log("🔊 Audio track closed");
       }
       if (localVideoTrack) {
         localVideoTrack.close();
+        console.log("📹 Video track closed");
       }
       if (client) {
         client.leave();
+        console.log("👋 Left channel");
       }
     };
   }, []);
@@ -161,7 +180,7 @@ export default function VideoCall({
   return (
     <div className={styles.overlay}>
       <div className={styles.container}>
-        {/* Remote video (full screen) */}
+        {/* Remote video */}
         <div className={styles.remoteVideoContainer}>
           {remoteUsers.length > 0 ? (
             <div ref={remoteVideoRef} className={styles.remoteVideo} />
@@ -169,6 +188,7 @@ export default function VideoCall({
             <div className={styles.waiting}>
               <FaUserCircle size={64} />
               <p>Waiting for {otherName || "the other party"} to join…</p>
+              <p className={styles.statusText}>{status}</p>
             </div>
           )}
         </div>
