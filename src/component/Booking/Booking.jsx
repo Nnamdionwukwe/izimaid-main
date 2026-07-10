@@ -71,7 +71,6 @@ function formatAddress(a) {
 
 // ── Unified helper for hourly rate ────────────────────────────────
 function getHourlyRate(maid) {
-  // Priority: hourly_rate first, then rate_hourly, then 0
   return Number(maid.hourly_rate || maid.rate_hourly || 0);
 }
 
@@ -134,7 +133,6 @@ const NEGOT_UNITS = [
 
 function buildRateOptions(maid, s) {
   const options = [];
-  // Use the same helper to ensure consistency
   const hourly = getHourlyRate(maid);
   const daily = Number(maid.rate_daily || 0);
   const weekly = Number(maid.rate_weekly || 0);
@@ -217,11 +215,10 @@ export default function Booking() {
   const { state } = useLocation();
   const navigate = useNavigate();
 
-  // ── State for maid data (fetched or from location) ───────────
+  // ── State for maid data ─────────────────────────────────────────
   const [maid, setMaid] = useState(state?.maid || {});
   const [loadingMaid, setLoadingMaid] = useState(!state?.maid);
 
-  // ── Fetch latest maid data ────────────────────────────────────
   useEffect(() => {
     if (!maidId) return;
     const fetchMaid = async () => {
@@ -232,13 +229,9 @@ export default function Booking() {
         });
         if (!res.ok) throw new Error("Maid not found");
         const data = await res.json();
-        // Merge with existing state to keep extra fields (avatar etc.)
         setMaid((prev) => ({ ...prev, ...data }));
       } catch (err) {
         console.error("Failed to fetch maid:", err);
-        if (!state?.maid) {
-          // No fallback – you may set an error state
-        }
       } finally {
         setLoadingMaid(false);
       }
@@ -276,7 +269,6 @@ export default function Booking() {
       ? DURATION_CONFIG[selected.rateType]
       : DURATION_CONFIG.hourly;
 
-  // Reset duration when rate type changes
   useEffect(() => {
     if (selected) {
       const cfg = DURATION_CONFIG[selected.rateType];
@@ -357,6 +349,7 @@ export default function Booking() {
 
   // ── Submit ────────────────────────────────────────────────────────
   async function handleSubmit() {
+    // ── Validation ──
     if (!form.service_date) return setError("Please select a service date");
     if (!form.address) return setError("Please enter your address");
     if (!selected) return setError("Please select a pricing option");
@@ -373,6 +366,8 @@ export default function Booking() {
         );
     }
 
+    // ── Compute total and validate ──
+    const total = calcTotal();
     if (total <= 0) return setError("Total amount must be greater than 0");
 
     const token = localStorage.getItem("token");
@@ -386,6 +381,7 @@ export default function Booking() {
       const unitLabel =
         NEGOT_UNITS.find((u) => u.value === negotiatedUnit)?.label || "Hours";
 
+      // ── Build payload ──
       const payload = {
         maid_id: maidId,
         service_date: form.service_date,
@@ -398,20 +394,28 @@ export default function Booking() {
         rate_type:
           selected.rateType === "negotiated" ? "hourly" : selected.rateType,
       };
+
+      // ── Notes ──
       const noteLines = [];
       if (form.notes) noteLines.push(form.notes);
 
+      // ── Override total for custom and negotiated ──
       if (selected.rateType === "negotiated") {
         payload.total_override = Number(negotiatedPrice);
         noteLines.push(
           `[Negotiated: ${s}${Number(negotiatedPrice).toLocaleString()} for ${negotiatedQty} ${unitLabel.toLowerCase()}]`,
         );
-      }
-      if (selected.rateType === "custom" && selected.customLabel) {
+      } else if (selected.rateType === "custom" && selected.price) {
+        const customTotal = selected.price * Number(duration || 1);
+        payload.total_override = customTotal;
+        // Also set total_amount to be safe (some backends use this)
+        payload.total_amount = customTotal;
         noteLines.push(
           `[Custom rate: ${selected.customLabel} × ${duration} unit(s)]`,
         );
       }
+
+      // ── Additional notes for standard rates ──
       if (selected.rateType === "daily")
         noteLines.push(`[Duration: ${duration} day(s)]`);
       if (selected.rateType === "weekly")
@@ -421,6 +425,7 @@ export default function Booking() {
 
       if (noteLines.length) payload.notes = noteLines.join(" — ");
 
+      // ── Submit ──
       const res = await fetch(`${API_URL}/api/bookings`, {
         method: "POST",
         headers: {

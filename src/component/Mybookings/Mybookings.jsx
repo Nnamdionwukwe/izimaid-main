@@ -423,11 +423,15 @@ export default function MyBookings() {
                 </div>
               )}
 
-              {/* Meta row */}
+              {/* ── Meta row – Duration shows units for custom rates ── */}
               <div className={styles.cardMeta}>
                 <div className={styles.metaItem}>
                   Duration{" "}
-                  <span className={styles.metaValue}>{b.duration_hours}h</span>
+                  <span className={styles.metaValue}>
+                    {b.rate_type === "custom" && b.duration_qty
+                      ? `${Number(b.duration_qty)} unit(s)`
+                      : `${b.duration_hours}h`}
+                  </span>
                 </div>
                 <div className={styles.metaItem}>
                   Total{" "}

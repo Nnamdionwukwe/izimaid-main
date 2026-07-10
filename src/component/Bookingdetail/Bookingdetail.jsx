@@ -1,6 +1,22 @@
-// src/component/Bookingdetail/Bookingdetail.jsx
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import {
+  FaArrowLeft,
+  FaMapMarkerAlt, // replaces FaLocationDot
+  FaVideo,
+  FaExclamationTriangle,
+  FaCheck,
+  FaMoneyBillWave,
+  FaLock,
+  FaPhone,
+  FaEnvelope,
+  FaClock,
+  FaStar,
+  FaRegStar,
+  FaBroom,
+  FaCircle,
+  FaInfoCircle,
+} from "react-icons/fa";
 import styles from "./Bookingdetail.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
@@ -24,7 +40,10 @@ function sym(c) {
   return CURRENCY_SYMBOLS[c] || (c ? c + " " : "₦");
 }
 function fmtAmt(n, c) {
-  return `${sym(c)}${Number(n || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `${sym(c)}${Number(n || 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 }
 
 const STATUS_CLASS = {
@@ -48,11 +67,10 @@ function formatDate(d) {
   });
 }
 
-// Replace the LiveMap component:
+// LiveMap component – only emoji replaced
 function LiveMap({ lat, lng, updatedAt }) {
   if (!lat || !lng) return null;
 
-  // Google Maps embed — no API key needed for basic embed
   const googleEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
   const googleDirectUrl = `https://www.google.com/maps?q=${lat},${lng}`;
 
@@ -68,7 +86,9 @@ function LiveMap({ lat, lng, updatedAt }) {
         referrerPolicy="no-referrer-when-downgrade"
       />
       <div className={styles.mapOverlay}>
-        <span className={styles.mapLiveTag}>📍 LIVE</span>
+        <span className={styles.mapLiveTag}>
+          <FaLocationDot style={{ marginRight: 4 }} /> LIVE
+        </span>
         <a
           href={googleDirectUrl}
           target="_blank"
@@ -80,7 +100,8 @@ function LiveMap({ lat, lng, updatedAt }) {
       </div>
       {updatedAt && (
         <p className={styles.mapUpdatedAt}>
-          🕐 Last updated: {new Date(updatedAt).toLocaleTimeString()}
+          <FaClock style={{ marginRight: 4 }} />
+          Last updated: {new Date(updatedAt).toLocaleTimeString()}
         </p>
       )}
     </div>
@@ -127,7 +148,6 @@ export default function BookingDetail() {
 
   useEffect(() => {
     async function fetchAll() {
-      // Don't show full-page spinner if we already have booking from state
       if (!booking) setLoading(true);
       try {
         const res = await fetch(`${API_URL}/api/bookings/${id}`, {
@@ -146,7 +166,7 @@ export default function BookingDetail() {
         setLoading(false);
       }
     }
-    fetchAll(); // ← always call, not just when booking is null
+    fetchAll();
 
     async function fetchPayment() {
       try {
@@ -161,7 +181,6 @@ export default function BookingDetail() {
   }, [id]);
 
   useEffect(() => {
-    // Poll when confirmed or in_progress (covers checkin → checkout window)
     if (!["confirmed", "in_progress"].includes(booking?.status)) return;
 
     async function pollLocation() {
@@ -174,7 +193,7 @@ export default function BookingDetail() {
       } catch {}
     }
     pollLocation();
-    pollRef.current = setInterval(pollLocation, 15000); // every 15s
+    pollRef.current = setInterval(pollLocation, 15000);
     return () => clearInterval(pollRef.current);
   }, [booking?.status, id]);
 
@@ -354,7 +373,6 @@ export default function BookingDetail() {
       if (!res.ok) throw new Error(data.error);
       setReviewed(true);
       setError("");
-      // Show review immediately for both parties
       setReview({
         rating,
         comment,
@@ -434,12 +452,13 @@ export default function BookingDetail() {
   return (
     <div className={styles.page}>
       <button className={styles.backBtn} onClick={() => navigate(-1)}>
-        ← Back
+        <FaArrowLeft style={{ marginRight: 6 }} /> Back
       </button>
       {activeSOS.length > 0 && (
         <div className={styles.sosBanner}>
-          🚨 <strong>SOS ACTIVE</strong> — Emergency services notified.
-          Triggered by: {activeSOS[0]?.triggered_by_name}
+          <FaExclamationTriangle style={{ marginRight: 6 }} />
+          <strong>SOS ACTIVE</strong> — Emergency services notified. Triggered
+          by: {activeSOS[0]?.triggered_by_name}
         </div>
       )}
       <div className={styles.header}>
@@ -456,7 +475,7 @@ export default function BookingDetail() {
       {showMap && (
         <div className={styles.section}>
           <p className={styles.sectionTitle}>
-            📍{" "}
+            <FaLocationDot style={{ marginRight: 6 }} />
             {booking.status === "in_progress"
               ? "Live Location"
               : booking.status === "completed"
@@ -476,18 +495,28 @@ export default function BookingDetail() {
                   : styles.locationStatic
               }`}
             >
-              {booking.status === "in_progress"
-                ? "🟢 Tracking active"
-                : "⚪ Last known location"}
+              {booking.status === "in_progress" ? (
+                <>
+                  <FaCircle style={{ color: "#22c55e", marginRight: 4 }} />{" "}
+                  Tracking active
+                </>
+              ) : (
+                <>
+                  <FaCircle style={{ color: "#9ca3af", marginRight: 4 }} /> Last
+                  known location
+                </>
+              )}
             </span>
             {!isMaid && booking.status === "in_progress" && (
               <span className={styles.locationHint}>
-                🧹 {booking.maid_name} is currently on your job
+                <FaBroom style={{ marginRight: 4 }} /> {booking.maid_name} is
+                currently on your job
               </span>
             )}
             {isMaid && booking.status === "in_progress" && (
               <span className={styles.locationHint}>
-                Your location is visible to the customer
+                <FaInfoCircle style={{ marginRight: 4 }} /> Your location is
+                visible to the customer
               </span>
             )}
           </div>
@@ -501,7 +530,8 @@ export default function BookingDetail() {
               onClick={handleVideoCall}
               disabled={videoLoading}
             >
-              {videoLoading ? "Connecting…" : "📹 Video Call"}
+              <FaVideo style={{ marginRight: 6 }} />
+              {videoLoading ? "Connecting…" : "Video Call"}
             </button>
           )}
           {canSOS && !sosSent && (
@@ -510,12 +540,13 @@ export default function BookingDetail() {
               onClick={handleSOS}
               disabled={sosSending}
             >
-              {sosSending ? "Sending…" : "🆘 SOS"}
+              <FaExclamationTriangle style={{ marginRight: 6 }} />
+              {sosSending ? "Sending…" : "SOS"}
             </button>
           )}
           {sosSent && (
             <span className={styles.sosSentTag}>
-              ✅ SOS Sent — Help is coming
+              <FaCheck style={{ marginRight: 4 }} /> SOS Sent — Help is coming
             </span>
           )}
         </div>
@@ -551,11 +582,15 @@ export default function BookingDetail() {
         <div className={styles.row}>
           <span className={styles.rowKey}>Duration</span>
           <span className={styles.rowVal}>
-            {booking.duration_hours} hour(s)
+            {booking.rate_type === "custom" && booking.duration_qty
+              ? `${Number(booking.duration_qty)} unit(s)`
+              : `${booking.duration_hours} hour(s)`}
           </span>
         </div>
         <div className={styles.row}>
-          <span className={styles.rowKey}>Address</span>
+          <span className={styles.rowKey}>
+            <FaMapMarkerAlt style={{ marginRight: 6 }} /> Address
+          </span>
           <span className={styles.rowVal}>{booking.address}</span>
         </div>
         {booking.notes && (
@@ -568,7 +603,8 @@ export default function BookingDetail() {
           <div className={styles.row}>
             <span className={styles.rowKey}>Checked In</span>
             <span className={styles.rowVal} style={{ color: "rgb(10,107,46)" }}>
-              ✅ {new Date(booking.checkin_at).toLocaleTimeString()}
+              <FaCheck style={{ marginRight: 4 }} />{" "}
+              {new Date(booking.checkin_at).toLocaleTimeString()}
             </span>
           </div>
         )}
@@ -632,7 +668,8 @@ export default function BookingDetail() {
       {emergency.length > 0 && (
         <div className={styles.section}>
           <p className={styles.sectionTitle}>
-            🆘 {isMaid ? "Customer's" : "Maid's"} Emergency Contacts
+            <FaExclamationTriangle style={{ marginRight: 6 }} />
+            {isMaid ? "Customer's" : "Maid's"} Emergency Contacts
           </p>
 
           {emergency.map((c, i) => (
@@ -651,11 +688,11 @@ export default function BookingDetail() {
                 }}
               >
                 <a href={`tel:${c.phone}`} className={styles.callBtn}>
-                  📞 {c.phone}
+                  <FaPhone style={{ marginRight: 4 }} /> {c.phone}
                 </a>
                 {c.email && (
                   <a href={`mailto:${c.email}`} className={styles.emailBtn}>
-                    ✉️ Email
+                    <FaEnvelope style={{ marginRight: 4 }} /> Email
                   </a>
                 )}
               </div>
@@ -670,7 +707,8 @@ export default function BookingDetail() {
             className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
             onClick={() => navigate("/payment", { state: { booking } })}
           >
-            🔒 Pay Now — {fmtAmt(booking.total_amount, currency)}
+            <FaLock style={{ marginRight: 6 }} /> Pay Now —{" "}
+            {fmtAmt(booking.total_amount, currency)}
           </button>
         )}
         {isCustomer &&
@@ -709,7 +747,8 @@ export default function BookingDetail() {
                     fontSize: 14,
                   }}
                 >
-                  💰 Your payment is held securely in escrow
+                  <FaMoneyBillWave style={{ marginRight: 6 }} /> Your payment is
+                  held securely in escrow
                 </p>
                 <p style={{ margin: 0 }}>
                   The maid has marked this job as complete. By tapping{" "}
@@ -738,7 +777,8 @@ export default function BookingDetail() {
                   borderColor: "rgb(10,107,46)",
                 }}
               >
-                {releaseLoading ? "Releasing…" : "💰 Release Funds to Maid"}
+                <FaMoneyBillWave style={{ marginRight: 6 }} />
+                {releaseLoading ? "Releasing…" : "Release Funds to Maid"}
               </button>
             </div>
           )}
@@ -749,7 +789,13 @@ export default function BookingDetail() {
               disabled={!!actionLoading}
               onClick={() => updateStatus("confirmed")}
             >
-              {actionLoading === "confirmed" ? "Accepting…" : "✅ Accept"}
+              {actionLoading === "confirmed" ? (
+                "Accepting…"
+              ) : (
+                <>
+                  <FaCheck style={{ marginRight: 6 }} /> Accept
+                </>
+              )}
             </button>
             <button
               className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
@@ -766,23 +812,31 @@ export default function BookingDetail() {
             disabled={actionLoading === "checkin"}
             onClick={handleCheckIn}
           >
-            {actionLoading === "checkin"
-              ? "Checking in…"
-              : "📍 Check In & Start Job"}
+            {actionLoading === "checkin" ? (
+              "Checking in…"
+            ) : (
+              <>
+                <FaMapMarkerAlt style={{ marginRight: 6 }} /> Check In & Start
+                Job
+              </>
+            )}
           </button>
         )}
         {isMaid && booking.status === "in_progress" && (
           <>
-            {/* ── Only show Check Out if not yet checked out ── */}
             {!booking.checkout_at && (
               <button
                 className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
                 disabled={actionLoading === "checkout"}
                 onClick={handleCheckOut}
               >
-                {actionLoading === "checkout"
-                  ? "📍 Getting location…"
-                  : "📍 Check Out"}
+                {actionLoading === "checkout" ? (
+                  "📍 Getting location…"
+                ) : (
+                  <>
+                    <FaMapMarkerAlt style={{ marginRight: 6 }} /> Check Out
+                  </>
+                )}
               </button>
             )}
             <button
@@ -790,15 +844,18 @@ export default function BookingDetail() {
               disabled={actionLoading === "completed"}
               onClick={() => updateStatus("completed")}
             >
-              {actionLoading === "completed"
-                ? "Completing…"
-                : "✅ Mark Complete"}
+              {actionLoading === "completed" ? (
+                "Completing…"
+              ) : (
+                <>
+                  <FaCheck style={{ marginRight: 6 }} /> Mark Complete
+                </>
+              )}
             </button>
           </>
         )}
       </div>
 
-      {/* ── Customer Review ── show to both maid and customer once submitted */}
       {booking.status === "completed" && review && (
         <div className={styles.section} style={{ marginTop: 16 }}>
           <p className={styles.sectionTitle}>Customer Review</p>
@@ -806,17 +863,12 @@ export default function BookingDetail() {
             <div className={styles.reviewDisplayHeader}>
               <div className={styles.reviewDisplayStars}>
                 {[1, 2, 3, 4, 5].map((n) => (
-                  <span
-                    key={n}
-                    style={{
-                      fontSize: 20,
-                      color:
-                        n <= review.rating
-                          ? "rgb(255,165,0)"
-                          : "rgb(220,220,220)",
-                    }}
-                  >
-                    ★
+                  <span key={n} style={{ fontSize: 20, marginRight: 2 }}>
+                    {n <= review.rating ? (
+                      <FaStar style={{ color: "rgb(255,165,0)" }} />
+                    ) : (
+                      <FaRegStar style={{ color: "rgb(220,220,220)" }} />
+                    )}
                   </span>
                 ))}
               </div>
@@ -839,7 +891,6 @@ export default function BookingDetail() {
         </div>
       )}
 
-      {/* Hide the form once review exists */}
       {isCustomer && booking.status === "completed" && !reviewed && !review && (
         <div className={styles.section} style={{ marginTop: 16 }}>
           <p className={styles.sectionTitle}>Leave a Review</p>
@@ -850,8 +901,13 @@ export default function BookingDetail() {
                   key={n}
                   className={`${styles.star} ${n <= rating ? styles.starActive : ""}`}
                   onClick={() => setRating(n)}
+                  style={{ fontSize: 24, cursor: "pointer" }}
                 >
-                  ★
+                  {n <= rating ? (
+                    <FaStar style={{ color: "rgb(255,165,0)" }} />
+                  ) : (
+                    <FaRegStar style={{ color: "rgb(200,200,200)" }} />
+                  )}
                 </span>
               ))}
             </div>
@@ -884,7 +940,7 @@ export default function BookingDetail() {
               fontSize: 14,
             }}
           >
-            ✓ Review submitted. Thank you!
+            <FaCheck style={{ marginRight: 6 }} /> Review submitted. Thank you!
           </p>
         </div>
       )}
