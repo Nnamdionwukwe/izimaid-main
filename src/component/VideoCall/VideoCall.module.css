@@ -20,14 +20,13 @@
   background: #0f0f1a;
 }
 
-/* ── Remote video ───────────────────────────────────────────── */
 .remoteVideoContainer {
   flex: 1;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #0a0a12;
-  position: relative;
   overflow: hidden;
   width: 100%;
   height: 100%;
@@ -67,7 +66,6 @@
   margin-top: 4px;
 }
 
-/* ── Local video ────────────────────────────────────────────── */
 .localVideoContainer {
   position: absolute;
   bottom: 80px;
@@ -99,7 +97,6 @@
   border-radius: 12px;
 }
 
-/* ── Controls ────────────────────────────────────────────────── */
 .controls {
   position: absolute;
   bottom: 24px;

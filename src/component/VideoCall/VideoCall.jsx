@@ -1,3 +1,4 @@
+// src/component/VideoCall/VideoCall.jsx
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AgoraRTC from "agora-rtc-sdk-ng";
@@ -19,6 +20,7 @@ export default function VideoCall({
   token,
   appId,
   otherName,
+  otherAvatar,
   onClose,
 }) {
   const navigate = useNavigate();
@@ -36,7 +38,6 @@ export default function VideoCall({
   const remoteVideoRef = useRef(null);
   const tokenStorage = localStorage.getItem("token");
   const joinedRef = useRef(false);
-  const remoteTrackRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -49,6 +50,7 @@ export default function VideoCall({
       setStatus("Creating client...");
 
       try {
+        // ✅ Force VP8 codec – avoids H.264 decode errors
         const rtcClient = AgoraRTC.createClient({
           mode: "rtc",
           codec: "vp8",
@@ -56,6 +58,8 @@ export default function VideoCall({
         setClient(rtcClient);
 
         setStatus("Joining channel...");
+        console.log(`🔑 Joining with appId: ${appId}, channel: ${channel}`);
+        // ✅ Use null UID – Agora auto‑assigns, avoids UID conflict
         await rtcClient.join(appId, channel, token, null);
         console.log(`✅ Joined channel: ${channel}`);
         setStatus("Joined channel, creating tracks...");
@@ -76,6 +80,7 @@ export default function VideoCall({
 
         // Play local video
         videoTrack.play(localVideoRef.current);
+        console.log("📹 Local video playing");
 
         setStatus("Publishing tracks...");
         await rtcClient.publish([audioTrack, videoTrack]);
@@ -86,22 +91,26 @@ export default function VideoCall({
         // ── Remote user events ──────────────────────────────────
         rtcClient.on("user-published", async (user, mediaType) => {
           console.log(`📢 Remote user ${user.uid} published ${mediaType}`);
-          await rtcClient.subscribe(user, mediaType);
-          if (mediaType === "video") {
-            const remoteVideoTrack = user.videoTrack;
-            remoteTrackRef.current = remoteVideoTrack;
-            // Play remote video on the dedicated container
-            if (remoteVideoRef.current) {
-              remoteVideoTrack.play(remoteVideoRef.current);
-              setRemoteUser(user);
-              setStatus(`Remote user joined`);
-              console.log("✅ Remote video playing");
-            } else {
-              console.warn("Remote video ref not ready");
+          try {
+            await rtcClient.subscribe(user, mediaType);
+            if (mediaType === "video") {
+              const remoteVideoTrack = user.videoTrack;
+              if (remoteVideoRef.current) {
+                remoteVideoTrack.play(remoteVideoRef.current);
+                setRemoteUser(user);
+                setStatus(`Remote user joined`);
+                console.log("✅ Remote video playing");
+              } else {
+                console.warn("Remote video ref not ready");
+              }
             }
-          }
-          if (mediaType === "audio") {
-            user.audioTrack?.play();
+            if (mediaType === "audio") {
+              user.audioTrack?.play();
+              console.log("🔊 Remote audio playing");
+            }
+          } catch (subErr) {
+            console.error("❌ Failed to subscribe to remote:", subErr);
+            setError("Failed to connect to remote user.");
           }
         });
 
@@ -109,14 +118,12 @@ export default function VideoCall({
           console.log(`👋 Remote user ${user.uid} unpublished ${mediaType}`);
           if (mediaType === "video") {
             setRemoteUser(null);
-            remoteTrackRef.current = null;
           }
         });
 
         rtcClient.on("user-left", (user) => {
           console.log(`🚪 Remote user ${user.uid} left`);
           setRemoteUser(null);
-          remoteTrackRef.current = null;
           setStatus("Remote user left");
         });
 
@@ -194,7 +201,6 @@ export default function VideoCall({
       <div className={styles.container}>
         {/* Remote video container */}
         <div className={styles.remoteVideoContainer}>
-          {/* The remote video element – always rendered, hidden when no remote user */}
           <div
             ref={remoteVideoRef}
             className={styles.remoteVideo}
