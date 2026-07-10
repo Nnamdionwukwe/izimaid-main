@@ -18,6 +18,7 @@ import {
   FaInfoCircle,
 } from "react-icons/fa";
 import styles from "./Bookingdetail.module.css";
+import VideoCall from "../VideoCall/VideoCall";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -135,6 +136,9 @@ export default function BookingDetail() {
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelLoading, setCancelLoading] = useState(false);
+
+  const [showVideoCall, setShowVideoCall] = useState(false);
+  const [videoCallData, setVideoCallData] = useState(null);
 
   const [review, setReview] = useState(null);
 
@@ -339,6 +343,7 @@ export default function BookingDetail() {
 
   async function handleVideoCall() {
     setVideoLoading(true);
+    setError("");
     try {
       const res = await fetch(`${API_URL}/api/bookings/${id}/video-call`, {
         method: "POST",
@@ -349,7 +354,17 @@ export default function BookingDetail() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      window.open(`https://meet.jit.si/deusizi-${data.room}`, "_blank");
+
+      // data: { channel, token, app_id, status }
+      setVideoCallData({
+        bookingId: id,
+        channel: data.channel,
+        token: data.token,
+        appId: data.app_id,
+        otherName: isMaid ? booking.customer_name : booking.maid_name,
+        otherAvatar: isMaid ? booking.customer_avatar : booking.maid_avatar,
+      });
+      setShowVideoCall(true);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -943,6 +958,21 @@ export default function BookingDetail() {
             <FaCheck style={{ marginRight: 6 }} /> Review submitted. Thank you!
           </p>
         </div>
+      )}
+
+      {showVideoCall && videoCallData && (
+        <VideoCall
+          bookingId={videoCallData.bookingId}
+          channel={videoCallData.channel}
+          token={videoCallData.token}
+          appId={videoCallData.appId}
+          otherName={videoCallData.otherName}
+          otherAvatar={videoCallData.otherAvatar}
+          onClose={() => {
+            setShowVideoCall(false);
+            setVideoCallData(null);
+          }}
+        />
       )}
     </div>
   );
