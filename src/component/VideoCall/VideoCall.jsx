@@ -31,14 +31,29 @@ export default function VideoCall({
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState("");
-  const [status, setStatus] = useState("Initializing..."); // NEW status
+  const [status, setStatus] = useState("Initializing...");
+  const [joined, setJoined] = useState(false);
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const tokenStorage = localStorage.getItem("token");
-  const uid = user.id ? parseInt(user.id.replace(/-/g, "").slice(0, 8), 16) : 0; // convert UUID to number
+
+  // Generate a unique UID (1 - 2^31-1) based on user id + random
+  const getUid = () => {
+    if (user.id) {
+      // Convert UUID to a numeric hash
+      const hash = user.id.replace(/-/g, "").slice(0, 8);
+      const num = parseInt(hash, 16);
+      // Ensure it's within 1 - 2^31-1
+      if (num > 0 && num < 2147483647) return num;
+    }
+    // Fallback: random number between 1 and 2^31-1
+    return Math.floor(Math.random() * 2147483646) + 1;
+  };
+
+  const uid = getUid();
 
   useEffect(() => {
     let mounted = true;
@@ -54,6 +69,7 @@ export default function VideoCall({
 
         setStatus("Joining channel...");
         await rtcClient.join(appId, channel, token, uid);
+        setJoined(true);
         console.log(`✅ Joined channel: ${channel} with UID ${uid}`);
         setStatus("Joined channel, creating tracks...");
 
@@ -139,7 +155,7 @@ export default function VideoCall({
         console.log("👋 Left channel");
       }
     };
-  }, []);
+  }, []); // Empty dependency array to run once
 
   // ── Controls ──────────────────────────────────────────────────
   const toggleMute = () => {
