@@ -28,7 +28,6 @@ export default function VideoCall({
   const [remoteUser, setRemoteUser] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
-  const [isConnected, setIsConnected] = useState(false); // ✅ defined
   const [error, setError] = useState("");
   const [status, setStatus] = useState("Initializing...");
   const [isJoining, setIsJoining] = useState(false);
@@ -37,6 +36,7 @@ export default function VideoCall({
   const remoteVideoRef = useRef(null);
   const tokenStorage = localStorage.getItem("token");
   const joinedRef = useRef(false);
+  const remoteTrackRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -80,7 +80,6 @@ export default function VideoCall({
         setStatus("Publishing tracks...");
         await rtcClient.publish([audioTrack, videoTrack]);
         console.log("✅ Published local tracks");
-        setIsConnected(true);
         setStatus("Connected, waiting for remote user...");
         setIsJoining(false);
 
@@ -90,14 +89,15 @@ export default function VideoCall({
           await rtcClient.subscribe(user, mediaType);
           if (mediaType === "video") {
             const remoteVideoTrack = user.videoTrack;
-            // The remote video container is always present, so ref is valid
+            remoteTrackRef.current = remoteVideoTrack;
+            // Play remote video
             if (remoteVideoRef.current) {
               remoteVideoTrack.play(remoteVideoRef.current);
               setRemoteUser(user);
               setStatus(`Remote user joined`);
               console.log("✅ Remote video playing");
             } else {
-              console.warn("Remote video container not ready");
+              console.warn("Remote video ref not ready");
             }
           }
           if (mediaType === "audio") {
@@ -109,12 +109,14 @@ export default function VideoCall({
           console.log(`👋 Remote user ${user.uid} unpublished ${mediaType}`);
           if (mediaType === "video") {
             setRemoteUser(null);
+            remoteTrackRef.current = null;
           }
         });
 
         rtcClient.on("user-left", (user) => {
           console.log(`🚪 Remote user ${user.uid} left`);
           setRemoteUser(null);
+          remoteTrackRef.current = null;
           setStatus("Remote user left");
         });
 
@@ -190,15 +192,11 @@ export default function VideoCall({
   return (
     <div className={styles.overlay}>
       <div className={styles.container}>
-        {/* Remote video – container always rendered so ref is available */}
+        {/* Remote video – container always rendered */}
         <div className={styles.remoteVideoContainer}>
-          <div
-            ref={remoteVideoRef}
-            className={styles.remoteVideo}
-            style={{ display: remoteUser ? "block" : "none" }}
-          />
+          <div ref={remoteVideoRef} className={styles.remoteVideo} />
           {!remoteUser && (
-            <div className={styles.waiting}>
+            <div className={styles.waitingOverlay}>
               <FaUserCircle size={64} />
               <p>Waiting for {otherName || "the other party"} to join…</p>
               <p className={styles.statusText}>{status}</p>
