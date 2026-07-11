@@ -10,11 +10,15 @@ export default function IncomingCallListener() {
   const [incomingCall, setIncomingCall] = useState(null);
   const pollRef = useRef(null);
   const token = localStorage.getItem("token");
+  const isNavigatingRef = useRef(false);
 
   useEffect(() => {
     if (!token) return;
 
     async function pollIncoming() {
+      // Skip polling if we're already navigating to the call
+      if (isNavigatingRef.current) return;
+
       try {
         const res = await fetch(`${API_URL}/api/bookings/active-call`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -23,15 +27,13 @@ export default function IncomingCallListener() {
         if (data.call) {
           setIncomingCall(data.call);
         } else {
-          // Only clear if no incoming call (prevents flicker)
-          setIncomingCall((prev) => (prev ? null : prev));
+          setIncomingCall(null);
         }
       } catch (err) {
         // silent fail
       }
     }
 
-    // Poll immediately, then every 5 seconds
     pollIncoming();
     pollRef.current = setInterval(pollIncoming, 5000);
 
@@ -54,6 +56,10 @@ export default function IncomingCallListener() {
   }
 
   function acceptCall() {
+    // Prevent further polling from re-triggering the banner
+    isNavigatingRef.current = true;
+    setIncomingCall(null);
+
     // Navigate to booking detail page with incoming call data
     navigate(`/bookings/${incomingCall.booking_id}`, {
       state: {
@@ -65,7 +71,11 @@ export default function IncomingCallListener() {
         },
       },
     });
-    setIncomingCall(null);
+
+    // Re-enable polling after a delay (e.g., 5 seconds)
+    setTimeout(() => {
+      isNavigatingRef.current = false;
+    }, 5000);
   }
 
   if (!incomingCall) return null;
