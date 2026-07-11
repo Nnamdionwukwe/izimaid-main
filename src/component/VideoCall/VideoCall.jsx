@@ -1,4 +1,3 @@
-// src/component/VideoCall/VideoCall.jsx
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AgoraRTC from "agora-rtc-sdk-ng";
@@ -14,13 +13,15 @@ import styles from "./VideoCall.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+// Enable debug logs for Agora
+AgoraRTC.setLogLevel(0);
+
 export default function VideoCall({
   bookingId,
   channel,
   token,
   appId,
   otherName,
-  otherAvatar,
   onClose,
 }) {
   const navigate = useNavigate();
@@ -38,6 +39,8 @@ export default function VideoCall({
   const remoteVideoRef = useRef(null);
   const tokenStorage = localStorage.getItem("token");
   const joinedRef = useRef(false);
+  const remoteTrackRef = useRef(null);
+  const retryTimeoutRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -50,16 +53,15 @@ export default function VideoCall({
       setStatus("Creating client...");
 
       try {
-        // ✅ Force VP8 codec – avoids H.264 decode errors
+        // Use H.264 for better compatibility
         const rtcClient = AgoraRTC.createClient({
           mode: "rtc",
-          codec: "vp8",
+          codec: "h264",
         });
         setClient(rtcClient);
 
         setStatus("Joining channel...");
         console.log(`🔑 Joining with appId: ${appId}, channel: ${channel}`);
-        // ✅ Use null UID – Agora auto‑assigns, avoids UID conflict
         await rtcClient.join(appId, channel, token, null);
         console.log(`✅ Joined channel: ${channel}`);
         setStatus("Joined channel, creating tracks...");
@@ -95,14 +97,20 @@ export default function VideoCall({
             await rtcClient.subscribe(user, mediaType);
             if (mediaType === "video") {
               const remoteVideoTrack = user.videoTrack;
-              if (remoteVideoRef.current) {
-                remoteVideoTrack.play(remoteVideoRef.current);
-                setRemoteUser(user);
-                setStatus(`Remote user joined`);
-                console.log("✅ Remote video playing");
-              } else {
-                console.warn("Remote video ref not ready");
-              }
+              remoteTrackRef.current = remoteVideoTrack;
+              // Ensure remote container is ready
+              const playRemote = () => {
+                if (remoteVideoRef.current) {
+                  remoteVideoTrack.play(remoteVideoRef.current);
+                  setRemoteUser(user);
+                  setStatus(`Remote user joined`);
+                  console.log("✅ Remote video playing");
+                } else {
+                  // Retry after a short delay
+                  setTimeout(playRemote, 200);
+                }
+              };
+              playRemote();
             }
             if (mediaType === "audio") {
               user.audioTrack?.play();
@@ -118,12 +126,14 @@ export default function VideoCall({
           console.log(`👋 Remote user ${user.uid} unpublished ${mediaType}`);
           if (mediaType === "video") {
             setRemoteUser(null);
+            remoteTrackRef.current = null;
           }
         });
 
         rtcClient.on("user-left", (user) => {
           console.log(`🚪 Remote user ${user.uid} left`);
           setRemoteUser(null);
+          remoteTrackRef.current = null;
           setStatus("Remote user left");
         });
 
@@ -136,6 +146,20 @@ export default function VideoCall({
           console.error("⚠️ Agora exception:", e);
           setError(e.message || "Agora exception occurred.");
         });
+
+        // ── Retry if no remote user after 15 seconds ────────────
+        retryTimeoutRef.current = setTimeout(() => {
+          if (!remoteUser && isMounted) {
+            console.warn(
+              "⏳ No remote user joined yet – re-publishing tracks...",
+            );
+            // Re-publish to refresh connection
+            rtcClient
+              .unpublish()
+              .then(() => rtcClient.publish([audioTrack, videoTrack]))
+              .catch((e) => console.error("Re-publish failed:", e));
+          }
+        }, 15000);
       } catch (err) {
         console.error("❌ Video call error:", err);
         joinedRef.current = false;
@@ -156,6 +180,7 @@ export default function VideoCall({
 
     return () => {
       isMounted = false;
+      if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
       if (localAudioTrack) localAudioTrack.close();
       if (localVideoTrack) localVideoTrack.close();
       if (client) client.leave();
