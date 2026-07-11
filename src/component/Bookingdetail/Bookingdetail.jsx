@@ -411,11 +411,17 @@ export default function BookingDetail() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
+      // Ensure appId is always defined
+      const appId =
+        data.app_id ||
+        import.meta.env.VITE_AGORA_APP_ID ||
+        "76bf723b062d4aa39f6395c53fff650e";
+
       setVideoCallData({
         bookingId: id,
         channel: data.channel,
         token: data.token,
-        appId: data.app_id,
+        appId: appId,
         otherName: isMaid ? booking.customer_name : booking.maid_name,
         otherAvatar: isMaid ? booking.customer_avatar : booking.maid_avatar,
       });
@@ -1071,12 +1077,17 @@ export default function BookingDetail() {
               <button
                 className={styles.acceptBtn}
                 onClick={() => {
+                  // Ensure appId is always defined
+                  const appId =
+                    incomingCall.appId ||
+                    import.meta.env.VITE_AGORA_APP_ID ||
+                    "76bf723b062d4aa39f6395c53fff650e";
                   setShowVideoCall(true);
                   setVideoCallData({
                     bookingId: id,
                     channel: incomingCall.channel,
                     token: incomingCall.token,
-                    appId: incomingCall.appId,
+                    appId: appId,
                     otherName: incomingCall.callerName,
                     otherAvatar: null,
                   });

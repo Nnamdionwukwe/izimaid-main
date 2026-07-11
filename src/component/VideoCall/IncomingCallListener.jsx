@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaPhoneAlt, FaTimes } from "react-icons/fa";
 import styles from "./IncomingCallListener.module.css";
 
@@ -7,17 +7,19 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 export default function IncomingCallListener() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [incomingCall, setIncomingCall] = useState(null);
   const pollRef = useRef(null);
   const token = localStorage.getItem("token");
-  const isNavigatingRef = useRef(false);
+  const isProcessingRef = useRef(false);
 
   useEffect(() => {
     if (!token) return;
 
     async function pollIncoming() {
-      // Skip polling if we're already navigating to the call
-      if (isNavigatingRef.current) return;
+      // Skip if navigating or already on booking detail
+      if (isProcessingRef.current) return;
+      if (location.pathname.match(/^\/bookings\//)) return;
 
       try {
         const res = await fetch(`${API_URL}/api/bookings/active-call`, {
@@ -37,8 +39,10 @@ export default function IncomingCallListener() {
     pollIncoming();
     pollRef.current = setInterval(pollIncoming, 5000);
 
-    return () => clearInterval(pollRef.current);
-  }, [token]);
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [token, location]);
 
   async function declineCall() {
     try {
@@ -56,29 +60,38 @@ export default function IncomingCallListener() {
   }
 
   function acceptCall() {
-    // Prevent further polling from re-triggering the banner
-    isNavigatingRef.current = true;
+    if (isProcessingRef.current) return;
+    isProcessingRef.current = true;
+
+    // Stop polling immediately
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+
+    const callData = incomingCall;
     setIncomingCall(null);
 
-    // Navigate to booking detail page with incoming call data
-    navigate(`/bookings/${incomingCall.booking_id}`, {
+    // Ensure appId is passed correctly
+    navigate(`/bookings/${callData.booking_id}`, {
       state: {
         incomingCall: {
-          channel: incomingCall.channel,
-          token: incomingCall.token,
-          appId: incomingCall.app_id,
-          callerName: incomingCall.caller_name,
+          channel: callData.channel,
+          token: callData.token,
+          appId: callData.app_id, // ✅ use correct key
+          callerName: callData.caller_name,
         },
       },
     });
 
-    // Re-enable polling after a delay (e.g., 5 seconds)
+    // Re-enable after 10 seconds (fallback)
     setTimeout(() => {
-      isNavigatingRef.current = false;
-    }, 5000);
+      isProcessingRef.current = false;
+    }, 10000);
   }
 
-  if (!incomingCall) return null;
+  // Only show if on non‑booking page and we have a call
+  if (!incomingCall || location.pathname.match(/^\/bookings\//)) return null;
 
   return (
     <div className={styles.overlay}>

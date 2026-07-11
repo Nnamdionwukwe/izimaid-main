@@ -42,6 +42,18 @@ export default function VideoCall({
   const remoteTrackRef = useRef(null);
   const retryTimeoutRef = useRef(null);
 
+  // ── Validate appId and provide fallback ───────────────────────────
+  const finalAppId =
+    appId ||
+    import.meta.env.VITE_AGORA_APP_ID ||
+    "76bf723b062d4aa39f6395c53fff650e";
+  if (!appId) {
+    console.warn(
+      "⚠️ VideoCall: appId not provided, using fallback:",
+      finalAppId,
+    );
+  }
+
   useEffect(() => {
     let isMounted = true;
 
@@ -61,8 +73,10 @@ export default function VideoCall({
         setClient(rtcClient);
 
         setStatus("Joining channel...");
-        console.log(`🔑 Joining with appId: ${appId}, channel: ${channel}`);
-        await rtcClient.join(appId, channel, token, null);
+        console.log(
+          `🔑 Joining with appId: ${finalAppId}, channel: ${channel}`,
+        );
+        await rtcClient.join(finalAppId, channel, token, null);
         console.log(`✅ Joined channel: ${channel}`);
         setStatus("Joined channel, creating tracks...");
 
