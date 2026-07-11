@@ -89,6 +89,7 @@ import FoundationVerify from "./component/DeausiziFoundation/FoundationVerify.js
 import GiftCertificateVerify from "./component/GiftCertificates/GiftCertificateVerify.jsx";
 import ResetPinPage from "./pages/settings/ResetPinPage.jsx";
 import CookieBanner from "./component/CookieBanner/CookieBanner.jsx";
+import IncomingCallListener from "./component/VideoCall/IncomingCallListener.jsx";
 
 function App() {
   return (
@@ -98,6 +99,7 @@ function App() {
           {/* Floating support chat — only renders for logged-in customers */}
           <FloatingSupportChat />
           <CookieBanner />
+          <IncomingCallListener />
           <AppRoutes />
           <PoweredByGestech />
         </BrowserRouter>
