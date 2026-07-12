@@ -163,3 +163,28 @@
   font-size: 14px;
   z-index: 30;
 }
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #fff;
+  text-align: center;
+  padding: 24px;
+}
+
+.errorTitle {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 16px 0 8px;
+  color: #dc3545;
+}
+
+.errorMessage {
+  font-size: 16px;
+  color: #ccc;
+  margin-bottom: 24px;
+  max-width: 400px;
+}

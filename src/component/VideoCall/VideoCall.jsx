@@ -19,7 +19,7 @@ AgoraRTC.setLogLevel(0);
 export default function VideoCall({
   bookingId,
   channel,
-  token: initialToken,
+  token,
   appId,
   otherName,
   onClose,
@@ -34,7 +34,6 @@ export default function VideoCall({
   const [error, setError] = useState("");
   const [status, setStatus] = useState("Initializing...");
   const [isJoining, setIsJoining] = useState(false);
-  const [token, setToken] = useState(initialToken);
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -43,52 +42,66 @@ export default function VideoCall({
   const remoteTrackRef = useRef(null);
   const retryTimeoutRef = useRef(null);
 
-  // ── Fetch token if missing ────────────────────────────────────────
-  useEffect(() => {
-    async function fetchToken() {
-      if (token && token !== "undefined" && token !== "null") return;
-      try {
-        console.log("🔑 Token missing, fetching from backend...");
-        const res = await fetch(
-          `${API_URL}/api/bookings/${bookingId}/video-call`,
-          {
-            headers: { Authorization: `Bearer ${tokenStorage}` },
-          },
-        );
-        const data = await res.json();
-        if (data.token) {
-          setToken(data.token);
-          console.log("✅ Token fetched successfully");
-        } else {
-          setError("Could not retrieve video call token. Please try again.");
-        }
-      } catch (err) {
-        console.error("Failed to fetch token:", err);
-        setError("Could not retrieve video call token. Please try again.");
-      }
-    }
-    fetchToken();
-  }, [bookingId, token, tokenStorage]);
-
-  // ── Validate appId and provide fallback ───────────────────────────
+  // ── Validate and fallback for appId ───────────────────────────────
   const finalAppId =
     appId ||
     import.meta.env.VITE_AGORA_APP_ID ||
     "76bf723b062d4aa39f6395c53fff650e";
-  if (!appId) {
-    console.warn(
-      "⚠️ VideoCall: appId not provided, using fallback:",
-      finalAppId,
-    );
-  }
+
+  // ── Validate channel – must be a non-empty string with allowed chars ──
+  const validateChannel = (ch) => {
+    if (!ch || typeof ch !== "string") return false;
+    // Agora allows: a-z, A-Z, 0-9, space, ! # $ % & ( ) + - : ; < = . > ? @ [ ] ^ _ { } | ~ ,
+    const allowed = /^[a-zA-Z0-9 !#$%&()+\\-:;<=.>?@[\]^_{|}~,]{1,64}$/;
+    return allowed.test(ch);
+  };
+
+  const finalChannel = channel && validateChannel(channel) ? channel : null;
+
+  // ── Validate token ────────────────────────────────────────────────
+  const isValidToken =
+    token &&
+    typeof token === "string" &&
+    token !== "undefined" &&
+    token !== "null" &&
+    token.length > 10;
+
+  useEffect(() => {
+    if (!isValidToken) {
+      setError("Video call token is missing or invalid. Please try again.");
+      setStatus("Error: Invalid token");
+      return;
+    }
+    if (!finalChannel) {
+      setError("Video call channel is invalid. Please try again.");
+      setStatus("Error: Invalid channel");
+      return;
+    }
+    if (!finalAppId) {
+      setError("Video call app ID is missing. Please contact support.");
+      setStatus("Error: Missing appId");
+      return;
+    }
+  }, [isValidToken, finalChannel, finalAppId]);
 
   useEffect(() => {
     let isMounted = true;
 
     async function startCall() {
-      // Wait for token to be available
-      if (!token || token === "undefined" || token === "null") {
-        setStatus("Waiting for token...");
+      // Validate again
+      if (!isValidToken) {
+        setError("Video call token is missing. Please try again.");
+        setStatus("Error: Missing token");
+        return;
+      }
+      if (!finalChannel) {
+        setError("Video call channel is invalid. Please try again.");
+        setStatus("Error: Invalid channel");
+        return;
+      }
+      if (!finalAppId) {
+        setError("Video call app ID is missing. Please contact support.");
+        setStatus("Error: Missing appId");
         return;
       }
 
@@ -108,10 +121,10 @@ export default function VideoCall({
 
         setStatus("Joining channel...");
         console.log(
-          `🔑 Joining with appId: ${finalAppId}, channel: ${channel}, token: ${token ? token.slice(0, 20) + "..." : "undefined"}`,
+          `🔑 Joining with appId: ${finalAppId}, channel: ${finalChannel}, token: ${token.slice(0, 20)}...`,
         );
-        await rtcClient.join(finalAppId, channel, token, null);
-        console.log(`✅ Joined channel: ${channel}`);
+        await rtcClient.join(finalAppId, finalChannel, token, null);
+        console.log(`✅ Joined channel: ${finalChannel}`);
         setStatus("Joined channel, creating tracks...");
 
         const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
@@ -146,7 +159,6 @@ export default function VideoCall({
             if (mediaType === "video") {
               const remoteVideoTrack = user.videoTrack;
               remoteTrackRef.current = remoteVideoTrack;
-              // Ensure remote container is ready
               const playRemote = () => {
                 if (remoteVideoRef.current) {
                   remoteVideoTrack.play(remoteVideoRef.current);
@@ -154,7 +166,6 @@ export default function VideoCall({
                   setStatus(`Remote user joined`);
                   console.log("✅ Remote video playing");
                 } else {
-                  // Retry after a short delay
                   setTimeout(playRemote, 200);
                 }
               };
@@ -201,7 +212,6 @@ export default function VideoCall({
             console.warn(
               "⏳ No remote user joined yet – re-publishing tracks...",
             );
-            // Re-publish to refresh connection
             rtcClient
               .unpublish()
               .then(() => rtcClient.publish([audioTrack, videoTrack]))
@@ -235,7 +245,7 @@ export default function VideoCall({
       console.log("🧹 Cleaned up");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]); // re-run when token changes
+  }, []);
 
   // ── Controls ──────────────────────────────────────────────────
   const toggleMute = () => {
@@ -268,6 +278,23 @@ export default function VideoCall({
       setError("Failed to end call properly.");
     }
   };
+
+  if (error) {
+    return (
+      <div className={styles.overlay}>
+        <div className={styles.container}>
+          <div className={styles.errorContainer}>
+            <FaUserCircle size={48} color="#dc3545" />
+            <p className={styles.errorTitle}>Connection Error</p>
+            <p className={styles.errorMessage}>{error}</p>
+            <button className={styles.endCallBtn} onClick={onClose}>
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.overlay}>

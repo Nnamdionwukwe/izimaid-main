@@ -411,16 +411,28 @@ export default function BookingDetail() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // Ensure appId is always defined
+      // ── Generate fallbacks for channel, token, appId ──────────
+      const channelName =
+        data.channel || `deusizi-${id.slice(0, 8)}-${Date.now().toString(36)}`;
+      const tokenValue = data.token || null; // if null, Agora will use null (no token)
       const appId =
         data.app_id ||
         import.meta.env.VITE_AGORA_APP_ID ||
         "76bf723b062d4aa39f6395c53fff650e";
 
+      console.log(
+        "📞 handleVideoCall – channel:",
+        channelName,
+        "token:",
+        tokenValue ? tokenValue.slice(0, 20) + "..." : "null",
+        "appId:",
+        appId,
+      );
+
       setVideoCallData({
         bookingId: id,
-        channel: data.channel,
-        token: data.token,
+        channel: channelName,
+        token: tokenValue,
         appId: appId,
         otherName: isMaid ? booking.customer_name : booking.maid_name,
         otherAvatar: isMaid ? booking.customer_avatar : booking.maid_avatar,
@@ -1077,16 +1089,30 @@ export default function BookingDetail() {
               <button
                 className={styles.acceptBtn}
                 onClick={() => {
-                  // Ensure appId is always defined
+                  // ── Generate fallbacks for channel, token, appId ──
+                  const channelName =
+                    incomingCall.channel ||
+                    `deusizi-${id.slice(0, 8)}-${Date.now().toString(36)}`;
+                  const tokenValue = incomingCall.token || null;
                   const appId =
                     incomingCall.appId ||
                     import.meta.env.VITE_AGORA_APP_ID ||
                     "76bf723b062d4aa39f6395c53fff650e";
+
+                  console.log(
+                    "📞 Accepting call – channel:",
+                    channelName,
+                    "token:",
+                    tokenValue ? tokenValue.slice(0, 20) + "..." : "null",
+                    "appId:",
+                    appId,
+                  );
+
                   setShowVideoCall(true);
                   setVideoCallData({
                     bookingId: id,
-                    channel: incomingCall.channel,
-                    token: incomingCall.token,
+                    channel: channelName,
+                    token: tokenValue,
                     appId: appId,
                     otherName: incomingCall.callerName,
                     otherAvatar: null,
