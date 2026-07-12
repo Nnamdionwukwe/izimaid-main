@@ -54,10 +54,26 @@ export default function VideoCall({
     );
   }
 
+  // ── Validate token ────────────────────────────────────────────────
+  useEffect(() => {
+    if (!token || token === "undefined" || token === "null") {
+      setError("Video call token is missing. Please try again.");
+      setStatus("Error: Missing token");
+      return;
+    }
+  }, [token]);
+
   useEffect(() => {
     let isMounted = true;
 
     async function startCall() {
+      // Don't proceed if token is invalid
+      if (!token || token === "undefined" || token === "null") {
+        setError("Video call token is missing. Please try again.");
+        setStatus("Error: Missing token");
+        return;
+      }
+
       if (joinedRef.current) return;
       joinedRef.current = true;
 
@@ -74,7 +90,7 @@ export default function VideoCall({
 
         setStatus("Joining channel...");
         console.log(
-          `🔑 Joining with appId: ${finalAppId}, channel: ${channel}`,
+          `🔑 Joining with appId: ${finalAppId}, channel: ${channel}, token: ${token ? token.slice(0, 20) + "..." : "undefined"}`,
         );
         await rtcClient.join(finalAppId, channel, token, null);
         console.log(`✅ Joined channel: ${channel}`);
