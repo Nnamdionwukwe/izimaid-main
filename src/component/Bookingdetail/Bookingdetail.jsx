@@ -141,13 +141,11 @@ export default function BookingDetail() {
   const [cancelLoading, setCancelLoading] = useState(false);
   const [review, setReview] = useState(null);
 
-  // ─── Video call state ────────────────────────────────────────────
+  // ─── Video call state (simplified) ──────────────────────────────
   const [showVideoCall, setShowVideoCall] = useState(false);
   const [videoCallData, setVideoCallData] = useState(null);
-  const [incomingCall, setIncomingCall] = useState(null);
 
   const pollRef = useRef(null);
-  const incomingPollRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const token = localStorage.getItem("token");
@@ -208,95 +206,88 @@ export default function BookingDetail() {
     return () => clearInterval(pollRef.current);
   }, [booking?.status, id, token]);
 
-  // ─── Restore incoming call from navigation state ──────────────────
+  // ─── Handle incoming call from global banner (via navigation state) ──
   useEffect(() => {
     if (state?.incomingCall) {
-      setIncomingCall({
-        channel: state.channel,
-        token: state.token,
-        appId: state.appId,
-        callerName: state.callerName,
-      });
-      // Clear the state to avoid re‑prompting on refresh
-      window.history.replaceState({}, document.title);
-    }
-  }, [state]);
-
-  // ─── If incoming call token is invalid, fetch a fresh one ──────────
-  useEffect(() => {
-    if (!incomingCall) return;
-    const isValid =
-      incomingCall.token &&
-      typeof incomingCall.token === "string" &&
-      incomingCall.token.length > 10;
-    if (isValid) return;
-
-    console.log(
-      "🔄 Incoming call token missing/invalid, fetching fresh token...",
-    );
-    async function refreshToken() {
-      try {
-        const res = await fetch(`${API_URL}/api/bookings/${id}/video-call`, {
+      const {
+        channel,
+        token: incomingToken,
+        appId,
+        callerName,
+      } = state.incomingCall;
+      // If token is invalid, we can refresh it (optional, but good for robustness)
+      const isValidToken =
+        incomingToken &&
+        typeof incomingToken === "string" &&
+        incomingToken.length > 10;
+      if (!isValidToken) {
+        console.log("🔄 Incoming token invalid, refreshing...");
+        // Fetch fresh token
+        fetch(`${API_URL}/api/bookings/${id}/video-call`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to fetch token");
-        setIncomingCall((prev) => ({
-          ...prev,
-          token: data.token,
-          channel: data.channel || prev.channel,
-          appId: data.app_id || prev.appId,
-        }));
-        console.log(
-          "✅ Fresh token obtained:",
-          data.token.slice(0, 20) + "...",
-        );
-      } catch (err) {
-        console.error("❌ Failed to refresh token:", err);
-        setError(
-          "Could not connect to video call. Please try the Video Call button.",
-        );
-      }
-    }
-    refreshToken();
-  }, [incomingCall, id, token]);
-
-  // ─── POLL FOR INCOMING CALLS ──────────────────────────────────────
-  useEffect(() => {
-    if (
-      !booking ||
-      !["confirmed", "in_progress"].includes(booking.status) ||
-      showVideoCall ||
-      incomingCall
-    )
-      return;
-
-    const pollIncoming = async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/bookings/active-call`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        if (data.call && data.call.booking_id === booking.id) {
-          setIncomingCall({
-            channel: data.call.channel,
-            token: data.call.token,
-            appId: data.call.app_id,
-            callerName: data.call.caller_name,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.token) {
+              const channelName =
+                data.channel ||
+                channel ||
+                `deusizi-${id.slice(0, 8)}-${Date.now().toString(36)}`;
+              const appId =
+                data.app_id ||
+                import.meta.env.VITE_AGORA_APP_ID ||
+                "76bf723b062d4aa39f6395c53fff650e";
+              setVideoCallData({
+                bookingId: id,
+                channel: channelName,
+                token: data.token,
+                appId: appId,
+                otherName:
+                  callerName ||
+                  (isMaid ? booking?.customer_name : booking?.maid_name),
+                otherAvatar: null,
+              });
+              setShowVideoCall(true);
+            } else {
+              setError(
+                "Could not start video call. Please use the Video Call button.",
+              );
+            }
+          })
+          .catch((err) => {
+            console.error("Failed to refresh token:", err);
+            setError(
+              "Could not start video call. Please use the Video Call button.",
+            );
           });
-        }
-      } catch (err) {
-        // ignore
+      } else {
+        // Token is valid – start call immediately
+        const channelName =
+          channel || `deusizi-${id.slice(0, 8)}-${Date.now().toString(36)}`;
+        const finalAppId =
+          appId ||
+          import.meta.env.VITE_AGORA_APP_ID ||
+          "76bf723b062d4aa39f6395c53fff650e";
+        setVideoCallData({
+          bookingId: id,
+          channel: channelName,
+          token: incomingToken,
+          appId: finalAppId,
+          otherName:
+            callerName ||
+            (isMaid ? booking?.customer_name : booking?.maid_name),
+          otherAvatar: null,
+        });
+        setShowVideoCall(true);
       }
-    };
-
-    incomingPollRef.current = setInterval(pollIncoming, 5000);
-    return () => clearInterval(incomingPollRef.current);
-  }, [booking, token, showVideoCall, incomingCall]);
+      // Clear the state to avoid re-triggering on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [state, id, token, isMaid, booking]);
 
   // ─── Currency ──────────────────────────────────────────────────────
   const currency = payment?.currency || booking?.maid_currency || "NGN";
@@ -440,6 +431,7 @@ export default function BookingDetail() {
     );
   }
 
+  // ─── Manual video call initiation ──────────────────────────────
   async function handleVideoCall() {
     setVideoLoading(true);
     setError("");
@@ -462,15 +454,6 @@ export default function BookingDetail() {
         import.meta.env.VITE_AGORA_APP_ID ||
         "76bf723b062d4aa39f6395c53fff650e";
 
-      console.log(
-        "📞 handleVideoCall – channel:",
-        channelName,
-        "token:",
-        tokenValue ? tokenValue.slice(0, 20) + "..." : "null",
-        "appId:",
-        appId,
-      );
-
       setVideoCallData({
         bookingId: id,
         channel: channelName,
@@ -485,18 +468,6 @@ export default function BookingDetail() {
     } finally {
       setVideoLoading(false);
     }
-  }
-
-  async function declineIncomingCall() {
-    try {
-      await fetch(`${API_URL}/api/bookings/${id}/video-call`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-    } catch (err) {
-      console.error("Failed to decline call:", err);
-    }
-    setIncomingCall(null);
   }
 
   async function submitReview() {
@@ -1107,64 +1078,6 @@ export default function BookingDetail() {
           >
             <FaCheck style={{ marginRight: 6 }} /> Review submitted. Thank you!
           </p>
-        </div>
-      )}
-
-      {/* ─── INCOMING CALL OVERLAY ────────────────────────────────── */}
-      {incomingCall && (
-        <div className={styles.incomingOverlay}>
-          <div className={styles.incomingCard}>
-            <div className={styles.ringingAnimation}>
-              <FaPhoneAlt className={styles.ringingIcon} />
-            </div>
-            <h2 className={styles.incomingTitle}>Incoming Video Call</h2>
-            <p className={styles.incomingCaller}>
-              {incomingCall.callerName} is calling you
-            </p>
-            <div className={styles.incomingActions}>
-              <button
-                className={styles.declineBtn}
-                onClick={declineIncomingCall}
-              >
-                Decline
-              </button>
-              <button
-                className={styles.acceptBtn}
-                onClick={() => {
-                  const channelName =
-                    incomingCall.channel ||
-                    `deusizi-${id.slice(0, 8)}-${Date.now().toString(36)}`;
-                  const tokenValue = incomingCall.token || null;
-                  const appId =
-                    incomingCall.appId ||
-                    import.meta.env.VITE_AGORA_APP_ID ||
-                    "76bf723b062d4aa39f6395c53fff650e";
-
-                  console.log(
-                    "📞 Accepting call – channel:",
-                    channelName,
-                    "token:",
-                    tokenValue ? tokenValue.slice(0, 20) + "..." : "null",
-                    "appId:",
-                    appId,
-                  );
-
-                  setShowVideoCall(true);
-                  setVideoCallData({
-                    bookingId: id,
-                    channel: channelName,
-                    token: tokenValue,
-                    appId: appId,
-                    otherName: incomingCall.callerName,
-                    otherAvatar: null,
-                  });
-                  setIncomingCall(null);
-                }}
-              >
-                Accept
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
