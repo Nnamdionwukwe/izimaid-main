@@ -17,9 +17,8 @@ export default function IncomingCallListener() {
     if (!token) return;
 
     async function pollIncoming() {
-      // Skip if navigating or already on booking detail
       if (isProcessingRef.current) return;
-      if (location.pathname.match(/^\/bookings\//)) return;
+      // ✅ Removed skip condition – banner appears everywhere
 
       try {
         const res = await fetch(`${API_URL}/api/bookings/active-call`, {
@@ -42,7 +41,7 @@ export default function IncomingCallListener() {
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
-  }, [token, location]);
+  }, [token]);
 
   async function declineCall() {
     try {
@@ -63,7 +62,6 @@ export default function IncomingCallListener() {
     if (isProcessingRef.current) return;
     isProcessingRef.current = true;
 
-    // Stop polling immediately
     if (pollRef.current) {
       clearInterval(pollRef.current);
       pollRef.current = null;
@@ -72,26 +70,24 @@ export default function IncomingCallListener() {
     const callData = incomingCall;
     setIncomingCall(null);
 
-    // Ensure appId is passed correctly
+    // ✅ Navigate to booking detail with call data (even if already there)
     navigate(`/bookings/${callData.booking_id}`, {
       state: {
         incomingCall: {
           channel: callData.channel,
           token: callData.token,
-          appId: callData.app_id, // ✅ use correct key
+          appId: callData.app_id,
           callerName: callData.caller_name,
         },
       },
     });
 
-    // Re-enable after 10 seconds (fallback)
     setTimeout(() => {
       isProcessingRef.current = false;
     }, 10000);
   }
 
-  // Only show if on non‑booking page and we have a call
-  if (!incomingCall || location.pathname.match(/^\/bookings\//)) return null;
+  if (!incomingCall) return null;
 
   return (
     <div className={styles.overlay}>
