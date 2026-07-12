@@ -51,7 +51,8 @@ export default function VideoCall({
   // ── Validate channel – must be a non-empty string with allowed chars ──
   const validateChannel = (ch) => {
     if (!ch || typeof ch !== "string") return false;
-    // Agora allows: a-z, A-Z, 0-9, space, ! # $ % & ( ) + - : ; < = . > ? @ [ ] ^ _ { } | ~ ,
+    // Allowed: letters (a-z, A-Z), digits (0-9), underscore (_), and hyphen (-)
+    // Hyphen is placed at the end to avoid range interpretation.
     const allowed = /^[a-zA-Z0-9_-]{1,64}$/;
     return allowed.test(ch);
   };
