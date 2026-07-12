@@ -222,6 +222,49 @@ export default function BookingDetail() {
     }
   }, [state]);
 
+  // ─── If incoming call token is invalid, fetch a fresh one ──────────
+  useEffect(() => {
+    if (!incomingCall) return;
+    const isValid =
+      incomingCall.token &&
+      typeof incomingCall.token === "string" &&
+      incomingCall.token.length > 10;
+    if (isValid) return;
+
+    console.log(
+      "🔄 Incoming call token missing/invalid, fetching fresh token...",
+    );
+    async function refreshToken() {
+      try {
+        const res = await fetch(`${API_URL}/api/bookings/${id}/video-call`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to fetch token");
+        setIncomingCall((prev) => ({
+          ...prev,
+          token: data.token,
+          channel: data.channel || prev.channel,
+          appId: data.app_id || prev.appId,
+        }));
+        console.log(
+          "✅ Fresh token obtained:",
+          data.token.slice(0, 20) + "...",
+        );
+      } catch (err) {
+        console.error("❌ Failed to refresh token:", err);
+        setError(
+          "Could not connect to video call. Please try the Video Call button.",
+        );
+      }
+    }
+    refreshToken();
+  }, [incomingCall, id, token]);
+
   // ─── POLL FOR INCOMING CALLS ──────────────────────────────────────
   useEffect(() => {
     if (
@@ -411,10 +454,9 @@ export default function BookingDetail() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // ── Generate fallbacks for channel, token, appId ──────────
       const channelName =
         data.channel || `deusizi-${id.slice(0, 8)}-${Date.now().toString(36)}`;
-      const tokenValue = data.token || null; // if null, Agora will use null (no token)
+      const tokenValue = data.token || null;
       const appId =
         data.app_id ||
         import.meta.env.VITE_AGORA_APP_ID ||
@@ -1089,7 +1131,6 @@ export default function BookingDetail() {
               <button
                 className={styles.acceptBtn}
                 onClick={() => {
-                  // ── Generate fallbacks for channel, token, appId ──
                   const channelName =
                     incomingCall.channel ||
                     `deusizi-${id.slice(0, 8)}-${Date.now().toString(36)}`;
