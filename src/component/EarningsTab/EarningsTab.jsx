@@ -81,7 +81,6 @@ const SYMBOLS = {
   UST: "UST ",
   LUNC: "LUNC ",
   LUNA: "LUNA ",
-  AVAX: "AVAX ",
   NEAR: "NEAR ",
   ALGO: "ALGO ",
   FLOW: "FLOW ",
