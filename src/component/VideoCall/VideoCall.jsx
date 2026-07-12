@@ -52,7 +52,7 @@ export default function VideoCall({
   const validateChannel = (ch) => {
     if (!ch || typeof ch !== "string") return false;
     // Agora allows: a-z, A-Z, 0-9, space, ! # $ % & ( ) + - : ; < = . > ? @ [ ] ^ _ { } | ~ ,
-    const allowed = /^[a-zA-Z0-9 !#$%&()+\\-:;<=.>?@\[\]^_{|}~,]{1,64}$/;
+    const allowed = /^[a-zA-Z0-9_-]{1,64}$/;
     return allowed.test(ch);
   };
 
