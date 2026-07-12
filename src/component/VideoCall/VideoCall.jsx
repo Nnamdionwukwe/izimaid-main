@@ -19,7 +19,7 @@ AgoraRTC.setLogLevel(0);
 export default function VideoCall({
   bookingId,
   channel,
-  token,
+  token: initialToken,
   appId,
   otherName,
   onClose,
@@ -34,6 +34,7 @@ export default function VideoCall({
   const [error, setError] = useState("");
   const [status, setStatus] = useState("Initializing...");
   const [isJoining, setIsJoining] = useState(false);
+  const [token, setToken] = useState(initialToken);
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -41,6 +42,33 @@ export default function VideoCall({
   const joinedRef = useRef(false);
   const remoteTrackRef = useRef(null);
   const retryTimeoutRef = useRef(null);
+
+  // ── Fetch token if missing ────────────────────────────────────────
+  useEffect(() => {
+    async function fetchToken() {
+      if (token && token !== "undefined" && token !== "null") return;
+      try {
+        console.log("🔑 Token missing, fetching from backend...");
+        const res = await fetch(
+          `${API_URL}/api/bookings/${bookingId}/video-call`,
+          {
+            headers: { Authorization: `Bearer ${tokenStorage}` },
+          },
+        );
+        const data = await res.json();
+        if (data.token) {
+          setToken(data.token);
+          console.log("✅ Token fetched successfully");
+        } else {
+          setError("Could not retrieve video call token. Please try again.");
+        }
+      } catch (err) {
+        console.error("Failed to fetch token:", err);
+        setError("Could not retrieve video call token. Please try again.");
+      }
+    }
+    fetchToken();
+  }, [bookingId, token, tokenStorage]);
 
   // ── Validate appId and provide fallback ───────────────────────────
   const finalAppId =
@@ -54,23 +82,13 @@ export default function VideoCall({
     );
   }
 
-  // ── Validate token ────────────────────────────────────────────────
-  useEffect(() => {
-    if (!token || token === "undefined" || token === "null") {
-      setError("Video call token is missing. Please try again.");
-      setStatus("Error: Missing token");
-      return;
-    }
-  }, [token]);
-
   useEffect(() => {
     let isMounted = true;
 
     async function startCall() {
-      // Don't proceed if token is invalid
+      // Wait for token to be available
       if (!token || token === "undefined" || token === "null") {
-        setError("Video call token is missing. Please try again.");
-        setStatus("Error: Missing token");
+        setStatus("Waiting for token...");
         return;
       }
 
@@ -217,7 +235,7 @@ export default function VideoCall({
       console.log("🧹 Cleaned up");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [token]); // re-run when token changes
 
   // ── Controls ──────────────────────────────────────────────────
   const toggleMute = () => {
