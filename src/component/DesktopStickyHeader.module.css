@@ -1,0 +1,26 @@
+.stickyWrapper {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: #ffffff;
+  z-index: 9999;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  /* Force hardware acceleration for smooth sticky behavior */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+  /* Ensure it doesn't inherit any parent positioning */
+  position: -webkit-sticky;
+  position: sticky;
+  /* Prevent any flex/grid parent from affecting it */
+  align-self: flex-start;
+  /* Ensure it stays at the top */
+  top: 0;
+}
+
+/* Make sure it's visible when sticky */
+.stickyWrapper.sticky {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}

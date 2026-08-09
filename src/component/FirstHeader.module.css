@@ -5,18 +5,14 @@
   font-style: italic;
   font-weight: bold;
   display: block;
-  width: 100vw;
+  width: 100%;
   box-sizing: border-box;
+  /* Remove fixed positioning - let the parent handle sticky */
   position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  /* margin-top: -10px; */
+  top: auto;
+  left: auto;
+  right: auto;
+  margin: 0;
 }
 
 .headerLink {

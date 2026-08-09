@@ -1,3 +1,22 @@
+/* ── Desktop header wrapper - make it sticky ── */
+.thirdHeaderMain {
+  position: sticky;
+  top: 0;
+  z-index: 9998;
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+}
+
+/* ── Make sure the desktop header stays above everything ── */
+@media screen and (min-width: 992px) {
+  .thirdHeaderMain {
+    display: block !important;
+  }
+}
+
 /* ── Mobile (base styles) ────────────────────────────────────────────────── */
 @media screen and (min-width: 20px) {
   .localIzimaidMain {

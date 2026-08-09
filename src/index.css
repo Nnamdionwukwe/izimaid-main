@@ -195,3 +195,42 @@ video {
   background: var(--ds-navy-muted);
   color: var(--ds-navy);
 }
+
+/* ── Global Sticky Header Fixes ── */
+
+/* Ensure sticky positioning works properly */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  background: #ffffff;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+}
+
+/* For Safari support */
+@supports (-webkit-touch-callout: none) {
+  .sticky-header {
+    position: -webkit-sticky;
+    position: sticky;
+  }
+}
+
+/* Prevent any overflow issues */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Ensure sticky headers stay above content */
+#root {
+  position: relative;
+  z-index: 1;
+}
