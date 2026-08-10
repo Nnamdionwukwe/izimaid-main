@@ -36,6 +36,9 @@ export default function SecuritySettings() {
   const [toast, setToast] = useState(null);
   const [showPwd, setShowPwd] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deletePasswordError, setDeletePasswordError] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   function validate() {
     const e = {};
@@ -79,6 +82,7 @@ export default function SecuritySettings() {
     "#22c55e",
     "#16a34a",
   ][pwdStrength];
+
   async function handleSubmit(e) {
     e.preventDefault();
     const errs = validate();
@@ -89,13 +93,11 @@ export default function SecuritySettings() {
     setErrors({});
     setSaving(true);
     try {
-      // Get token from localStorage
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("Please log in first");
       }
 
-      // Use the correct backend URL
       const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
       const response = await fetch(`${API_URL}/api/auth/change-password`, {
@@ -131,19 +133,73 @@ export default function SecuritySettings() {
   }
 
   function openDeleteModal() {
+    setDeletePassword("");
+    setDeletePasswordError("");
     setShowDeleteModal(true);
   }
 
   function closeDeleteModal() {
     setShowDeleteModal(false);
+    setDeletePassword("");
+    setDeletePasswordError("");
   }
 
-  function confirmDelete() {
-    closeDeleteModal();
-    setToast({
-      message: "Please contact support to delete your account.",
-      type: "error",
-    });
+  async function confirmDelete() {
+    if (!deletePassword) {
+      setDeletePasswordError("Please enter your password to confirm deletion");
+      return;
+    }
+
+    setDeleting(true);
+    setDeletePasswordError("");
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Please log in first");
+      }
+
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
+      const response = await fetch(`${API_URL}/api/settings/delete-account`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          password: deletePassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to delete account");
+      }
+
+      // Clear local storage and redirect to login
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setToast({
+        message: "Your account has been deleted successfully",
+        type: "success",
+      });
+      closeDeleteModal();
+
+      // Redirect to home page
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    } catch (err) {
+      setDeletePasswordError(err.message || "Incorrect password");
+      setToast({
+        message: err.message || "Failed to delete account",
+        type: "error",
+      });
+    } finally {
+      setDeleting(false);
+    }
   }
 
   return (
@@ -252,19 +308,68 @@ export default function SecuritySettings() {
               </ul>
             </div>
 
+            <div style={{ marginBottom: "20px" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  color: "var(--ds-text, #1a1a2e)",
+                  marginBottom: "6px",
+                }}
+              >
+                Enter your password to confirm
+              </label>
+              <input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => {
+                  setDeletePassword(e.target.value);
+                  setDeletePasswordError("");
+                }}
+                placeholder="Enter your current password"
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  borderRadius: "8px",
+                  border: `1px solid ${deletePasswordError ? "#dc2626" : "var(--ds-border, #e2e8f0)"}`,
+                  fontSize: "1rem",
+                  background: "var(--ds-bg-input, #fff)",
+                  color: "var(--ds-text, #1a1a2e)",
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") confirmDelete();
+                }}
+              />
+              {deletePasswordError && (
+                <p
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#dc2626",
+                    marginTop: "4px",
+                  }}
+                >
+                  {deletePasswordError}
+                </p>
+              )}
+            </div>
+
             <div
               style={{
                 display: "flex",
                 gap: "12px",
                 justifyContent: "flex-end",
-                marginTop: "8px",
               }}
             >
               <SecondaryButton onClick={closeDeleteModal}>
                 Cancel
               </SecondaryButton>
-              <DangerButton onClick={confirmDelete}>
-                Yes, delete my account
+              <DangerButton
+                onClick={confirmDelete}
+                disabled={deleting}
+                loading={deleting}
+              >
+                {deleting ? "Deleting..." : "Yes, delete my account"}
               </DangerButton>
             </div>
           </div>
