@@ -1,5 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import styles from "../Legal.module.css";
+import {
+  FaEnvelope,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaGlobe,
+  FaArrowLeft,
+} from "react-icons/fa";
 
 const SECTIONS = [
   {
@@ -518,17 +525,18 @@ export default function TermsOfService() {
         <p className={styles.heroEyebrow}>Legal</p>
         <h1 className={styles.heroTitle}>Terms of Service</h1>
         <p className={styles.heroMeta}>
-          Last updated: May 2026{" "}
+          Last updated: August 2026{" "}
           <span className={styles.updatedBadge}>Current</span>
         </p>
         <p className={styles.heroCompliance}>
-          Global Platform · Nigeria NDPA 2023 · GDPR Compliant
+          Global Platform · Nigeria NDPA 2023 · GDPR · Global Data Protection
+          Laws
         </p>
         <div className={styles.heroDivider} />
       </div>
 
       <button className={styles.backBtn} onClick={() => navigate(-1)}>
-        ← Back
+        <FaArrowLeft /> Back
       </button>
       <div className={styles.divider} />
 
@@ -568,19 +576,18 @@ export default function TermsOfService() {
             </p>
             <div className={styles.contactItems}>
               <div className={styles.contactItem}>
-                <span className={styles.contactIcon}>📧</span>{" "}
+                <FaEnvelope className={styles.contactIcon} />{" "}
                 hello@deusizisparkle.com
               </div>
               <div className={styles.contactItem}>
-                <span className={styles.contactIcon}>📞</span> +234 803 058 8774
+                <FaPhone className={styles.contactIcon} /> +234 803 058 8774
               </div>
               <div className={styles.contactItem}>
-                <span className={styles.contactIcon}>📍</span> Abuja, FCT,
+                <FaMapMarkerAlt className={styles.contactIcon} /> Abuja, FCT,
                 Nigeria
               </div>
               <div className={styles.contactItem}>
-                <span className={styles.contactIcon}>🌐</span>{" "}
-                deusizisparkle.com
+                <FaGlobe className={styles.contactIcon} /> deusizisparkle.com
               </div>
             </div>
           </div>

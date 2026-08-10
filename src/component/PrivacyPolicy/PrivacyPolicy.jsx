@@ -1,5 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import styles from "../Legal.module.css";
+import {
+  FaEnvelope,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaGlobe,
+  FaArrowLeft,
+} from "react-icons/fa";
 
 const SECTIONS = [
   {
@@ -78,9 +85,9 @@ const SECTIONS = [
         </p>
         <p>
           <strong>Payment Information</strong> — payment transactions are
-          processed by Paystack (African currencies) and Stripe (international
-          currencies). We store payment references and amounts but do not store
-          full card numbers, CVV codes, or bank credentials.
+          processed by <strong>Flutterwave</strong>. We store payment references
+          and amounts but do not store full card numbers, CVV codes, or bank
+          credentials.
         </p>
         <p>
           <strong>Push Notification Tokens</strong> — with your permission, we
@@ -155,11 +162,9 @@ const SECTIONS = [
           with the assigned professional to deliver the service.
         </p>
         <p>
-          <strong>With Payment Processors</strong> — Paystack handles African
-          currency payments (NGN, GHS, KES, ZAR, and more) and Stripe handles
-          international currency payments (USD, GBP, EUR, CAD, AUD, and all
-          other global currencies), each under their own Privacy Policies. We do
-          not store your full card details.
+          <strong>With Payment Processors</strong> —{" "}
+          <strong>Flutterwave</strong> processes all payments in all supported
+          currencies. We do not store your full card details.
         </p>
         <p>
           <strong>With Media Services</strong> — Cloudinary stores profile
@@ -470,7 +475,7 @@ export default function PrivacyPolicy() {
         <p className={styles.heroEyebrow}>Legal</p>
         <h1 className={styles.heroTitle}>Privacy Policy</h1>
         <p className={styles.heroMeta}>
-          Last updated: May 2026{" "}
+          Last updated: August 2026{" "}
           <span className={styles.updatedBadge}>Current</span>
         </p>
         <p className={styles.heroCompliance}>
@@ -480,7 +485,7 @@ export default function PrivacyPolicy() {
       </div>
 
       <button className={styles.backBtn} onClick={() => navigate(-1)}>
-        ← Back
+        <FaArrowLeft /> Back
       </button>
       <div className={styles.divider} />
 
@@ -523,19 +528,18 @@ export default function PrivacyPolicy() {
             </p>
             <div className={styles.contactItems}>
               <div className={styles.contactItem}>
-                <span className={styles.contactIcon}>📧</span>{" "}
+                <FaEnvelope className={styles.contactIcon} />{" "}
                 hello@deusizisparkle.com
               </div>
               <div className={styles.contactItem}>
-                <span className={styles.contactIcon}>📞</span> +234 803 058 8774
+                <FaPhone className={styles.contactIcon} /> +234 803 058 8774
               </div>
               <div className={styles.contactItem}>
-                <span className={styles.contactIcon}>📍</span> Abuja, FCT,
+                <FaMapMarkerAlt className={styles.contactIcon} /> Abuja, FCT,
                 Nigeria
               </div>
               <div className={styles.contactItem}>
-                <span className={styles.contactIcon}>🌐</span>{" "}
-                deusizisparkle.com
+                <FaGlobe className={styles.contactIcon} /> deusizisparkle.com
               </div>
             </div>
           </div>
