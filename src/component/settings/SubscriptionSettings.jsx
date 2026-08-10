@@ -69,7 +69,7 @@ const STATUS_COLOR = {
 
 export default function SubscriptionSettings({ styles }) {
   const [view, setView] = useState("overview");
-  const [billingInterval, setBillingInterval] = useState("monthly");
+  const [billingInterval, setBillingInterval] = useState(null); // ← CHANGED: null shows all plans
   const [toast, setToast] = useState({ message: null, type: "success" });
   const [busy, setBusy] = useState("");
   const [showCancelForm, setShowCancelForm] = useState(false);
@@ -92,7 +92,12 @@ export default function SubscriptionSettings({ styles }) {
   function isAnnualPlan(plan) {
     if (!plan) return false;
     // Check plan interval or name
-    if (plan.interval === "year" || plan.interval === "annual") return true;
+    if (
+      plan.interval === "year" ||
+      plan.interval === "annual" ||
+      plan.interval === "yearly"
+    )
+      return true; // ← CHANGED: added "yearly"
     const name = (plan.display_name || plan.name || "").toLowerCase();
     return (
       name.includes("annual") ||
@@ -545,7 +550,7 @@ export default function SubscriptionSettings({ styles }) {
             <div className={sub.intervalToggle}>
               {[
                 ["monthly", "Monthly"],
-                ["annual", "Annual (save 20%)"],
+                ["yearly", "Annual (save 20%)"], // ← CHANGED: "annual" → "yearly"
               ].map(([v, l]) => (
                 <button
                   key={v}
