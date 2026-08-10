@@ -79,7 +79,6 @@ export default function SecuritySettings() {
     "#22c55e",
     "#16a34a",
   ][pwdStrength];
-
   async function handleSubmit(e) {
     e.preventDefault();
     const errs = validate();
@@ -90,7 +89,35 @@ export default function SecuritySettings() {
     setErrors({});
     setSaving(true);
     try {
-      await changePassword(form.currentPassword, form.newPassword);
+      // Get token from localStorage
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Please log in first");
+      }
+
+      // Use the correct backend URL
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
+      const response = await fetch(`${API_URL}/api/auth/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          current_password: form.currentPassword,
+          new_password: form.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || data.message || "Failed to change password",
+        );
+      }
+
       setToast({ message: "Password changed successfully", type: "success" });
       setForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err) {
