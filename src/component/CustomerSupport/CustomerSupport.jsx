@@ -54,6 +54,8 @@ const STATUS_STYLES = {
 };
 
 const MAX_FILES = 5;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
 const ACCEPTED = "image/*,video/*";
 
 function formatDate(d) {
@@ -249,7 +251,37 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
 
   function handleFileChange(e) {
     const picked = Array.from(e.target.files || []);
-    const toAdd = picked
+
+    // Validate file sizes before adding to preview
+    const validFiles = [];
+    const errors = [];
+
+    for (const file of picked) {
+      const isImage = file.type.startsWith("image/");
+      const isVideo = file.type.startsWith("video/");
+
+      if (isImage && file.size > MAX_IMAGE_SIZE) {
+        errors.push(
+          `${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB) - Images must be under 5MB`,
+        );
+      } else if (isVideo && file.size > MAX_VIDEO_SIZE) {
+        errors.push(
+          `${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB) - Videos must be under 100MB`,
+        );
+      } else {
+        validFiles.push(file);
+      }
+    }
+
+    if (errors.length > 0) {
+      setError(`File(s) too large: ${errors.join(", ")}`);
+      if (validFiles.length === 0) {
+        e.target.value = "";
+        return;
+      }
+    }
+
+    const toAdd = validFiles
       .slice(0, MAX_FILES - mediaFiles.length)
       .map((f) => ({ file: f, preview: URL.createObjectURL(f) }));
     setMediaFiles((prev) => [...prev, ...toAdd]);
@@ -294,7 +326,6 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to submit");
       if (mediaFiles.length) await uploadFiles(data.ticket.id);
-      // seed seen count so new ticket shows 0 unread
       setSeenCount(data.ticket.id, 0);
       onSuccess(data.ticket);
     } catch (err) {
@@ -403,7 +434,10 @@ function NewTicketForm({ prefillBooking, onSuccess, onCancel }) {
           <label className={styles.label}>
             Attachments{" "}
             <span className={styles.labelHint}>
-              (photos/videos, up to {MAX_FILES})
+              (photos/videos, up to {MAX_FILES}){" "}
+              <span style={{ color: "#999", fontSize: "0.75rem" }}>
+                · Images: 5MB max · Videos: 100MB max
+              </span>
             </span>
           </label>
           <MediaPreviewGrid files={mediaFiles} onRemove={removeFile} />
@@ -483,7 +517,6 @@ function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
         setReplies(data.replies || []);
         setAttachments(data.attachments || []);
         setLastRefresh(new Date());
-        // mark all current replies as seen
         setSeenCount(ticket.id, (data.replies || []).length);
         if (onRepliesLoaded)
           onRepliesLoaded(ticket.id, (data.replies || []).length);
@@ -538,9 +571,34 @@ function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
   async function handleMediaUpload(e) {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
+
+    // ─── File size validation ────────────────────────────────────────
+    for (const file of files) {
+      const isImage = file.type.startsWith("image/");
+      const isVideo = file.type.startsWith("video/");
+
+      if (isImage && file.size > MAX_IMAGE_SIZE) {
+        setUploadError(
+          `"${file.name}" is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Images must be under 5MB.`,
+        );
+        setUploadingMedia(false);
+        e.target.value = "";
+        return;
+      }
+      if (isVideo && file.size > MAX_VIDEO_SIZE) {
+        setUploadError(
+          `"${file.name}" is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Videos must be under 100MB.`,
+        );
+        setUploadingMedia(false);
+        e.target.value = "";
+        return;
+      }
+    }
+
     const toUpload = files.slice(0, MAX_FILES - attachments.length);
     setUploadingMedia(true);
     setUploadError("");
+
     try {
       for (const file of toUpload) {
         const form = new FormData();
@@ -551,10 +609,15 @@ function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
           body: form,
         });
         const data = await res.json();
-        if (res.ok) setAttachments((prev) => [...prev, data.attachment]);
-        else setUploadError(data.error || "Upload failed");
+        if (res.ok) {
+          setAttachments((prev) => [...prev, data.attachment]);
+        } else {
+          setUploadError(data.error || data.details || "Upload failed");
+          break;
+        }
       }
-    } catch {
+    } catch (err) {
+      console.error("Upload error:", err);
       setUploadError("Upload failed. Please try again.");
     } finally {
       setUploadingMedia(false);
@@ -717,7 +780,6 @@ function TicketDetail({ ticket, onBack, onRepliesLoaded }) {
 function TicketCard({ ticket: initialTicket, unread, onClick }) {
   const [ticket, setTicket] = useState(initialTicket);
 
-  // Sync if parent updates the ticket (e.g. after list refresh)
   useEffect(() => {
     setTicket(initialTicket);
   }, [initialTicket]);
@@ -772,7 +834,7 @@ function TicketsList({ onNew, onOpen }) {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
-  const [unreadMap, setUnreadMap] = useState({}); // { [ticketId]: unreadCount }
+  const [unreadMap, setUnreadMap] = useState({});
   const [lastSync, setLastSync] = useState(null);
   const [syncing, setSyncing] = useState(false);
   const navigate = useNavigate();
@@ -791,7 +853,6 @@ function TicketsList({ onNew, onOpen }) {
         const list = data.tickets || [];
         setTickets(list);
         setLastSync(new Date());
-        // Calculate unread: compare reply_count (or use stored seen count)
         setUnreadMap((prev) => {
           const next = { ...prev };
           list.forEach((t) => {
@@ -814,13 +875,11 @@ function TicketsList({ onNew, onOpen }) {
     fetchTickets(false);
   }, [filter]);
 
-  // Background poll
   useEffect(() => {
     const id = setInterval(() => fetchTickets(true), POLL_INTERVAL);
     return () => clearInterval(id);
   }, [fetchTickets]);
 
-  // Called from TicketDetail when replies are seen — clears unread for that ticket
   function handleRepliesLoaded(ticketId, totalReplies) {
     setSeenCount(ticketId, totalReplies);
     setUnreadMap((prev) => ({ ...prev, [ticketId]: 0 }));
