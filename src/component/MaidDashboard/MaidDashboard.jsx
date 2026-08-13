@@ -158,32 +158,29 @@ function initials(name) {
 
 // ─── Profile Tab ──────────────────────────────────────────────
 const WORLD_CURRENCIES = [
+  // African Currencies (Flutterwave supported)
   { code: "NGN", name: "Nigerian Naira", symbol: "₦" },
+  { code: "GHS", name: "Ghanaian Cedi", symbol: "₵" },
+  { code: "KES", name: "Kenyan Shilling", symbol: "KSh" },
+  { code: "UGX", name: "Ugandan Shilling", symbol: "USh" },
+  { code: "TZS", name: "Tanzanian Shilling", symbol: "TSh" },
+  { code: "ZAR", name: "South African Rand", symbol: "R" },
+  { code: "RWF", name: "Rwandan Franc", symbol: "FRw" },
+  { code: "XOF", name: "West African CFA Franc", symbol: "CFA" },
+
+  // Major World Currencies (Flutterwave supported)
   { code: "USD", name: "US Dollar", symbol: "$" },
   { code: "GBP", name: "British Pound", symbol: "£" },
   { code: "EUR", name: "Euro", symbol: "€" },
-  { code: "GHS", name: "Ghanaian Cedi", symbol: "₵" },
-  { code: "KES", name: "Kenyan Shilling", symbol: "KSh" },
-  { code: "ZAR", name: "South African Rand", symbol: "R" },
-  { code: "UGX", name: "Ugandan Shilling", symbol: "USh" },
-  { code: "TZS", name: "Tanzanian Shilling", symbol: "TSh" },
-  { code: "RWF", name: "Rwandan Franc", symbol: "FRw" },
-  { code: "ETB", name: "Ethiopian Birr", symbol: "Br" },
-  { code: "XOF", name: "West African CFA Franc", symbol: "CFA" },
-  { code: "MAD", name: "Moroccan Dirham", symbol: "MAD" },
-  { code: "EGP", name: "Egyptian Pound", symbol: "E£" },
   { code: "CAD", name: "Canadian Dollar", symbol: "CA$" },
   { code: "AUD", name: "Australian Dollar", symbol: "A$" },
-  { code: "INR", name: "Indian Rupee", symbol: "₹" },
-  { code: "AED", name: "UAE Dirham", symbol: "د.إ" },
-  { code: "SAR", name: "Saudi Riyal", symbol: "﷼" },
-  { code: "QAR", name: "Qatari Riyal", symbol: "QR" },
-  { code: "SGD", name: "Singapore Dollar", symbol: "S$" },
-  { code: "MYR", name: "Malaysian Ringgit", symbol: "RM" },
-  { code: "BRL", name: "Brazilian Real", symbol: "R$" },
-  { code: "MXN", name: "Mexican Peso", symbol: "MX$" },
-  { code: "JPY", name: "Japanese Yen", symbol: "¥" },
-  { code: "CNY", name: "Chinese Yuan", symbol: "¥" },
+
+  // European Currencies (Flutterwave supported)
+  { code: "CHF", name: "Swiss Franc", symbol: "CHF" },
+  { code: "SEK", name: "Swedish Krona", symbol: "kr" },
+  { code: "NOK", name: "Norwegian Krone", symbol: "kr" },
+  { code: "DKK", name: "Danish Krone", symbol: "kr" },
+  { code: "PLN", name: "Polish Zloty", symbol: "zł" },
 ];
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
