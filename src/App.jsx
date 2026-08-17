@@ -90,6 +90,7 @@ import GiftCertificateVerify from "./component/GiftCertificates/GiftCertificateV
 import ResetPinPage from "./pages/settings/ResetPinPage.jsx";
 import CookieBanner from "./component/CookieBanner/CookieBanner.jsx";
 import IncomingCallListener from "./component/VideoCall/IncomingCallListener.jsx";
+import OAuthRedirect from "./component/OAuthRedirect.jsx";
 
 function App() {
   return (
@@ -288,6 +289,8 @@ function AppRoutes() {
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/settings/reset-pin" element={<ResetPinPage />} />
       <Route path="/subscription/verify" element={<SubscriptionVerify />} />
+
+      <Route path="/oauth-redirect" element={<OAuthRedirect />} />
 
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />
