@@ -1,0 +1,120 @@
+<!-- public/oauth-redirect-customer.html -->
+<!doctype html>
+<html>
+  <head>
+    <title>Redirecting to Deusizi Sparkle...</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial,
+          sans-serif;
+        background: #f5f4f0;
+      }
+      .container {
+        text-align: center;
+        padding: 40px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #1a1a2e;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      h1 {
+        color: #1a1a2e;
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+      p {
+        color: #888;
+        font-size: 16px;
+      }
+    </style>
+    <script>
+      (function () {
+        console.log("[OAuth Redirect Customer] Page loaded");
+
+        // Get the full URL including hash
+        const hash = window.location.hash;
+        console.log("[OAuth Redirect Customer] Hash:", hash);
+
+        if (hash && hash.includes("access_token")) {
+          // Extract the token
+          const params = new URLSearchParams(hash.substring(1));
+          const accessToken = params.get("access_token");
+          const state = params.get("state") || "customer";
+
+          console.log(
+            "[OAuth Redirect Customer] Access token found:",
+            !!accessToken,
+          );
+          console.log("[OAuth Redirect Customer] State:", state);
+
+          if (accessToken) {
+            // Redirect to the customer app with the token
+            const redirectUrl = "deusizicustomer://oauth2redirect" + hash;
+            console.log(
+              "[OAuth Redirect Customer] Redirecting to:",
+              redirectUrl,
+            );
+
+            // Use setTimeout to ensure the page renders before redirect
+            setTimeout(function () {
+              window.location.href = redirectUrl;
+            }, 1000);
+
+            // Show success message
+            document.getElementById("status").textContent =
+              "✓ Signing you in...";
+            document.getElementById("status").style.color = "#2e7d32";
+          } else {
+            document.getElementById("status").textContent =
+              "✗ No access token found";
+            document.getElementById("status").style.color = "#c62828";
+          }
+        } else {
+          console.log("[OAuth Redirect Customer] No access token in URL");
+          document.getElementById("status").textContent =
+            "✗ No access token found";
+          document.getElementById("status").style.color = "#c62828";
+
+          // Redirect back to login after 3 seconds
+          setTimeout(function () {
+            window.location.href = "https://deusizisparkle.com/login";
+          }, 3000);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="spinner"></div>
+      <h1>Deusizi Sparkle</h1>
+      <p id="status">Redirecting to app...</p>
+      <p style="font-size: 14px; color: #aaa; margin-top: 20px">
+        Please wait while we sign you in
+      </p>
+    </div>
+  </body>
+</html>
