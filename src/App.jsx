@@ -91,6 +91,7 @@ import ResetPinPage from "./pages/settings/ResetPinPage.jsx";
 import CookieBanner from "./component/CookieBanner/CookieBanner.jsx";
 import IncomingCallListener from "./component/VideoCall/IncomingCallListener.jsx";
 import OAuthRedirect from "./component/OAuthRedirect.jsx";
+import OAuthRedirectCustomer from "./component/OAuthRedirectCustomer.jsx";
 
 function App() {
   return (
@@ -291,6 +292,10 @@ function AppRoutes() {
       <Route path="/subscription/verify" element={<SubscriptionVerify />} />
 
       <Route path="/oauth-redirect" element={<OAuthRedirect />} />
+      <Route
+        path="/oauth-redirect-customer"
+        element={<OAuthRedirectCustomer />}
+      />
 
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />
