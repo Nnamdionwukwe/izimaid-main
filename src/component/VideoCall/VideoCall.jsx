@@ -353,12 +353,28 @@ export default function VideoCall({
       // Call onClose if provided
       onClose?.();
 
+      // Determine which app to redirect back to
+      // Check if the user is a maid or customer based on the otherName or role
+      const isMaid =
+        otherName?.toLowerCase().includes("customer") ||
+        otherName?.toLowerCase().includes("customer") === false ||
+        window.location.search.includes("role=maid");
+
+      // Also check if there's a role parameter in the URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const role = urlParams.get("role") || "customer";
+
+      const appScheme = role === "maid" ? "deusizimaid" : "deusizicustomer";
+      const deepLink = `${appScheme}://booking/${bookingId}`;
+
+      console.log("📹 [VideoCall] Redirecting to:", deepLink);
+
       // If in WebView, send message back to app
       if (window.ReactNativeWebView) {
         window.ReactNativeWebView.postMessage("end_call");
       } else {
         // Otherwise redirect back to app using deep link
-        window.location.href = `deusizicustomer://booking/${bookingId}`;
+        window.location.href = deepLink;
       }
     } catch (err) {
       console.error("❌ [VideoCall] End call error:", err);

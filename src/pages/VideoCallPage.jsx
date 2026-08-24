@@ -21,6 +21,7 @@ export default function VideoCallPage() {
     searchParams.get("otherName") ||
     searchParams.get("callerName") ||
     "Remote User";
+  const role = searchParams.get("role") || "customer"; // ← NEW: role parameter for app detection
 
   const [showCall, setShowCall] = useState(true);
 
@@ -35,6 +36,7 @@ export default function VideoCallPage() {
       : "MISSING",
     appId: appId ? `${appId.substring(0, 10)}...` : "MISSING",
     otherName: otherName || "MISSING",
+    role: role || "customer",
   });
 
   // Check token format
@@ -95,10 +97,15 @@ export default function VideoCallPage() {
             {token ? `✅ HAS TOKEN (${token.length} chars)` : "❌ MISSING"}
             appId: {appId || "❌ MISSING"}
             otherName: {otherName || "❌ MISSING"}
+            role: {role || "❌ MISSING"}
           </pre>
         </div>
         <button
-          onClick={() => (window.location.href = "deusizicustomer://")}
+          onClick={() => {
+            // Go back to the appropriate app based on role
+            const scheme = role === "maid" ? "deusizimaid" : "deusizicustomer";
+            window.location.href = `${scheme}://`;
+          }}
           style={{
             padding: "12px 24px",
             marginTop: "20px",
@@ -119,11 +126,18 @@ export default function VideoCallPage() {
   const handleClose = () => {
     console.log("📹 [VideoCallPage] Call ended, redirecting back to app");
     setShowCall(false);
+
+    // Determine which app to redirect back to based on role
+    const scheme = role === "maid" ? "deusizimaid" : "deusizicustomer";
+    const deepLink = `${scheme}://booking/${bookingId}`;
+
+    console.log("📹 [VideoCallPage] Redirecting to:", deepLink);
+
     // Redirect back to the app
     if (window.ReactNativeWebView) {
       window.ReactNativeWebView.postMessage("end_call");
     } else {
-      window.location.href = `deusizicustomer://booking/${bookingId}`;
+      window.location.href = deepLink;
     }
   };
 
@@ -137,6 +151,7 @@ export default function VideoCallPage() {
     token: token ? "HAS_TOKEN" : "NO_TOKEN",
     appId: appId ? appId.substring(0, 10) + "..." : "undefined",
     otherName,
+    role,
   });
 
   return (
@@ -148,6 +163,7 @@ export default function VideoCallPage() {
         appId={appId}
         otherName={otherName}
         onClose={handleClose}
+        role={role} // ← Pass the role prop
       />
     </div>
   );
