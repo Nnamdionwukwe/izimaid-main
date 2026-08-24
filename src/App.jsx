@@ -93,6 +93,7 @@ import IncomingCallListener from "./component/VideoCall/IncomingCallListener.jsx
 import OAuthRedirect from "./component/OAuthRedirect.jsx";
 import OAuthRedirectCustomer from "./component/OAuthRedirectCustomer.jsx";
 import VideoCall from "./component/VideoCall/VideoCall.jsx";
+import VideoCallPage from "./pages/VideoCallPage.jsx";
 
 function App() {
   return (
@@ -281,7 +282,8 @@ function AppRoutes() {
         }
       />
 
-      <Route path="/video-call" element={<VideoCall />} />
+      {/* <Route path="/video-call" element={<VideoCall />} /> */}
+      <Route path="/video-call" element={<VideoCallPage />} />
 
       <Route path="/chat/inquiry/:maidId" element={<InquiryChat />} />
 
