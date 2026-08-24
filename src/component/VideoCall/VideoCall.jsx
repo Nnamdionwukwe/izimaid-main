@@ -40,8 +40,6 @@ export default function VideoCall({
   const tokenStorage = localStorage.getItem("token");
   const joinedRef = useRef(false);
   const remoteTrackRef = useRef(null);
-  const retryTimeoutRef = useRef(null);
-
   // ── Validate and fallback for appId ───────────────────────────────
   const finalAppId =
     appId ||
@@ -272,8 +270,17 @@ export default function VideoCall({
       if (localAudioTrack) localAudioTrack.close();
       if (localVideoTrack) localVideoTrack.close();
       if (client) await client.leave();
+
+      // Call onClose if provided
       onClose?.();
-      navigate(-1);
+
+      // If in WebView, send message back to app
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage("end_call");
+      } else {
+        // Otherwise redirect back to app using deep link
+        window.location.href = `deusizicustomer://booking/${bookingId}`;
+      }
     } catch (err) {
       console.error("End call error:", err);
       setError("Failed to end call properly.");
