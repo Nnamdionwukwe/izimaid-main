@@ -7,6 +7,12 @@ export default function VideoCallPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  // Log ALL URL parameters
+  console.log(
+    "📹 [VideoCallPage] All URL params:",
+    Object.fromEntries(searchParams.entries()),
+  );
+
   const bookingId = searchParams.get("bookingId");
   const channel = searchParams.get("channel");
   const token = searchParams.get("token");
@@ -18,8 +24,35 @@ export default function VideoCallPage() {
 
   const [showCall, setShowCall] = useState(true);
 
-  // If missing parameters, show error
+  // Detailed logging of received parameters
+  console.log("📹 [VideoCallPage] Received params:", {
+    bookingId: bookingId || "MISSING",
+    channel: channel
+      ? `${channel.substring(0, 20)}... (length: ${channel.length})`
+      : "MISSING",
+    token: token
+      ? `${token.substring(0, 20)}... (length: ${token.length})`
+      : "MISSING",
+    appId: appId ? `${appId.substring(0, 10)}...` : "MISSING",
+    otherName: otherName || "MISSING",
+  });
+
+  // Check token format
+  if (token) {
+    console.log("📹 [VideoCallPage] Token format check:", {
+      startsWith006: token.startsWith("006"),
+      length: token.length,
+      firstChars: token.substring(0, 10),
+    });
+  }
+
+  // If missing parameters, show error with debug info
   if (!bookingId || !channel || !token) {
+    const missing = [];
+    if (!bookingId) missing.push("bookingId");
+    if (!channel) missing.push("channel");
+    if (!token) missing.push("token");
+
     return (
       <div
         style={{
@@ -36,8 +69,34 @@ export default function VideoCallPage() {
       >
         <h2>❌ Missing Video Call Parameters</h2>
         <p style={{ color: "#94a3b8", marginTop: "8px" }}>
-          Please go back and try again.
+          Missing: {missing.join(", ")}
         </p>
+        <div
+          style={{
+            marginTop: "20px",
+            background: "#1e293b",
+            padding: "16px",
+            borderRadius: "8px",
+            textAlign: "left",
+            maxWidth: "500px",
+            width: "100%",
+            overflow: "auto",
+          }}
+        >
+          <p
+            style={{ color: "#94a3b8", fontSize: "12px", marginBottom: "8px" }}
+          >
+            <strong>Debug Info:</strong>
+          </p>
+          <pre style={{ color: "#94a3b8", fontSize: "11px", margin: 0 }}>
+            bookingId: {bookingId || "❌ MISSING"}
+            channel: {channel || "❌ MISSING"}
+            token:{" "}
+            {token ? `✅ HAS TOKEN (${token.length} chars)` : "❌ MISSING"}
+            appId: {appId || "❌ MISSING"}
+            otherName: {otherName || "❌ MISSING"}
+          </pre>
+        </div>
         <button
           onClick={() => (window.location.href = "deusizicustomer://")}
           style={{
@@ -58,6 +117,7 @@ export default function VideoCallPage() {
   }
 
   const handleClose = () => {
+    console.log("📹 [VideoCallPage] Call ended, redirecting back to app");
     setShowCall(false);
     // Redirect back to the app
     if (window.ReactNativeWebView) {
@@ -70,6 +130,14 @@ export default function VideoCallPage() {
   if (!showCall) {
     return null;
   }
+
+  console.log("📹 [VideoCallPage] Rendering VideoCall component with props:", {
+    bookingId,
+    channel: channel.substring(0, 20) + "...",
+    token: token ? "HAS_TOKEN" : "NO_TOKEN",
+    appId: appId ? appId.substring(0, 10) + "..." : "undefined",
+    otherName,
+  });
 
   return (
     <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>

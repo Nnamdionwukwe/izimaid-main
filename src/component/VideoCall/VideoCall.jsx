@@ -1,3 +1,4 @@
+// src/component/VideoCall/VideoCall.jsx
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AgoraRTC from "agora-rtc-sdk-ng";
@@ -41,6 +42,18 @@ export default function VideoCall({
   const joinedRef = useRef(false);
   const remoteTrackRef = useRef(null);
   const retryTimeoutRef = useRef(null);
+
+  // ── LOG ALL PROPS ────────────────────────────────────────────────
+  console.log("📹 [VideoCall] Component mounted");
+  console.log("📹 [VideoCall] Props received:", {
+    bookingId: bookingId || "undefined",
+    channel: channel ? `"${channel}" (length: ${channel.length})` : "undefined",
+    token: token ? `HAS_TOKEN (length: ${token.length})` : "undefined",
+    tokenPreview: token ? token.substring(0, 30) + "..." : "undefined",
+    appId: appId ? `"${appId}"` : "undefined",
+    otherName: otherName || "undefined",
+  });
+
   // ── Validate and fallback for appId ───────────────────────────────
   const finalAppId =
     appId ||
@@ -50,8 +63,6 @@ export default function VideoCall({
   // ── Validate channel – must be a non-empty string with allowed chars ──
   const validateChannel = (ch) => {
     if (!ch || typeof ch !== "string") return false;
-    // Allowed: letters (a-z, A-Z), digits (0-9), underscore (_), and hyphen (-)
-    // Hyphen is placed at the end to avoid range interpretation.
     const allowed = /^[a-zA-Z0-9_-]{1,64}$/;
     return allowed.test(ch);
   };
@@ -66,46 +77,68 @@ export default function VideoCall({
     token !== "null" &&
     token.length > 10;
 
+  console.log("📹 [VideoCall] Validation results:", {
+    finalAppId: finalAppId ? "HAS_APP_ID" : "MISSING",
+    finalChannel: finalChannel ? `"${finalChannel}"` : "INVALID or MISSING",
+    isValidToken: isValidToken,
+    tokenLength: token ? token.length : 0,
+  });
+
   useEffect(() => {
     if (!isValidToken) {
+      console.error("❌ [VideoCall] Invalid token:", {
+        token: token ? `"${token.substring(0, 20)}..."` : "undefined",
+        tokenLength: token ? token.length : 0,
+      });
       setError("Video call token is missing or invalid. Please try again.");
       setStatus("Error: Invalid token");
       return;
     }
     if (!finalChannel) {
+      console.error("❌ [VideoCall] Invalid channel:", { channel });
       setError("Video call channel is invalid. Please try again.");
       setStatus("Error: Invalid channel");
       return;
     }
     if (!finalAppId) {
+      console.error("❌ [VideoCall] Missing App ID");
       setError("Video call app ID is missing. Please contact support.");
       setStatus("Error: Missing appId");
       return;
     }
+    console.log("✅ [VideoCall] All validations passed");
   }, [isValidToken, finalChannel, finalAppId]);
 
   useEffect(() => {
     let isMounted = true;
 
     async function startCall() {
+      console.log("📹 [VideoCall] startCall() invoked");
+
       // Validate again
       if (!isValidToken) {
+        console.error("❌ [VideoCall] startCall: Invalid token");
         setError("Video call token is missing. Please try again.");
         setStatus("Error: Missing token");
         return;
       }
       if (!finalChannel) {
+        console.error("❌ [VideoCall] startCall: Invalid channel");
         setError("Video call channel is invalid. Please try again.");
         setStatus("Error: Invalid channel");
         return;
       }
       if (!finalAppId) {
+        console.error("❌ [VideoCall] startCall: Missing App ID");
         setError("Video call app ID is missing. Please contact support.");
         setStatus("Error: Missing appId");
         return;
       }
 
-      if (joinedRef.current) return;
+      if (joinedRef.current) {
+        console.log("📹 [VideoCall] Already joined, skipping");
+        return;
+      }
       joinedRef.current = true;
 
       setIsJoining(true);
@@ -113,19 +146,50 @@ export default function VideoCall({
 
       try {
         // Use H.264 for better compatibility
+        console.log("📹 [VideoCall] Creating Agora client...");
         const rtcClient = AgoraRTC.createClient({
           mode: "rtc",
           codec: "h264",
         });
         setClient(rtcClient);
+        console.log("✅ [VideoCall] Client created");
 
         setStatus("Joining channel...");
-        console.log(
-          `🔑 Joining with appId: ${finalAppId}, channel: ${finalChannel}, token: ${token.slice(0, 20)}...`,
-        );
-        await rtcClient.join(finalAppId, finalChannel, token, null);
-        console.log(`✅ Joined channel: ${finalChannel}`);
+        console.log(`📹 [VideoCall] Joining with:`, {
+          appId: finalAppId ? finalAppId.substring(0, 10) + "..." : "MISSING",
+          channel: finalChannel,
+          tokenLength: token.length,
+          tokenPreview: token.substring(0, 30) + "...",
+        });
+
+        try {
+          await rtcClient.join(finalAppId, finalChannel, token, null);
+          console.log(`✅ [VideoCall] Joined channel: ${finalChannel}`);
+        } catch (joinError) {
+          console.error("❌ [VideoCall] Join failed:", {
+            message: joinError.message,
+            code: joinError.code,
+            name: joinError.name,
+            stack: joinError.stack,
+          });
+          // Check for specific error codes
+          if (
+            joinError.message?.includes("token") ||
+            joinError.code === "ERR_TOKEN_EXPIRED"
+          ) {
+            setError("Token expired. Please start a new call.");
+          } else if (joinError.code === "ERR_INVALID_TOKEN") {
+            setError("Invalid token. Please try again.");
+          } else if (joinError.code === "ERR_DYNAMIC_APP_SIGNATURE_INVALID") {
+            setError("Invalid App ID. Please check Agora configuration.");
+          } else {
+            setError(`Join failed: ${joinError.message}`);
+          }
+          throw joinError;
+        }
+
         setStatus("Joined channel, creating tracks...");
+        console.log("📹 [VideoCall] Creating audio and video tracks...");
 
         const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
         const videoTrack = await AgoraRTC.createCameraVideoTrack({
@@ -133,6 +197,9 @@ export default function VideoCall({
         });
 
         if (!isMounted) {
+          console.log(
+            "📹 [VideoCall] Component unmounted during track creation, cleaning up",
+          );
           audioTrack.close();
           videoTrack.close();
           return;
@@ -143,17 +210,19 @@ export default function VideoCall({
 
         // Play local video
         videoTrack.play(localVideoRef.current);
-        console.log("📹 Local video playing");
+        console.log("📹 [VideoCall] Local video playing");
 
         setStatus("Publishing tracks...");
         await rtcClient.publish([audioTrack, videoTrack]);
-        console.log("✅ Published local tracks");
+        console.log("✅ [VideoCall] Published local tracks");
         setStatus("Connected, waiting for remote user...");
         setIsJoining(false);
 
         // ── Remote user events ──────────────────────────────────
         rtcClient.on("user-published", async (user, mediaType) => {
-          console.log(`📢 Remote user ${user.uid} published ${mediaType}`);
+          console.log(
+            `📢 [VideoCall] Remote user ${user.uid} published ${mediaType}`,
+          );
           try {
             await rtcClient.subscribe(user, mediaType);
             if (mediaType === "video") {
@@ -164,7 +233,7 @@ export default function VideoCall({
                   remoteVideoTrack.play(remoteVideoRef.current);
                   setRemoteUser(user);
                   setStatus(`Remote user joined`);
-                  console.log("✅ Remote video playing");
+                  console.log("✅ [VideoCall] Remote video playing");
                 } else {
                   setTimeout(playRemote, 200);
                 }
@@ -173,16 +242,21 @@ export default function VideoCall({
             }
             if (mediaType === "audio") {
               user.audioTrack?.play();
-              console.log("🔊 Remote audio playing");
+              console.log("🔊 [VideoCall] Remote audio playing");
             }
           } catch (subErr) {
-            console.error("❌ Failed to subscribe to remote:", subErr);
+            console.error(
+              "❌ [VideoCall] Failed to subscribe to remote:",
+              subErr,
+            );
             setError("Failed to connect to remote user.");
           }
         });
 
         rtcClient.on("user-unpublished", (user, mediaType) => {
-          console.log(`👋 Remote user ${user.uid} unpublished ${mediaType}`);
+          console.log(
+            `👋 [VideoCall] Remote user ${user.uid} unpublished ${mediaType}`,
+          );
           if (mediaType === "video") {
             setRemoteUser(null);
             remoteTrackRef.current = null;
@@ -190,19 +264,21 @@ export default function VideoCall({
         });
 
         rtcClient.on("user-left", (user) => {
-          console.log(`🚪 Remote user ${user.uid} left`);
+          console.log(`🚪 [VideoCall] Remote user ${user.uid} left`);
           setRemoteUser(null);
           remoteTrackRef.current = null;
           setStatus("Remote user left");
         });
 
         rtcClient.on("connection-state-change", (cur, prev, reason) => {
-          console.log(`🔄 Connection state: ${prev} → ${cur} (${reason})`);
+          console.log(
+            `🔄 [VideoCall] Connection state: ${prev} → ${cur} (${reason})`,
+          );
           setStatus(`Connection: ${cur}`);
         });
 
         rtcClient.on("exception", (e) => {
-          console.error("⚠️ Agora exception:", e);
+          console.error("⚠️ [VideoCall] Agora exception:", e);
           setError(e.message || "Agora exception occurred.");
         });
 
@@ -210,7 +286,7 @@ export default function VideoCall({
         retryTimeoutRef.current = setTimeout(() => {
           if (!remoteUser && isMounted) {
             console.warn(
-              "⏳ No remote user joined yet – re-publishing tracks...",
+              "⏳ [VideoCall] No remote user joined yet – re-publishing tracks...",
             );
             rtcClient
               .unpublish()
@@ -219,7 +295,7 @@ export default function VideoCall({
           }
         }, 15000);
       } catch (err) {
-        console.error("❌ Video call error:", err);
+        console.error("❌ [VideoCall] Video call error:", err);
         joinedRef.current = false;
         setError(
           err.message || "Could not start video call. Please try again.",
@@ -238,11 +314,12 @@ export default function VideoCall({
 
     return () => {
       isMounted = false;
+      console.log("🧹 [VideoCall] Cleaning up...");
       if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
       if (localAudioTrack) localAudioTrack.close();
       if (localVideoTrack) localVideoTrack.close();
       if (client) client.leave();
-      console.log("🧹 Cleaned up");
+      console.log("🧹 [VideoCall] Cleaned up");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -263,6 +340,7 @@ export default function VideoCall({
   };
 
   const endCall = async () => {
+    console.log("📹 [VideoCall] Ending call...");
     try {
       await fetch(`${API_URL}/api/bookings/${bookingId}/video-call`, {
         method: "DELETE",
@@ -283,7 +361,7 @@ export default function VideoCall({
         window.location.href = `deusizicustomer://booking/${bookingId}`;
       }
     } catch (err) {
-      console.error("End call error:", err);
+      console.error("❌ [VideoCall] End call error:", err);
       setError("Failed to end call properly.");
     }
   };
