@@ -92,6 +92,7 @@ import CookieBanner from "./component/CookieBanner/CookieBanner.jsx";
 import IncomingCallListener from "./component/VideoCall/IncomingCallListener.jsx";
 import OAuthRedirect from "./component/OAuthRedirect.jsx";
 import OAuthRedirectCustomer from "./component/OAuthRedirectCustomer.jsx";
+import VideoCall from "./component/VideoCall/VideoCall.jsx";
 
 function App() {
   return (
@@ -279,6 +280,8 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      <Route path="/video-call" element={<VideoCall />} />
 
       <Route path="/chat/inquiry/:maidId" element={<InquiryChat />} />
 
