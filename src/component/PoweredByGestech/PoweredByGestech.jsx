@@ -4,7 +4,7 @@ export default function PoweredByGestech() {
   return (
     <div className={styles.wrap}>
       <span className={styles.brand}>
-        Powered by <span className={styles.ges}>GES</span>tech
+        Powered by <span className={styles.ges}>GES</span>TECHCOM
       </span>
     </div>
   );
