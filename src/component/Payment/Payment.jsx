@@ -171,7 +171,7 @@ export default function Payment() {
 
   // ── Extract currency string safely ──────────────────────────────
   const currency =
-    getCurrencyCode(booking?.maid_currency) ||
+    getCurrencyCode(booking?.booking_currency) || getCurrencyCode(booking?.maid_currency) ||
     getCurrencyCode(booking?.currency) ||
     "NGN";
   const serviceAmt = Number(booking?.total_amount || 0);

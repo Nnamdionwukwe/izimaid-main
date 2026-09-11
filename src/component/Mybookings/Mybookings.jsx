@@ -111,7 +111,7 @@ const CURRENCY_SYMBOLS = {
 };
 
 function fmtBookingAmt(b) {
-  const c = b.payment_currency || b.maid_currency || "NGN";
+  const c = b.booking_currency || b.payment_currency || b.maid_currency || "NGN";
   return `${CURRENCY_SYMBOLS[c] || c + " "}${Number(b.total_amount || 0).toLocaleString()}`;
 }
 

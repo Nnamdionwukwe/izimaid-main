@@ -299,7 +299,7 @@ export default function BookingDetail() {
   }, [booking, token, showVideoCall, incomingCall]);
 
   // ─── Currency ──────────────────────────────────────────────────────
-  const currency = payment?.currency || booking?.maid_currency || "NGN";
+  const currency = booking?.booking_currency || payment?.currency || booking?.maid_currency || "NGN";
 
   // ─── Action handlers ──────────────────────────────────────────────
   async function updateStatus(status, extra = {}) {

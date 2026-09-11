@@ -400,7 +400,7 @@ function BookingDetailModal({ booking, onClose, onStatusUpdate }) {
     b.notes && ["Notes", b.notes],
     [
       "Total",
-      formatCurrency(b.total_amount, b.payment_currency || b.maid_currency),
+      formatCurrency(b.total_amount, b.booking_currency || b.payment_currency || b.maid_currency),
     ],
     ["Payment", b.payment_status || "unpaid"],
     ["Gateway", b.gateway || "—"],
@@ -466,7 +466,7 @@ function BookingDetailModal({ booking, onClose, onStatusUpdate }) {
             <p className={styles.approvalBannerBody}>
               {formatCurrency(
                 b.payment_amount || b.total_amount,
-                b.payment_currency || b.maid_currency,
+                b.booking_currency || b.payment_currency || b.maid_currency,
               )}{" "}
               via {b.gateway || "card"}
             </p>
@@ -820,7 +820,7 @@ export default function AdminBookings({ onNavigate }) {
                       💰{" "}
                       {formatCurrency(
                         booking.total_amount,
-                        booking.payment_currency || booking.maid_currency,
+                        booking.booking_currency || booking.payment_currency || booking.maid_currency,
                       )}
                     </span>
                     {booking.address && (
