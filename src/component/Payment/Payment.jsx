@@ -171,7 +171,8 @@ export default function Payment() {
 
   // ── Extract currency string safely ──────────────────────────────
   const currency =
-    getCurrencyCode(booking?.booking_currency) || getCurrencyCode(booking?.maid_currency) ||
+    getCurrencyCode(booking?.booking_currency) ||
+    getCurrencyCode(booking?.maid_currency) ||
     getCurrencyCode(booking?.currency) ||
     "NGN";
   const serviceAmt = Number(booking?.total_amount || 0);
@@ -307,9 +308,31 @@ export default function Payment() {
         },
         body: JSON.stringify(body),
       });
-      const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.error || "Payment initialization failed");
+
+      // ── Robust response parsing (handles HTML 502 pages) ─────────
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        console.error(
+          "[Payment] Non-JSON response from server:",
+          text.slice(0, 300),
+        );
+        throw new Error(
+          `Server error (${res.status}). Please try again in a moment.`,
+        );
+      }
+
+      if (!res.ok) {
+        // Prefer the most descriptive error field the backend provides
+        throw new Error(
+          data.details ||
+            data.flw_data?.message ||
+            data.error ||
+            `Payment failed (${res.status})`,
+        );
+      }
 
       if (method === "flutterwave") {
         sessionStorage.setItem("pending_booking", JSON.stringify(booking));
