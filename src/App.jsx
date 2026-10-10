@@ -94,6 +94,7 @@ import OAuthRedirect from "./component/OAuthRedirect.jsx";
 import OAuthRedirectCustomer from "./component/OAuthRedirectCustomer.jsx";
 import VideoCall from "./component/VideoCall/VideoCall.jsx";
 import VideoCallPage from "./pages/VideoCallPage.jsx";
+import DeleteAccount from "./pages/DeleteAccount.jsx";
 
 function App() {
   return (
@@ -291,6 +292,7 @@ function AppRoutes() {
 
       <Route path="/terms-of-service" element={<TermsOfService />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/delete-account" element={<DeleteAccount />} />
 
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/settings/reset-pin" element={<ResetPinPage />} />

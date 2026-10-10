@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import styles from "../Legal.module.css";
 import {
   FaEnvelope,
@@ -6,6 +6,7 @@ import {
   FaMapMarkerAlt,
   FaGlobe,
   FaArrowLeft,
+  FaTrash,
 } from "react-icons/fa";
 
 const SECTIONS = [
@@ -415,6 +416,30 @@ const SECTIONS = [
           data protection authority — in Nigeria, this is the Nigeria Data
           Protection Commission (NDPC).
         </p>
+        <div className={styles.warning} style={{ marginTop: 20 }}>
+          <strong>Want to delete your account and all personal data?</strong>
+          <p style={{ margin: "8px 0 12px" }}>
+            You can request permanent deletion of your account and data at any
+            time. We process all requests within 30 days.
+          </p>
+          <Link
+            to="/delete-account"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              background: "rgb(187, 19, 47)",
+              color: "white",
+              padding: "10px 18px",
+              borderRadius: 8,
+              fontWeight: 700,
+              fontSize: 13,
+              textDecoration: "none",
+            }}
+          >
+            <FaTrash /> Delete My Account
+          </Link>
+        </div>
       </>
     ),
   },
@@ -541,6 +566,27 @@ export default function PrivacyPolicy() {
               <div className={styles.contactItem}>
                 <FaGlobe className={styles.contactIcon} /> deusizisparkle.com
               </div>
+            </div>
+
+            {/* Delete account CTA */}
+            <div style={{ marginTop: 20 }}>
+              <Link
+                to="/delete-account"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  background: "rgb(187, 19, 47)",
+                  color: "white",
+                  padding: "12px 20px",
+                  borderRadius: 8,
+                  fontWeight: 700,
+                  fontSize: 13,
+                  textDecoration: "none",
+                }}
+              >
+                <FaTrash /> Delete Your Account
+              </Link>
             </div>
           </div>
         </div>
